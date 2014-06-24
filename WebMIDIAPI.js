@@ -345,7 +345,7 @@
             this._jazzInstance.MidiOutOpen(this.name);
         };
         for (var i=0; (i<midiAccess._jazzInstances.length)&&(!outputInstance); i++) {
-            if (!midiAccess._jazzInstances[i].outputInUse)
+            // if (!midiAccess._jazzInstances[i].outputInUse)
                 outputInstance=midiAccess._jazzInstances[i];
         }
         if (!outputInstance) {
