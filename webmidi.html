@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+<head>
+  <title>Web MIDI monosynth using Web Audio</title>
+
+<!-- grep '^REGISTER_PATCH'  Libraries/OwlPatches/patches.cpp  |sed 's:REGISTER_PATCH.*"\([^"]*\)".*:<option>\1</option>:g' -->
+
+  <!-- <script src="//code.jquery.com/jquery-latest.min.js"></script> -->
+  <!-- Set up Web MIDI polyfill -->
+  <!-- <script src='http://cwilso.github.com/WebMIDIAPIShim/WebMIDIAPI.js'></script> -->
+  <script src="midiclient.js"></script>
+  <script>
+function noteOn(note, velocity) {
+  console.log("received noteOn "+note+"/"+velocity);
+}
+
+function noteOff(note) {
+  console.log("received noteOff "+note);
+}
+
+function controlChange(cc, value) {
+    console.log("received CC "+cc+": "+value);
+    switch(cc){
+    case 30:
+	var button = document.getElementById("pushbutton");
+	console.log("colour "+value+" " + button);
+	if(value < 42){
+	    button.style.color = "#000000";
+	}else if(value < 84){
+	    button.style.color = "#00ff00";
+	}else{
+	    button.style.color = "#ff0000";
+	}
+	break;
+    case 20:
+	document.getElementById("parameterA").value = value;
+	break;
+    case 21:
+	document.getElementById("parameterB").value = value;
+	break;
+    case 22:
+	document.getElementById("parameterC").value = value;
+	break;
+    case 23:
+	document.getElementById("parameterD").value = value;
+	break;
+    case 24:
+	document.getElementById("parameterE").value = value;
+	break;
+    }
+}
+  </script>
+</head>
+<body>
+
+  <p>Green Patch:</p>
+  <select onChange="sendCc(28, this.selectedIndex)">
+  <!-- <select onChange="sendCc(28, this.options[this.selectedIndex].value)"> -->
+<option>Contest/DroneBox</option>
+<option>FreeVerb</option>
+<option>Simple Delay</option>
+<option>Gain</option>
+<option>Parametric EQ</option>
+<option>Overdrive</option>
+<option>Phaser</option>
+<option>State Variable Filter</option>
+<option>Resonant Low Pass Filter</option>
+<option>Leaky Integrator</option>
+<option>Octave Pitch Shifter</option>
+<option>Stereo Mixer</option>
+<option>Vibro-Flange</option>
+<option>Ring Modulator</option>
+<option>Synthesizer</option>
+<option>Four Band EQ</option>
+<option>Contest/BiasedDelay</option>
+<option>Contest/blo bleep</option>
+<option>Contest/Bias</option>
+<option>Contest/BitH8r</option>
+<option>Contest/ConnyPatch</option>
+<option>Contest/DualTremolo</option>
+<option>MDA/Bandisto</option>
+<option>MDA/Stereo</option>
+<option>MDA/Transient</option>
+<option>Qompression</option>
+<option>Psyche Filter</option>
+<option>Digital Mayhem</option>
+<option>Reverse Reverb</option>
+<option>Simple Distortion</option>
+<option>Tremolo</option>
+<option>Moog Filter</option>
+<option>Karplus Strong</option>
+<option>Faust/FreeVerb</option>
+<option>Faust/Harp</option>
+<option>Faust/AutoHarp</option>
+<option>Faust/SmoothDelay</option>
+<option>Faust/1 Sec Echo</option>
+<option>Faust/Crybaby</option>
+<option>Faust/StereoWah</option>
+<option>Faust/StereoEcho</option>
+<option>Faust/Low Pass Filter</option>
+<option>Faust/Low Shelf Filter</option>
+<option>Faust/Pitch Shifter</option>
+<option>GuitarixMoogPatch</option>
+<option>GuitarixOverdrivePatch</option>
+<option>GuitarixPhaserMonoPatch</option>
+<option>GuitarixOscTubePatch</option>
+<option>GuitarixFlangerGXPatch</option>
+<option>GuitarixDunwahPatch</option>
+<option>GuitarixTonePatch</option>
+<option>GuitarixBMfpPatch</option>
+<option>GuitarixDistortion1Patch</option>
+  </select>
+
+  <p>Red Patch:</p>
+  <select onChange="sendCc(29, this.selectedIndex)">
+  <!-- <select onChange="sendCc(29, this.options[this.selectedIndex].value)"> -->
+<option>Contest/DroneBox</option>
+<option>FreeVerb</option>
+<option>Simple Delay</option>
+<option>Gain</option>
+<option>Parametric EQ</option>
+<option>Overdrive</option>
+<option>Phaser</option>
+<option>State Variable Filter</option>
+<option>Resonant Low Pass Filter</option>
+<option>Leaky Integrator</option>
+<option>Octave Pitch Shifter</option>
+<option>Stereo Mixer</option>
+<option>Vibro-Flange</option>
+<option>Ring Modulator</option>
+<option>Synthesizer</option>
+<option>Four Band EQ</option>
+<option>Contest/BiasedDelay</option>
+<option>Contest/blo bleep</option>
+<option>Contest/Bias</option>
+<option>Contest/BitH8r</option>
+<option>Contest/ConnyPatch</option>
+<option>Contest/DualTremolo</option>
+<option>MDA/Bandisto</option>
+<option>MDA/Stereo</option>
+<option>MDA/Transient</option>
+<option>Qompression</option>
+<option>Psyche Filter</option>
+<option>Digital Mayhem</option>
+<option>Reverse Reverb</option>
+<option>Simple Distortion</option>
+<option>Tremolo</option>
+<option>Moog Filter</option>
+<option>Karplus Strong</option>
+<option>Faust/FreeVerb</option>
+<option>Faust/Harp</option>
+<option>Faust/AutoHarp</option>
+<option>Faust/SmoothDelay</option>
+<option>Faust/1 Sec Echo</option>
+<option>Faust/Crybaby</option>
+<option>Faust/StereoWah</option>
+<option>Faust/StereoEcho</option>
+<option>Faust/Low Pass Filter</option>
+<option>Faust/Low Shelf Filter</option>
+<option>Faust/Pitch Shifter</option>
+<option>GuitarixMoogPatch</option>
+<option>GuitarixOverdrivePatch</option>
+<option>GuitarixPhaserMonoPatch</option>
+<option>GuitarixOscTubePatch</option>
+<option>GuitarixFlangerGXPatch</option>
+<option>GuitarixDunwahPatch</option>
+<option>GuitarixTonePatch</option>
+<option>GuitarixBMfpPatch</option>
+<option>GuitarixDistortion1Patch</option>
+  </select>
+
+  <p>Patch Mode:</p>
+  <select onChange="sendCc(27, this.options[this.selectedIndex].value)">
+    <option value="0">Single</option>
+    <option value="32">Dual</option>
+    <option value="64">Series</option>
+    <option value="96">Parallel</option>
+  </select>
+
+  <p>Remote Control:
+    <input type="checkbox" onChange="sendCc(26, this.checked ? 127 : 0)"/>
+  </p>
+
+  <p>Parameters:</p>
+  <p>A <input id="parameterA" type="range" min="0" max="127" step="1" onChange="sendCc(20, this.value)"/></p>
+  <p>B <input id="parameterB" type="range" min="0" max="127" step="1" onChange="sendCc(21, this.value)"/></p>
+  <p>C <input id="parameterC" type="range" min="0" max="127" step="1" onChange="sendCc(22, this.value)"/></p>
+  <p>D <input id="parameterD" type="range" min="0" max="127" step="1" onChange="sendCc(23, this.value)"/></p>
+  <p>E <input id="parameterE" type="range" min="0" max="127" step="1" onChange="sendCc(24, this.value)"/></p>
+
+  <p><button id="pushbutton" onClick="sendCc(25, 127)">Pushbutton</button></p>
+
+  <p><button onClick="sendCc(67, 127)">Load from OWL</button></p>
+
+</body>
+</html>
