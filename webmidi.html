@@ -7,7 +7,7 @@
 
   <!-- <script src="//code.jquery.com/jquery-latest.min.js"></script> -->
   <!-- Set up Web MIDI polyfill -->
-  <!-- <script src='http://cwilso.github.com/WebMIDIAPIShim/WebMIDIAPI.js'></script> -->
+  <script src="http://cwilso.github.com/WebMIDIAPIShim/WebMIDIAPI.js"></script>
   <script src="midiclient.js"></script>
   <script>
 function noteOn(note, velocity) {
@@ -16,6 +16,11 @@ function noteOn(note, velocity) {
 
 function noteOff(note) {
   console.log("received noteOff "+note);
+}
+
+function systemExclusive(data) {
+  console.log("sysex: "+data);
+  console.log("sysex length: "+data.length);
 }
 
 function controlChange(cc, value) {

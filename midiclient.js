@@ -1,7 +1,9 @@
 var midiAccess = null;  // global MIDIAccess object
 var midiOutputs = [];
 
-function onMIDIInit(midi) {
+function onMIDIInit(midi, options) {
+    console.log("MIDI sysex options: "+options);
+    console.log("MIDI sysex: "+midi.sysexEnabled);
     midiAccess = midi;
 
     var inputs=midiAccess.inputs();
@@ -13,7 +15,6 @@ function onMIDIInit(midi) {
 	    console.log("added MIDI input "+inputs[i].name+" ("+inputs[i].manufacturer+") "+inputs[i].id);
 	}
     }
-
     var outputs=midiAccess.outputs();
     if (outputs.length === 0)
 	alert("No MIDI output devices present.")
@@ -30,7 +31,7 @@ function onMIDIReject(err) {
 }
 
 function MIDIMessageEventHandler(event) {
-    console.log("received MIDI event "+event);
+    console.log("received "+event.data.length+" bytes 0x"+event.data[0].toString(16));
     // Mask off the lower nibble (MIDI channel, which we don't care about)
     switch (event.data[0] & 0xf0) {
     case 0x90:
@@ -45,6 +46,10 @@ function MIDIMessageEventHandler(event) {
     case 0xB0:
 	controlChange(event.data[1], event.data[2]);
 	return;
+    case 0xF0:
+	console.log("sysex");
+	systemExclusive(event.data);
+	return;
     }
 }
 
@@ -58,10 +63,10 @@ function sendCc(cc, value) {
 window.addEventListener('load', function() {
     // patch up prefixes
     window.AudioContext=window.AudioContext||window.webkitAudioContext;
-
     context = new AudioContext();
+    var options = { sysex: true };
     if (navigator.requestMIDIAccess)
-	navigator.requestMIDIAccess().then( onMIDIInit, onMIDIReject );
+	navigator.requestMIDIAccess(options).then( onMIDIInit, onMIDIReject );
     else
 	alert("No MIDI support present in your browser.")
 } );
