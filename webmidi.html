@@ -7,7 +7,8 @@
 
   <!-- <script src="//code.jquery.com/jquery-latest.min.js"></script> -->
   <!-- Set up Web MIDI polyfill -->
-  <script src="http://cwilso.github.com/WebMIDIAPIShim/WebMIDIAPI.js"></script>
+  <!-- <script src="http://cwilso.github.com/WebMIDIAPIShim/WebMIDIAPI.js"></script> -->
+  <script src="WebMIDIAPI.js"></script>
   <script src="midiclient.js"></script>
   <script>
 function noteOn(note, velocity) {
@@ -18,9 +19,70 @@ function noteOff(note) {
   console.log("received noteOff "+note);
 }
 
+var MIDI_SYSEX_MANUFACTURER        = 0x7d;     /* Educational or development use only */
+var MIDI_SYSEX_DEVICE              = 0x52;     /* OWL Open Ware Laboratory */
+var MIDI_SYSEX_VERSION             = 0x03;     /* Revision */
+var MIDI_MAX_MESSAGE_SIZE          = 0x0f;
+var SYSEX_PRESET_NAME_COMMAND      = 0x01;
+var SYSEX_PARAMETER_NAME_COMMAND   = 0x02;
+var SYSEX_DFU_COMMAND              = 0x7e;
+var SYSEX_FIRMWARE_VERSION         = 0x20;
+var SYSEX_DEVICE_ID                = 0x21;
+var SYSEX_SELFTEST                 = 0x22;
+
+function pack(bytes) {
+    <!-- var chars = []; -->
+    <!-- for(var i = 0, n = bytes.length; i < n;) { -->
+    <!--     chars.push(((bytes[i++] & 0xff) << 8) | (bytes[i++] & 0xff)); -->
+    <!-- } -->
+    <!-- return String.fromCharCode.apply(null, chars); -->
+    return String.fromCharCode.apply(null, bytes);
+}
+
+function unpack(str) {
+    var bytes = [];
+    for(var i = 0, n = str.length; i < n; i++) {
+        var char = str.charCodeAt(i);
+        bytes.push(char >>> 8, char & 0xFF);
+    }
+    return bytes;
+}
+
+function getStringFromSysex(data, startOffset, endOffset){
+     data = data.subarray(startOffset, data.length-endOffset);
+    return String.fromCharCode.apply(null, data);
+}
+
 function systemExclusive(data) {
-  console.log("sysex: "+data);
-  console.log("sysex length: "+data.length);
+  <!-- console.log("got sysex: 0x"+data[0].toString(16)); -->
+  <!-- console.log("sysex: 0x"+data[1].toString(16)); -->
+  <!-- console.log("sysex: 0x"+data[2].toString(16)); -->
+  <!-- console.log("sysex: 0x"+data[3].toString(16)); -->
+  <!-- console.log("sysex length: "+data.length); -->
+  if(data.length > 3 /* && data[0] == 0xf0 */
+     && data[1] == MIDI_SYSEX_MANUFACTURER
+     && data[2] == MIDI_SYSEX_DEVICE){
+  console.log("sysex: 0x"+data[3].toString(16)+" length: "+data.length);
+    switch(data[3]){
+      case SYSEX_PRESET_NAME_COMMAND:
+        var index = data[4];
+        var name = getStringFromSysex(data, 5, 2);
+        console.log("Preset "+index+": "+name);
+        <!-- var name = pack(data.subarray(4, data.length-2)); -->
+        <!-- var name = pack(new UInt8Array(data, 4, data.length-6)); -->
+        <!-- var name = pack(data.slice(4, data.length-2)); -->
+        <!-- console.log("Preset name "+name); -->
+        break;
+      case SYSEX_PARAMETER_NAME_COMMAND:
+        var index = data[4];
+        var name = getStringFromSysex(data, 5, 2);
+        console.log("Parameter "+index+": "+name);
+      break;
+      case 0x2:
+        console.log("Parameter hello");
+      break;
+    }
+  }
 }
 
 function controlChange(cc, value) {
