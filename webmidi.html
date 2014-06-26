@@ -61,6 +61,14 @@ function systemExclusive(data) {
         console.log("Parameter "+index+": "+name);
         setParameter(index, name);
       break;
+      case OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION:
+        var name = getStringFromSysex(data, 4, 2);
+        document.getElementById("firmwareVersion").innerHTML = name;
+      break;
+      case OpenWareMidiSysexCommand.SYSEX_DEVICE_ID:
+      break;
+      case OpenWareMidiSysexCommand.SYSEX_SELFTEST:
+      break;
     }
   }
 }
@@ -91,9 +99,7 @@ function setParameter(index, name) {
         input = document.getElementById("nameParameterE");
       break;
   }
-  <!-- input.nextSibling = innerHTML = "<p>"+name+"</p>"; -->
   input.innerHTML = name;
-  <!-- input.nextSibling.innerHTML = "<p>"+name+"</p>"; -->
 }
 
 function changePatch(cc, index){
@@ -130,10 +136,10 @@ function controlChange(cc, value) {
     case OpenWareMidiControl.PATCH_PARAMETER_E:
 	document.getElementById("parameterE").value = value;
 	break;
-    case 28:
+    case OpenWareMidiControl.PATCH_SLOT_GREEN:
 	document.getElementById("greenSlot").selectedIndex = value;
 	break;
-    case 29:
+    case OpenWareMidiControl.PATCH_SLOT_RED:
 	document.getElementById("redSlot").selectedIndex = value;
 	break;
     }
@@ -142,26 +148,31 @@ function controlChange(cc, value) {
 </head>
 <body>
 
-  <div>Green Patch:
+  <p>OpenWareLaboratory <span id="firmwareVersion"/></p>
+
+  <p>Green Patch:</p>
+  <div>
   <select id="greenSlot" onChange="changePatch(28, this.selectedIndex)">
     <option>...</option>
   </select>
   </div>
 
-  <p>Red Patch:
+  <p>Red Patch:</p>
+  <div>
     <select id="redSlot" onChange="changePatch(29, this.selectedIndex)">
       <!-- <select onChange="sendCc(29, this.options[this.selectedIndex].value)"> -->
       <option>...</option>
     </select>
-  </p>
+  </div>
 
-  <p>Patch Mode:</p>
-  <select onChange="sendCc(27, this.options[this.selectedIndex].value)">
-    <option value="0">Single</option>
-    <option value="32">Dual</option>
-    <option value="64">Series</option>
-    <option value="96">Parallel</option>
-  </select>
+  <p>Patch Mode:
+    <select onChange="sendCc(27, this.options[this.selectedIndex].value)">
+      <option value="0">Single</option>
+      <option value="32">Dual</option>
+      <option value="64">Series</option>
+      <option value="96">Parallel</option>
+    </select>
+  </p>
 
   <p>Remote Control:
     <input type="checkbox" onChange="sendCc(26, this.checked ? 127 : 0)"/>
