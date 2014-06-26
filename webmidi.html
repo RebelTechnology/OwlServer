@@ -1,7 +1,8 @@
-<!doctype html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Web MIDI monosynth using Web Audio</title>
+  <title>OpenWareLaboratory</title>
 
 <!-- grep '^REGISTER_PATCH'  Libraries/OwlPatches/patches.cpp  |sed 's:REGISTER_PATCH.*"\([^"]*\)".*:<option>\1</option>:g' -->
 
@@ -10,6 +11,7 @@
   <!-- <script src="http://cwilso.github.com/WebMIDIAPIShim/WebMIDIAPI.js"></script> -->
   <script src="WebMIDIAPI.js"></script>
   <script src="midiclient.js"></script>
+  <script src="OpenWareMidiControl.js"></script>
   <script>
 function noteOn(note, velocity) {
   console.log("received noteOn "+note+"/"+velocity);
@@ -19,24 +21,12 @@ function noteOff(note) {
   console.log("received noteOff "+note);
 }
 
-var MIDI_SYSEX_MANUFACTURER        = 0x7d;     /* Educational or development use only */
-var MIDI_SYSEX_DEVICE              = 0x52;     /* OWL Open Ware Laboratory */
-var MIDI_SYSEX_VERSION             = 0x03;     /* Revision */
-var MIDI_MAX_MESSAGE_SIZE          = 0x0f;
-var SYSEX_PRESET_NAME_COMMAND      = 0x01;
-var SYSEX_PARAMETER_NAME_COMMAND   = 0x02;
-var SYSEX_DFU_COMMAND              = 0x7e;
-var SYSEX_FIRMWARE_VERSION         = 0x20;
-var SYSEX_DEVICE_ID                = 0x21;
-var SYSEX_SELFTEST                 = 0x22;
-
 function pack(bytes) {
-    <!-- var chars = []; -->
-    <!-- for(var i = 0, n = bytes.length; i < n;) { -->
-    <!--     chars.push(((bytes[i++] & 0xff) << 8) | (bytes[i++] & 0xff)); -->
-    <!-- } -->
-    <!-- return String.fromCharCode.apply(null, chars); -->
-    return String.fromCharCode.apply(null, bytes);
+    var chars = [];
+    for(var i = 0, n = bytes.length; i < n;) {
+        chars.push(((bytes[i++] & 0xff) << 8) | (bytes[i++] & 0xff));
+    }
+    return String.fromCharCode.apply(null, chars);
 }
 
 function unpack(str) {
@@ -54,41 +44,67 @@ function getStringFromSysex(data, startOffset, endOffset){
 }
 
 function systemExclusive(data) {
-  <!-- console.log("got sysex: 0x"+data[0].toString(16)); -->
-  <!-- console.log("sysex: 0x"+data[1].toString(16)); -->
-  <!-- console.log("sysex: 0x"+data[2].toString(16)); -->
-  <!-- console.log("sysex: 0x"+data[3].toString(16)); -->
-  <!-- console.log("sysex length: "+data.length); -->
-  if(data.length > 3 /* && data[0] == 0xf0 */
+  if(data.length > 3 && data[0] == 0xf0
      && data[1] == MIDI_SYSEX_MANUFACTURER
      && data[2] == MIDI_SYSEX_DEVICE){
-  console.log("sysex: 0x"+data[3].toString(16)+" length: "+data.length);
+    console.log("sysex: 0x"+data[3].toString(16)+" length: "+data.length);
     switch(data[3]){
-      case SYSEX_PRESET_NAME_COMMAND:
+      case OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND:
         var index = data[4];
         var name = getStringFromSysex(data, 5, 2);
         console.log("Preset "+index+": "+name);
-        <!-- var name = pack(data.subarray(4, data.length-2)); -->
-        <!-- var name = pack(new UInt8Array(data, 4, data.length-6)); -->
-        <!-- var name = pack(data.slice(4, data.length-2)); -->
-        <!-- console.log("Preset name "+name); -->
+        setPreset(index, name);
         break;
-      case SYSEX_PARAMETER_NAME_COMMAND:
+      case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
         var index = data[4];
         var name = getStringFromSysex(data, 5, 2);
         console.log("Parameter "+index+": "+name);
-      break;
-      case 0x2:
-        console.log("Parameter hello");
+        setParameter(index, name);
       break;
     }
   }
 }
 
+function setPreset(index, name) {
+  var select = document.getElementById("greenSlot");
+  select.options[index] = new Option(name, index);
+  select = document.getElementById("redSlot");
+  select.options[index] = new Option(name, index);
+}
+
+function setParameter(index, name) {
+  var input;
+  switch(index){
+      case 0:
+        input = document.getElementById("nameParameterA");
+      break;
+      case 1:
+        input = document.getElementById("nameParameterB");
+      break;
+      case 2:
+        input = document.getElementById("nameParameterC");
+      break;
+      case 3:
+        input = document.getElementById("nameParameterD");
+      break;
+      case 4:
+        input = document.getElementById("nameParameterE");
+      break;
+  }
+  <!-- input.nextSibling = innerHTML = "<p>"+name+"</p>"; -->
+  input.innerHTML = name;
+  <!-- input.nextSibling.innerHTML = "<p>"+name+"</p>"; -->
+}
+
+function changePatch(cc, index){
+  sendCc(cc, index);
+  sendCc(67, 2); // request parameter names
+}
+
 function controlChange(cc, value) {
     console.log("received CC "+cc+": "+value);
     switch(cc){
-    case 30:
+    case OpenWareMidiControl.LED:
 	var button = document.getElementById("pushbutton");
 	console.log("colour "+value+" " + button);
 	if(value < 42){
@@ -99,20 +115,26 @@ function controlChange(cc, value) {
 	    button.style.color = "#ff0000";
 	}
 	break;
-    case 20:
+    case OpenWareMidiControl.PATCH_PARAMETER_A:
 	document.getElementById("parameterA").value = value;
 	break;
-    case 21:
+    case OpenWareMidiControl.PATCH_PARAMETER_B:
 	document.getElementById("parameterB").value = value;
 	break;
-    case 22:
+    case OpenWareMidiControl.PATCH_PARAMETER_C:
 	document.getElementById("parameterC").value = value;
 	break;
-    case 23:
+    case OpenWareMidiControl.PATCH_PARAMETER_D:
 	document.getElementById("parameterD").value = value;
 	break;
-    case 24:
+    case OpenWareMidiControl.PATCH_PARAMETER_E:
 	document.getElementById("parameterE").value = value;
+	break;
+    case 28:
+	document.getElementById("greenSlot").selectedIndex = value;
+	break;
+    case 29:
+	document.getElementById("redSlot").selectedIndex = value;
 	break;
     }
 }
@@ -120,121 +142,18 @@ function controlChange(cc, value) {
 </head>
 <body>
 
-  <p>Green Patch:</p>
-  <select onChange="sendCc(28, this.selectedIndex)">
-  <!-- <select onChange="sendCc(28, this.options[this.selectedIndex].value)"> -->
-<option>Contest/DroneBox</option>
-<option>FreeVerb</option>
-<option>Simple Delay</option>
-<option>Gain</option>
-<option>Parametric EQ</option>
-<option>Overdrive</option>
-<option>Phaser</option>
-<option>State Variable Filter</option>
-<option>Resonant Low Pass Filter</option>
-<option>Leaky Integrator</option>
-<option>Octave Pitch Shifter</option>
-<option>Stereo Mixer</option>
-<option>Vibro-Flange</option>
-<option>Ring Modulator</option>
-<option>Synthesizer</option>
-<option>Four Band EQ</option>
-<option>Contest/BiasedDelay</option>
-<option>Contest/blo bleep</option>
-<option>Contest/Bias</option>
-<option>Contest/BitH8r</option>
-<option>Contest/ConnyPatch</option>
-<option>Contest/DualTremolo</option>
-<option>MDA/Bandisto</option>
-<option>MDA/Stereo</option>
-<option>MDA/Transient</option>
-<option>Qompression</option>
-<option>Psyche Filter</option>
-<option>Digital Mayhem</option>
-<option>Reverse Reverb</option>
-<option>Simple Distortion</option>
-<option>Tremolo</option>
-<option>Moog Filter</option>
-<option>Karplus Strong</option>
-<option>Faust/FreeVerb</option>
-<option>Faust/Harp</option>
-<option>Faust/AutoHarp</option>
-<option>Faust/SmoothDelay</option>
-<option>Faust/1 Sec Echo</option>
-<option>Faust/Crybaby</option>
-<option>Faust/StereoWah</option>
-<option>Faust/StereoEcho</option>
-<option>Faust/Low Pass Filter</option>
-<option>Faust/Low Shelf Filter</option>
-<option>Faust/Pitch Shifter</option>
-<option>GuitarixMoogPatch</option>
-<option>GuitarixOverdrivePatch</option>
-<option>GuitarixPhaserMonoPatch</option>
-<option>GuitarixOscTubePatch</option>
-<option>GuitarixFlangerGXPatch</option>
-<option>GuitarixDunwahPatch</option>
-<option>GuitarixTonePatch</option>
-<option>GuitarixBMfpPatch</option>
-<option>GuitarixDistortion1Patch</option>
+  <div>Green Patch:
+  <select id="greenSlot" onChange="changePatch(28, this.selectedIndex)">
+    <option>...</option>
   </select>
+  </div>
 
-  <p>Red Patch:</p>
-  <select onChange="sendCc(29, this.selectedIndex)">
-  <!-- <select onChange="sendCc(29, this.options[this.selectedIndex].value)"> -->
-<option>Contest/DroneBox</option>
-<option>FreeVerb</option>
-<option>Simple Delay</option>
-<option>Gain</option>
-<option>Parametric EQ</option>
-<option>Overdrive</option>
-<option>Phaser</option>
-<option>State Variable Filter</option>
-<option>Resonant Low Pass Filter</option>
-<option>Leaky Integrator</option>
-<option>Octave Pitch Shifter</option>
-<option>Stereo Mixer</option>
-<option>Vibro-Flange</option>
-<option>Ring Modulator</option>
-<option>Synthesizer</option>
-<option>Four Band EQ</option>
-<option>Contest/BiasedDelay</option>
-<option>Contest/blo bleep</option>
-<option>Contest/Bias</option>
-<option>Contest/BitH8r</option>
-<option>Contest/ConnyPatch</option>
-<option>Contest/DualTremolo</option>
-<option>MDA/Bandisto</option>
-<option>MDA/Stereo</option>
-<option>MDA/Transient</option>
-<option>Qompression</option>
-<option>Psyche Filter</option>
-<option>Digital Mayhem</option>
-<option>Reverse Reverb</option>
-<option>Simple Distortion</option>
-<option>Tremolo</option>
-<option>Moog Filter</option>
-<option>Karplus Strong</option>
-<option>Faust/FreeVerb</option>
-<option>Faust/Harp</option>
-<option>Faust/AutoHarp</option>
-<option>Faust/SmoothDelay</option>
-<option>Faust/1 Sec Echo</option>
-<option>Faust/Crybaby</option>
-<option>Faust/StereoWah</option>
-<option>Faust/StereoEcho</option>
-<option>Faust/Low Pass Filter</option>
-<option>Faust/Low Shelf Filter</option>
-<option>Faust/Pitch Shifter</option>
-<option>GuitarixMoogPatch</option>
-<option>GuitarixOverdrivePatch</option>
-<option>GuitarixPhaserMonoPatch</option>
-<option>GuitarixOscTubePatch</option>
-<option>GuitarixFlangerGXPatch</option>
-<option>GuitarixDunwahPatch</option>
-<option>GuitarixTonePatch</option>
-<option>GuitarixBMfpPatch</option>
-<option>GuitarixDistortion1Patch</option>
-  </select>
+  <p>Red Patch:
+    <select id="redSlot" onChange="changePatch(29, this.selectedIndex)">
+      <!-- <select onChange="sendCc(29, this.options[this.selectedIndex].value)"> -->
+      <option>...</option>
+    </select>
+  </p>
 
   <p>Patch Mode:</p>
   <select onChange="sendCc(27, this.options[this.selectedIndex].value)">
@@ -249,15 +168,38 @@ function controlChange(cc, value) {
   </p>
 
   <p>Parameters:</p>
-  <p>A <input id="parameterA" type="range" min="0" max="127" step="1" onChange="sendCc(20, this.value)"/></p>
-  <p>B <input id="parameterB" type="range" min="0" max="127" step="1" onChange="sendCc(21, this.value)"/></p>
-  <p>C <input id="parameterC" type="range" min="0" max="127" step="1" onChange="sendCc(22, this.value)"/></p>
-  <p>D <input id="parameterD" type="range" min="0" max="127" step="1" onChange="sendCc(23, this.value)"/></p>
-  <p>E <input id="parameterE" type="range" min="0" max="127" step="1" onChange="sendCc(24, this.value)"/></p>
+  <div>A
+    <input id="parameterA" type="range" min="0" max="127" step="1" onChange="sendCc(20, this.value)"/>
+    <span id="nameParameterA">Knob A</span>
+  </div>
+  <p>B
+    <input id="parameterB" type="range" min="0" max="127" step="1" onChange="sendCc(21, this.value)"/>
+    <span id="nameParameterB">Knob B</span>
+  </p>
+  <p>C
+    <input id="parameterC" type="range" min="0" max="127" step="1" onChange="sendCc(22, this.value)"/>
+    <span id="nameParameterC">Knob C</span>
+  </p>
+  <p>D 
+    <input id="parameterD" type="range" min="0" max="127" step="1" onChange="sendCc(23, this.value)"/>
+    <span id="nameParameterD">Knob D</span>
+  </p>
+  <p>E 
+    <input id="parameterE" type="range" min="0" max="127" step="1" onChange="sendCc(24, this.value)"/>
+    <span id="nameParameterE">Expression Pedal</span>
+  </p>
 
   <p><button id="pushbutton" onClick="sendCc(25, 127)">Pushbutton</button></p>
 
-  <p><button onClick="sendCc(67, 127)">Load from OWL</button></p>
+  <p><button onClick="sendCc(67, 0)">Load Device Info</button></p>
+  <p><button onClick="sendCc(67, 1)">Load Patch Names</button></p>
+  <p><button onClick="sendCc(67, 2)">Load Parameter Names</button></p>
+  <p><button onClick="sendCc(67, 3)">Load Firmware Version</button></p>
+  <p><button onClick="sendCc(67, 4)">Load Device ID</button></p>
+  <p><button onClick="sendCc(67, 5)">Self Test</button></p>
+  <p><button onClick="sendCc(67, 25)">Load Pushbutton</button></p>
+  <p><button onClick="sendCc(67, 30)">Load LED</button></p>
+  <p><button onClick="sendCc(67, 127)">Load settings</button></p>
 
 </body>
 </html>
