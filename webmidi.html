@@ -29,23 +29,6 @@ function noteOff(note) {
   console.log("received noteOff "+note);
 }
 
-function pack(bytes) {
-    var chars = [];
-    for(var i = 0, n = bytes.length; i < n;) {
-        chars.push(((bytes[i++] & 0xff) << 8) | (bytes[i++] & 0xff));
-    }
-    return String.fromCharCode.apply(null, chars);
-}
-
-function unpack(str) {
-    var bytes = [];
-    for(var i = 0, n = str.length; i < n; i++) {
-        var char = str.charCodeAt(i);
-        bytes.push(char >>> 8, char & 0xFF);
-    }
-    return bytes;
-}
-
 function getStringFromSysex(data, startOffset, endOffset){
      data = data.subarray(startOffset, data.length-endOffset);
     return String.fromCharCode.apply(null, data);
@@ -149,6 +132,24 @@ function controlChange(cc, value) {
     case OpenWareMidiControl.PATCH_PARAMETER_E:
 	document.getElementById("parameterE").value = value;
 	break;
+    case OpenWareMidiControl.PATCH_CONTROL:
+        var input = document.getElementById("patchControl");
+	if(value == 127)
+	  input.checked = true;
+	else
+	  input.checked = false;
+	break;
+    case OpenWareMidiControl.PATCH_MODE:
+        var select = document.getElementById("patchMode");
+        if(value < 32)
+            select.selectedIndex = 0;
+	else if(value < 64)
+            select.selectedIndex = 1;
+	else if(value < 96)
+            select.selectedIndex = 2;
+	else
+            select.selectedIndex = 3;
+	break;
     case OpenWareMidiControl.PATCH_SLOT_GREEN:
 	document.getElementById("greenSlot").selectedIndex = value;
 	break;
@@ -179,7 +180,7 @@ function controlChange(cc, value) {
   </div>
 
   <p>Patch Mode:
-    <select onChange="sendCc(27, this.options[this.selectedIndex].value)">
+    <select id="patchMode" onChange="sendCc(27, this.options[this.selectedIndex].value)">
       <option value="0">Single</option>
       <option value="32">Dual</option>
       <option value="64">Series</option>
@@ -188,7 +189,7 @@ function controlChange(cc, value) {
   </p>
 
   <p>Remote Control:
-    <input type="checkbox" onChange="sendCc(26, this.checked ? 127 : 0)"/>
+    <input id="patchControl" type="checkbox" onChange="sendCc(26, this.checked ? 127 : 0)"/>
   </p>
 
   <p>Parameters:</p>
