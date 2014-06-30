@@ -16,7 +16,7 @@
 
 function requestStatus(){
   sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 3); // request firmware version
-  setTimeout(function() { sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 127) }, 3000);
+  <!-- setTimeout(function() { sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 127) }, 3000); -->
 }
 
 var timer = setInterval(requestStatus, 6000);
@@ -62,6 +62,11 @@ function systemExclusive(data) {
   }
 }
 
+function registerMidiOutput(index, name){
+  var select = document.getElementById("midiOutputs");
+  select.options[index] = new Option(name, index);
+}
+
 function setPreset(index, name) {
   <!-- console.log("Preset "+index+": "+name); -->
   var select = document.getElementById("greenSlot");
@@ -97,6 +102,13 @@ function changePatch(cc, index){
   sendCc(cc, index);
   sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 2); // request parameter names
   sendCc(OpenWareMidiControl.REQUEST_SETTINGS, OpenWareMidiControl.LED);
+}
+
+function changeMidiOutput(index){
+  selectMidiOutput(index);
+  sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 1); // load patch names
+  <!-- setTimeout(function() { sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 1) }, 500); // load patch names -->
+  setTimeout(function() { sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 127) }, 1000); // load settings  
 }
 
 function pressPushbutton(){
@@ -164,6 +176,12 @@ function controlChange(cc, value) {
 
   <p><span id="firmwareVersion">OpenWareLaboratory</span></p>
 
+  <div>MIDI Output: 
+  <select id="midiOutputs" onChange="changeMidiOutput(this.selectedIndex)">
+    <option>...</option>
+  </select>
+  </div>
+
   <p>Green Patch:</p>
   <div>
   <select id="greenSlot" onChange="changePatch(28, this.selectedIndex)">
@@ -226,5 +244,7 @@ function controlChange(cc, value) {
   <p><button onClick="sendCc(OpenWareMidiControl.REQUEST_SETTINGS, OpenWareMidiControl.LED)">Load LED</button></p>
   <p><button onClick="sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 127)">Load settings</button></p>
 
+  <p><a href="chrome://flags/#enable-web-midi">Enable Chrome Web Midi</a></p>
+  <p><a href="http://jazz-soft.net/download/Jazz-Plugin/">Download Jazz Plugin</a></p>
 </body>
 </html>

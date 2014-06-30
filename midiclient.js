@@ -1,5 +1,6 @@
 var midiAccess = null;  // global MIDIAccess object
 var midiOutputs = [];
+var midiOutput = null;
 
 function onMIDIInit(midi, options) {
     // console.log("MIDI sysex options: "+options);
@@ -22,6 +23,7 @@ function onMIDIInit(midi, options) {
 	for (var i=0;i<outputs.length;i++){
 	    console.log("adding MIDI output "+i+"/"+outputs.length);
             midiOutputs.push(outputs[i]);
+	    registerMidiOutput(i, outputs[i].name);
 	    console.log("added MIDI output "+outputs[i].name+" ("+outputs[i].manufacturer+") "+outputs[i].id);
 	}
     }
@@ -33,7 +35,7 @@ function onMIDIReject(err) {
 
 var sysexMessage = [];
 function MIDIMessageEventHandler(event) {
-    // console.log("MIDI 0x"+event.data[0].toString(16)+" "+event.data.length+" bytes");
+    console.log("MIDI 0x"+event.data[0].toString(16)+" "+event.data.length+" bytes");
     switch(event.data[0] & 0xf0) {
     case 0x90:
 	if (event.data[2] != 0) {  // if velocity != 0, this is a note-on message
@@ -59,11 +61,15 @@ function MIDIMessageEventHandler(event) {
     }
 }
 
+function selectMidiOutput(index) {
+    midiOutput = midiOutputs[index];
+    console.log("selecting MIDI output "+index+": "+midiOutput.name+" ("+midiOutput.manufacturer+")");
+}
+
 function sendCc(cc, value) {
     // console.log("sending CC "+cc+"/"+value);
-    // for(var i=0;i<midiOutputs.length;i++)
-    // 	midiOutputs[i].send([0xB0, cc, value], 0);
-	midiOutputs[midiOutputs.length-1].send([0xB0, cc, value], 0);
+    if(midiOutput)
+      midiOutput.send([0xB0, cc, value], 0);
 }
 
 window.addEventListener('load', function() {
