@@ -9,7 +9,7 @@ function onMIDIInit(midi, options) {
 
     var inputs=midiAccess.inputs();
     if (inputs.length === 0)
-	alert("No MIDI input devices present.")
+	console.log("No MIDI input devices present.")
     else { // Hook the message handler for all MIDI inputs
 	for (var i=0;i<inputs.length;i++){
 	    inputs[i].onmidimessage = MIDIMessageEventHandler;
@@ -18,14 +18,14 @@ function onMIDIInit(midi, options) {
     }
     var outputs=midiAccess.outputs();
     if (outputs.length === 0)
-	alert("No MIDI output devices present.")
+	console.log("No MIDI output devices present.")
     else {
 	for (var i=0;i<outputs.length;i++){
-	    console.log("adding MIDI output "+i+"/"+outputs.length);
             midiOutputs.push(outputs[i]);
 	    registerMidiOutput(i, outputs[i].name);
 	    console.log("added MIDI output "+outputs[i].name+" ("+outputs[i].manufacturer+") "+outputs[i].id);
 	}
+        midiOutput = outputs[outputs.length - 1];
     }
 }
 
@@ -35,10 +35,10 @@ function onMIDIReject(err) {
 
 var sysexMessage = [];
 function MIDIMessageEventHandler(event) {
-    console.log("MIDI 0x"+event.data[0].toString(16)+" "+event.data.length+" bytes");
+    // console.log("MIDI 0x"+event.data[0].toString(16)+" "+event.data.length+" bytes");
     switch(event.data[0] & 0xf0) {
     case 0x90:
-	if (event.data[2] != 0) {  // if velocity != 0, this is a note-on message
+	if(event.data[2] != 0) {  // if velocity != 0, this is a note-on message
 	    noteOn(event.data[1], event.data[2]);
 	    return;
 	}
@@ -63,7 +63,8 @@ function MIDIMessageEventHandler(event) {
 
 function selectMidiOutput(index) {
     midiOutput = midiOutputs[index];
-    console.log("selecting MIDI output "+index+": "+midiOutput.name+" ("+midiOutput.manufacturer+")");
+    if(midiOutput)
+      console.log("selecting MIDI output "+index+": "+midiOutput.name+" ("+midiOutput.manufacturer+")");
 }
 
 function sendCc(cc, value) {
@@ -74,7 +75,7 @@ function sendCc(cc, value) {
 
 window.addEventListener('load', function() {
     // patch up prefixes
-    window.AudioContext=window.AudioContext||window.webkitAudioContext;
+    window.AudioContext = window.AudioContext||window.webkitAudioContext;
     context = new AudioContext();
     var options = { sysex: true };
     if (navigator.requestMIDIAccess)
