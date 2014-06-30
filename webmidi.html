@@ -242,6 +242,7 @@ function controlChange(cc, value) {
   <p><button onClick="sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 5)">Self Test</button></p>
   <p><button onClick="sendCc(OpenWareMidiControl.REQUEST_SETTINGS, OpenWareMidiControl.PATCH_BUTTON)">Load Pushbutton</button></p>
   <p><button onClick="sendCc(OpenWareMidiControl.REQUEST_SETTINGS, OpenWareMidiControl.LED)">Load LED</button></p>
+  <p><button onClick="sendCc(OpenWareMidiControl.SAVE_SETTINGS, 127)">Save settings</button></p>
   <p><button onClick="sendCc(OpenWareMidiControl.REQUEST_SETTINGS, 127)">Load settings</button></p>
 
   <p><a href="chrome://flags/#enable-web-midi">Enable Chrome Web MIDI</a></p>
