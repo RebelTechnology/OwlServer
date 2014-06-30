@@ -30,8 +30,10 @@ function noteOff(note) {
 }
 
 function getStringFromSysex(data, startOffset, endOffset){
-     data = data.subarray(startOffset, data.length-endOffset);
-    return String.fromCharCode.apply(null, data);
+  var str = "";
+  for(i=startOffset; i<(data.length-endOffset) && data[i] != 0x00; ++i)
+    str += String.fromCharCode(data[i]);
+  return str;
 }
 
 function systemExclusive(data) {
