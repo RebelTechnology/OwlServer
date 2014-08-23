@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!-- saved from url=(0026)http://jonnykates.com/owl/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="./owl_files/style.css">
+<link href="./owl_files/css" rel="stylesheet" type="text/css">
+  <script src="js3rdparty/less-1.2.1.min.js"></script>
+  <script src='js3rdparty/jquery-1.7.1.min.js'></script>
+  <script src='js3rdparty/bootstrap-tabs.js'></script>
+</head>
+<body>
+
+<div id="primary-nav-bar">
+    <div id="primary-nav-container">
+        <a href="#"><img id="logo" src="./owl_files/logo.png" alt="Hoxton Owl"></a>
+        <ul id="primary-nav-items">
+            <li><a href="#">About</a></li>
+            <li><a href="#">News</a></li>
+            <li><a href="#" class="active">Community</a></li>
+            <li><a href="#">Patches</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        <ul id="reg-signin-items">
+            <li><a href="#">Register</a></li>
+            <li><a href="#">Sign in</a></li>
+            <li><a href="#" class="order-button">Order</a></li>
+        </ul>
+    </div>
+</div>
+
+<div id="secondary-nav-bar">
+
+    <div id="secondary-nav-bar-content">
+    
+    <a href=""><div class="secondary-nav-item">
+        <img src="./owl_files/browse-all-icon.png" width="40" height="40" alt="icon">
+        <p>Browse all</p>
+    </div></a>
+    <a href=""><div class="secondary-nav-item">
+        <img src="./owl_files/latest-icon.png" width="40" height="40" alt="icon">
+        <p>Latest</p>
+    </div></a>
+    <a href=""><div class="secondary-nav-item">
+        <img src="./owl_files/popular-icon.png" width="40" height="40" alt="icon">
+        <p>Popular</p>
+    </div></a>
+    <a href=""><div class="secondary-nav-item active">
+        <img src="./owl_files/tags-icon.png" width="40" height="40" alt="icon">
+        <p>Tags</p>
+    </div></a>
+    <a href=""><div class="secondary-nav-item">
+        <img src="./owl_files/authors-icon.png" width="40" height="40" alt="icon">
+        <p>Authors</p>
+    </div></a>
+    <a href=""><div class="secondary-nav-item">
+        <img src="./owl_files/my-patches-icon.png" width="40" height="40" alt="icon">
+        <p>My patches</p>
+    </div></a>
+    <a href=""><div class="secondary-nav-item">
+        <img src="./owl_files/my-rigs-icon.png" width="40" height="40" alt="icon">
+        <p>My rigs</p>
+    </div></a>
+    
+        
+    </div>
+</div>
+    
+<div id="filter-bar">
+    <div class="wrapper">
+    
+        <a href="#"><div class="tag-filter-button active">Overdrive</div></a>
+        <a href="#"><div class="tag-filter-button">Overdrive</div></a>
+        <a href="#"><div class="tag-filter-button">Overdrive</div></a>
+        <a href="#"><div class="tag-filter-button">Overdrive</div></a>
+    
+    </div>
+</div>
+
+<div class="wrapper">
+
+    <div id="breadcrumb"></div>
+    
+    <div class="content-container" data-bind="foreach: patches">
+        
+      <!-- Start of a tile here -->
+	<div class="patch-tile">
+        <table class="patch-title-controls">
+          <tbody><tr>
+              <td width="40"><div class="play-button">&gt;</div></td>
+              <td><a href="#"><span class="patch-title" data-bind="text: name"></span></a></td>
+              <td width="40"><div class="add-button"><span>+</span></div></td>
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+              <td style="padding-top: 20px;"><a href="#"><span class="author-name" data-bind="text: author"></span></a></td>
+              <td>&nbsp;</td>
+            </tr>
+        </tbody></table>
+        <div class="patch-baseline">
+	  <!-- ko foreach: tags -->
+          <div class="tag"><span data-bind="text: $data"></span></div>
+	  <!-- /ko -->
+          <span class="add-counter">215</span>
+        </div>
+      </div>
+        <!-- End of the tile -->
+        
+        <!-- Start of a tile here -->
+        <!-- <div class="patch-tile"> -->
+        <!--     <table class="patch-title-controls"> -->
+        <!--         <tbody><tr> -->
+        <!--             <td width="40"><div class="play-button">&gt;</div></td> -->
+        <!--             <td><a href="http://jonnykates.com/owl/#"><span class="patch-title">Patch title here</span></a></td> -->
+        <!--             <td width="40"><div class="add-button"><span>+</span></div></td> -->
+        <!--         </tr> -->
+        <!--         <tr> -->
+        <!--             <td>&nbsp;</td> -->
+        <!--             <td style="padding-top: 20px;"><a href="http://jonnykates.com/owl/#"><span class="author-name">Author name</span></a></td> -->
+        <!--             <td>&nbsp;</td> -->
+        <!--         </tr> -->
+        <!--     </tbody></table> -->
+
+        <!--     <div class="patch-baseline"> -->
+        <!--         <div class="tag"><span>Distortion</span></div> -->
+        <!--         <div class="tag"><span>Distortion</span></div> -->
+        <!--         <div class="tag"><span>Distortion</span></div> -->
+        <!--         <span class="add-counter">214</span> -->
+        <!--     </div> -->
+        <!-- </div> -->
+        <!-- End of the tile -->
+        
+    </div>
+    
+</div>
+    
+
+</body>
+<script src='js3rdparty/sockjs-min-0.3.4.js'></script>
+<script src='js3rdparty/knockout-2.0.0.js'></script>
+<script src='js/vertxbus.js'></script>
+<script src='js/client_app.js'></script>
+</html>
