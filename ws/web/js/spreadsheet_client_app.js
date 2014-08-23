@@ -17,6 +17,7 @@ function importGSS(root){
     var that = this;
     that.items = ko.observableArray([]);
     // that.patches = ko.observableArray([]);
+    that.tagSearch = ko.observable("All");
 
     var feed = root.feed;
     var entries = feed.entry || [];
@@ -29,7 +30,7 @@ function importGSS(root){
 	    author: entry['gsx$author']['$t'],
 	    description: entry['gsx$description']['$t'],
 	    // tags: entry['gsx$tags']['$t'],
-	    tags: (entry['gsx$tags']['$t']).split(','),
+	    tags: $.map((entry['gsx$tags']['$t']).split(','), $.trim),
 	    parameters: [ entry['gsx$parametera']['$t'],
 			  entry['gsx$parameterb']['$t'],
 			  entry['gsx$parameterc']['$t'],
@@ -49,7 +50,21 @@ function importGSS(root){
     console.log(patches.length+" patches");
     that.patches = ko.observableArray(patches);
     tags = unique(tags);
+    tags.push("All");
     that.tags = ko.observableArray(tags);
+
+    self.filteredPatches = ko.computed(function() {
+	    return ko.utils.arrayFilter
+	    (self.patches(), function(r) {
+		return (self.tagSearch() === "All" || 
+			r.tags.indexOf(self.tagSearch()) > -1)
+	    });
+	});
+
+    self.selectTag = function(data){
+	console.log(JSON.stringify(data));
+	self.tagSearch(data);
+    };
     ko.applyBindings(that);  
 }
 

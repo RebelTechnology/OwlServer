@@ -70,7 +70,7 @@
     
 <div id="filter-bar">
   <div class="wrapper" data-bind="foreach: tags">    
-    <a href="#"><div class="tag-filter-button" data-bind="text: $data"></div></a>    
+    <a href="#"><div class="tag-filter-button" data-bind="text: $data, click: selectTag"></div></a>    
   </div>
 </div>
 
@@ -78,7 +78,7 @@
 
     <div id="breadcrumb"></div>
     
-    <div class="content-container" data-bind="foreach: patches">
+    <div class="content-container" data-bind="foreach: filteredPatches">
         
       <!-- Start of a tile here -->
 	<div class="patch-tile">
