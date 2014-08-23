@@ -62,7 +62,7 @@ function importGSS(root){
 	});
 
     self.selectTag = function(data){
-	console.log(JSON.stringify(data));
+// 	console.log(JSON.stringify(data));
 	self.tagSearch(data);
     };
     ko.applyBindings(that);  
