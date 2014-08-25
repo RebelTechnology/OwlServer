@@ -69,8 +69,10 @@
 </div>
     
 <div id="filter-bar">
-  <div class="wrapper" data-bind="foreach: tags">    
-    <a href="#"><div class="tag-filter-button" data-bind="text: $data, click: selectTag"></div></a>    
+  <div class="wrapper" data-bind="foreach: tags">
+    <div class="tag-filter-button" 
+	 data-bind="text: $data, click: selectTag, css: { active: tagSearch.indexOf($data) > -1 }">
+    </div>
   </div>
 </div>
 

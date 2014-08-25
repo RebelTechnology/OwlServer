@@ -17,7 +17,7 @@ function importGSS(root){
     var that = this;
     that.items = ko.observableArray([]);
     // that.patches = ko.observableArray([]);
-    that.tagSearch = ko.observable("All");
+    that.tagSearch = ko.observableArray(["All"]);
 
     var feed = root.feed;
     var entries = feed.entry || [];
@@ -54,17 +54,39 @@ function importGSS(root){
     that.tags = ko.observableArray(tags);
 
     self.filteredPatches = ko.computed(function() {
-	    return ko.utils.arrayFilter
-	    (self.patches(), function(r) {
-		return (self.tagSearch() === "All" || 
-			r.tags.indexOf(self.tagSearch()) > -1)
-	    });
+	return ko.utils.arrayFilter
+	(self.patches(), function(r) {
+	    if(self.tagSearch.indexOf("All") > -1)
+		return true;
+	    for(i=0; i<r.tags.length; ++i){
+		if(self.tagSearch.indexOf(r.tags[i]) > -1)
+		    return true;
+	    }
+	    return false;
+		// return (self.tagSearch.indexOf("All") > -1 || 
+		// 	r.tags.indexOf(self.tagSearch()) > -1)
 	});
+    });
 
-    self.selectTag = function(data){
-// 	console.log(JSON.stringify(data));
-	self.tagSearch(data);
+    self.selectTag = function(tag, el){
+// 	console.log(JSON.stringify(tag));
+	// if($(el).hasClass("active")){
+	//     $(el).removeClass("active");
+	// }else{
+	//     $(el).addClass("active");
+	// }
+	// console.log(el);
+	if(self.tagSearch.indexOf(tag) > -1){
+	    self.tagSearch.remove(tag);
+	}else{
+	    if(tag === "All")
+		self.tagSearch.removeAll();
+	    else
+		self.tagSearch.remove("All"); 
+	    self.tagSearch.push(tag);
+	}
     };
+
     ko.applyBindings(that);  
 }
 
