@@ -11,23 +11,19 @@ function unique(arr) {
 }
 
 function importGSS(root){
-    // console.log("spreadsheet data: "+JSON.stringify(root));
-    // console.log("spreadsheet entry: "+JSON.stringify(root.feed.entry.content));
-
     var that = this;
-    that.items = ko.observableArray([]);
-    // that.patches = ko.observableArray([]);
-    that.tagSearch = ko.observableArray(["All"]);
-
     var feed = root.feed;
     var entries = feed.entry || [];
     var tags = [];
+    that.tagSearch = ko.observableArray(["All"]);
+    var authors = [];
+    that.authorSearch = ko.observableArray(["All"]);
     var patches = [];
     for(var i = 0; i < entries.length; ++i){
 	var entry = entries[i];
 	var patch = { 
 	    name: entry['gsx$name']['$t'],
-	    author: entry['gsx$author']['$t'],
+	    author: entry['gsx$author']['$t'].trim(),
 	    description: entry['gsx$description']['$t'],
 	    // tags: entry['gsx$tags']['$t'],
 	    tags: $.map((entry['gsx$tags']['$t']).split(','), $.trim),
@@ -44,6 +40,7 @@ function importGSS(root){
 	// console.log("patch: "+JSON.stringify(patch));
 	patches.push(patch);
 	$.merge(tags, patch.tags);
+	authors.push(patch.author);
 	// tags.push.apply(
 	// that.patches.push(patch);
     }
@@ -52,6 +49,12 @@ function importGSS(root){
     tags = unique(tags);
     tags.push("All");
     that.tags = ko.observableArray(tags);
+    that.tags.sort();
+
+    authors = unique(authors);
+    authors.push("All");
+    that.authors = ko.observableArray(authors);
+    that.authors.sort();
 
     self.filteredPatches = ko.computed(function() {
 	return ko.utils.arrayFilter
@@ -63,19 +66,30 @@ function importGSS(root){
 		    return true;
 	    }
 	    return false;
-		// return (self.tagSearch.indexOf("All") > -1 || 
-		// 	r.tags.indexOf(self.tagSearch()) > -1)
 	});
     });
 
-    self.selectTag = function(tag, el){
-// 	console.log(JSON.stringify(tag));
-	// if($(el).hasClass("active")){
-	//     $(el).removeClass("active");
-	// }else{
-	//     $(el).addClass("active");
-	// }
-	// console.log(el);
+    self.authorPatches = ko.computed(function() {
+	return ko.utils.arrayFilter
+	(self.patches(), function(r) {
+	    return self.authorSearch.indexOf("All") > -1 || self.authorSearch.indexOf(r.author) > -1;
+	});
+    });
+
+    self.selectAuthor = function(author){
+	// console.log("select author: "+author);
+	if(self.authorSearch.indexOf(author) > -1){
+	    self.authorSearch.remove(author);
+	}else{
+	    if(author === "All")
+		self.authorSearch.removeAll();
+	    else
+		self.authorSearch.remove("All"); 
+	    self.authorSearch.push(author);
+	}
+    };
+
+    self.selectTag = function(tag){
 	if(self.tagSearch.indexOf(tag) > -1){
 	    self.tagSearch.remove(tag);
 	}else{
