@@ -77,9 +77,12 @@ function importGSS(root){
     });
 
     self.selectAuthor = function(author){
-	// console.log("select author: "+author);
+	if(author.author)
+	    author = author.author;
 	if(self.authorSearch.indexOf(author) > -1){
 	    self.authorSearch.remove(author);
+	    if(self.authorSearch().length === 0)
+		self.authorSearch.push("All");	
 	}else{
 	    if(author === "All")
 		self.authorSearch.removeAll();
@@ -92,6 +95,8 @@ function importGSS(root){
     self.selectTag = function(tag){
 	if(self.tagSearch.indexOf(tag) > -1){
 	    self.tagSearch.remove(tag);
+	    if(self.tagSearch().length == 0)
+		self.tagSearch.push("All");	
 	}else{
 	    if(tag === "All")
 		self.tagSearch.removeAll();
