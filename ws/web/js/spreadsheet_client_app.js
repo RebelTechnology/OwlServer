@@ -162,29 +162,9 @@ function importGSS(root){
 	    "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
     });
 
-    // get github gist-it source
-    // var src = "http://gist-it.appspot.com/github/" +
-    // 	that.selectedPatch().github.substring(that.selectedPatch().github.indexOf("github.com/")+11) +
-    // 	"?footer=no";
-    // $.getJSON(src+"on?callback=?", function( data ) {
-    // 	console.log("data: "+JSON.stringify(data));
-    // 	$("#gitsource").replaceWith($(data.div));
-    // 	// load the stylesheet, but only once
-    // 	add_stylesheet_once( "https://gist.github.com/" + data.stylesheet)
-    // var src = "http://rawgit.com/" +
-    // 	that.selectedPatch().github.substring(that.selectedPatch().github.indexOf("github.com/")+11);
-    // console.log("src "+src);
-    // $("#gitsource").load(src, function(data){
-    // 	console.log("loaded src "+src);
-    // 	prettyPrint();
-    // });
-
-    // var src = "https://api.github.com/repos/"+
-    // 	that.selectedPatch().github.substring(that.selectedPatch().github.indexOf("github.com/")+11);
-
     var user = "pingdynasty";
     var repo = "OwlPatches";
-    var sha = "5000bed38134b5e94d3071ab7c7ebee3e5c37292";
+    var sha = selectedPatch().github;
     getGithubFile(user, repo, sha, function(contents) {
 	// console.log("contents "+contents);
 	$("#gitsource").text(contents).removeClass("prettyprinted").parent();
