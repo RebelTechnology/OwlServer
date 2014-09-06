@@ -1,12 +1,44 @@
+function getGithubFile(user, repo, sha, callback, startLineNum, endLineNum) {
+    startLineNum = (typeof startLineNum == "undefined") ? 1 : startLineNum;
+    endLineNum = (typeof endLineNum == "undefined") ? 0 : endLineNum;
+    var url = "https://api.github.com/repos/" + user + "/" + repo + "/git/blobs/" + sha;
+    console.log("get github file "+url);
+    $.ajax({
+        type: "GET",
+        url: url,
+        dataType: "jsonp",
+        success: function(data) {
+            if (typeof data.data.content != "undefined") {
+		if (data.data.encoding == "base64") {
+		    var base64EncodedContent = data.data.content;
+		    base64EncodedContent = base64EncodedContent.replace(/\n/g, "");
+		    var content = window.atob(base64EncodedContent);
+		    var contentArray = content.split("\n");
+		    if (endLineNum == 0) {
+			endLineNum = contentArray.length;
+		    }
+		    callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"));
+		}
+            }
+        }
+    })
+}
+
 function getURLParameter(sParam){
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
     for (var i = 0; i < sURLVariables.length; i++){
         var sParameterName = sURLVariables[i].split('=');
         if(sParameterName[0] == sParam) 
-            return sParameterName[1];
+            return decodeURIComponent(sParameterName[1]);
     }
-}​
+}
+
+function add_stylesheet_once( url ){
+    $head = $('head');
+    if( $head.find('link[rel="stylesheet"][href="'+url+'"]').length < 1 )
+	$head.append('<link rel="stylesheet" href="'+ url +'" type="text/css" />');
+}
 
 function unique(arr) {
     var u = {}, a = [];
@@ -22,20 +54,25 @@ function unique(arr) {
 
 function importGSS(root){
     var that = this;
+
+    var patchName = getURLParameter("patch");
+    console.log("patch: "+patchName);
+    that.selectedPatchName = ko.observable(patchName);
+    that.selectedPatch = ko.observable();
+
     var feed = root.feed;
     var entries = feed.entry || [];
     var tags = [];
-    that.tagSearch = ko.observableArray(["All"]);
     var authors = [];
-    that.authorSearch = ko.observableArray(["All"]);
     var patches = [];
+    that.tagSearch = ko.observableArray(["All"]);
+    that.authorSearch = ko.observableArray(["All"]);
     for(var i = 0; i < entries.length; ++i){
 	var entry = entries[i];
 	var patch = { 
 	    name: entry['gsx$name']['$t'],
 	    author: entry['gsx$author']['$t'].trim(),
 	    description: entry['gsx$description']['$t'],
-	    // tags: entry['gsx$tags']['$t'],
 	    tags: $.map((entry['gsx$tags']['$t']).split(','), $.trim),
 	    parameters: [ entry['gsx$parametera']['$t'],
 			  entry['gsx$parameterb']['$t'],
@@ -45,15 +82,18 @@ function importGSS(root){
 	    inputs: entry['gsx$inputs']['$t'],
 	    outputs: entry['gsx$outputs']['$t'],
 	    armcycles: entry['gsx$armcyclespersample']['$t'],
-	    bytes: entry['gsx$byteswithgain']['$t']
+	    bytes: entry['gsx$byteswithgain']['$t'],
+	    soundcloud: entry['gsx$soundcloud']['$t'],
+	    github: entry['gsx$github']['$t']
 	};
+	if(patch.name === selectedPatchName())
+	    selectedPatch(patch);
 	// console.log("patch: "+JSON.stringify(patch));
 	patches.push(patch);
 	$.merge(tags, patch.tags);
 	authors.push(patch.author);
-	// tags.push.apply(
-	// that.patches.push(patch);
     }
+
     console.log(patches.length+" patches");
     that.patches = ko.observableArray(patches);
     tags = unique(tags);
@@ -116,52 +156,51 @@ function importGSS(root){
 	}
     };
 
+    that.soundcloud = ko.computed(function() {
+	return "https://w.soundcloud.com/player/?url=" +
+	    encodeURIComponent(that.selectedPatch().soundcloud) +
+	    "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
+    });
+
+    // get github gist-it source
+    // var src = "http://gist-it.appspot.com/github/" +
+    // 	that.selectedPatch().github.substring(that.selectedPatch().github.indexOf("github.com/")+11) +
+    // 	"?footer=no";
+    // $.getJSON(src+"on?callback=?", function( data ) {
+    // 	console.log("data: "+JSON.stringify(data));
+    // 	$("#gitsource").replaceWith($(data.div));
+    // 	// load the stylesheet, but only once
+    // 	add_stylesheet_once( "https://gist.github.com/" + data.stylesheet)
+    // var src = "http://rawgit.com/" +
+    // 	that.selectedPatch().github.substring(that.selectedPatch().github.indexOf("github.com/")+11);
+    // console.log("src "+src);
+    // $("#gitsource").load(src, function(data){
+    // 	console.log("loaded src "+src);
+    // 	prettyPrint();
+    // });
+
+    // var src = "https://api.github.com/repos/"+
+    // 	that.selectedPatch().github.substring(that.selectedPatch().github.indexOf("github.com/")+11);
+
+    var user = "pingdynasty";
+    var repo = "OwlPatches";
+    var sha = "5000bed38134b5e94d3071ab7c7ebee3e5c37292";
+    getGithubFile(user, repo, sha, function(contents) {
+	// console.log("contents "+contents);
+	$("#gitsource").text(contents).removeClass("prettyprinted").parent();
+	console.log("pretty printing");
+	prettyPrint();
+	// use highlight.js instead?
+	// https://github.com/isagalaev/highlight.js
+    });
+    // var img = new Image();
+    // var src = "https://raw.githubusercontent.com/pingdynasty/OwlPatches/master/Contest/DroneBox.hpp";
+    // img.onload = function(){
+    // 	console.log("hello: "+this.src + " loaded");
+    // }
+    // img.src = src;
+
+
+    console.log("selected patch: "+JSON.stringify(that.selectedPatch()));
     ko.applyBindings(that);  
 }
-
-/*
-  "gsx$name":{"$t":"Guitarix/Dunwah"},
-  "gsx$author":{"$t":"Grame "},
-  "gsx$description":{"$t":""},
-  "gsx$parametera":{"$t":"Wah"},
-  "gsx$parameterb":{"$t":""},
-  "gsx$parameterc":{"$t":""},
-  "gsx$parameterd":{"$t":""},
-  "gsx$parametere":{"$t":""},
-  "gsx$inputs":{"$t":"1"},
-  "gsx$outputs":{"$t":"1"},
-  "gsx$armcyclespersample":{"$t":"570"},
-  "gsx$byteswithgain":{"$t":"1680"},
-  "gsx$soundsample":{"$t":""} 
-*/
-
-// (function DemoViewModel() {
-//   var that = this;
-//   var eb = new vertx.EventBus(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/eventbus');
-//   that.items = ko.observableArray([]);
-
-//   eb.onopen = function() {
-
-//     // Get the static data
-
-//     eb.send('vertx.mongopersistor', {action: 'find', collection: 'patches', matcher: {} },
-//       function(reply) {
-//         if (reply.status === 'ok') {
-//           // var albumArray = [];
-//           // for (var i = 0; i < reply.results.length; i++) {
-//           //   albumArray[i] = new Patch(reply.results[i]);
-//           // }
-//           var albumArray = reply.results;
-//           that.patches = ko.observableArray(albumArray);
-//           ko.applyBindings(that);
-//         } else {
-//           console.error('Failed to retrieve patches: ' + reply.message);
-//         }
-//       });
-//   };
-
-//   eb.onclose = function() {
-//     eb = null;
-//   };
-
-// })();
