@@ -55,7 +55,6 @@ function importGSS(root){
 
     var patchName = getURLParameter("patch");
     console.log("patch: "+patchName);
-    that.selectedPatchName = ko.observable(patchName);
     that.selectedPatch = ko.observable();
 
     var feed = root.feed;
@@ -84,8 +83,6 @@ function importGSS(root){
 	    soundcloud: entry['gsx$soundcloud']['$t'],
 	    github: entry['gsx$github']['$t']
 	};
-	if(patch.name === selectedPatchName())
-	    selectedPatch(patch);
 	// console.log("patch: "+JSON.stringify(patch));
 	patches.push(patch);
 	$.merge(tags, patch.tags);
@@ -126,21 +123,21 @@ function importGSS(root){
 
     that.selectFilter = function(item){
 	console.log("select filter "+item+" searching "+that.search());
-	if(that.search() == "tag")
-	    return selectTag(item);
-	else 
+	if(that.search() === "author")
 	    return selectAuthor(item);
+	else 
+	    return selectTag(item);
     };
 
     that.selectAuthor = function(author){
-	console.log("select author "+author);
 	if(author.author)
 	    author = author.author;
+	console.log("select author "+author);
 	if(that.search() != "author"){
 	    that.search("author");
 	    that.searchItems.removeAll();
 	    that.searchItems.push(author);
-	    return;
+	    that.selectedPatch(null);
 	}else if(that.searchItems.indexOf(author) > -1){
 	    that.searchItems.remove(author);
 	    if(that.searchItems().length === 0)
@@ -160,6 +157,7 @@ function importGSS(root){
 	    that.search("tag");
 	    that.searchItems.removeAll();
 	    that.searchItems.push(tag);
+	    that.selectedPatch(null);
 	}else if(that.searchItems.indexOf(tag) > -1){
 	    that.searchItems.remove(tag);
 	    if(that.searchItems().length == 0)
@@ -173,20 +171,20 @@ function importGSS(root){
 	}
     };
 
-    selectTag("All");
-
-    if(that.selectedPatch()){
-	// console.log("selected patch: "+JSON.stringify(that.selectedPatch()));
-	that.soundcloud = ko.computed(function() {
-	    return "https://w.soundcloud.com/player/?url=" +
-		encodeURIComponent(that.selectedPatch().soundcloud) +
-		"&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
-	});
-	var user = "pingdynasty";
-	var repo = "OwlPatches";
-	// var sha = selectedPatch().github;
+    that.selectPatch = function(name){
+	if(name.name)
+	    name = name.name;
+	console.log("select patch "+name);
+	that.search("patch");
+	that.searchItems.removeAll();
+	$("#gitsource").empty();
+	for(var i=0; i<that.patches().length; ++i){
+	    var patch = that.patches()[i];
+	    if(patch.name === name)
+		that.selectedPatch(patch);
+	}
 	// var url = "https://api.github.com/repos/" + user + "/" + repo + "/git/blobs/" + sha;
-	var url = "https://api.github.com/repos/" + user + "/" + repo + "/contents/" + selectedPatch().github;
+	var url = "https://api.github.com/repos/pingdynasty/OwlPatches/contents/" + that.selectedPatch().github;
 	getGithubFile(url, function(contents) {
 	    // console.log("contents "+contents);
 	    $("#gitsource").text(contents).removeClass("prettyprinted").parent();
@@ -195,8 +193,21 @@ function importGSS(root){
 	    // use highlight.js instead?
 	    // https://github.com/isagalaev/highlight.js
 	});
+    };
+
+    that.soundcloud = ko.computed(function() {
+	if(selectedPatch())
+	    return "https://w.soundcloud.com/player/?url=" +
+	    encodeURIComponent(that.selectedPatch().soundcloud) +
+	    "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
+	else
+	    return "";
+    });
+
+    if(patchName){
+	selectPatch(patchName);
     }else{
-	that.soundcloud = "";
+	selectTag("All");
     }
     ko.applyBindings(that);  
 }
