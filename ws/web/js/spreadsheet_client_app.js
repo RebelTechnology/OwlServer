@@ -1,8 +1,6 @@
-function getGithubFile(user, repo, sha, callback, startLineNum, endLineNum) {
+function getGithubFile(url, callback, startLineNum, endLineNum) {
     startLineNum = (typeof startLineNum == "undefined") ? 1 : startLineNum;
     endLineNum = (typeof endLineNum == "undefined") ? 0 : endLineNum;
-    var url = "https://api.github.com/repos/" + user + "/" + repo + "/git/blobs/" + sha;
-    console.log("get github file "+url);
     $.ajax({
         type: "GET",
         url: url,
@@ -71,6 +69,7 @@ function importGSS(root){
 	var entry = entries[i];
 	var patch = { 
 	    name: entry['gsx$name']['$t'],
+	    link: "patch.html?patch="+encodeURIComponent(entry['gsx$name']['$t']),
 	    author: entry['gsx$author']['$t'].trim(),
 	    description: entry['gsx$description']['$t'],
 	    tags: $.map((entry['gsx$tags']['$t']).split(','), $.trim),
@@ -156,31 +155,28 @@ function importGSS(root){
 	}
     };
 
-    that.soundcloud = ko.computed(function() {
-	return "https://w.soundcloud.com/player/?url=" +
-	    encodeURIComponent(that.selectedPatch().soundcloud) +
-	    "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
-    });
-
-    var user = "pingdynasty";
-    var repo = "OwlPatches";
-    var sha = selectedPatch().github;
-    getGithubFile(user, repo, sha, function(contents) {
-	// console.log("contents "+contents);
-	$("#gitsource").text(contents).removeClass("prettyprinted").parent();
-	console.log("pretty printing");
-	prettyPrint();
-	// use highlight.js instead?
-	// https://github.com/isagalaev/highlight.js
-    });
-    // var img = new Image();
-    // var src = "https://raw.githubusercontent.com/pingdynasty/OwlPatches/master/Contest/DroneBox.hpp";
-    // img.onload = function(){
-    // 	console.log("hello: "+this.src + " loaded");
-    // }
-    // img.src = src;
-
-
-    console.log("selected patch: "+JSON.stringify(that.selectedPatch()));
+    if(that.selectedPatch()){
+	// console.log("selected patch: "+JSON.stringify(that.selectedPatch()));
+	that.soundcloud = ko.computed(function() {
+	    return "https://w.soundcloud.com/player/?url=" +
+		encodeURIComponent(that.selectedPatch().soundcloud) +
+		"&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
+	});
+	var user = "pingdynasty";
+	var repo = "OwlPatches";
+	// var sha = selectedPatch().github;
+	// var url = "https://api.github.com/repos/" + user + "/" + repo + "/git/blobs/" + sha;
+	var url = "https://api.github.com/repos/" + user + "/" + repo + "/contents/" + selectedPatch().github;
+	getGithubFile(url, function(contents) {
+	    // console.log("contents "+contents);
+	    $("#gitsource").text(contents).removeClass("prettyprinted").parent();
+	    console.log("pretty printing");
+	    prettyPrint();
+	    // use highlight.js instead?
+	    // https://github.com/isagalaev/highlight.js
+	});
+    }else{
+	that.soundcloud = "";
+    }
     ko.applyBindings(that);  
 }

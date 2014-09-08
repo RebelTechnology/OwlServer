@@ -19,7 +19,7 @@
             <li><a href="#">About</a></li>
             <li><a href="#">News</a></li>
             <li><a href="#" class="active">Community</a></li>
-            <li><a href="#">Patches</a></li>
+            <li><a href="tags.html">Patches</a></li>
             <li><a href="#">Contact</a></li>
         </ul>
         <ul id="reg-signin-items">
@@ -86,7 +86,7 @@
         <table class="patch-title-controls">
           <tbody><tr>
               <td width="40"><div class="play-button">&gt;</div></td>
-              <td><a href="#"><span class="patch-title" data-bind="text: name"></span></a></td>
+              <td><a data-bind="attr: { href: link }"><span class="patch-title" data-bind="text: name"></span></a></td>
               <td width="40"><div class="add-button"><span>+</span></div></td>
             </tr>
             <tr>
