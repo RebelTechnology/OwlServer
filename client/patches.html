@@ -83,7 +83,8 @@
     
     <div class="content-container">
 
-        <div id="one-third" data-bind="visible: selectedPatch, with: selectedPatch">
+      <!-- ko if: selectedPatch -->
+        <div id="one-third" data-bind="with: selectedPatch">
             <div class="patch-tile-small" id="sticker">
                 <table class="patch-title-controls">
                 <tr>
@@ -97,32 +98,26 @@
                     <td>&nbsp;</td>
                 </tr>
             </table>
-            </div>
-            
+            </div>            
             <div class="patch-description">
                 <p data-bind="text: description"></p>
-            </div>
-            
+            </div>            
             <div class="tag" data-bind="foreach: tags">
 	      <span data-bind="text: $data, click: selectTag"></span>
 	    </div>
-        </div>
-        
-        <div id="two-thirds" data-bind="visible: selectedPatch">
-        
+        </div>        
+        <div id="two-thirds">
             <!-- Soundcloud embed here -->
             <iframe width="100%" height="250" scrolling="no" frameborder="no" 
-		    data-bind="attr: { src: soundcloud }">
+		    data-bind="if: soundcloud, attr: { src: soundcloud }">
 	    </iframe>
-            
             <div class="clear"></div>
-            
             <div class="white-box">
                 <h2>Patch code</h2>
 		<pre id="gitsource" class="prettyprint"></pre>
-            </div>
-                
+            </div>                
         </div>
+	<!-- /ko -->
 
       <!-- ko foreach: filteredPatches -->
       <!-- Start of a tile here -->

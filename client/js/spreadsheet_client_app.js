@@ -196,7 +196,7 @@ function importGSS(root){
     };
 
     that.soundcloud = ko.computed(function() {
-	if(selectedPatch())
+	if(selectedPatch() && selectedPatch().soundcloud)
 	    return "https://w.soundcloud.com/player/?url=" +
 	    encodeURIComponent(that.selectedPatch().soundcloud) +
 	    "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
