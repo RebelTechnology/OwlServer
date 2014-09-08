@@ -171,6 +171,16 @@ function importGSS(root){
 	}
     };
 
+    that.selectOnlyTag = function(tag){
+	that.searchItems.removeAll();
+	selectTag(tag);
+    }
+
+    that.selectOnlyAuthor = function(author){
+	that.searchItems.removeAll();
+	selectAuthor(author);
+    }
+
     that.selectPatch = function(name){
 	if(name.name)
 	    name = name.name;

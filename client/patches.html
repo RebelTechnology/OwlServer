@@ -93,7 +93,7 @@
                 </tr>
                 <tr>
                     <td style="padding-top: 20px;"><a href="#">
-			<span class="author-name" data-bind="text: author, click: selectAuthor"></span>
+			<span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
 		    </a></td>
                     <td>&nbsp;</td>
                 </tr>
@@ -103,7 +103,7 @@
                 <p data-bind="text: description"></p>
             </div>            
             <div class="tag" data-bind="foreach: tags">
-	      <span data-bind="text: $data, click: selectTag"></span>
+	      <span data-bind="text: $data, click: selectOnlyTag"></span>
 	    </div>
         </div>        
         <div id="two-thirds">
@@ -131,14 +131,14 @@
             <tr>
               <td>&nbsp;</td>
               <td style="padding-top: 20px;"><a href="#">
-		  <span class="author-name" data-bind="text: author, click: selectAuthor"></span>
+		  <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
 	      </a></td>
               <td>&nbsp;</td>
             </tr>
         </tbody></table>
         <div class="patch-baseline">
 	  <!-- ko foreach: tags -->
-          <div class="tag"><span data-bind="text: $data, click: selectTag"></span></div>
+          <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
 	  <!-- /ko -->
           <span class="add-counter">215</span>
         </div>
