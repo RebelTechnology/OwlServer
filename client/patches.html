@@ -36,35 +36,34 @@
 
     <div id="secondary-nav-bar-content">
     
-    <a href=""><div class="secondary-nav-item">
+      <div class="secondary-nav-item">
         <img src="images/browse-all-icon.png" width="40" height="40" alt="icon">
         <p>Browse all</p>
-    </div></a>
-    <a href=""><div class="secondary-nav-item">
+      </div>
+      <div class="secondary-nav-item">
         <img src="images/latest-icon.png" width="40" height="40" alt="icon">
         <p>Latest</p>
-    </div></a>
-    <a href=""><div class="secondary-nav-item">
+      </div>
+      <div class="secondary-nav-item">
         <img src="images/popular-icon.png" width="40" height="40" alt="icon">
         <p>Popular</p>
-    </div></a>
-    <a href="#"><div class="secondary-nav-item" data-bind="css: { active: search() === 'tag' }, click: selectAllTags">
-        <img src="images/tags-icon.png" width="40" height="40" alt="icon">
-        <p>Tags</p>
-    </div></a>
-    <a href="#"><div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }, click: selectAllAuthors">
+      </div>
+    <div class="secondary-nav-item" data-bind="css: { active: search() === 'tag' }, click: selectAllTags">
+      <img src="images/tags-icon.png" width="40" height="40" alt="icon">
+      <p>Tags</p>
+    </div>
+    <div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }, click: selectAllAuthors">
         <img src="images/authors-icon.png" width="40" height="40" alt="icon">
         <p>Authors</p>
-    </div></a>
-    <a href=""><div class="secondary-nav-item">
+    </div>
+    <div class="secondary-nav-item">
         <img src="images/my-patches-icon.png" width="40" height="40" alt="icon">
         <p>My patches</p>
-    </div></a>
-    <a href=""><div class="secondary-nav-item">
+    </div>
+    <div class="secondary-nav-item">
         <img src="images/my-rigs-icon.png" width="40" height="40" alt="icon">
         <p>My rigs</p>
-    </div></a>
-    
+    </div>
         
     </div>
 </div>
@@ -92,9 +91,9 @@
                     <td width="40"><div class="add-button"><span>+</span></div></td>
                 </tr>
                 <tr>
-                    <td style="padding-top: 20px;"><a href="#">
-			<span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
-		    </a></td>
+                    <td style="padding-top: 20px;">
+		      <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
+		    </td>
                     <td>&nbsp;</td>
                 </tr>
             </table>
@@ -125,14 +124,14 @@
         <table class="patch-title-controls">
           <tbody><tr>
               <td width="40"><div class="play-button">&gt;</div></td>
-              <td><a href="#"><span class="patch-title" data-bind="text: name, click: selectPatch"></span></a></td>
+              <td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td>
               <td width="40"><div class="add-button"><span>+</span></div></td>
             </tr>
             <tr>
               <td>&nbsp;</td>
-              <td style="padding-top: 20px;"><a href="#">
+              <td style="padding-top: 20px;">
 		  <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
-	      </a></td>
+	      </td>
               <td>&nbsp;</td>
             </tr>
         </tbody></table>
