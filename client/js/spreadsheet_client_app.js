@@ -63,8 +63,7 @@ function importGSS(root){
     var tags = [];
     var authors = [];
     var patches = [];
-    that.tagSearch = ko.observableArray(["All"]);
-    that.authorSearch = ko.observableArray(["All"]);
+
     for(var i = 0; i < entries.length; ++i){
 	var entry = entries[i];
 	var patch = { 
@@ -105,55 +104,76 @@ function importGSS(root){
     that.authors = ko.observableArray(authors);
     that.authors.sort();
 
-    self.filteredPatches = ko.computed(function() {
+    that.search = ko.observable();
+    that.searchItems = ko.observableArray();
+
+    that.filteredPatches = ko.computed(function() {
 	return ko.utils.arrayFilter
-	(self.patches(), function(r) {
-	    if(self.tagSearch.indexOf("All") > -1)
+	(that.patches(), function(r) {
+	    if(that.searchItems.indexOf("All") > -1)
 		return true;
-	    for(i=0; i<r.tags.length; ++i){
-		if(self.tagSearch.indexOf(r.tags[i]) > -1)
-		    return true;
+	    if(that.search() === "tag"){
+		for(i=0; i<r.tags.length; ++i){
+		    if(that.searchItems.indexOf(r.tags[i]) > -1)
+			return true;
+		}
+	    }else if(that.search() === "author"){
+		return that.searchItems.indexOf(r.author) > -1;		
 	    }
 	    return false;
 	});
     });
 
-    self.authorPatches = ko.computed(function() {
-	return ko.utils.arrayFilter
-	(self.patches(), function(r) {
-	    return self.authorSearch.indexOf("All") > -1 || self.authorSearch.indexOf(r.author) > -1;
-	});
-    });
+    that.selectFilter = function(item){
+	console.log("select filter "+item+" searching "+that.search());
+	if(that.search() == "tag")
+	    return selectTag(item);
+	else 
+	    return selectAuthor(item);
+    };
 
-    self.selectAuthor = function(author){
+    that.selectAuthor = function(author){
+	console.log("select author "+author);
 	if(author.author)
 	    author = author.author;
-	if(self.authorSearch.indexOf(author) > -1){
-	    self.authorSearch.remove(author);
-	    if(self.authorSearch().length === 0)
-		self.authorSearch.push("All");	
+	if(that.search() != "author"){
+	    that.search("author");
+	    that.searchItems.removeAll();
+	    that.searchItems.push(author);
+	    return;
+	}else if(that.searchItems.indexOf(author) > -1){
+	    that.searchItems.remove(author);
+	    if(that.searchItems().length === 0)
+		that.searchItems.push("All");	
 	}else{
 	    if(author === "All")
-		self.authorSearch.removeAll();
+		that.searchItems.removeAll();
 	    else
-		self.authorSearch.remove("All"); 
-	    self.authorSearch.push(author);
+		that.searchItems.remove("All"); 
+	    that.searchItems.push(author);
 	}
     };
 
-    self.selectTag = function(tag){
-	if(self.tagSearch.indexOf(tag) > -1){
-	    self.tagSearch.remove(tag);
-	    if(self.tagSearch().length == 0)
-		self.tagSearch.push("All");	
+    that.selectTag = function(tag){
+	console.log("select tag "+tag);
+	if(that.search() != "tag"){
+	    that.search("tag");
+	    that.searchItems.removeAll();
+	    that.searchItems.push(tag);
+	}else if(that.searchItems.indexOf(tag) > -1){
+	    that.searchItems.remove(tag);
+	    if(that.searchItems().length == 0)
+		that.searchItems.push("All");	
 	}else{
 	    if(tag === "All")
-		self.tagSearch.removeAll();
+		that.searchItems.removeAll();
 	    else
-		self.tagSearch.remove("All"); 
-	    self.tagSearch.push(tag);
+		that.searchItems.remove("All"); 
+	    that.searchItems.push(tag);
 	}
     };
+
+    selectTag("All");
 
     if(that.selectedPatch()){
 	// console.log("selected patch: "+JSON.stringify(that.selectedPatch()));

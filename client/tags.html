@@ -68,9 +68,9 @@
 </div>
     
 <div id="filter-bar">
-  <div class="wrapper" data-bind="foreach: tags">
+  <div class="wrapper" data-bind="foreach: search() === 'author' ? authors : tags">
     <div class="tag-filter-button" 
-	 data-bind="text: $data, click: selectTag, css: { active: tagSearch.indexOf($data) > -1 }">
+	 data-bind="text: $data, click: selectFilter, css: { active: searchItems.indexOf($data) > -1 }">
     </div>
   </div>
 </div>
@@ -91,7 +91,9 @@
             </tr>
             <tr>
               <td>&nbsp;</td>
-              <td style="padding-top: 20px;"><a href="#"><span class="author-name" data-bind="text: author"></span></a></td>
+              <td style="padding-top: 20px;"><a href="#">
+		  <span class="author-name" data-bind="text: author, click: selectAuthor"></span>
+	      </a></td>
               <td>&nbsp;</td>
             </tr>
         </tbody></table>
