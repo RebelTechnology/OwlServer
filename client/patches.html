@@ -48,11 +48,11 @@
         <img src="images/popular-icon.png" width="40" height="40" alt="icon">
         <p>Popular</p>
     </div></a>
-    <a href="#"><div class="secondary-nav-item" data-bind="css: { active: search() === 'tag' }">
+    <a href="#"><div class="secondary-nav-item" data-bind="css: { active: search() === 'tag' }, click: selectAllTags">
         <img src="images/tags-icon.png" width="40" height="40" alt="icon">
         <p>Tags</p>
     </div></a>
-    <a href="#"><div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }">
+    <a href="#"><div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }, click: selectAllAuthors">
         <img src="images/authors-icon.png" width="40" height="40" alt="icon">
         <p>Authors</p>
     </div></a>

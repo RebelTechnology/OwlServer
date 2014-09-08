@@ -133,11 +133,11 @@ function importGSS(root){
 	if(author.author)
 	    author = author.author;
 	console.log("select author "+author);
+	that.selectedPatch(null);
 	if(that.search() != "author"){
 	    that.search("author");
 	    that.searchItems.removeAll();
 	    that.searchItems.push(author);
-	    that.selectedPatch(null);
 	}else if(that.searchItems.indexOf(author) > -1){
 	    that.searchItems.remove(author);
 	    if(that.searchItems().length === 0)
@@ -153,11 +153,11 @@ function importGSS(root){
 
     that.selectTag = function(tag){
 	console.log("select tag "+tag);
+	that.selectedPatch(null);
 	if(that.search() != "tag"){
 	    that.search("tag");
 	    that.searchItems.removeAll();
 	    that.searchItems.push(tag);
-	    that.selectedPatch(null);
 	}else if(that.searchItems.indexOf(tag) > -1){
 	    that.searchItems.remove(tag);
 	    if(that.searchItems().length == 0)
@@ -174,12 +174,20 @@ function importGSS(root){
     that.selectOnlyTag = function(tag){
 	that.searchItems.removeAll();
 	selectTag(tag);
-    }
+    };
+
+    that.selectAllTags = function(tag){
+	selectTag('All');
+    };
 
     that.selectOnlyAuthor = function(author){
 	that.searchItems.removeAll();
 	selectAuthor(author);
-    }
+    };
+
+    that.selectAllAuthors = function(tag){
+	selectAuthor('All');
+    };
 
     that.selectPatch = function(name){
 	if(name.name)
