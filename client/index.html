@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!-- saved from url=(0026)http://jonnykates.com/owl/ -->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href="style.css" rel="stylesheet" type="text/css" rel="stylesheet">
+    <script src="js3rdparty/less-1.2.1.min.js"></script>
+    <script src="js3rdparty/jquery-1.7.1.min.js"></script>
+    <script src="js3rdparty/bootstrap-tabs.js"></script>
+    <script src="js3rdparty/sockjs-min-0.3.4.js"></script>
+    <script src="js3rdparty/knockout-2.0.0.js"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+  </head>
+  <body>
+
+<!-- <div id="primary-nav-bar"> -->
+<!--     <div id="primary-nav-container"> -->
+<!--         <a href="#"><img id="logo" src="images/logo.png" alt="Hoxton Owl"></a> -->
+<!--         <ul id="primary-nav-items"> -->
+<!--             <li><a href="#">About</a></li> -->
+<!--             <li><a href="#">News</a></li> -->
+<!--             <li><a href="#">Community</a></li> -->
+<!--             <li><a href="#" class="active">Patches</a></li> -->
+<!--             <li><a href="#">Contact</a></li> -->
+<!--         </ul> -->
+<!--         <ul id="reg-signin-items"> -->
+<!--             <li><a href="#">Register</a></li> -->
+<!--             <li><a href="#">Sign in</a></li> -->
+<!--             <li><a href="#" class="order-button">Order</a></li> -->
+<!--         </ul> -->
+<!--     </div> -->
+<!-- </div> -->
+
+<div id="secondary-nav-bar">
+
+    <div id="secondary-nav-bar-content">
+    
+      <!-- <div class="secondary-nav-item"> -->
+      <!--   <img src="images/browse-all-icon.png" width="40" height="40" alt="icon"> -->
+      <!--   <p>Browse all</p> -->
+      <!-- </div> -->
+      <!-- <div class="secondary-nav-item"> -->
+      <!--   <img src="images/latest-icon.png" width="40" height="40" alt="icon"> -->
+      <!--   <p>Latest</p> -->
+      <!-- </div> -->
+      <!-- <div class="secondary-nav-item"> -->
+      <!--   <img src="images/popular-icon.png" width="40" height="40" alt="icon"> -->
+      <!--   <p>Popular</p> -->
+      <!-- </div> -->
+    <div class="secondary-nav-item" data-bind="css: { active: search() === 'tag' }, click: selectAllTags">
+      <img src="images/tags-icon.png" width="40" height="40" alt="icon">
+      <p>Tags</p>
+    </div>
+    <div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }, click: selectAllAuthors">
+        <img src="images/authors-icon.png" width="40" height="40" alt="icon">
+        <p>Authors</p>
+    </div>
+    <!-- <div class="secondary-nav-item"> -->
+    <!--     <img src="images/my-patches-icon.png" width="40" height="40" alt="icon"> -->
+    <!--     <p>My patches</p> -->
+    <!-- </div> -->
+    <!-- <div class="secondary-nav-item"> -->
+    <!--     <img src="images/my-rigs-icon.png" width="40" height="40" alt="icon"> -->
+    <!--     <p>My rigs</p> -->
+    <!-- </div> -->
+        
+    </div>
+</div>
+    
+<div id="filter-bar" data-bind="if: search() != 'patch'">
+  <div class="wrapper" data-bind="foreach: search() === 'author' ? authors : tags">
+    <div class="tag-filter-button" 
+	 data-bind="text: $data, click: selectFilter, css: { active: searchItems.indexOf($data) > -1 }">
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+
+    <!-- <div id="breadcrumb"></div> -->
+    
+    <div class="content-container">
+
+      <!-- ko if: selectedPatch -->
+        <div id="one-third" data-bind="with: selectedPatch">
+            <div class="patch-tile-small" id="sticker">
+                <table class="patch-title-controls">
+                <tr>
+                    <td><span class="patch-title" data-bind="text: name"></span></td>
+                    <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
+                </tr>
+                <tr>
+                    <td style="padding-top: 20px;">
+		      <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
+		    </td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+            </div>            
+            <div class="patch-description">
+                <p data-bind="text: description"></p>
+            </div>            
+            <div class="tag" data-bind="foreach: tags">
+	      <span data-bind="text: $data, click: selectOnlyTag"></span>
+	    </div>
+        </div>        
+        <div id="two-thirds">
+            <!-- Soundcloud embed here -->
+            <iframe width="100%" height="250" scrolling="no" frameborder="no" 
+		    data-bind="if: soundcloud, attr: { src: soundcloud }">
+	    </iframe>
+            <div class="clear"></div>
+            <div class="white-box">
+                <h2>Patch code</h2>
+		<pre id="gitsource" class="prettyprint"></pre>
+            </div>                
+        </div>
+	<!-- /ko -->
+
+      <!-- ko foreach: filteredPatches -->
+      <!-- Start of a tile here -->
+	<div class="patch-tile">
+        <table class="patch-title-controls">
+          <tbody><tr>
+              <td width="40"><div class="play-button">&gt;</div></td>
+              <td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td>
+              <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+              <td style="padding-top: 20px;">
+		  <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
+	      </td>
+              <td>&nbsp;</td>
+            </tr>
+        </tbody></table>
+        <div class="patch-baseline">
+	  <!-- ko foreach: tags -->
+          <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
+	  <!-- /ko -->
+          <!-- <span class="add-counter">215</span> -->
+        </div>
+      </div>
+        <!-- End of the tile -->
+	<!-- /ko -->
+    </div>
+    
+</div>
+    
+
+</body>
+    <script src="js/vertxbus.js"></script>
+    <script src="js/spreadsheet_client_app.js"></script>
+    <script src="https://spreadsheets.google.com/feeds/list/1ocSb1dTeOm8YgeqDOAGsfLddZrGxzAbymuq0bz5ZQ3Q/od6/public/values?alt=json-in-script&callback=importGSS"></script>
+</html>
