@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+<!-- saved from url=(0026)http://jonnykates.com/owl/ -->
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <link href="style.css" rel="stylesheet" type="text/css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700' rel='stylesheet' type='text/css'>
     <script src="js3rdparty/less-1.2.1.min.js"></script>
     <script src="js3rdparty/jquery-1.7.1.min.js"></script>
     <script src="js3rdparty/bootstrap-tabs.js"></script>
@@ -102,30 +104,6 @@
             <div class="patch-description">
                 <p data-bind="text: description"></p>
             </div>            
-            <div class="patch-stats">
-              <table width="100%">
-                <tr>
-                  <td width="30%"><span class="parameter-label">Channels</span></td>
-                  <td><p data-bind="text: (inputs + ' in / ' + outputs + ' out')"></p></td>
-                </tr>
-                <tr>
-                  <td><span class="parameter-label">CPU</span></td>
-                  <td><p data-bind="text: cycles"></p></td>
-                </tr>
-                <tr>
-                  <td><span class="parameter-label">Memory</span></td>
-                  <td><p data-bind="text: (bytes + ' / 1Mb')"></p></td>
-                </tr>
-                <tr>
-                  <td><span class="parameter-label">Version</span></td>
-                  <td><p>v.1.1.0 - 21/04/2014</p></td>
-                </tr>
-                <tr>
-                  <td><span class="parameter-label">Used in</span></td>
-                  <td><p>123 rigs</p></td>
-                </tr>
-              </table>
-            </div>
 	    <!-- ko foreach: tags -->
             <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
 	    <!-- /ko -->

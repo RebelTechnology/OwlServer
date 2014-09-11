@@ -104,7 +104,7 @@ body { background: #f4f4f4; }
     text-transform: uppercase;
     line-height: 60px;
     font-weight: 400;
-    font-family: montserrat;
+    font-family: 'montserrat', sans-serif;
     color: #676565;
 }
 
@@ -467,7 +467,7 @@ body { background: #f4f4f4; }
 }
 
 .tag span {
-    font-family: ubuntu;
+    font-family: 'ubuntu', sans-serif;
     font-size: 12px;
 }
 
@@ -510,7 +510,7 @@ a {
 /* Typography */
 
 h2, #primary-nav-items li, #reg-signin-items li {
-    font-family: montserrat;
+    font-family: 'montserrat', sans-serif;
     color: #fff;
     font-weight: 400;
     font-size: 12px;
@@ -532,7 +532,7 @@ h2, .parameter-label {
 }
 
 .secondary-nav-item p, .tag-filter-button {
-    font-family: ubuntu;
+    font-family: 'Ubuntu', sans-serif;
     font-weight: 100;
     font-size: 14px;
 }
@@ -542,14 +542,14 @@ h2, .secondary-nav-item p {
 }
 
 .parameter-label {
-    font-family: montserrat;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 400;
     font-size: 13px;
     color: #231f20;
 }
 
 .patch-tile, .patch-tile-small, .patch-description {
-    font-family: ubuntu;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 .patch-title {
