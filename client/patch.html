@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<!-- saved from url=(0026)http://jonnykates.com/owl/ -->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href="style.css" rel="stylesheet" type="text/css" rel="stylesheet">
+    <script src="js3rdparty/less-1.2.1.min.js"></script>
+    <script src="js3rdparty/jquery-1.7.1.min.js"></script>
+    <script src="js3rdparty/bootstrap-tabs.js"></script>
+    <script src="js3rdparty/sockjs-min-0.3.4.js"></script>
+    <script src="js3rdparty/knockout-2.0.0.js"></script>
+    <script src="js3rdparty/jquery.knob.min.js"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+
+    <!-- JQuery function for knobs data -->
+    <script>
+        $(function($) {
+
+            $(".knob").knob({
+                change : function (value) {
+                    //console.log("change : " + value);
+                },
+                release : function (value) {
+                    //console.log(this.$.attr('value'));
+                    console.log("release : " + value);
+                },
+                cancel : function () {
+                    console.log("cancel : ", this);
+                },
+                /*format : function (value) {
+                    return value + '%';
+                },*/
+                draw : function () {
+
+                    // "tron" case
+                    if(this.$.data('skin') == 'tron') {
+
+                        this.cursorExt = 0.3;
+
+                        var a = this.arc(this.cv)  // Arc
+                            , pa                   // Previous arc
+                            , r = 1;
+
+                        this.g.lineWidth = this.lineWidth;
+
+                        if (this.o.displayPrevious) {
+                            pa = this.arc(this.v);
+                            this.g.beginPath();
+                            this.g.strokeStyle = this.pColor;
+                            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+                            this.g.stroke();
+                        }
+
+                        this.g.beginPath();
+                        this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+                        this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+                        this.g.stroke();
+
+                        this.g.lineWidth = 2;
+                        this.g.beginPath();
+                        this.g.strokeStyle = this.o.fgColor;
+                        this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+                        this.g.stroke();
+
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+
+  </head>
+  <body>
+
+<div id="primary-nav-bar">
+    <div id="primary-nav-container">
+        <a href="#"><img id="logo" src="images/logo.png" alt="Hoxton Owl"></a>
+        <ul id="primary-nav-items">
+            <li><a href="#">About</a></li>
+            <li><a href="#">News</a></li>
+            <li><a href="#" class="active">Community</a></li>
+            <li><a href="tags.html">Patches</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        <ul id="reg-signin-items">
+            <li><a href="#">Register</a></li>
+            <li><a href="#">Sign in</a></li>
+            <li><a href="#" class="order-button">Order</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="wrapper">
+
+<div id="breadcrumb">
+Breadcrumb  >  Goes  >  Here    
+</div>
+    
+    <div class="content-container">
+        <div id="one-third">
+            <div class="patch-tile-small" id="sticker">
+                <table class="patch-title-controls">
+                <tr>
+                    <td><span class="patch-title" data-bind="text: selectedPatch().name"></span></td>
+                    <td width="40"><div class="add-button"><span>+</span></div></td>
+                </tr>
+                <tr>
+                    <td style="padding-top: 20px;"><a href="todo#"><span class="author-name" data-bind="text: selectedPatch().author"></span></a></td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+            </div>
+            
+            <div class="patch-description">
+                <p data-bind="text: selectedPatch().description"></p>
+            </div>
+
+            <div class="patch-stats">
+                <table width="100%">
+                    <tr>
+                        <td width="30%"><span class="parameter-label">Mono / stereo</span></td>
+                        <td><p>1 in / 2 out</p></td>
+                    </tr>
+                    <tr>
+                        <td><span class="parameter-label">CPU</span></td>
+                        <td><p>500 cycles / 1KB memory</p></td>
+                    </tr>
+                    <tr>
+                        <td><span class="parameter-label">Version</span></td>
+                        <td><p>v.1.1.0 - 21/04/2014</p></td>
+                    </tr>
+                    <tr>
+                        <td><span class="parameter-label">Used in</span></td>
+                        <td><p>123 rigs</p></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="tag" data-bind="foreach: selectedPatch().tags">
+                <span data-bind="text: $data, click: selectTag"></span>
+            </div>
+        </div>
+        
+        <div id="two-thirds">
+        
+            <!-- Soundcloud embed here -->
+            <iframe width="100%" height="250" scrolling="no" frameborder="no" 
+		    data-bind="attr: { src: soundcloud }">
+	    </iframe>
+            
+            <div class="clear"></div>
+
+            <div class="white-box">
+                <h2>Parameters</h2>
+
+                <div class="flexbox">
+
+                    <div class="knob-container">
+                        <input class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#ed7800" data-linecap=round data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                        <p class="parameter-label">Name</p>
+                    </div>
+
+                    <div class="knob-container">
+                        <input class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#ed7800" data-linecap=round data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                        <p class="parameter-label">Name</p>
+                    </div>
+
+                    <div class="knob-container">
+                        <input class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#ed7800" data-linecap=round data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                        <p class="parameter-label">Name</p>
+                    </div>
+
+                    <div class="knob-container">
+                        <input class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#ed7800" data-linecap=round data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                        <p class="parameter-label">Name</p>
+                    </div>
+
+                </div>
+
+            </div>        
+            
+            <div class="white-box">
+                <h2>Patch code</h2>
+		<pre id="gitsource" class="prettyprint"></pre>
+                <!-- Git embed here, using GIST-IT -->
+                <!-- <script data-bind="attr: { src: github }"></script> -->
+                <!-- <script src="http://gist-it.appspot.com/github/pingdynasty/OwlPatches/blob/master/DigitalMayhemPatch.hpp"></script> -->
+            </div>
+                
+        </div>
+        
+    </div>
+    
+</div>
+    
+
+</body>
+    <script src="js/vertxbus.js"></script>
+    <script src="js/spreadsheet_client_app.js"></script>
+    <script src="https://spreadsheets.google.com/feeds/list/1ocSb1dTeOm8YgeqDOAGsfLddZrGxzAbymuq0bz5ZQ3Q/od6/public/values?alt=json-in-script&callback=importGSS"></script>
+</html>
