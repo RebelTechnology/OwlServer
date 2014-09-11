@@ -54,6 +54,12 @@ table {
 
 body { background: #f4f4f4; }
 
+.flexbox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 #primary-nav-bar {
     height: 60px;
     width: 100%;
@@ -121,14 +127,21 @@ body { background: #f4f4f4; }
     width: 66%;
 }
 
-.patch-description {
+.patch-description, .patch-stats {
     width: 100%;
     padding: 20px;
     border-radius: 5px;
-    background: #5d5d5d;
     margin-top: 20px;
     margin-bottom: 10px;
     border: 1px solid white;
+}
+
+.patch-description {
+    background: #5d5d5d;
+}
+
+.patch-stats {
+    background: #8d8d8d;
 }
 
 .clear {
@@ -139,6 +152,8 @@ body { background: #f4f4f4; }
 
 .white-box {
     width: 100%;
+    height: auto;
+    overflow: hidden;
     padding: 20px;
     border-radius: 5px;
     background: #ffffff;
@@ -146,10 +161,25 @@ body { background: #f4f4f4; }
     margin-bottom: 20px;
 }
 
+.knob-container {
+    width: 20%;
+    height: auto;
+    float: left;
+    display: inline;
+    position: relative;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.knob-container:first-of-type {
+    margin-left: 0px;
+}
+
 /* Navigation items */
 
 #reg-signin-items {
     float: right;
+    top: 100px;
 }
 
 #logo {
@@ -466,16 +496,22 @@ a {
 
 /* Typography */
 
-h2, #primary-nav-items li, #reg-signin-items li {
+h2, #primary-nav-items li, #reg-signin-items li, .parameter-label {
     font-family: montserrat;
     color: #fff;
     font-weight: 400;
     font-size: 12px;
 }
 
-h2 {
+h2, .parameter-label {
     text-transform: uppercase;
     padding-bottom: 10px;
+}
+
+.parameter-label {
+    text-align: center;
+    font-size: 10px;
+    margin-top: -20px;
 }
 
 #primary-nav-items li, a.order-button {
@@ -488,7 +524,7 @@ h2 {
     font-size: 14px;
 }
 
-h2, .secondary-nav-item p {
+h2, .secondary-nav-item p, .parameter-label {
     color: #cccccc;   
 }
 
@@ -527,7 +563,7 @@ h2, .secondary-nav-item p {
     color: #231f20;
 }
 
-.patch-description p {
+.patch-description p, .patch-stats p {
     color: #fff;
     line-height: 1.5;
     font-size: 14px;
