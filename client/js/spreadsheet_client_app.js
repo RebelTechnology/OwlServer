@@ -50,6 +50,11 @@ function unique(arr) {
     return a;
 }
 
+function humanFileSize(size) {
+    var i = Math.floor( Math.log(size) / Math.log(1024) );
+    return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+}
+
 function importGSS(root){
     var that = this;
     var patchName = getURLParameter("patch");
@@ -75,11 +80,14 @@ function importGSS(root){
 			  entry['gsx$parametere']['$t]'] ],
 	    inputs: entry['gsx$inputs']['$t'],
 	    outputs: entry['gsx$outputs']['$t'],
-	    armcycles: entry['gsx$armcyclespersample']['$t'],
+	    cycles: entry['gsx$armcyclespersample']['$t'],
 	    bytes: entry['gsx$byteswithgain']['$t'],
 	    soundcloud: entry['gsx$soundcloud']['$t'],
 	    github: entry['gsx$github']['$t']
 	};
+	console.log("cycles "+patch.cycles);
+	patch.cycles = Math.round(patch.cycles * 100.0 / 3500.0) + "%";
+	patch.bytes = humanFileSize(patch.bytes);
 	// console.log("patch: "+JSON.stringify(patch));
 	patches.push(patch);
 	$.merge(tags, patch.tags);
@@ -210,7 +218,6 @@ function importGSS(root){
 	    // embed editor?
 	    // http://ace.c9.io/#nav=embedding
 	});
-
 	knobify();
     };
 
@@ -223,10 +230,11 @@ function importGSS(root){
 	    return "";
     });
 
+    ko.applyBindings(that);  
+
     if(patchName){
 	selectPatch(patchName);
     }else{
 	selectTag("All");
     }
-    ko.applyBindings(that);  
 }
