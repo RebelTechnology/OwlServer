@@ -144,6 +144,19 @@ body { background: #f4f4f4; }
     background: #8d8d8d;
 }
 
+.patch-stats table tr td {
+    border-top: 1px dotted #b7b7b7;
+    padding: 5px;
+}
+
+.patch-stats table tr td p {
+    padding: 0;
+}
+
+.patch-stats table tr:last-of-type {
+    border-bottom: 1px dotted #b7b7b7;
+}
+
 .clear {
     width: 100%;
     height: 20px;
@@ -496,7 +509,7 @@ a {
 
 /* Typography */
 
-h2, #primary-nav-items li, #reg-signin-items li, .parameter-label {
+h2, #primary-nav-items li, #reg-signin-items li {
     font-family: montserrat;
     color: #fff;
     font-weight: 400;
@@ -524,8 +537,15 @@ h2, .parameter-label {
     font-size: 14px;
 }
 
-h2, .secondary-nav-item p, .parameter-label {
+h2, .secondary-nav-item p {
     color: #cccccc;   
+}
+
+.parameter-label {
+    font-family: montserrat;
+    font-weight: 400;
+    font-size: 13px;
+    color: #231f20;
 }
 
 .patch-tile, .patch-tile-small, .patch-description {
