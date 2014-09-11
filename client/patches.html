@@ -103,7 +103,31 @@
             </div>            
             <div class="patch-description">
                 <p data-bind="text: description"></p>
-            </div>            
+            </div>
+            <div class="patch-stats">
+              <table width="100%">
+                <tr>
+                  <td width="30%"><span class="parameter-label">Channels</span></td>
+                  <td><p data-bind="text: (inputs + ' in / ' + outputs + ' out')"></p></td>
+                </tr>
+                <tr>
+                  <td><span class="parameter-label">CPU</span></td>
+                  <td><p data-bind="text: cycles"></p></td>
+                </tr>
+                <tr>
+                  <td><span class="parameter-label">Memory</span></td>
+                  <td><p data-bind="text: (bytes + ' / 1Mb')"></p></td>
+                </tr>
+                <tr>
+                  <td><span class="parameter-label">Version</span></td>
+                  <td><p>v.1.1.0 - 21/04/2014</p></td>
+                </tr>
+                <tr>
+                  <td><span class="parameter-label">Used in</span></td>
+                  <td><p>123 rigs</p></td>
+                </tr>
+              </table>
+            </div>                        
 	    <!-- ko foreach: tags -->
             <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
 	    <!-- /ko -->
