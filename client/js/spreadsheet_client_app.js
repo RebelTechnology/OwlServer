@@ -97,14 +97,14 @@ function importGSS(root){
     console.log(patches.length+" patches");
     that.patches = ko.observableArray(patches);
     tags = unique(tags);
-    tags.push("All");
     that.tags = ko.observableArray(tags);
     that.tags.sort();
+    tags.unshift("All");
 
     authors = unique(authors);
-    authors.push("All");
     that.authors = ko.observableArray(authors);
     that.authors.sort();
+    authors.unshift("All");
 
     that.search = ko.observable();
     that.searchItems = ko.observableArray();
