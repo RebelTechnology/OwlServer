@@ -52,17 +52,14 @@ function unique(arr) {
 
 function importGSS(root){
     var that = this;
-
     var patchName = getURLParameter("patch");
     console.log("patch: "+patchName);
     that.selectedPatch = ko.observable();
-
     var feed = root.feed;
     var entries = feed.entry || [];
     var tags = [];
     var authors = [];
     var patches = [];
-
     for(var i = 0; i < entries.length; ++i){
 	var entry = entries[i];
 	var patch = { 
@@ -213,6 +210,8 @@ function importGSS(root){
 	    // embed editor?
 	    // http://ace.c9.io/#nav=embedding
 	});
+
+	knobify();
     };
 
     that.soundcloud = ko.computed(function() {

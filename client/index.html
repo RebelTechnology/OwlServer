@@ -9,6 +9,8 @@
     <script src="js3rdparty/bootstrap-tabs.js"></script>
     <script src="js3rdparty/sockjs-min-0.3.4.js"></script>
     <script src="js3rdparty/knockout-2.0.0.js"></script>
+    <script src="js3rdparty/jquery.knob.min.js"></script>
+    <script src="js/knob.js"></script>
     <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
     <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
   </head>
@@ -111,6 +113,35 @@
 		    data-bind="if: soundcloud, attr: { src: soundcloud }">
 	    </iframe>
             <div class="clear"></div>
+            <div class="white-box" data-bind="with: selectedPatch">
+                <h2>Parameters</h2>
+                <div class="flexbox">
+                  <div class="knob-container">
+                    <input class="knob" data-angleOffset="-125" data-angleArc="250" 
+			   data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
+			   data-rotation="clockwise" data-readOnly="true" value="35">
+                    <p class="parameter-label" data-bind="text: parameters[0]"></p>
+                  </div>
+                  <div class="knob-container">
+                    <input class="knob" data-angleOffset="-125" data-angleArc="250" 
+			   data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
+			   data-rotation="clockwise" data-readOnly="true" value="35">
+                    <p class="parameter-label" data-bind="text: parameters[1]"></p>
+                  </div>
+                  <div class="knob-container">
+                    <input class="knob" data-angleOffset="-125" data-angleArc="250" 
+			   data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
+			   data-rotation="clockwise" data-readOnly="true" value="35">
+                    <p class="parameter-label" data-bind="text: parameters[2]"></p>
+                  </div>
+                  <div class="knob-container">
+                    <input class="knob" data-angleOffset="-125" data-angleArc="250" 
+			   data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
+			   data-rotation="clockwise" data-readOnly="true" value="35">
+                    <p class="parameter-label" data-bind="text: parameters[3]"></p>
+                  </div>
+                </div>
+            </div>        
             <div class="white-box">
                 <h2>Patch code</h2>
 		<pre id="gitsource" class="prettyprint"></pre>
