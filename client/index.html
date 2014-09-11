@@ -101,9 +101,9 @@
             <div class="patch-description">
                 <p data-bind="text: description"></p>
             </div>            
-            <div class="tag" data-bind="foreach: tags">
-	      <span data-bind="text: $data, click: selectOnlyTag"></span>
-	    </div>
+	    <!-- ko foreach: tags -->
+            <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
+	    <!-- /ko -->
         </div>        
         <div id="two-thirds">
             <!-- Soundcloud embed here -->

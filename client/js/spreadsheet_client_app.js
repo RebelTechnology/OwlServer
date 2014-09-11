@@ -210,6 +210,8 @@ function importGSS(root){
 	    prettyPrint();
 	    // use highlight.js instead?
 	    // https://github.com/isagalaev/highlight.js
+	    // embed editor?
+	    // http://ace.c9.io/#nav=embedding
 	});
     };
 
