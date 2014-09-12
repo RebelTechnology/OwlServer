@@ -57,6 +57,9 @@ body { background: #f4f4f4; }
 .flexbox {
     display: flex;
     flex-wrap: wrap;
+}
+
+.flex-center {
     justify-content: center;
 }
 
@@ -69,7 +72,7 @@ body { background: #f4f4f4; }
 
 #primary-nav-container {
     height: 100%;
-    width: 1000px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -90,7 +93,8 @@ body { background: #f4f4f4; }
 }
 
 .wrapper {
-    width: 1200px;
+    width: 80%;
+    max-width: 1200px;
     padding-top: 10px;
     display: block;
     margin: 0 auto;
@@ -118,13 +122,15 @@ body { background: #f4f4f4; }
     width: 32%;
     float: left;
     position: relative;
+    min-width: 320px;
+    margin-bottom: 20px;
 }
 
 #two-thirds {
     float: left;
     position: relative;
-    float: right;
-    width: 66%;
+    width: 65%;
+    margin-left: 2%;
 }
 
 .patch-description, .patch-stats {
@@ -285,6 +291,7 @@ body { background: #f4f4f4; }
     display: inline;
     float: left;
     margin: 0 4px 4px 0;
+    align: center;
 }
 
 .tag-filter-button:hover {
@@ -318,22 +325,20 @@ body { background: #f4f4f4; }
 .patch-tile {
     height: 280px;
     width: 32%;
+    min-width: 320px;
     float: left;
     position: relative;
     padding: 20px;
-    margin-bottom: 24px;
-    margin-left: 24px;
+    /* margin-bottom: 24px;
+    margin-left: 24px; */
+    margin: 0 15px 15px 0;
     border: 1px solid #d0d0d0;
     border-radius: 5px;
     box-shadow: 0px 0px 10px #6f757f;
-    background-image:url(images/patch-background.png);
+    background:url(images/patch-background.png);
     background-size: 100%;
-    background-position: top center;
+    background-position: center center;
     transition: .3s;
-}
-
-.patch-tile:nth-of-type(3n+1) {
-    margin-left: 0px;
 }
 
 .patch-tile:hover {
@@ -588,4 +593,102 @@ h2, .secondary-nav-item p {
     line-height: 1.5;
     font-size: 14px;
     padding-bottom: 10px;
+}
+
+/* Media queries */
+
+@media only screen and (max-width: 1430px) {
+    .patch-tile { 
+        width: 45%;
+        height: 180px;
+    }
+    #one-third {
+        width: 100%;
+        display: flex;
+    }
+    #two-thirds {
+        width: 100%;
+        clear: both;
+        margin-left: 0px;
+    }
+    .patch-tile-small, .patch-description, .patch-stats {
+        width: 33%;
+        height: auto;
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+    .patch-description, .patch-stats {
+        margin-left: 20px;
+    }
+    #one-third .tag {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 860px) {
+    #primary-nav-items li, #reg-signin-items li {
+        font-size: 10px;
+    }
+    #logo {
+        margin: 11px 10px 0 5px;
+    }
+    #secondary-nav-bar {
+        height: 70px;
+    }
+    .secondary-nav-item {
+        width: 65px;
+    }
+    .secondary-nav-item p {
+        font-size: 12px;
+    }
+    .secondary-nav-item img {
+        width: 30px;
+        height: 30px;
+    }
+    .patch-tile {
+        width: 48%;
+        margin: 0 8px 8px 0;
+    }
+    .wrapper {
+        width: 100%;
+        padding: 5px;
+    }
+    #one-third {
+        flex-wrap: wrap;
+    }
+    .patch-tile-small {
+        width: 49.5%;
+    }
+    .patch-stats {
+        width: 49.5%;
+        margin-left: 1%;
+    }
+    .patch-description {
+        width: 100%;
+        margin-left: 0px;
+        margin-top: 10px;
+        order: 3;
+    }
+}
+
+@media only screen and (max-width: 680px) {
+    #reg-signin-items {
+        display: none;
+    }
+    .patch-tile {
+        width: 100%;
+        margin: 0 0 10px 0;
+    }
+    .secondary-nav-item {
+        width: 50px;
+    }
+    .secondary-nav-item img {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .tag-filter-button {
+        width: 48.9%;
+    }
 }
