@@ -133,21 +133,51 @@ body { background: #f4f4f4; }
     margin-left: 2%;
 }
 
-.patch-description, .patch-stats {
+.patch-description {
     width: 100%;
     padding: 20px;
     border-radius: 5px;
     margin-top: 20px;
     margin-bottom: 10px;
     border: 1px solid white;
-}
-
-.patch-description {
     background: #5d5d5d;
 }
 
+.video-wrapper1, .video-wrapper2 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
+}
+
+.video-wrapper1 iframe, .video-wrapper2 iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-wrapper1 {
+    display: block;
+}
+
+.video-wrapper2 {
+    display: none;
+}
+
 .patch-stats {
-    background: #8d8d8d;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background: none;
+}
+
+span.parameter-label {
+    font-size: 10px;
+    color: #909090;
 }
 
 .patch-stats table tr td {
@@ -157,6 +187,8 @@ body { background: #f4f4f4; }
 
 .patch-stats table tr td p {
     padding: 0;
+    font-size: 10px;
+    color: #231f20;
 }
 
 .patch-stats table tr:last-of-type {
@@ -181,13 +213,16 @@ body { background: #f4f4f4; }
 }
 
 .knob-container {
-    width: 20%;
-    height: auto;
+    width: 100px;
     float: left;
-    display: inline;
+    display: inline-block;
     position: relative;
     margin-top: 10px;
     margin-left: 20px;
+}
+
+input.knob {
+    font-size: 20px !important;
 }
 
 .knob-container:first-of-type {
@@ -529,7 +564,6 @@ h2, .parameter-label {
 .parameter-label {
     text-align: center;
     font-size: 10px;
-    margin-top: -20px;
 }
 
 #primary-nav-items li, a.order-button {
@@ -622,6 +656,12 @@ h2, .secondary-nav-item p {
     }
     #one-third .tag {
         display: none;
+    }
+    .video-wrapper1 {
+        display: none;
+    }
+    .video-wrapper2 {
+        display: block;
     }
 }
 

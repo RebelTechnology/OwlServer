@@ -100,10 +100,14 @@
                     <td>&nbsp;</td>
                 </tr>
             </table>
-            </div>            
+            </div>
             <div class="patch-description">
                 <p data-bind="text: description"></p>
             </div>
+            <div class="video-wrapper1">
+              <!-- Youtube embed here -->
+              <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
+            </div>            
             <div class="patch-stats">
               <table width="100%">
                 <tr>
@@ -137,7 +141,11 @@
             <iframe width="100%" height="250" scrolling="no" frameborder="no" 
 		    data-bind="if: soundcloud, attr: { src: soundcloud }">
 	    </iframe>
-            <div class="clear"></div>
+            <div class="video-wrapper2">
+              <!-- Youtube embed here -->
+              <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
+            </div>       
+            <div class="clear"></div>            
             <div class="white-box" data-bind="with: selectedPatch">
                 <h2>Parameters</h2>
                 <div class="flexbox flex-center">
@@ -205,6 +213,10 @@
     
 </div>
     
+
+<script type='text/javascript'>//<![CDATA[
+document.write("<script async src='//HOST:3000/browser-sync/browser-sync-client.1.5.2.js'><\/script>".replace(/HOST/g, location.hostname).replace(/PORT/g, location.port));
+//]]></script>
 
 </body>
     <script src="js/vertxbus.js"></script>
