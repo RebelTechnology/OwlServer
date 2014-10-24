@@ -102,12 +102,17 @@
             </table>
             </div>
             <div class="patch-description">
+                <h2>Description</h2>
+                <p data-bind="text: description"></p>
+            </div>
+            <div class="patch-instructions">
+              <h2>Instructions</h2>
                 <p data-bind="text: description"></p>
             </div>
             <div class="video-wrapper1">
               <!-- Youtube embed here -->
               <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
-            </div>            
+            </div>
             <div class="patch-stats">
               <table width="100%">
                 <tr>
@@ -145,7 +150,20 @@
               <!-- Youtube embed here -->
               <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
             </div>       
-            <div class="clear"></div>            
+            <div class="clear"></div>
+            <!-- Patch stats row here -->
+            <div class="patch-stats2">
+              <span class="parameter-label">Channels</span>
+              <span class="parameter-value">1.2</span>
+              <span class="parameter-label">CPU</span>
+              <span class="parameter-value">1.2</span>
+              <span class="parameter-label">Memory</span>
+              <span class="parameter-value">1.2</span>
+              <span class="parameter-label">Version</span>
+              <span class="parameter-value">v.1.1.0 - 21/04/2014</span>
+              <span class="parameter-label">Used in</span>
+              <span class="parameter-value">123 rigs</span>          
+            </div>        
             <div class="white-box" data-bind="with: selectedPatch">
                 <h2>Parameters</h2>
                 <div class="flexbox flex-center">
@@ -213,10 +231,6 @@
     
 </div>
     
-
-<script type='text/javascript'>//<![CDATA[
-document.write("<script async src='//HOST:3000/browser-sync/browser-sync-client.1.5.2.js'><\/script>".replace(/HOST/g, location.hostname).replace(/PORT/g, location.port));
-//]]></script>
 
 </body>
     <script src="js/vertxbus.js"></script>

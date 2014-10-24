@@ -133,14 +133,21 @@ body { background: #f4f4f4; }
     margin-left: 2%;
 }
 
-.patch-description {
+.patch-description, .patch-instructions {
     width: 100%;
     padding: 20px;
     border-radius: 5px;
     margin-top: 20px;
     margin-bottom: 10px;
     border: 1px solid white;
+}
+
+.patch-description {
     background: #5d5d5d;
+}
+
+.patch-instructions {
+    background: grey;
 }
 
 .video-wrapper1, .video-wrapper2 {
@@ -168,16 +175,44 @@ body { background: #f4f4f4; }
     display: none;
 }
 
-.patch-stats {
+.patch-stats, .patch-stats2 {
     width: 100%;
     margin-top: 20px;
     margin-bottom: 10px;
     background: none;
 }
 
+.patch-stats2 {
+    border: 1px dotted #b7b7b7;
+    border-radius: 5px;
+    text-align: center;
+    padding: 10px;
+    line-height: 1.4;
+    margin-top: 0;
+}
+
 span.parameter-label {
     font-size: 10px;
     color: #909090;
+}
+
+.patch-stats2 span.parameter-value {
+    font-size: 12px;
+    color: #333;
+    margin-left: 10px;
+}
+
+.patch-stats2 span.parameter-value::after {
+    content: "//";
+    margin-left: 20px;
+    margin-right: 20px;
+    color: #b7b7b7;
+    font-size: 8px;
+}
+
+.patch-stats2 span.parameter-value:last-child::after {
+    content: "";
+    margin-right: 0;
 }
 
 .patch-stats table tr td {
@@ -587,7 +622,7 @@ h2, .secondary-nav-item p {
     color: #231f20;
 }
 
-.patch-tile, .patch-tile-small, .patch-description {
+.patch-tile, .patch-tile-small, .patch-description, .patch-instructions {
     font-family: 'Ubuntu', sans-serif;
 }
 
@@ -622,11 +657,10 @@ h2, .secondary-nav-item p {
     color: #231f20;
 }
 
-.patch-description p, .patch-stats p {
+.patch-description p, .patch-stats p, .patch-instructions {
     color: #fff;
     line-height: 1.5;
     font-size: 14px;
-    padding-bottom: 10px;
 }
 
 /* Media queries */
@@ -645,13 +679,19 @@ h2, .secondary-nav-item p {
         clear: both;
         margin-left: 0px;
     }
-    .patch-tile-small, .patch-description, .patch-stats {
-        width: 33%;
+    .patch-tile-small, .patch-description, .patch-instructions {
+        width: 33% !important;
         height: auto;
         margin-top: 0px;
         margin-bottom: 0px;
+        display: inline;
     }
-    .patch-description, .patch-stats {
+    .patch-stats {
+        display: none;
+        clear: both;
+        width: 100%;
+    }
+    .patch-description, .patch-instructions {
         margin-left: 20px;
     }
     #one-third .tag {
@@ -697,17 +737,16 @@ h2, .secondary-nav-item p {
         flex-wrap: wrap;
     }
     .patch-tile-small {
-        width: 49.5%;
+        width: 100% !important;
     }
-    .patch-stats {
+    /*.patch-stats {
         width: 49.5%;
         margin-left: 1%;
-    }
-    .patch-description {
-        width: 100%;
+    }*/
+    .patch-description, .patch-instructions {
+        width: 100% !important;
         margin-left: 0px;
         margin-top: 10px;
-        order: 3;
     }
 }
 
