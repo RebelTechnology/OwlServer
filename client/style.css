@@ -247,6 +247,11 @@ span.parameter-label {
     margin-bottom: 20px;
 }
 
+#git-code {
+    max-height: 500px;
+    overflow-y: scroll;
+}
+
 .knob-container {
     width: 100px;
     float: left;
