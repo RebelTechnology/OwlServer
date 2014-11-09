@@ -498,6 +498,7 @@ input.knob {
     width: 30px;
     border: 1px solid #D4D4D4;
     border-radius: 5px;
+    cursor: pointer;
     text-align: center;
     line-height: 26px; /* Take some px off for internal box borders */
     margin-left: 10px;
