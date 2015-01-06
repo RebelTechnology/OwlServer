@@ -1,0 +1,62 @@
+div.mw-body-content h1 {
+    background: none repeat scroll 0 0 #5d5d5d;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 18px;
+    margin-top: 20px;
+    padding: 10px;
+    text-transform: initial;
+}
+
+#searchInput {
+    width: 140px;
+}
+
+#toc {
+    background: none repeat scroll 0 0 #e0e0e0;
+    clear: both;
+    display: block;
+    float: right;
+    padding: 0 10px 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+span.toctoggle {
+    float: right;
+    font-size: 12px;
+    margin: 33px 7px;
+}
+
+#footer-bar p {
+    margin-top: 15px !important;
+}
+
+#p-search {
+    margin-bottom: 15px;
+}
+
+form.bbp-login-form input[type=text], form.bbp-login-form input[type=password] {
+    width: 190px;
+}
+
+form.bbp-login-form legend:first-child {
+    display: none;
+}
+
+div.bbp-username {
+    margin-top: 10px;
+}
+
+.widget-area li {
+    list-style-type: square;
+}
+
+#toolbar img {
+    display: inline;
+    margin: 0;
+}
+
+#wpTextbox1 {
+    width: 100%;
+}
