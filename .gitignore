@@ -28,3 +28,6 @@ node_modules
 web/api/node_modules
 web/api/api-settings.js
 web/api/*.log
+
+# Other
+utils/owl-patch-db-import/node_modules
