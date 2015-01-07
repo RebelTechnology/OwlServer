@@ -25,6 +25,7 @@ var mongodb = require('mongodb');
 var assert = require('assert');
 var GoogleSpreadsheet = require("google-spreadsheet");
 var trim = require('trim');
+var readline = require('readline');
 
 var patchSheet = new GoogleSpreadsheet(SPREADSHEET_ID);
 
@@ -131,17 +132,32 @@ patchSheet.getRows(1, function(err, records) {
             
             var collection = db.collection(MONGO_COLLECTION);
             
-            // Delete previous data
-            collection.remove({}, function(err, result) {
-                console.log('Cleaning up database...');
-                assert.equal(err, null);
+            var rl = readline.createInterface(process.stdin, process.stdout);
+            
+            rl.question('WARNING: This script will overwrite existing data in MongoDB. Continue? (y/N): ', function(answer) {
                 
-                // Insert data
-                collection.insert(patches, function(err, result) {
-                    assert.equal(err, null);
-                    console.log('Added %d patches to the database.', result.length);
-                    db.close();
-                });
+                if(answer === 'y' || answer === 'Y') {
+                
+                    // Delete previous data
+                    collection.remove({}, function(err, result) {
+                        console.log('Cleaning up database...');
+                        assert.equal(err, null);
+                        
+                        // Insert data
+                        collection.insert(patches, function(err, result) {
+                            assert.equal(err, null);
+                            console.log('Added %d patches to the database.', result.length);
+                            db.close();
+                            process.exit(0);
+                        });
+                    });
+                
+                } else {
+                    
+                    console.log ('Aborting.');
+                    process.exit(1);
+                    
+                }
             });
         });
 });
