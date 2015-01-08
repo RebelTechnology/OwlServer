@@ -23,7 +23,7 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 function usage {
-    echo "Usage: ./$0 {production|staging}" 1>&2
+    echo "Usage: $0 {production|staging}" 1>&2
     exit 1
 }
 
