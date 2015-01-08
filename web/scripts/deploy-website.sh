@@ -41,6 +41,8 @@ echo "This is $HOSTNAME, assuming $TARGET_ENV environment."
 
 # Delete previous clone
 rm -rf $DIR/$CLONE_DIR
+
+# Clone repository
 echo "Cloning $CLONE_DIR repository..."
 git clone --quiet $REPO_URL $DIR/$CLONE_DIR
 cd $DIR/$CLONE_DIR
