@@ -3,7 +3,7 @@ This project exposes some data related to the [OWL][1] project over a RESTful AP
 ## Requirements
 * Node.js
 
-## Installing
+## How to run
 1. Clone directory `web/api` from repository.
 2. Copy file `_meta/api-settings.tpl.js` to root directory and rename it to `api-settings.js`:
 
@@ -14,7 +14,11 @@ This project exposes some data related to the [OWL][1] project over a RESTful AP
         npm install
 5. Enjoy!
 
-       ./bin/www
+        ./bin/www
+
+**NOTE:** The method above is suitable for quickly testing the API locally. If
+you want to run it in production, consider using a SysV init script. Here's [an
+example][_meta/init-scripts/owl-api].
 
 ## API documentation
 
