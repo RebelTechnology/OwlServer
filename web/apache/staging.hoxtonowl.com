@@ -9,6 +9,16 @@
         php_flag display_errors on
         SetEnv APPLICATION_ENV staging
 
+        # Reverse proxy for REST API
+        ProxyRequests Off
+        ProxyVia On
+        <Location /api/>
+            ProxyPass http://127.0.0.1:3000/
+            ProxyPassReverse http://127.0.0.1:3000/
+            Order allow,deny
+            Allow from all
+        </Location>
+
         <Directory /var/www/hoxtonowl.com/subdomains/staging/httpdocs/>
 		    Options FollowSymLinks
 	        AllowOverride Limit Options FileInfo

@@ -12,6 +12,16 @@
     CustomLog /var/log/apache2/owl.pingdynasty.com.log combined
     php_flag display_errors off
     SetEnv APPLICATION_ENV production
+
+    # Reverse proxy for REST API 
+    ProxyRequests Off 
+    ProxyVia On
+    <Location /api/>
+        ProxyPass http://staging.hoxtonowl.com:3001/
+        ProxyPassReverse http://staging.hoxtonowl.com:3001/
+        Order allow,deny
+        Allow from all 
+    </Location> 
     
     <Directory /home/owl/wordpress>
         Options FollowSymLinks -Indexes
