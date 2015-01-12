@@ -18,7 +18,7 @@ This project exposes some data related to the [OWL][1] project over a RESTful AP
 
 **NOTE:** The method above is suitable for quickly testing the API locally. If
 you want to run it in production, consider using a SysV init script. Here's [an
-example][_meta/init-scripts/owl-api].
+example](_meta/init-scripts/owl-api).
 
 ## API documentation
 
