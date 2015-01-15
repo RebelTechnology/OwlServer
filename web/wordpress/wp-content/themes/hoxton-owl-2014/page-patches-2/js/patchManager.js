@@ -17,9 +17,85 @@ if(!com.hoxtonowl) {
 }
 
 /**
- * Conveniently groups some utility functions to handle patches.
+ * API client
  * 
  * @class
+ */
+com.hoxtonowl.ApiClient = function() {
+    // Determine API endpoint
+    this.apiEndPoint = window.location.protocol + '//' + window.location.host + '/api';
+    if ('hoxtonowl.localhost' == window.location.hostname) { // for local debugging
+        this.apiEndPoint = 'http://' + window.location.hostname + ':3000';
+    }
+};
+
+/**
+ * Calls an API method.
+ * 
+ * @param  {string}       path
+ *     The path to the API method.
+ * @param  {string} [verb=get]
+ *     The  HTTP verb to use.
+ * @return Object
+ *     An object representing an ajax request.
+ */
+com.hoxtonowl.ApiClient.prototype.query = function(path, method) {
+    method = method || 'get';
+    return $[method](this.apiEndPoint + path);
+};
+
+/**
+ * Represents a patch.
+ * 
+ * @param {Object} p
+ *     Patch data as returned by the API, which can come in the form of a summary
+ *     or as complete data.
+ * @class
+ */
+com.hoxtonowl.Patch = function(p) {
+    
+    /**
+     * Converts a number of bytes into a human-readable string.
+     * 
+     * @param {number} size
+     *     The size in bytes.
+     * @return {string}
+     *     A human-readable string.
+     * @private
+     */
+    var humanFileSize = function(size) {
+        var i = Math.floor( Math.log(size) / Math.log(1024) );
+        return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+    };
+    
+    // Minimal patch data (summary)
+    this.id          = p._id,
+    this.name        = p.name;
+    this.author      = $.trim(p.author.name);
+    this.tags        = $.map(p.tags, $.trim);
+    //this.link      = 'patch.html?patch=' + encodeURIComponent(p.name); // should we use id?
+    
+    // Complete data
+    if (p.description) this.description = p.description;
+    if (typeof p.inputs !== 'undefined') this.inputs = p.inputs;
+    if (typeof p.outputs !== 'undefined') this.outputs     = p.outputs;
+    if (p.armCyclesPerSample) this.cycles = Math.round(p.armCyclesPerSample * 100.0 / 3500.0) + '%';
+    if (p.bytesWithGain) this.bytes = humanFileSize(p.bytesWithGain);
+    if (p.soundcloud) this.soundcloud = p.soundcloud;
+    if (p.repo) this.repo = p.repo;
+    if (p.github) this.file = p.github;
+    if (p.parameters) {
+        this.parameters = [];
+        for(var key in p.parameters) {
+            this.parameters.push(p.parameters[key]);
+        }
+    }
+};
+
+/**
+ * Conveniently groups some utility functions to handle patches.
+ * 
+ * @namespace
  */
 com.hoxtonowl.patchManager = {
 
@@ -60,58 +136,15 @@ com.hoxtonowl.patchManager = {
     },
 
     /**
-     * Returns the value of the specified query string parameter.
-     * 
-     * @param  {string} sParam
-     *     The query string parameter to look for.
-     * @return {string|undefined}
-     *     The value of the specified query string parameter, or `undefined`
-     *     if the parameter could not be found.
-     */
-    getURLParameter: function(sParam){
-        var sPageURL = window.location.search.substring(1);
-        var sURLVariables = sPageURL.split('&');
-        for (var i = 0; i < sURLVariables.length; i++){
-            var sParameterName = sURLVariables[i].split('=');
-            if(sParameterName[0] == sParam) 
-                return decodeURIComponent(sParameterName[1]);
-        }
-    },
-
-    /**
-     * Removes all duplicates from an array of strings.
-     * 
-     * @param  {string[]} array
-     *     An array of strings.
-     * @return {string[]}
-     *     The input array with duplicates removed.
-     */
-    unique: function(array) {
-        return $.grep(array, function(el, index) {
-            return index === $.inArray(el, array);
-        });
-    },
-
-    /**
-     * Converts a number of bytes into a human-readable string.
-     * 
-     * @param  {number} size
-     *     The size in bytes.
-     * @return {string}
-     *     A human-readable string.
-     */
-    humanFileSize: function(size) {
-        var i = Math.floor( Math.log(size) / Math.log(1024) );
-        return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
-    },
-
-    /**
      * Retrieves all patch data by calling the OWL API.
+     * 
+     * @param  {Function} callback
+     *     A callback that will be invoked once data is loaded.
      */
-    getAllPatchData: function(callback) {
+    getAllPatches: function(callback) {
         
         var owl = com.hoxtonowl;
-        var client = new owl.apiClient();
+        var client = new owl.ApiClient();
         
         $.when(
             client.query('/patches/findAll'),
@@ -120,9 +153,8 @@ com.hoxtonowl.patchManager = {
         ).done(function(patchData, authorData, tagData) {
             
             var patches = patchData[0].result;
-            // for backward compatibility
             for (var i = 0; i < patches.length; i++) {
-                patches[i].author = patches[i].author.name;
+                patches[i] = new owl.Patch(patches[i]);
             }
             
             var authors = [];
@@ -141,7 +173,28 @@ com.hoxtonowl.patchManager = {
             callback(patches, authors, tags);
             
         });
+    },
+    
+    /**
+     * Get data for the patch with the specified ID by calling the OWL API.
+     * 
+     * @param  {string} patchId
+     *     The patch ID.
+     * @param  {Function} callback
+     *     A callback that will be invoked once data is loaded. This function will
+     *     be passed the freshly loaded patch.
+     */
+    getSinglePatch: function(patchId, callback) {
         
+        var owl = com.hoxtonowl;
+        var client = new owl.ApiClient();
+        
+        $.when(client.query('/patches/findOne/' + patchId)).done(function(patchData) {
+            // console.log(patchData.result);
+            var patch = patchData.result;
+            patch = new owl.Patch(patch);
+            callback(patch);
+        });
     },
 
     /**
@@ -156,160 +209,181 @@ com.hoxtonowl.patchManager = {
      */
     main: function(patches, authors, tags) {
         
+        var that = this;
         var owl = com.hoxtonowl;
         var pm = owl.patchManager;
         
-        window.selectedPatch = ko.observable();
-        window.patches = ko.observableArray(patches);
-        window.tags = ko.observableArray(tags);
-        window.authors = ko.observableArray(authors);
+        that.selectedPatch = ko.observable();       // currently selected patch
+        that.patches = ko.observableArray(patches); // all patches
+        that.authors = ko.observableArray(authors); // all authors
+        that.tags = ko.observableArray(tags);       // all tags
 
-        window.search = ko.observable();
-        window.searchItems = ko.observableArray();
+        that.search = ko.observable();              // either 'search', 'tag' or 'patch'
+        that.searchItems = ko.observableArray();
 
-        window.filteredPatches = ko.computed(function() {
-            return ko.utils.arrayFilter(window.patches(), function(r) {
-                if(window.searchItems.indexOf("All") > -1) {
+        that.filteredPatches = ko.computed(function() {
+            //console.log('filteredPatches');
+            //console.log(that.searchItems());
+            return ko.utils.arrayFilter(that.patches(), function(r) {
+                //console.log(that.searchItems);
+                if(that.searchItems.indexOf("All") > -1) {
                     return true;
                 }
-                if(window.search() === "tag") {
-                    for(i=0; i<r.tags.length; ++i) {
-                        if(window.searchItems.indexOf(r.tags[i]) > -1) {
+                if(that.search() === "tag") {
+                    for (i=0; i<r.tags.length; ++i) {
+                        if(that.searchItems.indexOf(r.tags[i]) > -1) {
                             return true;
                         }
                     }
-                } else if(window.search() === "author") {
-                    return window.searchItems.indexOf(r.author) > -1;
+                } else if(that.search() === "author") {
+                    return that.searchItems.indexOf(r.author) > -1;
                 }
                 return false;
             });
         });
 
-        window.selectFilter = function(item) {
-            //console.log("select filter "+item+" searching "+window.search());
-            if(window.search() === "author") {
+        that.selectFilter = function(item) {
+            //console.log("select filter "+item+" searching "+that.search());
+            if(that.search() === "author") {
                 return selectAuthor(item);
             } else {
                 return selectTag(item);
             }
         };
 
-        window.selectAuthor = function(author) {
+        that.selectAuthor = function(author) {
             if(author.author) {
                 author = author.author;
             }
             //console.log("select author "+author);
-            window.selectedPatch(null);
-            if(window.search() != "author") {
-                window.search("author");
-                window.searchItems.removeAll();
-                window.searchItems.push(author);
-            } else if(window.searchItems.indexOf(author) > -1) {
-                window.searchItems.remove(author);
-                if(window.searchItems().length === 0) {
-                    window.searchItems.push("All");
+            that.selectedPatch(null);
+            if(that.search() != "author") {
+                that.search("author");
+                that.searchItems.removeAll();
+                that.searchItems.push(author);
+            } else if (that.searchItems.indexOf(author) > -1) {
+                that.searchItems.remove(author);
+                if(that.searchItems().length === 0) {
+                    that.searchItems.push("All");
                 }
             } else {
-                if(author === "All") {
-                    window.searchItems.removeAll();
+                if (author === "All") {
+                    that.searchItems.removeAll();
+                    that.searchItems.push('All'); // added by Sam
                 } else {
-                    window.searchItems.remove("All"); 
-                    window.searchItems.push(author);
+                    that.searchItems.remove("All"); 
+                    that.searchItems.push(author);
                 }
             }
         };
 
-        window.selectTag = function(tag){
-        //console.log("select tag "+tag);
-        window.selectedPatch(null);
-        if(window.search() != "tag"){
-            window.search("tag");
-            window.searchItems.removeAll();
-            window.searchItems.push(tag);
-        }else if(window.searchItems.indexOf(tag) > -1){
-            window.searchItems.remove(tag);
-            if(window.searchItems().length == 0)
-            window.searchItems.push("All");   
-        }else{
-            if(tag === "All")
-            window.searchItems.removeAll();
-            else
-            window.searchItems.remove("All"); 
-            window.searchItems.push(tag);
-        }
+        that.selectTag = function(tag) {
+            //console.log("select tag " + tag);
+            that.selectedPatch(null);
+            if (that.search() != "tag") {
+                that.search("tag");
+                that.searchItems.removeAll();
+                that.searchItems.push(tag);
+            } else if (that.searchItems.indexOf(tag) > -1) {
+                that.searchItems.remove(tag);
+                if(that.searchItems().length == 0) {
+                    that.searchItems.push("All");
+                }
+            } else {
+                if (tag === "All") {
+                    that.searchItems.removeAll();
+                    that.searchItems.push('All'); // added by Sam
+                } else {
+                    that.searchItems.remove("All"); 
+                    that.searchItems.push(tag);
+                }
+            }
         };
 
-        window.selectOnlyTag = function(tag) {
-            window.searchItems.removeAll();
+        that.selectOnlyTag = function(tag) {
+            //console.log('selectOnlyTag');
+            that.searchItems.removeAll();
             selectTag(tag);
         };
 
-        window.selectAllTags = function(tag) {
+        that.selectAllTags = function(tag) {
+            //console.log('selectAllTags');
             selectTag('All');
         };
 
-        window.selectOnlyAuthor = function(author) {
-            window.searchItems.removeAll();
+        that.selectOnlyAuthor = function(author) {
+            //console.log('selectOnlyAuthor');
+            that.searchItems.removeAll();
             selectAuthor(author);
         };
 
-        window.selectAllAuthors = function(tag) {
+        that.selectAllAuthors = function(tag) {
+            //console.log('selectAllAuthors');
             selectAuthor('All');
         };
 
-        window.selectPatch = function(name) {
-            if (name.name) {
-                name = name.name;
+        that.selectPatch = function(name, e) {
+            console.log('selectPatch');
+            
+            var target;
+            if (e.target) {
+                target = e.target; // gecko
+            } else if (e.srcElement) {
+                target = e.srcElement; // ie
+            } if (target.nodeType == 3) { // defeat Safari bug
+                target = target.parentNode;
             }
-            //console.log("select patch "+name);
-            window.search("patch");
-            window.searchItems.removeAll();
-            $("#gitsource").empty();
-            for (var i = 0; i < window.patches().length; ++i) {
-                var patch = window.patches()[i];
-                if(patch.name === name) {
-                    window.selectedPatch(patch);
+            
+            var patchId = $(target).attr('data-patch-id');
+            pm.getSinglePatch(patchId, function(patch) {
+                
+                if (name.name) {
+                    name = name.name;
                 }
-            }
-            // var url = "https://api.github.com/repos/" + user + "/" + repo + "/git/blobs/" + sha;
-            // var url = "https://api.github.com/repos/pingdynasty/OwlPatches/contents/" + window.selectedPatch().file;
-            var url = "https://api.github.com/repos/"+window.selectedPatch().repo+"/contents/"+window.selectedPatch().file;
-            pm.getGithubFile(url, function(contents) {
-                // console.log("contents "+contents);
-                $("#gitsource").text(contents).removeClass("prettyprinted").parent();
-                //console.log("pretty printing");
-                prettyPrint();
-                // use highlight.js instead?
-                // https://github.com/isagalaev/highlight.js
-                // embed editor?
-                // http://ace.c9.io/#nav=embedding
+                //console.log("select patch "+name);
+                that.search("patch");
+                that.searchItems.removeAll();
+                $("#gitsource").empty();
+                that.selectedPatch(patch);
+                
+                // var url = "https://api.github.com/repos/" + user + "/" + repo + "/git/blobs/" + sha;
+                // var url = "https://api.github.com/repos/pingdynasty/OwlPatches/contents/" + that.selectedPatch().file;
+                var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().file;
+                pm.getGithubFile(url, function(contents) {
+                    // console.log("contents "+contents);
+                    $("#gitsource").text(contents).removeClass("prettyprinted").parent();
+                    //console.log("pretty printing");
+                    prettyPrint();
+                    // use highlight.js instead?
+                    // https://github.com/isagalaev/highlight.js
+                    // embed editor?
+                    // http://ace.c9.io/#nav=embedding
+                });
+                knobify();
+                
             });
-            knobify();
         };
 
-        window.soundcloud = ko.computed(function() {
-            if(window.selectedPatch() && window.selectedPatch().soundcloud) {
+        that.soundcloud = ko.computed(function() {
+            if(that.selectedPatch() && that.selectedPatch().soundcloud) {
                 return "https://w.soundcloud.com/player/?url=" +
-                encodeURIComponent(window.selectedPatch().soundcloud) +
+                encodeURIComponent(that.selectedPatch().soundcloud) +
                 "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
             } else {
                 return "";
             }
         });
 
-        ko.applyBindings(window);
-
-        var patchName = pm.getURLParameter("patch");
-        if(patchName) {
-            selectPatch(patchName);
-        } else {
-            selectTag("All");
-        }
+        ko.applyBindings(that);
+        selectTag("All");
+        
     }
 };
 
 (function() {
     var owl = com.hoxtonowl;
     var pm = owl.patchManager;
-    pm.getAllPatchData(pm.main);
+    pm.getAllPatches(pm.main);
 })();
+
+// EOF

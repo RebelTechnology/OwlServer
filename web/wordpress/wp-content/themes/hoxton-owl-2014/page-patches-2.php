@@ -30,8 +30,6 @@ wp_enqueue_script('owl-patches-page_vertxbus'              , $resUri . 'js/vertx
 wp_enqueue_script('owl-patches-page_spreadsheet_client_app', $resUri . 'js/spreadsheet_client_app.js', array(), false, true);
 
 //wp_enqueue_script('owl-patches-page_spreadsheets_google',    'https://spreadsheets.google.com/feeds/list/1ocSb1dTeOm8YgeqDOAGsfLddZrGxzAbymuq0bz5ZQ3Q/od6/public/values?alt=json-in-script&callback=importGSS', array(), false, true);
-
-wp_enqueue_script('owl-patches-page_api_client', $resUri . 'js/apiClient.js', array(), false, true);
 wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array(), false, true);
 
 ?>
@@ -187,7 +185,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <table class="patch-title-controls">
                       <tbody><tr>
                           <!-- <td width="40"><div class="play-button">&gt;</div></td> -->
-                          <td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td>
+                          <td><span class="patch-title" data-bind="text: name, click: selectPatch, attr: { 'data-patch-id': id }"></span></td>
                           <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
                         </tr>
                         <tr>
