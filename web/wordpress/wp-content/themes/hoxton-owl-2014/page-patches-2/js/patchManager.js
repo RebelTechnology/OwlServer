@@ -72,7 +72,10 @@ com.hoxtonowl.Patch = function(p) {
     this.id          = p._id,
     this.name        = p.name;
     this.author      = $.trim(p.author.name);
-    this.tags        = $.map(p.tags, $.trim);
+    this.tags        = [];
+    if (p.tags && p.tags.length) {
+        this.tags = $.map(p.tags, $.trim);
+    }
     //this.link      = 'patch.html?patch=' + encodeURIComponent(p.name); // should we use id?
     
     // Complete data
