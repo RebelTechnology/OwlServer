@@ -30,8 +30,8 @@ web/api/api-settings.js
 web/api/*.log
 
 # Patch importer
-utils/owl-patch-db-import/node_modules
-utils/owl-patch-db-import/mongo-credentials.js
+web/utils/owl-patch-db-import/node_modules
+web/utils/owl-patch-db-import/mongo-credentials.js
 
 # Sublime Text 2 Editor 
 *.sublime-*
