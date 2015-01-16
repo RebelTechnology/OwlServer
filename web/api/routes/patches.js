@@ -36,7 +36,7 @@ router.get('/findOne/:id', function(req, res) {
 router.get('/findAll', function(req, res) {
     
     var collection = req.db.get('patches');
-    collection.find({}, { fields: summaryFields }, function(err, patchSummaries) {
+    collection.find({}, { fields: summaryFields, sort: 'name' }, function(err, patchSummaries) {
         var response = { error: null === err ? 0 : err };
         if (null === err) {
             response.count = patchSummaries.length;

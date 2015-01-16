@@ -221,7 +221,7 @@ com.hoxtonowl.patchManager = {
         that.authors = ko.observableArray(authors); // all authors
         that.tags = ko.observableArray(tags);       // all tags
 
-        that.search = ko.observable();              // either 'search', 'tag' or 'patch'
+        that.search = ko.observable();              // one of 'all', 'search', 'tag' or 'patch'
         that.searchItems = ko.observableArray();
 
         that.filteredPatches = ko.computed(function() {
@@ -245,6 +245,13 @@ com.hoxtonowl.patchManager = {
             });
         });
 
+        that.selectAllPatches = function() {
+            that.selectedPatch(null);
+            that.search('all');
+            that.searchItems.removeAll();
+            that.searchItems.push('All');
+        };
+        
         that.selectFilter = function(item) {
             //console.log("select filter "+item+" searching "+that.search());
             if(that.search() === "author") {
@@ -379,7 +386,7 @@ com.hoxtonowl.patchManager = {
 
         ko.applyBindings(that);
         selectTag("All");
-        
+        that.search("all");
     }
 };
 

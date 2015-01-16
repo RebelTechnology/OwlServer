@@ -47,10 +47,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
             
                 <div id="secondary-nav-bar-content">
                 
-                  <!-- <div class="secondary-nav-item"> -->
-                  <!--   <img src="<?= $resUri ?>images/browse-all-icon.png" width="40" height="40" alt="icon"> -->
-                  <!--   <p>Browse all</p> -->
-                  <!-- </div> -->
+                  <div class="secondary-nav-item" data-bind="css: { active: search() === 'all' }, click: selectAllPatches">
+                    <img src="<?= $resUri ?>images/browse-all-icon.png" width="40" height="40" alt="icon">
+                    <p>Browse all</p>
+                  </div>
                   <!-- <div class="secondary-nav-item"> -->
                   <!--   <img src="<?= $resUri ?>images/latest-icon.png" width="40" height="40" alt="icon"> -->
                   <!--   <p>Latest</p> -->
@@ -79,7 +79,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                 </div>
             </div>
                 
-            <div id="filter-bar" data-bind="if: search() != 'patch'">
+            <div id="filter-bar" data-bind="if: search() != 'patch' && search() != 'all'">
               <div id="filter-wrapper" class="wrapper" data-bind="foreach: search() === 'author' ? authors : tags">
                 <div class="tag-filter-button" 
                  data-bind="text: $data, click: selectFilter, css: { active: searchItems.indexOf($data) > -1 }">
