@@ -88,8 +88,6 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
             </div>
             
             <div class="wrapper">
-            
-                <!-- <div id="breadcrumb"></div> -->
                 
                 <div class="content-container">
             
@@ -97,21 +95,21 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <div id="one-third" data-bind="with: selectedPatch">
                         <div class="patch-tile-small" id="sticker">
                             <table class="patch-title-controls">
-                            <tr>
-                                <td><span class="patch-title" data-bind="text: name"></span></td>
-                                <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
-                            </tr>
-                            <tr>
-                                <td style="padding-top: 20px;">
-                          <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
-                        </td>
-                                <td>&nbsp;</td>
-                            </tr>
-                        </table>
-                        </div>            
+                                <tr>
+                                    <td><span class="patch-title no-pseudo-link" data-bind="text: name"></span></td>
+                                    <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 20px;">
+                                        <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
+                                    </td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </table>
+                        </div>
                         <div class="patch-description">
                             <p data-bind="text: description"></p>
-                        </div>            
+                        </div>
                         <div class="patch-stats">
                           <table width="100%">
                             <tr>
@@ -170,12 +168,12 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                                 <p class="parameter-label" data-bind="text: parameters[3]"></p>
                               </div>
                             </div>
-                        </div>        
+                        </div>
                         <div class="">
                             <h2>Patch code</h2>
-                    <pre id="gitsource" class="prettyprint"></pre>
-                        </div>                
-                    </div>
+                            <pre id="gitsource" class="prettyprint"></pre>
+                            </div>
+                        </div>
                 <!-- /ko -->
             
                   <!-- ko foreach: filteredPatches -->
@@ -184,7 +182,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <table class="patch-title-controls">
                       <tbody><tr>
                           <!-- <td width="40"><div class="play-button">&gt;</div></td> -->
-                          <td><span class="patch-title" data-bind="text: name, click: selectPatch, attr: { 'data-patch-id': id }"></span></td>
+                          <td><span class="patch-title" data-bind="text: name, click: com.hoxtonowl.patchManager.openPatch, attr: { 'data-patch-id': id }"></span></td>
                           <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
                         </tr>
                         <tr>

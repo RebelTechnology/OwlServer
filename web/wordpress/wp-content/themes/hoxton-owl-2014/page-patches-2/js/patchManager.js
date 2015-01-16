@@ -96,6 +96,18 @@ com.hoxtonowl.Patch = function(p) {
 };
 
 /**
+ * Return an SEO-friendly version of the patch's name.
+ * 
+ * @return {string}
+ *     An SEO-friendly version of the patch's name.
+ */
+com.hoxtonowl.Patch.prototype.getSeoFriendlyName = function() {
+    return this.name.replace(/[^a-z0-9]/gi, '_'); // Replace anything that is not a
+                                                  // letter or a number with an
+                                                  // underscore symbol.
+};
+
+/**
  * Conveniently groups some utility functions to handle patches.
  * 
  * @namespace
@@ -333,7 +345,7 @@ com.hoxtonowl.patchManager = {
         };
 
         that.selectPatch = function(name, e) {
-            console.log('selectPatch');
+            //console.log('selectPatch');
             
             var target;
             if (e.target) {
@@ -387,6 +399,16 @@ com.hoxtonowl.patchManager = {
         ko.applyBindings(that);
         selectTag("All");
         that.search("all");
+    },
+    
+    /**
+     * Navigates to a patch page.
+     * 
+     * @param {Object} e
+     *     The click event.
+     */
+    openPatch: function(patch) {
+        console.log(patch.getSeoFriendlyName());
     }
 };
 

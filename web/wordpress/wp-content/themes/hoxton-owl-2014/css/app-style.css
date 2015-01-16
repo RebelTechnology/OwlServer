@@ -358,6 +358,10 @@ body { background: #f4f4f4; }
     transition: .3s;
 }
 
+.patch-title.no-pseudo-link:hover {
+    cursor: default;
+}
+
 .spacer {
     height: 280px;
     width: 2%;
