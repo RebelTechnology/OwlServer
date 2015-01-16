@@ -293,12 +293,13 @@ ul.menu li:hover ul {
   visibility: visible;
 }
 li.current_page_item a {
-	background: #433f40 !important;
-	border-bottom: 5px solid #f47a20;
+    background: #433f40 !important;
+    border-bottom: 5px solid #f47a20;
 }
 /* CSS rules added by Sam */
 input[type=text], input[type=password], input[type=search] {
-    border: none;
+    border: 1px solid #d3d3d3;
+    border-radius: 5px;
     font-size: 12px;
     padding: 4px;
     color: #5d5d5d;
