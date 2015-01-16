@@ -6,12 +6,20 @@
     DocumentRoot /home/owl/wordpress
 
     # Logging
-
     ErrorLog /var/log/apache2/owl.pingdinasty.com.error.log
     LogLevel debug
     CustomLog /var/log/apache2/owl.pingdynasty.com.log combined
     php_flag display_errors off
     SetEnv APPLICATION_ENV production
+
+    # Prevent direct access to /wp-login.php (i.e. no HTTP referrer)
+    <IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteCond %{REQUEST_URI} .wp-login\.php*
+	RewriteCond %{HTTP_REFERER} !.*hoxtonowl.com.* [OR]
+	RewriteCond %{HTTP_USER_AGENT} ^$
+        RewriteRule (.*) http://www.example.com/ [R=301,L]
+    </IfModule>
 
     # Reverse proxy for REST API 
     ProxyRequests Off 
@@ -158,4 +166,17 @@
             deny from all
         </Files>
     </Directory>
+
+#    # Password protect wp-admin directory:
+#    <Directory "/home/owl/wordpress/wp-admin">
+#        AuthName "Are you an evil sp4mb0t?"
+#        AuthType Basic
+#        AuthUserFile /home/owl/.htpasswd
+#        require valid-user
+#        <Files "admin-ajax.php">
+#            Order allow,deny
+#            Allow from all
+#            Satisfy any
+#        </Files>
+#    </Directory>
 </VirtualHost>
