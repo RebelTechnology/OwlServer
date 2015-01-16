@@ -316,7 +316,7 @@ body { background: #f4f4f4; }
     border: 1px solid #d0d0d0;
     border-radius: 5px;
     box-shadow: 0px 0px 10px #6f757f;
-    background-image:url(page-patches-2/images/patch-background.png);
+    background-image:url(page-patch-library/images/patch-background.png);
     background-size: 100%;
     background-position: top center;
     transition: .3s;
@@ -335,7 +335,7 @@ body { background: #f4f4f4; }
     border: 1px solid #d0d0d0;
     border-radius: 5px;
     box-shadow: 0px 0px 10px #6f757f;
-    background:url(page-patches-2/images/patch-background.png);
+    background:url(page-patch-library/images/patch-background.png);
     background-size: 100%;
     background-position: center center;
     transition: .3s;

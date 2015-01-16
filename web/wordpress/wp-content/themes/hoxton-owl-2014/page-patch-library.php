@@ -8,7 +8,7 @@
  * convention "page-{page_slug}.php".
  */
 
-$resUri = get_template_directory_uri() . '/page-patches-2/';
+$resUri = get_template_directory_uri() . '/page-patch-library/';
 
 // <link rel="stylesheet"> tags to be placed in <head>
 //wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), 5);
