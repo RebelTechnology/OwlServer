@@ -1,0 +1,16 @@
+{
+  "name": "patch-seo-friendly-name-gen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sam Artuso <sam@highoctanedev.co.uk>",
+  "license": "WTFPL",
+  "dependencies": {
+    "mongodb": "^1.4.22",
+    "readline": "0.0.5",
+    "trim": "0.0.1"
+  }
+}
