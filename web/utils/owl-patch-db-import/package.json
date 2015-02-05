@@ -9,8 +9,6 @@
   "author": "Sam Artuso",
   "license": "WTFPL",
   "dependencies": {
-    "csv-parse": "0.0.6",
-    "fs": "0.0.2",
     "google-spreadsheet": "^0.2.8",
     "mongodb": "^1.4.22",
     "readline": "0.0.5",

@@ -3,7 +3,6 @@
  */
 
 // Settings
-var PATCHES_DB = 'patches.csv';
 var SPREADSHEET_ID = '1ocSb1dTeOm8YgeqDOAGsfLddZrGxzAbymuq0bz5ZQ3Q';
 var AUTHOR_URLS = {
     "Oli Larkin": "http://hoxtonowl.com/forums/users/hibrasil/"
@@ -19,8 +18,6 @@ var MONGO_DATABASE   = mongoCredentials.MONGO_DATABASE;
 var MONGO_COLLECTION = mongoCredentials.MONGO_COLLECTION;
 
 // Import modules
-var csvParse = require('csv-parse');
-var fs = require('fs');
 var mongodb = require('mongodb');
 var assert = require('assert');
 var GoogleSpreadsheet = require("google-spreadsheet");
