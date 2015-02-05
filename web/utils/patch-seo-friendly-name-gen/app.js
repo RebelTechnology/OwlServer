@@ -41,7 +41,7 @@ MongoClient.connect(connectionString, function(err, db) {
     collection.find().toArray(function(err, results) {
         
         console.log('Found %d patches.', results.length);
-        console.log('\n');
+        console.log();
         console.log('Generating SEO friendly names...');
         
         for (var i = 0, max = results.length, patch = {}, seoName = '', updated = 0; i < max; i++) {
