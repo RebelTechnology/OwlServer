@@ -10,13 +10,17 @@ var summaryFields = {
     name: 1,
     'author.name': 1,
     'author.url': 1,
-    tags: 1
+    tags: 1,
+    seoName: 1
 };
 
 RegExp.escape = function(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 };
 
+/*
+ * GET /patches/findOne
+ */
 router.get('/findOne/:id', function(req, res) {
     
     var id = req.params.id;
@@ -83,6 +87,22 @@ router.get('/findByAuthor/:authorList', function(req, res) {
         if (null === err) {
             response.count = patchSummaries.length;
             response.result = patchSummaries;
+        }
+        res.json(response);
+    });
+});
+
+/*
+ * GET /patches/findOneBySeoName
+ */
+router.get('/findOneBySeoName/:seoName', function(req, res) {
+    
+    var seoName = req.params.seoName;
+    var collection = req.db.get('patches');
+    collection.findOne({ seoName: seoName }, function(err, patch) {
+        var response = { error: null === err ? 0 : err };
+        if (null === err) {
+            response.result = patch;
         }
         res.json(response);
     });
