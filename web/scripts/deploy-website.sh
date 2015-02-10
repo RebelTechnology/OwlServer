@@ -53,10 +53,15 @@ cd - > /dev/null
 
 # Update Wordpress
 echo "Updating Wordpress files..."
-rsync --quiet -avz $DIR/OwlServer/web/wordpress/wp-content $DIR/../httpdocs/
-chown -R root:root $DIR/../httpdocs/wp-content
+#rsync --quiet -avz $DIR/OwlServer/web/wordpress/wp-content $DIR/../httpdocs/
+rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
+echo $DIR
+mv $DIR/OwlServer/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
+chown -R root:root $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
 find $DIR/../httpdocs/wp-content -type f -exec chmod 644 '{}' \;
 find $DIR/../httpdocs/wp-content -type d -exec chmod 755 '{}' \;
+cp -a $DIR/OwlServer/web/wordpress/robots.txt $DIR/../httpdocs/
+chown root:root $DIR/../httpdocs/robots.txt
 
 # Update Mediawiki
 echo "Updating Mediawiki files..."
@@ -72,3 +77,7 @@ chown -R www-data:www-data $DIR/../httpdocs/wp-content/uploads
 rm -rf $DIR/$CLONE_DIR
 
 echo "Done."
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "REMEMBER TO CLEAR APC CACHE!!!"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
