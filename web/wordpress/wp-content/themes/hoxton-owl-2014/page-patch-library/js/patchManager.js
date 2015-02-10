@@ -6,14 +6,9 @@
 /**
  * @namespace
  */
-var com;
-if (!com) com = {};
-
-if(!com.hoxtonowl) {
-    /**
-     * @namespace
-     */
-    com.hoxtonowl = {};
+var HoxtonOwl;
+if (!HoxtonOwl) {
+    HoxtonOwl = {};
 }
 
 /**
@@ -21,7 +16,7 @@ if(!com.hoxtonowl) {
  * 
  * @class
  */
-com.hoxtonowl.ApiClient = function() {
+HoxtonOwl.ApiClient = function() {
     // Determine API endpoint
     this.apiEndPoint = window.location.protocol + '//' + window.location.host + '/api';
     if ('hoxtonowl.localhost' == window.location.hostname) { // for local debugging
@@ -39,7 +34,7 @@ com.hoxtonowl.ApiClient = function() {
  * @return Object
  *     An object representing an ajax request.
  */
-com.hoxtonowl.ApiClient.prototype.query = function(path, method) {
+HoxtonOwl.ApiClient.prototype.query = function(path, method) {
     method = method || 'get';
     return $[method](this.apiEndPoint + path);
 };
@@ -52,7 +47,7 @@ com.hoxtonowl.ApiClient.prototype.query = function(path, method) {
  *     or as complete data.
  * @class
  */
-com.hoxtonowl.Patch = function(p) {
+HoxtonOwl.Patch = function(p) {
     
     /**
      * Converts a number of bytes into a human-readable string.
@@ -71,6 +66,7 @@ com.hoxtonowl.Patch = function(p) {
     // Minimal patch data (summary)
     this.id          = p._id,
     this.name        = p.name;
+    this.seoName     = p.seoName;
     this.author      = $.trim(p.author.name);
     this.tags        = [];
     if (p.tags && p.tags.length) {
@@ -96,34 +92,22 @@ com.hoxtonowl.Patch = function(p) {
 };
 
 /**
- * Return an SEO-friendly version of the patch's name.
- * 
- * @return {string}
- *     An SEO-friendly version of the patch's name.
- */
-com.hoxtonowl.Patch.prototype.getSeoFriendlyName = function() {
-    return this.name.replace(/[^a-z0-9]/gi, '_'); // Replace anything that is not a
-                                                  // letter or a number with an
-                                                  // underscore symbol.
-};
-
-/**
  * Conveniently groups some utility functions to handle patches.
  * 
  * @namespace
  */
-com.hoxtonowl.patchManager = {
+HoxtonOwl.patchManager = {
 
     /**
      * Fetches a file from GitHub.
      * 
-     * @param  {string} url
+     * @param {string} url
      *     The URL.
-     * @param  {Function} callback
+     * @param {Function} callback
      *     A callback returned data will be passed to.
-     * @param  {number} startLineNum
+     * @param {number} startLineNum
      *     Selection start.
-     * @param  {number} endLineNum
+     * @param {number} endLineNum
      *     Selection end.
      */
     getGithubFile: function(url, callback, startLineNum, endLineNum) {
@@ -153,13 +137,12 @@ com.hoxtonowl.patchManager = {
     /**
      * Retrieves all patch data by calling the OWL API.
      * 
-     * @param  {Function} callback
+     * @param {Function} callback
      *     A callback that will be invoked once data is loaded.
      */
     getAllPatches: function(callback) {
         
-        var owl = com.hoxtonowl;
-        var client = new owl.ApiClient();
+        var client = new HoxtonOwl.ApiClient();
         
         $.when(
             client.query('/patches/findAll'),
@@ -169,7 +152,7 @@ com.hoxtonowl.patchManager = {
             
             var patches = patchData[0].result;
             for (var i = 0; i < patches.length; i++) {
-                patches[i] = new owl.Patch(patches[i]);
+                patches[i] = new HoxtonOwl.Patch(patches[i]);
             }
             
             var authors = [];
@@ -201,17 +184,36 @@ com.hoxtonowl.patchManager = {
      */
     getSinglePatch: function(patchId, callback) {
         
-        var owl = com.hoxtonowl;
-        var client = new owl.ApiClient();
+        var client = new HoxtonOwl.ApiClient();
         
         $.when(client.query('/patches/findOne/' + patchId)).done(function(patchData) {
             // console.log(patchData.result);
             var patch = patchData.result;
-            patch = new owl.Patch(patch);
+            patch = new HoxtonOwl.Patch(patch);
             callback(patch);
         });
     },
-
+    
+    /**
+     * Get data for the patch with the specified ID by calling the OWL API.
+     * 
+     * @param  {string} patchSeoName
+     *     The patch's SEO name.
+     * @param  {Function} callback
+     *     A callback that will be invoked once data is loaded. This function will
+     *     be passed the freshly loaded patch.
+     */
+    getSinglePatchBySeoName: function(patchSeoName, callback) {
+        
+        var client = new HoxtonOwl.ApiClient();
+        
+        $.when(client.query('/patches/findOneBySeoName/' + patchSeoName)).done(function(patchData) {
+            var patch = patchData.result;
+            patch = new HoxtonOwl.Patch(patch);
+            callback(patch);
+        });
+    },
+    
     /**
      * Contains the code that operates the patches page.
      * 
@@ -225,8 +227,7 @@ com.hoxtonowl.patchManager = {
     main: function(patches, authors, tags) {
         
         var that = this;
-        var owl = com.hoxtonowl;
-        var pm = owl.patchManager;
+        var pm = HoxtonOwl.patchManager;
         
         that.selectedPatch = ko.observable();       // currently selected patch
         that.patches = ko.observableArray(patches); // all patches
@@ -258,6 +259,9 @@ com.hoxtonowl.patchManager = {
         });
 
         that.selectAllPatches = function() {
+            //console.log('selectAllPatches');
+            pm.updateBreadcrumbs();
+            
             that.selectedPatch(null);
             that.search('all');
             that.searchItems.removeAll();
@@ -274,6 +278,7 @@ com.hoxtonowl.patchManager = {
         };
 
         that.selectAuthor = function(author) {
+            pm.updateBreadcrumbs();
             if(author.author) {
                 author = author.author;
             }
@@ -330,6 +335,7 @@ com.hoxtonowl.patchManager = {
 
         that.selectAllTags = function(tag) {
             //console.log('selectAllTags');
+            pm.updateBreadcrumbs();
             selectTag('All');
         };
 
@@ -341,23 +347,17 @@ com.hoxtonowl.patchManager = {
 
         that.selectAllAuthors = function(tag) {
             //console.log('selectAllAuthors');
+            pm.updateBreadcrumbs();
             selectAuthor('All');
         };
 
-        that.selectPatch = function(name, e) {
+        that.selectPatch = function(patch) {
             //console.log('selectPatch');
+            pm.updateBreadcrumbs(patch);
             
-            var target;
-            if (e.target) {
-                target = e.target; // gecko
-            } else if (e.srcElement) {
-                target = e.srcElement; // ie
-            } if (target.nodeType == 3) { // defeat Safari bug
-                target = target.parentNode;
-            }
-            
-            var patchId = $(target).attr('data-patch-id');
+            var patchId = patch.id;
             pm.getSinglePatch(patchId, function(patch) {
+                
                 
                 if (name.name) {
                     name = name.name;
@@ -397,8 +397,16 @@ com.hoxtonowl.patchManager = {
         });
 
         ko.applyBindings(that);
-        selectTag("All");
-        that.search("all");
+        
+        var url = location.pathname;
+        var matches = url.match(/^\/patch-library\/patch\/.+\/?$/g);
+        if (matches) {
+            var seoName = url.split('/')[3];
+            pm.getSinglePatchBySeoName(seoName, selectPatch);
+        } else {
+            selectTag("All");
+            that.search("all");
+        }
     },
     
     /**
@@ -408,14 +416,26 @@ com.hoxtonowl.patchManager = {
      *     The click event.
      */
     openPatch: function(patch) {
-        console.log(patch.getSeoFriendlyName());
+        location = '/patch-library/patch/' + patch.seoName;
+    },
+    
+    updateBreadcrumbs: function(patch) {
+        $('#breadcrumbs li').slice(2).remove();
+        if (patch) {
+            document.title = 'The OWL | ' + patch.name;
+            $('#breadcrumbs').append('<li><a href="/patch-library/" rel="category tag">Patch Library</a></li><li class="separator"> / </li><li>' + patch.name + '</li>');
+        } else {
+            $('#breadcrumbs').append('<li><strong>Patch Library</strong></li>');
+            document.title = 'The OWL | Patch Library';
+        }
     }
 };
 
 (function() {
-    var owl = com.hoxtonowl;
-    var pm = owl.patchManager;
+    
+    var pm = HoxtonOwl.patchManager;
     pm.getAllPatches(pm.main);
+    
 })();
 
 // EOF

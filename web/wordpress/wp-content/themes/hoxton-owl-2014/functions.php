@@ -118,11 +118,10 @@
 
     /* Breadcrumb */
     function the_breadcrumb() {
+        
         global $post;
-        // echo '<pre>';
-        // var_dump($post);
-        // echo '</pre>';
-        // exit;
+        global $wp_query;
+        
         echo '<ul id="breadcrumbs">';
         if (is_tag()) {
             single_tag_title();
@@ -180,7 +179,23 @@
                     echo $output;
                     echo '<strong title="'.$title.'"> '.$title.'</strong>';
                 } else {
-                    echo '<li><strong> '.get_the_title().'</strong></li>';
+                    
+                    //if ('patch-library' === $post->post_name && isset($wp_query->query_vars['patch'])) {
+                    //    
+                    //    // We're effectively simulating the single patch page here.
+                    //    // At this stage we don't have the real patch name, 
+                    //    // we only have its SEO friendly version (get_query_var('patch')).
+                    //    // So we prepare the breadcrumb which will be then 
+                    //    // finished with some javascript code.
+                    //    
+                    //    $patch = get_query_var('patch');
+                    //    
+                    //    echo '<li><strong> '.get_the_title().'</strong></li><li class="separator"> / </li>';
+                    //    echo '<li><strong> '.htmlentities($patch).'</strong>'; // FIXME
+                    //    
+                    //} else {
+                        echo '<li><strong> ' . get_the_title() . '</strong></li>';
+                    //}
                 }
             } elseif (is_home()) { // news page
                 echo '<li>News</li>';
@@ -189,4 +204,23 @@
             }
         }
         echo '</ul>';
+    }
+    
+    /* ~~~~~~~~~~~~~~~~~~~
+     *  Single patch page
+     * ~~~~~~~~~~~~~~~~~~~ */
+    
+    // Register a new var
+    function add_patch_query_var($vars) {
+        $vars[] = 'patch'; // name of the var as seen in the URL
+        return $vars;
+    }
+    
+    // Hook our function into query_vars
+    add_filter('query_vars', 'add_patch_query_var');
+    
+    add_action('init', 'add_patch_rewrite_rules');
+    function add_patch_rewrite_rules() {
+        add_rewrite_rule('(patch-library)/patch/(.+)/?$', 'index.php?pagename=$matches[1]&patch=$matches[2]', 'top');
+        flush_rewrite_rules();
     }

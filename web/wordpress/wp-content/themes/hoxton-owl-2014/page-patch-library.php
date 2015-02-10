@@ -182,7 +182,8 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <table class="patch-title-controls">
                       <tbody><tr>
                           <!-- <td width="40"><div class="play-button">&gt;</div></td> -->
-                          <td><span class="patch-title" data-bind="text: name, click: com.hoxtonowl.patchManager.openPatch, attr: { 'data-patch-id': id }"></span></td>
+                          <td><span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': id }"></span></td>
+                          <!--td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td-->
                           <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
                         </tr>
                         <tr>
