@@ -12,86 +12,6 @@ if (!HoxtonOwl) {
 }
 
 /**
- * API client
- * 
- * @class
- */
-HoxtonOwl.ApiClient = function() {
-    // Determine API endpoint
-    this.apiEndPoint = window.location.protocol + '//' + window.location.host + '/api';
-    if ('hoxtonowl.localhost' == window.location.hostname) { // for local debugging
-        this.apiEndPoint = 'http://' + window.location.hostname + ':3000';
-    }
-};
-
-/**
- * Calls an API method.
- * 
- * @param  {string}       path
- *     The path to the API method.
- * @param  {string} [verb=get]
- *     The  HTTP verb to use.
- * @return Object
- *     An object representing an ajax request.
- */
-HoxtonOwl.ApiClient.prototype.query = function(path, method) {
-    method = method || 'get';
-    return $[method](this.apiEndPoint + path);
-};
-
-/**
- * Represents a patch.
- * 
- * @param {Object} p
- *     Patch data as returned by the API, which can come in the form of a summary
- *     or as complete data.
- * @class
- */
-HoxtonOwl.Patch = function(p) {
-    
-    /**
-     * Converts a number of bytes into a human-readable string.
-     * 
-     * @param {number} size
-     *     The size in bytes.
-     * @return {string}
-     *     A human-readable string.
-     * @private
-     */
-    var humanFileSize = function(size) {
-        var i = Math.floor( Math.log(size) / Math.log(1024) );
-        return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
-    };
-    
-    // Minimal patch data (summary)
-    this.id          = p._id,
-    this.name        = p.name;
-    this.seoName     = p.seoName;
-    this.author      = $.trim(p.author.name);
-    this.tags        = [];
-    if (p.tags && p.tags.length) {
-        this.tags = $.map(p.tags, $.trim);
-    }
-    //this.link      = 'patch.html?patch=' + encodeURIComponent(p.name); // should we use id?
-    
-    // Complete data
-    if (p.description) this.description = p.description;
-    if (typeof p.inputs !== 'undefined') this.inputs = p.inputs;
-    if (typeof p.outputs !== 'undefined') this.outputs     = p.outputs;
-    if (p.armCyclesPerSample) this.cycles = Math.round(p.armCyclesPerSample * 100.0 / 3500.0) + '%';
-    if (p.bytesWithGain) this.bytes = humanFileSize(p.bytesWithGain);
-    if (p.soundcloud) this.soundcloud = p.soundcloud;
-    if (p.repo) this.repo = p.repo;
-    if (p.github) this.file = p.github;
-    if (p.parameters) {
-        this.parameters = [];
-        for(var key in p.parameters) {
-            this.parameters.push(p.parameters[key]);
-        }
-    }
-};
-
-/**
  * Conveniently groups some utility functions to handle patches.
  * 
  * @namespace
@@ -132,86 +52,6 @@ HoxtonOwl.patchManager = {
                 }
             }
         })
-    },
-
-    /**
-     * Retrieves all patch data by calling the OWL API.
-     * 
-     * @param {Function} callback
-     *     A callback that will be invoked once data is loaded.
-     */
-    getAllPatches: function(callback) {
-        
-        var client = new HoxtonOwl.ApiClient();
-        
-        $.when(
-            client.query('/patches/findAll'),
-            client.query('/authors/findAll'),
-            client.query('/tags/findAll')
-        ).done(function(patchData, authorData, tagData) {
-            
-            var patches = patchData[0].result;
-            for (var i = 0; i < patches.length; i++) {
-                patches[i] = new HoxtonOwl.Patch(patches[i]);
-            }
-            
-            var authors = [];
-            for(var i = 0; i < authorData[0].result.length; i++) {
-                authors.push(authorData[0].result[i].name);
-            }
-            authors.unshift("All");
-            
-            var tags = tagData[0].result;
-            tags.unshift("All");
-            
-            // console.log('From API:');
-            // console.log(patches);
-            // console.log(authors);
-            // console.log(tags);
-            callback(patches, authors, tags);
-            
-        });
-    },
-    
-    /**
-     * Get data for the patch with the specified ID by calling the OWL API.
-     * 
-     * @param  {string} patchId
-     *     The patch ID.
-     * @param  {Function} callback
-     *     A callback that will be invoked once data is loaded. This function will
-     *     be passed the freshly loaded patch.
-     */
-    getSinglePatch: function(patchId, callback) {
-        
-        var client = new HoxtonOwl.ApiClient();
-        
-        $.when(client.query('/patches/findOne/' + patchId)).done(function(patchData) {
-            // console.log(patchData.result);
-            var patch = patchData.result;
-            patch = new HoxtonOwl.Patch(patch);
-            callback(patch);
-        });
-    },
-    
-    /**
-     * Get data for the patch with the specified ID by calling the OWL API.
-     * 
-     * @param  {string} patchSeoName
-     *     The patch's SEO name.
-     * @param  {Function} callback
-     *     A callback that will be invoked once data is loaded. This function will
-     *     be passed the freshly loaded patch.
-     */
-    getSinglePatchBySeoName: function(patchSeoName, callback) {
-        
-        var client = new HoxtonOwl.ApiClient();
-        
-        $.when(client.query('/patches/findOneBySeoName/' + patchSeoName)).done(function(patchData) {
-            var patch = patchData.result;
-            patch = new HoxtonOwl.Patch(patch);
-            callback(patch);
-        });
     },
     
     /**
@@ -356,7 +196,8 @@ HoxtonOwl.patchManager = {
             pm.updateBreadcrumbs(patch);
             
             var patchId = patch.id;
-            pm.getSinglePatch(patchId, function(patch) {
+            var apiClient = new HoxtonOwl.ApiClient();
+            apiClient.getSinglePatch(patchId, function(patch) {
                 
                 
                 if (name.name) {
@@ -402,7 +243,8 @@ HoxtonOwl.patchManager = {
         var matches = url.match(/^\/patch-library\/patch\/.+\/?$/g);
         if (matches) {
             var seoName = url.split('/')[3];
-            pm.getSinglePatchBySeoName(seoName, selectPatch);
+            var apiClient = new HoxtonOwl.ApiClient();
+            apiClient.getSinglePatchBySeoName(seoName, selectPatch);
         } else {
             selectTag("All");
             that.search("all");
@@ -434,7 +276,8 @@ HoxtonOwl.patchManager = {
 (function() {
     
     var pm = HoxtonOwl.patchManager;
-    pm.getAllPatches(pm.main);
+    var apiClient = new HoxtonOwl.ApiClient();
+    apiClient.getAllPatches(pm.main);
     
 })();
 

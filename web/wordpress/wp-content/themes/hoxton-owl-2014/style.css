@@ -297,7 +297,7 @@ li.current_page_item a {
     border-bottom: 5px solid #f47a20;
 }
 /* CSS rules added by Sam */
-input[type=text], input[type=password], input[type=search] {
+input[type=text], input[type=url], input[type=password], input[type=search] {
     border: 1px solid #d3d3d3;
     border-radius: 5px;
     font-size: 12px;
@@ -306,7 +306,7 @@ input[type=text], input[type=password], input[type=search] {
     height: 17px;
 }
 
-input[type=submit], input[type=button], button {
+input[type=submit], input[type=reset], input[type=button], button {
     color: #fff;
     font-family: "montserrat",sans-serif;
     font-size: 12px;
@@ -327,7 +327,7 @@ input[type=submit], input[type=button], button {
     cursor: pointer;
 }
 
-input[type=submit]:hover, input[type=button]:hover, button:hover {
+input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, button:hover {
     color: white;
     background: #433540;
 }
@@ -447,4 +447,110 @@ form[class^="bbp"] input[type=text],
 form[class^="bbp"] input[type=password] {
   border: 1px solid #d3d3d3;
   border-radius: 5px;
+}
+
+/* add/edit patch form */
+
+#patch-add-edit-form .row {
+  margin-top: 10px;
+}
+
+#patch-add-edit-form .btn-row {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding-left: 21%;
+}
+
+#patch-add-edit-form .row:before, #patch-add-edit-form .row:after {
+  content: " ";
+  display: table;
+  clear: both;
+}
+
+#patch-add-edit-form textarea {
+  height: 100px;
+}
+
+#patch-add-edit-form input[type=number],
+#patch-add-edit-form select {
+  width: 100px;
+  width: 30% !important;
+}
+
+#patch-add-edit-form select {
+  background-color: white;
+}
+
+#patch-add-edit-form fieldset {
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  padding: 5px 0 20px 0;
+  margin-top: 10px;
+}
+
+#patch-add-edit-form fieldset legend {
+  margin-left: 21%;
+  padding: 0 10px;
+  font-weight: bold;
+  color: #5d5d5d;
+}
+
+#patch-add-edit-form label {
+  width: 20%;
+  text-align: right;
+  float: left;
+  display: block;
+  margin-right: 10px;
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+#frm-patch-tags {
+  width: 30% !important;
+}
+
+#patch-add-edit-form .form-control {
+  width: 70%;
+  float: left;
+  display: block;
+}
+
+#patch-add-edit-form input.form-control,
+#patch-add-edit-form textarea.form-control,
+#patch-add-edit-form select.form-control {
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  font-family: Ubuntu, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 15px;
+  color: #5d5d5d;
+  padding: 4px;
+}
+
+#patch-add-edit-form label.required:after {
+  content: "*";
+}
+
+#patch-add-edit-form small {
+  font-size: 12px;
+  color: #5d5d5d;
+}
+
+#patch-add-edit-form .row.repeat input[type=text],
+#patch-add-edit-form .row.repeat input[type=url] {
+  width: 80%;
+}
+
+#patch-add-edit-form div.remove {
+  padding-left: 10px;
+  font-size: 12px;
+  display: inline !important;
+}
+
+#patch-add-edit-form fieldset .add {
+  padding-left: 21%;
+  padding-top: 10px;
+  display: block;
+  font-size: 12px;
 }

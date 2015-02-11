@@ -29,6 +29,8 @@ wp_enqueue_script('owl-patches-page_run_prettify',   'https://google-code-pretti
 wp_enqueue_script('owl-patches-page_vertxbus'              , $resUri . 'js/vertxbus.js', array(), false, true);
 //wp_enqueue_script('owl-patches-page_spreadsheet_client_app', $resUri . 'js/spreadsheet_client_app.js', array(), false, true);
 //wp_enqueue_script('owl-patches-page_spreadsheets_google',    'https://spreadsheets.google.com/feeds/list/1ocSb1dTeOm8YgeqDOAGsfLddZrGxzAbymuq0bz5ZQ3Q/od6/public/values?alt=json-in-script&callback=importGSS', array(), false, true);
+wp_enqueue_script('owl-api-client', get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array(), false, true);
+wp_enqueue_script('owl-patch',      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
 wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array(), false, true);
 
 ?>
