@@ -228,10 +228,18 @@ HoxtonOwl.patchManager = {
         };
 
         that.soundcloud = ko.computed(function() {
-            if(that.selectedPatch() && that.selectedPatch().soundcloud) {
-                return "https://w.soundcloud.com/player/?url=" +
-                encodeURIComponent(that.selectedPatch().soundcloud) +
-                "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true";
+            if(that.selectedPatch() && that.selectedPatch().soundcloud.length) {
+                
+                var iframeSrcs = [];
+                for (var i = 0, max = that.selectedPatch().soundcloud.length; i < max; i++) {
+                    iframeSrcs.push(
+                        "https://w.soundcloud.com/player/?url=" +
+                        encodeURIComponent(that.selectedPatch().soundcloud[i]) +
+                        "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"
+                    );
+                }
+                return iframeSrcs;
+                
             } else {
                 return "";
             }
