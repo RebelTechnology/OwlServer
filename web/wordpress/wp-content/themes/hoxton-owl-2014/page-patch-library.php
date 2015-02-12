@@ -15,9 +15,6 @@ $resUri = get_template_directory_uri() . '/page-patch-library/';
 wp_enqueue_style('owl-patches-page_fonts_googleapis', 'http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700');
 
 // <script> tags to be placed in <head>
-wp_enqueue_script('owl-patches-page_less',           $resUri . 'js3rdparty/less-1.2.1.min.js');
-wp_enqueue_script('owl-patches-page_bootstrap_tabs', $resUri . 'js3rdparty/bootstrap-tabs.js', array('jquery'));
-wp_enqueue_script('owl-patches-page_socksjs',        $resUri . 'js3rdparty/sockjs-min-0.3.4.js');
 wp_enqueue_script('owl-patches-page_knockout',       $resUri . 'js3rdparty/knockout-2.0.0.js');
 wp_enqueue_script('jquery',                          $resUri . 'js3rdparty/jquery-1.7.1.min.js');
 wp_enqueue_script('owl-patches-page_jquery_knob',    $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
@@ -26,9 +23,6 @@ wp_enqueue_script('owl-patches-page_prettify',       'https://google-code-pretti
 wp_enqueue_script('owl-patches-page_run_prettify',   'https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js');
 
 // <script> tags to be placed just before </body>
-wp_enqueue_script('owl-patches-page_vertxbus'              , $resUri . 'js/vertxbus.js', array(), false, true);
-//wp_enqueue_script('owl-patches-page_spreadsheet_client_app', $resUri . 'js/spreadsheet_client_app.js', array(), false, true);
-//wp_enqueue_script('owl-patches-page_spreadsheets_google',    'https://spreadsheets.google.com/feeds/list/1ocSb1dTeOm8YgeqDOAGsfLddZrGxzAbymuq0bz5ZQ3Q/od6/public/values?alt=json-in-script&callback=importGSS', array(), false, true);
 wp_enqueue_script('owl-api-client', get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
 wp_enqueue_script('owl-patch',      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
 wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'owl-patch', 'owl-api-client'), false, true);
