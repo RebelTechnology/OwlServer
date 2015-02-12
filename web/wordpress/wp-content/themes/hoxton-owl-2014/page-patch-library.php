@@ -138,9 +138,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     </div>        
                     <div id="two-thirds">
                         <!-- Soundcloud embed here -->
-                        <iframe width="100%" height="250" scrolling="no" frameborder="no" 
-                        data-bind="if: soundcloud, attr: { src: soundcloud }">
-                    </iframe>
+                        <div data-bind="foreach: soundcloud">
+                          <iframe width="100%" height="250" scrolling="no" frameborder="no" data-bind="attr: { src: $data }">
+                          </iframe>
+                        </div>
                         <!--div class="clear"></div-->
                         <div class="" data-bind="with: selectedPatch">
                             <h2>Parameters</h2>
