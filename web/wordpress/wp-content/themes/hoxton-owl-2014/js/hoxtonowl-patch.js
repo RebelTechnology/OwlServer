@@ -38,10 +38,10 @@ HoxtonOwl.Patch = function(p) {
     this.id          = p._id,
     this.name        = p.name;
     this.seoName     = p.seoName;
-    this.author      = $.trim(p.author.name);
+    this.author      = jQuery.trim(p.author.name);
     this.tags        = [];
     if (p.tags && p.tags.length) {
-        this.tags = $.map(p.tags, $.trim);
+        this.tags = jQuery.map(p.tags, jQuery.trim);
     }
     //this.link      = 'patch.html?patch=' + encodeURIComponent(p.name); // should we use id?
     

@@ -48,7 +48,7 @@ HoxtonOwl.ApiClient.prototype.getAllPatches = function(callback) {
     
     var client = this;
     
-    $.when(
+    jQuery.when(
         client.query('/patches/findAll'),
         client.query('/authors/findAll'),
         client.query('/tags/findAll')
