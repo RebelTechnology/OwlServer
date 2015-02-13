@@ -13,19 +13,24 @@ $resUri = get_template_directory_uri() . '/page-patch-library/';
 // <link rel="stylesheet"> tags to be placed in <head>
 //wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), 5);
 wp_enqueue_style('owl-patches-page_fonts_googleapis', 'http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700');
+wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.min.css');
+wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.structure.min.css');
+wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.theme.min.css');
 
 // <script> tags to be placed in <head>
-wp_enqueue_script('owl-patches-page_knockout',       $resUri . 'js3rdparty/knockout-2.0.0.js');
-wp_enqueue_script('jquery',                          $resUri . 'js3rdparty/jquery-1.7.1.min.js');
-wp_enqueue_script('owl-patches-page_jquery_knob',    $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
-wp_enqueue_script('owl-patches-page_knob',           $resUri . 'js/knob.js');
-wp_enqueue_script('owl-patches-page_prettify',       'https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js');
-wp_enqueue_script('owl-patches-page_run_prettify',   'https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js');
+wp_enqueue_script('owl-patches-page_knockout',      $resUri . 'js3rdparty/knockout-2.0.0.js');
+wp_enqueue_script('jquery',                         $resUri . 'js3rdparty/jquery-1.7.1.min.js');
+wp_enqueue_script('jquery-ui',                      get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.min.js', array('jquery'));
+wp_enqueue_script('owl-patches-page_jquery_knob',   $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
+wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
+
+wp_enqueue_script('owl-patches-page_prettify',      'https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js');
+wp_enqueue_script('owl-patches-page_run_prettify',  'https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js');
 
 // <script> tags to be placed just before </body>
-wp_enqueue_script('owl-api-client', get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
-wp_enqueue_script('owl-patch',      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
-wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'owl-patch', 'owl-api-client'), false, true);
+wp_enqueue_script('owl-api-client',                 get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
+wp_enqueue_script('owl-patch',                      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
+wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'jquery-ui', 'owl-patch', 'owl-api-client'), false, true);
 
 ?>
 
@@ -168,9 +173,21 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         </div>
                         <div class="">
                             <h2>Patch code</h2>
-                            <pre id="gitsource" class="prettyprint"></pre>
+                            
+                            <div id="github-files">
+                                <!--
+                                <ul>
+                                    <li><a href="#tabs-1">Nunc tincidunt</a></li>
+                                </ul>
+                                <div id="tabs-1">
+                                    <pre class="prettyprint"></pre>
+                                </div>
+                                -->
                             </div>
+                            
                         </div>
+                        
+                      </div>
                 <!-- /ko -->
             
                   <!-- ko foreach: filteredPatches -->
@@ -179,8 +196,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <table class="patch-title-controls">
                       <tbody><tr>
                           <!-- <td width="40"><div class="play-button">&gt;</div></td> -->
+                          
                           <td><span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': id }"></span></td>
                           <!--td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td-->
+                          
                           <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
                         </tr>
                         <tr>

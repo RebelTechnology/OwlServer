@@ -48,12 +48,11 @@ HoxtonOwl.Patch = function(p) {
     // Complete data
     if (p.description) this.description = p.description;
     if (typeof p.inputs !== 'undefined') this.inputs = p.inputs;
-    if (typeof p.outputs !== 'undefined') this.outputs     = p.outputs;
+    if (typeof p.outputs !== 'undefined') this.outputs = p.outputs;
     if (p.armCyclesPerSample) this.cycles = Math.round(p.armCyclesPerSample * 100.0 / 3500.0) + '%';
     if (p.bytesWithGain) this.bytes = humanFileSize(p.bytesWithGain);
     if (p.soundcloud) this.soundcloud = p.soundcloud;
-    if (p.repo) this.repo = p.repo;
-    if (p.github) this.file = p.github;
+    if (p.github) this.github = p.github;
     if (p.parameters) {
         this.parameters = [];
         for(var key in p.parameters) {

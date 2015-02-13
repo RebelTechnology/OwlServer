@@ -554,3 +554,27 @@ form[class^="bbp"] input[type=password] {
   display: block;
   font-size: 12px;
 }
+
+/* GitHub file tabs */
+#github-files.ui-widget-content {
+  border: none;
+}
+
+.ui-tabs .ui-tabs-nav {
+  font-size: 11px;
+}
+
+#github-files .ui-widget-header {
+  background: none;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid #d3d3d3;
+}
+
+#github-files.ui-tabs .ui-tabs-panel {
+  padding: 0;
+}
+
+#github-files pre.prettyprint {
+  border: none !important; 
+}

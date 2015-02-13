@@ -31,13 +31,34 @@ HoxtonOwl.patchManager = {
      *     Selection end.
      */
     getGithubFile: function(url, callback, startLineNum, endLineNum) {
+        
         startLineNum = (typeof startLineNum == "undefined") ? 1 : startLineNum;
         endLineNum = (typeof endLineNum == "undefined") ? 0 : endLineNum;
+        
+        // input:
+        // 
+        // https://github.com/pingdynasty/OwlPatches/blob/master/Contest/ConnyPatch.hpp
+        //                    [+++++++++] [++++++++]      [++++] [++++++++++++++++++++]
+        //                    owner       repo            branch file path
+        //                    
+        // output:
+        // https://api.github.com/repos/pingdynasty/OwlPatches/contents/Contest/ConnyPatch.hpp?ref=master
+        //                              [+++++++++] [++++++++]          [++++++++++++++++++++]     [++++]
+        //                              owner       repo                path                       branch
+        
+        var bits     = url.split('/');
+        var repo     = bits.slice(3,5).join('/');
+        var branch   = bits[6];
+        var path     = bits.slice(7).join('/');
+        var filename = bits[bits.length-1];
+        var endpoint = 'https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=' + branch;
+        console.log(endpoint);
+        
         $.ajax({
-            type: "GET",
-            url: url,
+            type:     "GET",
+            url:      endpoint,
             dataType: "jsonp",
-            success: function(data) {
+            success:  function(data) {
                 if (typeof data.data.content != "undefined") {
                     if (data.data.encoding == "base64") {
                         var base64EncodedContent = data.data.content;
@@ -47,7 +68,8 @@ HoxtonOwl.patchManager = {
                         if (endLineNum == 0) {
                             endLineNum = contentArray.length;
                         }
-                        callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"));
+                        HoxtonOwl.patchManager.getGithubFile.count++;
+                        callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"), filename);
                     }
                 }
             }
@@ -209,19 +231,34 @@ HoxtonOwl.patchManager = {
                 $("#gitsource").empty();
                 that.selectedPatch(patch);
                 
-                // var url = "https://api.github.com/repos/" + user + "/" + repo + "/git/blobs/" + sha;
-                // var url = "https://api.github.com/repos/pingdynasty/OwlPatches/contents/" + that.selectedPatch().file;
-                var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().file;
-                pm.getGithubFile(url, function(contents) {
-                    // console.log("contents "+contents);
-                    $("#gitsource").text(contents).removeClass("prettyprinted").parent();
-                    //console.log("pretty printing");
-                    prettyPrint();
-                    // use highlight.js instead?
-                    // https://github.com/isagalaev/highlight.js
-                    // embed editor?
-                    // http://ace.c9.io/#nav=embedding
-                });
+                //var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().github;
+                
+                $('#github-files').empty();
+                for (var i = 0, max = that.selectedPatch().github.length; i < max; i++) {
+                    
+                    pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename) {
+                        
+                        var cnt;
+                        
+                        if (0 === $('#github-files > ul').length) {
+                            $('#github-files').html('<ul></ul>');
+                        }
+                        cnt = $('#github-files > ul > li').length;
+                        
+                        cnt++;
+                        $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
+                        $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint">' + contents + '</pre></div>');
+                        
+                        if (HoxtonOwl.patchManager.getGithubFile.count == max) {
+                            // no more files to be loaded
+                            prettyPrint();
+                            $('#github-files').tabs({ active: 0 }); // jQuery-UI tabs
+                        }
+                        
+                        //$("#gitsource").text(contents).removeClass("prettyprinted").parent();
+                    });
+                }
+                
                 knobify();
                 
             });
@@ -281,12 +318,13 @@ HoxtonOwl.patchManager = {
     }
 };
 
-(function() {
+HoxtonOwl.patchManager.getGithubFile.count = 0;
+
+$(function() {
     
     var pm = HoxtonOwl.patchManager;
     var apiClient = new HoxtonOwl.ApiClient();
     apiClient.getAllPatches(pm.main);
-    
-})();
+});
 
 // EOF
