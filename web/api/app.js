@@ -16,8 +16,11 @@ var monk = require('monk');
 var apiSettings = require('./api-settings');
 var db = monk(apiSettings.mongoConnectionString);
 
-var patches = require('./routes/patches');
+var author  = require('./routes/author');
 var authors = require('./routes/authors');
+var patch   = require('./routes/patch');
+var patches = require('./routes/patches');
+var tag     = require('./routes/tag');
 var tags    = require('./routes/tags');
 
 var app = express();
@@ -40,8 +43,11 @@ app.use(function(req,res,next) {
     req.db = db; next();
 });
 
-app.use('/patches', patches);
+app.use('/author', author);
 app.use('/authors', authors);
+app.use('/patch', patch);
+app.use('/patches', patches);
+app.use('/tag', tag);
 app.use('/tags', tags);
 
 // catch 404 and forward to error handler

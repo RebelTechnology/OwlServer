@@ -14,40 +14,40 @@ var summaryFields = {
     seoName: 1
 };
 
-RegExp.escape = function(str) {
+RegExp.prototype.escape = function(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 };
 
-/*
- * GET /patches/findOne
+/**
+ * Retrieves all patches.
+ * 
+ * GET /patches? tags = taglist &
+ *               authors = authorlist &
+ *               seoName = name
  */
-router.get('/findOne/:id', function(req, res) {
-    
-    var id = req.params.id;
-    var collection = req.db.get('patches');
-    collection.findOne({ _id: id }, function(err, patch) {
-        var response = { error: null === err ? 0 : err };
-        if (null === err) {
-            response.result = patch;
-        }
-        res.json(response);
-    });
-});
-
-/*
- * GET /patches/findAll
- */
-router.get('/findAll', function(req, res) {
+router.get('/', function(req, res) {
     
     var collection = req.db.get('patches');
     collection.find({}, { fields: summaryFields, sort: 'name' }, function(err, patchSummaries) {
-        var response = { error: null === err ? 0 : err };
-        if (null === err) {
+        
+        var response = {};
+        if (null !== err) {
+            res.status(500).json({ message: err, error: { status: 500 }});
+        } else {
             response.count = patchSummaries.length;
             response.result = patchSummaries;
+            res.status(200).json(response);
         }
-        res.json(response);
     });
+});
+
+/**
+ * Creates a new patch.
+ * 
+ * POST /patches
+ */
+router.post('/', function(req, res) {
+    // TODO
 });
 
 /*
@@ -94,6 +94,8 @@ router.get('/findByAuthor/:authorList', function(req, res) {
 
 /*
  * GET /patches/findOneBySeoName
+ * 
+ * FIXME: make this search case-insensitive
  */
 router.get('/findOneBySeoName/:seoName', function(req, res) {
     

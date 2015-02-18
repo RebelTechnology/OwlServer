@@ -5,10 +5,12 @@
 var express = require('express');
 var router = express.Router();
 
-/*
- * GET /authors/findAll
+/**
+ * Retrieves all authors.
+ * 
+ * GET /authors
  */
-router.get('/findAll', function(req, res) {
+router.get('/', function(req, res) {
     
     var collection = req.db.get('patches');
     var nativeCol = collection.col;
@@ -21,7 +23,7 @@ router.get('/findAll', function(req, res) {
         
         function(err, result) {
             if (err !== null) {
-                res.json({error: err});
+                res.status(500).json({error: err});
             } else {
                 console.log('test');
                 var authors = [];
@@ -32,7 +34,7 @@ router.get('/findAll', function(req, res) {
                     }
                     authors.push(author);
                 }
-                res.json({error: 0, count: authors.length, result: authors});
+                res.status(200).json({ count: authors.length, result: authors });
             }
         }
     );
