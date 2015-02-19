@@ -179,23 +179,7 @@
                     echo $output;
                     echo '<strong title="'.$title.'"> '.$title.'</strong>';
                 } else {
-                    
-                    //if ('patch-library' === $post->post_name && isset($wp_query->query_vars['patch'])) {
-                    //    
-                    //    // We're effectively simulating the single patch page here.
-                    //    // At this stage we don't have the real patch name, 
-                    //    // we only have its SEO friendly version (get_query_var('patch')).
-                    //    // So we prepare the breadcrumb which will be then 
-                    //    // finished with some javascript code.
-                    //    
-                    //    $patch = get_query_var('patch');
-                    //    
-                    //    echo '<li><strong> '.get_the_title().'</strong></li><li class="separator"> / </li>';
-                    //    echo '<li><strong> '.htmlentities($patch).'</strong>'; // FIXME
-                    //    
-                    //} else {
-                        echo '<li><strong> ' . get_the_title() . '</strong></li>';
-                    //}
+                    echo '<li><strong> ' . get_the_title() . '</strong></li>';
                 }
             } elseif (is_home()) { // news page
                 echo '<li>News</li>';
@@ -221,6 +205,12 @@
     
     add_action('init', 'add_patch_rewrite_rules');
     function add_patch_rewrite_rules() {
+        
+        // Single patch page
         add_rewrite_rule('(patch-library)/patch/(.+)/?$', 'index.php?pagename=$matches[1]&patch=$matches[2]', 'top');
+        
+        // Edit patch page
+        add_rewrite_rule('edit-patch/(.+)/?$', 'index.php?pagename=edit-patch&patch=$matches[1]', 'top');
+        
         flush_rewrite_rules();
     }

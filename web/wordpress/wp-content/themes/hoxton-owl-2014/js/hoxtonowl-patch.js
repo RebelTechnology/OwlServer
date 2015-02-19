@@ -20,22 +20,8 @@ if (!HoxtonOwl) {
  */
 HoxtonOwl.Patch = function(p) {
     
-    /**
-     * Converts a number of bytes into a human-readable string.
-     * 
-     * @param {number} size
-     *     The size in bytes.
-     * @return {string}
-     *     A human-readable string.
-     * @private
-     */
-    var humanFileSize = function(size) {
-        var i = Math.floor( Math.log(size) / Math.log(1024) );
-        return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
-    };
-    
     // Minimal patch data (summary)
-    this.id          = p._id,
+    this._id         = p._id,
     this.name        = p.name;
     this.seoName     = p.seoName;
     this.author      = jQuery.trim(p.author.name);
@@ -47,16 +33,56 @@ HoxtonOwl.Patch = function(p) {
     
     // Complete data
     if (p.description) this.description = p.description;
+    if (p.instructions) this.instructions = p.instructions;
     if (typeof p.inputs !== 'undefined') this.inputs = p.inputs;
     if (typeof p.outputs !== 'undefined') this.outputs = p.outputs;
-    if (p.armCyclesPerSample) this.cycles = Math.round(p.armCyclesPerSample * 100.0 / 3500.0) + '%';
-    if (p.bytesWithGain) this.bytes = humanFileSize(p.bytesWithGain);
+    //if (p.cycles) this.cycles = Math.round(p.cycles * 100.0 / 3500.0) + '%';
+    if (p.cycles) this.cycles = this.cyclesToPercent(p.cycles);
+    //if (p.bytes) this.bytes = humanFileSize(p.bytes);
+    if (p.bytes) this.bytes = p.bytes;
     if (p.soundcloud) this.soundcloud = p.soundcloud;
     if (p.github) this.github = p.github;
     if (p.parameters) {
-        this.parameters = [];
+        this.parameters = {};
         for(var key in p.parameters) {
-            this.parameters.push(p.parameters[key]);
+            this.parameters[key] = p.parameters[key];
         }
     }
+};
+
+/**
+ * Converts a number of bytes into a human-readable file size string.
+ * 
+ * @param {Number} bytes
+ *     The number of bytes.
+ * @return {String}
+ *     A human-readable file size string.
+ */
+HoxtonOwl.Patch.prototype.bytesToHuman = function(bytes) {
+    var i = Math.floor( Math.log(bytes) / Math.log(1024) );
+    return (bytes / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+};
+
+/**
+ * Converts cycles into a CPU%.
+ * 
+ * @param  {Number} cycles
+ *      The number of cycles.
+ * @return {Number}
+ *     The CPU%.
+ */
+HoxtonOwl.Patch.prototype.cyclesToPercent = function(cycles) {
+    return Math.round(cycles * 100.0 / 3500.0);
+};
+
+/**
+ * Converts CPU% into number of cycles.
+ * 
+ * @param  {Number} percent
+ *      The CPU%.
+ * @return {Number}
+ *     The number of cycles.
+ */
+HoxtonOwl.Patch.prototype.percentToCycles = function(percent) {
+    return Math.round(percent * 3500.0 / 100.0);
 };

@@ -86,23 +86,19 @@ patchSheet.getRows(1, function(err, records) {
             }
             
             if ('' !== records[i].armcyclespersample) {
-                patch.armCyclesPerSample = parseInt(records[i].armcyclespersample);
+                patch.cycles = parseInt(records[i].armcyclespersample);
             }
             
             if ('' !== records[i].byteswithgain) {
-                patch.bytesWithGain = parseInt(records[i].byteswithgain);
+                patch.bytes = parseInt(records[i].byteswithgain);
             }
             
             if ('' !== trim(records[i].soundcloud)) {
-                patch.soundcloud = records[i].soundcloud;
+                patch.soundcloud = [ records[i].soundcloud ];
             }
             
-            if ('' !== trim(records[i].repo)) {
-                patch.repo = records[i].repo;
-            }
-            
-            if ('' !== trim(records[i].github)) {
-                patch.github = records[i].github;
+            if ('' !== trim(records[i].github) && '' !== trim(records[i].repo)) {
+                patch.github = [ 'https://github.com/' + records[i].repo + '/blob/master/' + records[i].github ];
             }
             
             if ('' !== trim(records[i].notes)) {

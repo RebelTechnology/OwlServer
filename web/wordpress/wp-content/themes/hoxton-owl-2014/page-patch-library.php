@@ -119,11 +119,11 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                             </tr>
                             <tr>
                               <td><span class="parameter-label">CPU</span></td>
-                              <td><p data-bind="text: cycles"></p></td>
+                              <td><p data-bind="text: cycles + '%'"></p></td>
                             </tr>
                             <tr>
                               <td><span class="parameter-label">Memory</span></td>
-                              <td><p data-bind="text: (bytes + ' / 1Mb')"></p></td>
+                              <td><p data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></p></td>
                             </tr>
                             <!-- <tr> -->
                             <!--   <td><span class="parameter-label">Used in</span></td> -->
@@ -149,25 +149,25 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                                 <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false"
                            data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
                            data-rotation="clockwise" data-readOnly="true" value="35">
-                                <p class="parameter-label" data-bind="text: parameters[0]"></p>
+                                <p class="parameter-label" data-bind="text: parameters.a"></p>
                               </div>
                               <div class="knob-container">
                                 <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" 
                            data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
                            data-rotation="clockwise" data-readOnly="true" value="35">
-                                <p class="parameter-label" data-bind="text: parameters[1]"></p>
+                                <p class="parameter-label" data-bind="text: parameters.b"></p>
                               </div>
                               <div class="knob-container">
                                 <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" 
                            data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
                            data-rotation="clockwise" data-readOnly="true" value="35">
-                                <p class="parameter-label" data-bind="text: parameters[2]"></p>
+                                <p class="parameter-label" data-bind="text: parameters.c"></p>
                               </div>
                               <div class="knob-container">
                                 <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" 
                            data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
                            data-rotation="clockwise" data-readOnly="true" value="35">
-                                <p class="parameter-label" data-bind="text: parameters[3]"></p>
+                                <p class="parameter-label" data-bind="text: parameters.d"></p>
                               </div>
                             </div>
                         </div>
@@ -197,7 +197,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                       <tbody><tr>
                           <!-- <td width="40"><div class="play-button">&gt;</div></td> -->
                           
-                          <td><span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': id }"></span></td>
+                          <td><span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': _id }"></span></td>
                           <!--td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td-->
                           
                           <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->

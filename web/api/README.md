@@ -4,15 +4,14 @@ This project exposes some data related to the [OWL][1] project over a RESTful AP
 * Node.js
 
 ## How to run
-1. Clone directory `web/api` from repository.
-2. Copy file `_meta/api-settings.tpl.js` to root directory and rename it to `api-settings.js`:
+1. Copy file `_meta/api-settings.tpl.js` to root directory and rename it to `api-settings.js`:
 
         cp _meta/api-settings.tpl.js api-settings.js
-3. You're likey to want to change variables `API_PORT` and/or `MONGO_DATABASE` in this new file. We are using a port and a MongoDB database for each environment (staging, production).
-4. Install node.js modules:
+2. You're likey to want to change variables `API_PORT` and/or `MONGO_DATABASE` in this new file. We are using a port and a MongoDB database for each environment (staging, production).
+3. Install node.js modules:
 
         npm install
-5. Enjoy!
+4. Enjoy!
 
         ./bin/www
 
@@ -24,30 +23,32 @@ example](_meta/init-scripts/owl-api).
 
 ### Patches
 
-#### GET /patches/findOne/:id
-Retrieves the patch with the given ID (if it exists).
+#### GET /patch/:id
+Retrieves the patch with the given ID. Returns `404 Not found` if the specified
+patch could not be found.
 
-#### GET /patches/findAll
+#### GET /patches/
 Retrieves all patches.
 
-#### GET /findByTag/:tags
-Retrieves a summary for each patch tagged with at least one of the specified tags.
-##### Parameters
-`:tags` - A comma-separated list of tags.
+#### POST /patches/
+Creates a new patch.
 
-#### GET /findByAuthor/:authors
-Retrieves a summary for each patch by the specified authors.
-##### Parameters
-`:authors` - A comma-separated list of authors.
+#### PUT /patch/:id
+Updates a patch. Returns `404 Not found` if the specified patch could not be
+found.
+
+#### DELETE /patch/:id
+Deletes a patch.  Returns `404 Not found` if the specified patch could not be
+found.
 
 ### Authors
 
-#### GET /authors/findAll
+#### GET /authors/
 Retrieves a list of all authors.
 
 ### Tags
 
-#### GET /tags/findAll
+#### GET /tags/
 Retrieves a list of all tags.
 
 [1]: http://hoxtonowl.com/ "Hoxton OpenWare Laboratory"

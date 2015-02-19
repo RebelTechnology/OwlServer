@@ -303,7 +303,7 @@ input[type=text], input[type=url], input[type=password], input[type=search] {
     font-size: 12px;
     padding: 4px;
     color: #5d5d5d;
-    height: 17px;
+    /* height: 17px; */
 }
 
 input[type=submit], input[type=reset], input[type=button], button {
@@ -475,6 +475,7 @@ form[class^="bbp"] input[type=password] {
 #patch-add-edit-form select {
   width: 100px;
   width: 30% !important;
+  text-align: right;
 }
 
 #patch-add-edit-form select {
@@ -503,6 +504,11 @@ form[class^="bbp"] input[type=password] {
   margin-right: 10px;
   margin-top: 4px;
   font-size: 16px;
+}
+
+#patch-add-edit-form label.percent {
+  width: auto;
+  padding: 5px;
 }
 
 #frm-patch-tags {
@@ -553,6 +559,25 @@ form[class^="bbp"] input[type=password] {
   padding-top: 10px;
   display: block;
   font-size: 12px;
+}
+
+#patch-add-edit-form .invalid {
+  border-color: #ed7800;
+  box-shadow: 0 0 8px rgba(237,120  ,0,.6);
+}
+
+#patch-add-edit-form div.error-message {
+  clear: both;
+  display: none;
+  float: left;
+  margin-left: 21%;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #ed7800;
+}
+
+#patch-add-edit-form div.error-message.no-margin {
+  margin-left: 0;
 }
 
 /* GitHub file tabs */

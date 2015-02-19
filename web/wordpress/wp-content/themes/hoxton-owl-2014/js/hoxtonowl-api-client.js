@@ -30,12 +30,27 @@ HoxtonOwl.ApiClient = function() {
  *     The path to the API method.
  * @param  {string} [verb=get]
  *     The  HTTP verb to use.
+ * @param {?object} data
+ *     An optional object containing the payload for the API call. Used with
+ *     methods like POST and PUT.
  * @return Object
  *     An object representing an ajax request.
  */
-HoxtonOwl.ApiClient.prototype.query = function(path, method) {
-    method = method || 'get';
-    return jQuery[method](this.apiEndPoint + path);
+HoxtonOwl.ApiClient.prototype.query = function(path, method, data) {
+    method = method || 'GET';
+    //if (data) {
+    //    return jQuery[method](, data, null, 'json');
+    //} else {
+    //    return jQuery[method](this.apiEndPoint + path);
+    //}
+    var settings = {
+        type: method,
+        dataType: 'json'
+    };
+    if (data) {
+        settings.data = data;
+    }
+    return $.ajax(this.apiEndPoint + path, settings);
 };
 
 /**
@@ -49,12 +64,13 @@ HoxtonOwl.ApiClient.prototype.getAllPatches = function(callback) {
     var client = this;
     
     jQuery.when(
-        client.query('/patches/findAll'),
-        client.query('/authors/findAll'),
-        client.query('/tags/findAll')
+        client.query('/patches/'),
+        client.query('/authors/'),
+        client.query('/tags/')
     ).done(function(patchData, authorData, tagData) {
         
         var patches = patchData[0].result;
+        
         for (var i = 0; i < patches.length; i++) {
             patches[i] = new HoxtonOwl.Patch(patches[i]);
         }
@@ -68,10 +84,6 @@ HoxtonOwl.ApiClient.prototype.getAllPatches = function(callback) {
         var tags = tagData[0].result;
         tags.unshift("All");
         
-        // console.log('From API:');
-        // console.log(patches);
-        // console.log(authors);
-        // console.log(tags);
         callback(patches, authors, tags);
         
     });
@@ -90,12 +102,46 @@ HoxtonOwl.ApiClient.prototype.getSinglePatch = function(patchId, callback) {
     
     var client = this;
     
-    jQuery.when(client.query('/patches/findOne/' + patchId)).done(function(patchData) {
-        // console.log(patchData.result);
+    jQuery.when(client.query('/patch/' + patchId)).done(function(patchData) {
+        
         var patch = patchData.result;
         patch = new HoxtonOwl.Patch(patch);
         callback(patch);
     });
+};
+
+/**
+ * Saves a patch. This method will determine wheter to create a new patch or
+ * update an existing one based on the presence of the '_id' property in the
+ * 'patch' object.
+ * 
+ * @param  {object}   patch
+ *     A patch object.
+ * @param  {function} callback
+ *     A callback that will be invoked when the API sends a response. The
+ *     response will be passed to the callback as an argument.
+ */
+HoxtonOwl.ApiClient.prototype.savePatch = function(patch, callback) {
+    
+    var client = this;
+    var path, method;
+    
+    if ('undefined' === typeof patch._id) {
+        path = '/patches/';
+        method = 'POST';
+    } else {
+        path = '/patch/';
+        method = 'PUT';
+    }
+    console.log(path);
+    console.log(method);
+    
+    jQuery.when(client.query(path, method, patch)).done(function(data) {
+        
+    }).fail(function() {
+        
+    });
+    
 };
 
 /**
@@ -111,7 +157,7 @@ HoxtonOwl.ApiClient.prototype.getSinglePatchBySeoName = function(patchSeoName, c
     
     var client = this;
     
-    jQuery.when(client.query('/patches/findOneBySeoName/' + patchSeoName)).done(function(patchData) {
+    jQuery.when(client.query('/patch/?seoName=' + encodeURIComponent(patchSeoName))).done(function(patchData) {
         var patch = patchData.result;
         patch = new HoxtonOwl.Patch(patch);
         callback(patch);
@@ -128,7 +174,7 @@ HoxtonOwl.ApiClient.prototype.getAllTags = function(callback) {
     
     var client = this;
     
-    jQuery.when(client.query('/tags/findAll')).done(function(tagData) {
+    jQuery.when(client.query('/tags/')).done(function(tagData) {
         var tags = tagData.result;
         callback(tags);
     });

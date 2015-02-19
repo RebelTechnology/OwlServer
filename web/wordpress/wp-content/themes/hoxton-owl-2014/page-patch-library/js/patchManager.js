@@ -217,7 +217,7 @@ HoxtonOwl.patchManager = {
             //console.log('selectPatch');
             pm.updateBreadcrumbs(patch);
             
-            var patchId = patch.id;
+            var patchId = patch._id;
             var apiClient = new HoxtonOwl.ApiClient();
             apiClient.getSinglePatch(patchId, function(patch) {
                 
@@ -234,29 +234,33 @@ HoxtonOwl.patchManager = {
                 //var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().github;
                 
                 $('#github-files').empty();
-                for (var i = 0, max = that.selectedPatch().github.length; i < max; i++) {
-                    
-                    pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename) {
+                if (that.selectedPatch().github) {
+                    for (var i = 0, max = that.selectedPatch().github.length; i < max; i++) {
                         
-                        var cnt;
-                        
-                        if (0 === $('#github-files > ul').length) {
-                            $('#github-files').html('<ul></ul>');
-                        }
-                        cnt = $('#github-files > ul > li').length;
-                        
-                        cnt++;
-                        $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
-                        $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint">' + contents + '</pre></div>');
-                        
-                        if (HoxtonOwl.patchManager.getGithubFile.count == max) {
-                            // no more files to be loaded
-                            prettyPrint();
-                            $('#github-files').tabs({ active: 0 }); // jQuery-UI tabs
-                        }
-                        
-                        //$("#gitsource").text(contents).removeClass("prettyprinted").parent();
-                    });
+                        pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename) {
+                            
+                            var cnt;
+                            
+                            if (0 === $('#github-files > ul').length) {
+                                $('#github-files').html('<ul></ul>');
+                            }
+                            cnt = $('#github-files > ul > li').length;
+                            
+                            cnt++;
+                            $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
+                            $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint">' + contents + '</pre></div>');
+                            
+                            if (HoxtonOwl.patchManager.getGithubFile.count == max) {
+                                // no more files to be loaded
+                                prettyPrint();
+                                $('#github-files').tabs({ active: 0 }); // jQuery-UI tabs
+                            }
+                            
+                            //$("#gitsource").text(contents).removeClass("prettyprinted").parent();
+                        });
+                    }
+                } else {
+                    $('#github-files').append('<p>No code available.</p>');
                 }
                 
                 knobify();
