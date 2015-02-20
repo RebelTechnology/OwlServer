@@ -28,17 +28,37 @@ router.get('/', function(req, res) {
     
     var collection = req.db.get('patches');
     
-    collection.find({}, { fields: summaryFields, sort: 'name' }, function(err, patchSummaries) {
-        
-        var response = {};
-        if (null !== err) {
-            res.status(500).json({ message: err, error: { status: 500 }});
-        } else {
-            response.count = patchSummaries.length;
-            response.result = patchSummaries;
-            res.status(200).json(response);
+    // new code
+    var nativeCol = collection.col;
+    var summaryFields2 = summaryFields;
+    summaryFields2.lowercase = { $toLower: '$name' };
+    nativeCol.aggregate(
+        { $project: summaryFields2 },
+        { $sort: { lowercase: 1 }},
+        function (err, result) {
+            if (err !== null) {
+                return res.status(500).json({error: err});
+            } else {
+                var response = {};
+                response.count = result.length;
+                response.result = result;
+                return res.status(200).json(response);
+            }
         }
-    });
+    );
+    // end of new code
+    
+    //collection.find({}, { fields: summaryFields, sort: 'name' }, function(err, patchSummaries) {
+    //    
+    //    var response = {};
+    //    if (null !== err) {
+    //        return res.status(500).json({ message: err, error: { status: 500 }});
+    //    } else {
+    //        response.count = patchSummaries.length;
+    //        response.result = patchSummaries;
+    //        return res.status(200).json(response);
+    //    }
+    //});
 });
 
 /**
@@ -139,23 +159,23 @@ router.post('/', function(req, res) {
 //        res.json(response);
 //    });
 //});
-
-/*
- * GET /patches/findOneBySeoName
- * 
- * FIXME: make this search case-insensitive
- */
-router.get('/findOneBySeoName/:seoName', function(req, res) {
-    
-    var seoName = req.params.seoName;
-    var collection = req.db.get('patches');
-    collection.findOne({ seoName: seoName }, function(err, patch) {
-        var response = { error: null === err ? 0 : err };
-        if (null === err) {
-            response.result = patch;
-        }
-        res.json(response);
-    });
-});
+//
+///*
+// * GET /patches/findOneBySeoName
+// * 
+// * FIXME: make this search case-insensitive
+// */
+//router.get('/findOneBySeoName/:seoName', function(req, res) {
+//    
+//    var seoName = req.params.seoName;
+//    var collection = req.db.get('patches');
+//    collection.findOne({ seoName: seoName }, function(err, patch) {
+//        var response = { error: null === err ? 0 : err };
+//        if (null === err) {
+//            response.result = patch;
+//        }
+//        res.json(response);
+//    });
+//});
 
 module.exports = router;
