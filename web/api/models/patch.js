@@ -194,17 +194,6 @@ var patchModel = {
                         throw err;
                     }
                 }
-            },
-            sanitize: function(val) {
-                
-                if ('undefined' === typeof val) {
-                    return val;
-                }
-                
-                for (var i = 0, max = val.length; i < max; i++) {
-                    val[i] = val[i].toLowerCase();
-                }
-                return val;
             }
         },
         
@@ -234,17 +223,6 @@ var patchModel = {
                         throw err;
                     }
                 }
-            },
-            sanitize: function(val) {
-                
-                if ('undefined' === typeof val) {
-                    return val;
-                }
-                
-                for (var i = 0, max = val.length; i < max; i++) {
-                    val[i] = val[i].toLowerCase();
-                }
-                return val;
             }
         },
         

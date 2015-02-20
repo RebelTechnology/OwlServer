@@ -59,6 +59,7 @@ HoxtonOwl.patchManager = {
             url:      endpoint,
             dataType: "jsonp",
             success:  function(data) {
+                HoxtonOwl.patchManager.getGithubFile.count++;
                 if (typeof data.data.content != "undefined") {
                     if (data.data.encoding == "base64") {
                         var base64EncodedContent = data.data.content;
@@ -68,11 +69,15 @@ HoxtonOwl.patchManager = {
                         if (endLineNum == 0) {
                             endLineNum = contentArray.length;
                         }
-                        HoxtonOwl.patchManager.getGithubFile.count++;
-                        console.log(content);
                         callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"), filename);
+                        return;
                     }
                 }
+                callback('// This file could not be fetched. Is it from a public GitHub repository?', filename);
+            },
+            error: function(data) {
+                HoxtonOwl.patchManager.getGithubFile.count++;
+                callback('// This file could not be fetched because of an unexpected error.', filename);
             }
         })
     },
@@ -80,11 +85,11 @@ HoxtonOwl.patchManager = {
     /**
      * Contains the code that operates the patches page.
      * 
-     * @param  {Object[]} patches
+     * @param {Object[]} patches
      *     An array of objects that represent patches.
-     * @param  {string[]} authors
+     * @param {string[]} authors
      *     The authors.
-     * @param  {string[]} tags
+     * @param {string[]} tags
      *     The tags.
      */
     main: function(patches, authors, tags) {
@@ -248,8 +253,8 @@ HoxtonOwl.patchManager = {
                             
                             cnt++;
                             $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
-                            $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint">' + contents + '</pre></div>');
-                            
+                            $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint"></pre></div>');
+                            $('#github-files pre.prettyprint').text(contents);
                             if (HoxtonOwl.patchManager.getGithubFile.count == max) {
                                 // no more files to be loaded
                                 prettyPrint();
