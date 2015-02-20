@@ -103,7 +103,6 @@ HoxtonOwl.ApiClient.prototype.getSinglePatch = function(patchId, callback) {
     var client = this;
     
     jQuery.when(client.query('/patch/' + patchId)).done(function(patchData) {
-        
         var patch = patchData.result;
         patch = new HoxtonOwl.Patch(patch);
         callback(patch);
@@ -130,7 +129,7 @@ HoxtonOwl.ApiClient.prototype.savePatch = function(patch, callback) {
         path = '/patches/';
         method = 'POST';
     } else {
-        path = '/patch/';
+        path = '/patch/' + patch._id;
         method = 'PUT';
     }
     

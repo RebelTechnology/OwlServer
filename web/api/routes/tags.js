@@ -23,14 +23,14 @@ router.get('/', function(req, res) {
         
         function(err, result) {
             if (err !== null) {
-                res.status(500).json({error: err});
+                return res.status(500).json({error: err});
             } else {
                 var tags = [];
                 for (var i = 0; i < result.length; i++) {
                     var tag = result[i]._id;
                     tags.push(tag);
                 }
-                res.status(200).json({ count: tags.length, result: tags });
+                return res.status(200).json({ count: tags.length, result: tags });
             }
         }
     );

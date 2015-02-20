@@ -53,8 +53,7 @@ var patchModel = {
                     err.message = 'This field should be at least 1 and at most 255 characters long.';
                     throw err;
                 }
-            },
-            sanitize: function(val) { return val.trim().toLowerCase(); }
+            }
         },
         
         author: {
@@ -333,6 +332,10 @@ var patchModel = {
         }
         
         return patch;
+    },
+    
+    generateSeoName: function(patch) {
+        return patch.name.replace(/[^a-z0-9]/i, '_');
     }
 };
 

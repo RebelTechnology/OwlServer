@@ -17,7 +17,7 @@ router.get('/:author', function(req, res) {
         message: 'Not implemented',
         error: { status: 405 }
     };
-    res.status(405).json(response);
+    return res.status(405).json(response);
 });
 
 module.exports = router;

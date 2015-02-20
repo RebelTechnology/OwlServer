@@ -23,9 +23,8 @@ router.get('/', function(req, res) {
         
         function(err, result) {
             if (err !== null) {
-                res.status(500).json({error: err});
+                return res.status(500).json({error: err});
             } else {
-                console.log('test');
                 var authors = [];
                 for (var i = 0; i < result.length; i++) {
                     var author = { name: result[i]._id };
@@ -34,7 +33,7 @@ router.get('/', function(req, res) {
                     }
                     authors.push(author);
                 }
-                res.status(200).json({ count: authors.length, result: authors });
+                return res.status(200).json({ count: authors.length, result: authors });
             }
         }
     );

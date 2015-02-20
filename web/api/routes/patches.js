@@ -25,25 +25,20 @@ var regExpEscape = function(str) {
  * GET /patches
  */
 router.get('/', function(req, res) {
-    
     var collection = req.db.get('patches');
     var nativeCol = collection.col;
     var summaryFields2 = summaryFields;
     summaryFields2.lowercase = { $toLower: '$name' };
-    nativeCol.aggregate(
-        { $project: summaryFields2 },
-        { $sort: { lowercase: 1 }},
-        function (err, result) {
-            if (err !== null) {
-                return res.status(500).json({error: err});
-            } else {
-                var response = {};
-                response.count = result.length;
-                response.result = result;
-                return res.status(200).json(response);
-            }
+    nativeCol.aggregate({ $project: summaryFields2 }, { $sort: { lowercase: 1 }}, function (err, result) {
+        if (err !== null) {
+            return res.status(500).json({error: err});
+        } else {
+            var response = {};
+            response.count = result.length;
+            response.result = result;
+            return res.status(200).json(response);
         }
-    );
+    });
 });
 
 /**
@@ -56,7 +51,7 @@ router.post('/', function(req, res) {
     var collection = req.db.get('patches');
     var patch = req.body;
     
-    patch.seoName = patch.name.replace(/[^a-z0-9]/i, '_');
+    patch.seoName = patchModel.generateSeoName(patch);
     patch.author = { name: 'OWL' }; // FIXME
     try {
         patchModel.validate(patch);
@@ -68,9 +63,9 @@ router.post('/', function(req, res) {
         }
     }
     
+    // we make sure that no other patches are named the same (in a case insensitive fashion)
     var nameRegexp = new RegExp(regExpEscape(patch.name), 'i');
     var seoNameRegexp = new RegExp(regExpEscape(patch.seoName), 'i');
-    
     collection.findOne({ $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] }, function(err, doc) {
         
         if (null !== err) {
