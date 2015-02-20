@@ -68,10 +68,6 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <img src="<?= $resUri ?>images/authors-icon.png" width="40" height="40" alt="icon">
                     <p>Authors</p>
                 </div>
-                <div class="secondary-nav-item">
-                    <a href="/add-patch/"><img src="<?= $resUri ?>images/add.png" width="40" height="40" alt="icon"></a>
-                    <p>Add new</p>
-                </div>
                 <!-- <div class="secondary-nav-item"> -->
                 <!--     <img src="<?= $resUri ?>images/my-patches-icon.png" width="40" height="40" alt="icon"> -->
                 <!--     <p>My patches</p> -->
