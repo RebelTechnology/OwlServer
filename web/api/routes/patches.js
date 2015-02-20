@@ -27,8 +27,6 @@ var regExpEscape = function(str) {
 router.get('/', function(req, res) {
     
     var collection = req.db.get('patches');
-    
-    // new code
     var nativeCol = collection.col;
     var summaryFields2 = summaryFields;
     summaryFields2.lowercase = { $toLower: '$name' };
@@ -46,19 +44,6 @@ router.get('/', function(req, res) {
             }
         }
     );
-    // end of new code
-    
-    //collection.find({}, { fields: summaryFields, sort: 'name' }, function(err, patchSummaries) {
-    //    
-    //    var response = {};
-    //    if (null !== err) {
-    //        return res.status(500).json({ message: err, error: { status: 500 }});
-    //    } else {
-    //        response.count = patchSummaries.length;
-    //        response.result = patchSummaries;
-    //        return res.status(200).json(response);
-    //    }
-    //});
 });
 
 /**
