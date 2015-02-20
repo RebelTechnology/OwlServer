@@ -36,14 +36,23 @@ HoxtonOwl.Patch = function(p) {
     if (p.instructions) this.instructions = p.instructions;
     if (typeof p.inputs !== 'undefined') this.inputs = p.inputs;
     if (typeof p.outputs !== 'undefined') this.outputs = p.outputs;
+    
+    this.cycles = '';
     //if (p.cycles) this.cycles = Math.round(p.cycles * 100.0 / 3500.0) + '%';
     if (p.cycles) this.cycles = this.cyclesToPercent(p.cycles);
+    
+    this.bytes = '';
     //if (p.bytes) this.bytes = humanFileSize(p.bytes);
     if (p.bytes) this.bytes = p.bytes;
+    
+    this.soundcloud = [];
     if (p.soundcloud) this.soundcloud = p.soundcloud;
+    
+    this.github = [];
     if (p.github) this.github = p.github;
+    
+    this.parameters = {};
     if (p.parameters) {
-        this.parameters = {};
         for(var key in p.parameters) {
             this.parameters[key] = p.parameters[key];
         }

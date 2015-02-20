@@ -52,8 +52,8 @@ HoxtonOwl.patchManager = {
         var path     = bits.slice(7).join('/');
         var filename = bits[bits.length-1];
         var endpoint = 'https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=' + branch;
-        console.log(endpoint);
         
+        console.log(endpoint);
         $.ajax({
             type:     "GET",
             url:      endpoint,
@@ -69,6 +69,7 @@ HoxtonOwl.patchManager = {
                             endLineNum = contentArray.length;
                         }
                         HoxtonOwl.patchManager.getGithubFile.count++;
+                        console.log(content);
                         callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"), filename);
                     }
                 }
@@ -214,7 +215,6 @@ HoxtonOwl.patchManager = {
         };
 
         that.selectPatch = function(patch) {
-            //console.log('selectPatch');
             pm.updateBreadcrumbs(patch);
             
             var patchId = patch._id;
@@ -302,12 +302,16 @@ HoxtonOwl.patchManager = {
     
     /**
      * Navigates to a patch page.
-     * 
-     * @param {Object} e
-     *     The click event.
      */
     openPatch: function(patch) {
         location = '/patch-library/patch/' + patch.seoName;
+    },
+    
+    /**
+     * Navigates to the patch edit page.
+     */
+    editPatch: function(patch) {
+        location = '/edit-patch/' + patch.seoName;
     },
     
     updateBreadcrumbs: function(patch) {

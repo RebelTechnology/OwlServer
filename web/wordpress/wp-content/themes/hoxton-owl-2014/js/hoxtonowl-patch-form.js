@@ -106,6 +106,15 @@ HoxtonOwl.patchForm = {
         $('#patch-add-edit-form textarea').next('div.error-message').hide();
         $('#patch-add-edit-form select').next('div.error-message').hide();
         
+        $('[id^=frm-patch-samples_]').
+            removeClass('invalid').
+            nextAll('div.error-message').
+            hide();
+        $('[id^=frm-patch-github_]').
+            removeClass('invalid').
+            nextAll('div.error-message').
+            hide();
+        
         var name = $.trim($('#frm-patch-name').val());
         var description = $.trim($('#frm-patch-description').val());
         var instructions = $.trim($('#frm-patch-instructions').val());
@@ -218,8 +227,36 @@ HoxtonOwl.patchForm = {
     save: function(patch) {
         
         var apiClient = new HoxtonOwl.ApiClient;
-        apiClient.savePatch(patch);
-        
+        apiClient.savePatch(patch, function(data) {
+            if (data._id) {
+                // patch saved
+                location = '/patch-library/patch/' + data.seoName;
+            } else if (data.responseJSON) {
+                
+                var response = data.responseJSON;
+                if (response.error && response.field && response.message) {
+                    
+                    if (response.field == 'soundcloud' || response.field == 'github') {
+                        $('#frm-patch-' + (response.field == 'soundcloud' ? 'samples' : 'github') + '_' + response.index).
+                            addClass('invalid').
+                            nextAll('div.error-message').
+                            text(response.message).
+                            show();
+                    } else {
+                        $('#frm-patch-' + response.field).
+                            addClass('invalid').
+                            next('div.error-message').
+                            text(response.message).
+                            show();
+                    }
+                    location = '#form-top';
+                } else {
+                    alert('Internal error.');
+                }
+            } else {
+                alert('Internal error.');
+            }
+        });
     },
     
     /**
@@ -263,6 +300,10 @@ HoxtonOwl.patchForm = {
                 if (patch) {
                     HoxtonOwl.patchForm.save(patch);
                 }
+            });
+            
+            $('#frm-patch-btn-cancel').click(function(e) {
+                location = '/patch-library/';
             });
             
             // Trigger the "formInited" event

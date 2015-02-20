@@ -58,7 +58,7 @@ var patchModel = {
         },
         
         author: {
-            required: false, // FIXME
+            required: false, // FIXME-----------------------------------------------------------------------------------
             validate: function(val) {
                 var err = { type: 'not_valid', field: 'author', error: { status: 400 }};
                 // FIXME - complete this function

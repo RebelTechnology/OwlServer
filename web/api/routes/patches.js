@@ -52,13 +52,14 @@ router.post('/', function(req, res) {
     var patch = req.body;
     
     patch.seoName = patch.name.replace(/[^a-z0-9]/i, '_');
+    patch.author = { name: 'OWL' }; // FIXME
     try {
         patchModel.validate(patch);
     } catch(err) {
         if ('undefined' === typeof err.error && 'undefined' === typeof err.error.status) {
-            res.status(500).json(err);
+            return res.status(500).json(err);
         } else {
-            res.status(err.error.status).json(err);
+            return res.status(err.error.status).json(err);
         }
     }
     
@@ -69,13 +70,13 @@ router.post('/', function(req, res) {
         
         if (null !== err) {
             // database returned an error
-            res.status(500).json({ message: err, error: { status: 500 }});
+            return res.status(500).json({ message: err, error: { status: 500 }});
         } else {
             
             if (null !== doc) {
                 
                 var err = { message: 'This name is already taken.', type: 'not_valid', field: 'name', error: { status: 400 }};
-                res.status(err.error.status).json(err);
+                return res.status(err.error.status).json(err);
                 
             } else {
                 
@@ -84,12 +85,12 @@ router.post('/', function(req, res) {
                     
                     if (null !== err) {
                         // database returned an error
-                        res.status(500).json({
+                        return res.status(500).json({
                             message: err,
                             error: { status: 500 }
                         });
                     } else {
-                        res.status(200).json({ message: 'New patch saved.', _id: newlyInsertedPatch._id, seoName: newlyInsertedPatch.seoName });
+                        return res.status(200).json({ message: 'New patch saved.', _id: newlyInsertedPatch._id, seoName: newlyInsertedPatch.seoName });
                     }
                 });
             }

@@ -133,13 +133,9 @@ HoxtonOwl.ApiClient.prototype.savePatch = function(patch, callback) {
         path = '/patch/';
         method = 'PUT';
     }
-    console.log(path);
-    console.log(method);
     
-    jQuery.when(client.query(path, method, patch)).done(function(data) {
-        
-    }).fail(function() {
-        
+    jQuery.when(client.query(path, method, patch)).always(function(data) {
+        callback(data);
     });
     
 };
