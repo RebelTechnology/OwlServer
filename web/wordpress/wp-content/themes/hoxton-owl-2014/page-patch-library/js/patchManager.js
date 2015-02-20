@@ -53,7 +53,6 @@ HoxtonOwl.patchManager = {
         var filename = bits[bits.length-1];
         var endpoint = 'https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=' + branch;
         
-        console.log(endpoint);
         $.ajax({
             type:     "GET",
             url:      endpoint,
