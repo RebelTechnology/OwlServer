@@ -318,9 +318,9 @@ HoxtonOwl.patchManager = {
         $('#breadcrumbs li').slice(2).remove();
         if (patch) {
             document.title = 'The OWL | ' + patch.name;
-            $('#breadcrumbs').append('<li><a href="/patch-library/" rel="category tag">Patch Library</a></li><li class="separator"> / </li><li>' + patch.name + '</li>');
+            $('#breadcrumbs').append('<li><a href="/patch-library/" rel="category tag">Patches</a></li><li class="separator"> / </li><li>' + patch.name + '</li>');
         } else {
-            $('#breadcrumbs').append('<li><strong>Patch Library</strong></li>');
+            $('#breadcrumbs').append('<li><strong>Patches</strong></li>');
             document.title = 'The OWL | Patch Library';
         }
     }
