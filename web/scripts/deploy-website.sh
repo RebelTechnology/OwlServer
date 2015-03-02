@@ -28,7 +28,7 @@ if [ "$HOSTNAME" = "bella" ]
 then
     TARGET_ENV='staging'
     GIT_BRANCH='dev'
-elif [ "$HOSTNAME" = "buenaventura" ]
+elif [ "$HOSTNAME" = "buenaventura" || "$HOSTNAME" = "nestor" ]
 then
     TARGET_ENV='production'
     GIT_BRANCH='master'
