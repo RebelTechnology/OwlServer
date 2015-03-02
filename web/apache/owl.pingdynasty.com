@@ -1,51 +1,51 @@
 <VirtualHost *:80>
-    
+
     # Basic settings
     ServerName www.hoxtonowl.com
     ServerAlias hoxtonowl.com owl.pingdynasty.com
-    DocumentRoot /home/owl/wordpress
+    DocumentRoot /var/www/hoxtonowl.com/subdomains/www/httpdocs
 
     # Logging
-    ErrorLog /var/log/apache2/owl.pingdinasty.com.error.log
+    ErrorLog /var/www/hoxtonowl.com/subdomains/www/logs/error.log
     LogLevel debug
-    CustomLog /var/log/apache2/owl.pingdynasty.com.log combined
+    CustomLog /var/www/hoxtonowl.com/subdomains/www/logs/access.log combined
     php_flag display_errors off
     SetEnv APPLICATION_ENV production
 
     # Prevent direct access to /wp-login.php (i.e. no HTTP referrer)
     <IfModule mod_rewrite.c>
-	RewriteEngine On
-	RewriteCond %{REQUEST_URI} .wp-login\.php*
-	RewriteCond %{HTTP_REFERER} !.*hoxtonowl.com.* [OR]
-	RewriteCond %{HTTP_USER_AGENT} ^$
+        RewriteEngine On
+        RewriteCond %{REQUEST_URI} .wp-login\.php*
+        RewriteCond %{HTTP_REFERER} !.*hoxtonowl.com.* [OR]
+        RewriteCond %{HTTP_USER_AGENT} ^$
         RewriteRule (.*) http://www.example.com/ [R=301,L]
     </IfModule>
 
-    # Reverse proxy for REST API 
-    ProxyRequests Off 
+    # Reverse proxy for REST API
+    ProxyRequests Off
     ProxyVia On
     <Location /api/>
-        ProxyPass http://staging.hoxtonowl.com:3001/
-        ProxyPassReverse http://staging.hoxtonowl.com:3001/
+        ProxyPass http://localhost:3001/
+        ProxyPassReverse http://localhost:3001/
         Order allow,deny
-        Allow from all 
-    </Location> 
-    
-    <Directory /home/owl/wordpress>
+        Allow from all
+    </Location>
+
+    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs>
         Options FollowSymLinks -Indexes
         #AllowOverride Limit Options FileInfo
         AllowOverride None
         DirectoryIndex index.php
-        
+
         php_flag display_errors on
 
         <Files "xmlrpc.php">
             Order Allow,Deny
             deny from all
         </Files>
-        
+
         <IfModule mod_rewrite.c>
-            
+
             RewriteEngine On
             RewriteBase /
 
@@ -97,7 +97,7 @@
         </Files>
         <IfModule mod_rewrite.c>
                 RewriteEngine On
-                
+
                 # Rules to protect wp-includes
                 RewriteRule ^wp-admin/includes/ - [F]
                 RewriteRule !^wp-includes/ - [S=3]
@@ -105,14 +105,14 @@
                 RewriteRule ^wp-includes/[^/]+\.php$ - [F]
                 RewriteRule ^wp-includes/js/tinymce/langs/.+\.php - [F]
                 RewriteRule ^wp-includes/theme-compat/ - [F]
-                
+
                 # Rules to prevent php execution in uploads
                 RewriteRule ^(.*)/uploads/(.*).php(.?) - [F]
-                
+
                 # Rules to block unneeded HTTP methods
                 RewriteCond %{REQUEST_METHOD} ^(TRACE|DELETE|TRACK) [NC]
                 RewriteRule ^(.*)$ - [F]
-                
+
                 # Rules to block suspicious URIs
                 RewriteCond %{QUERY_STRING} \.\.\/ [NC,OR]
                 RewriteCond %{QUERY_STRING} ^.*\.(bash|git|hg|log|svn|swp|cvs) [NC,OR]
@@ -134,7 +134,7 @@
                 RewriteCond %{HTTP_COOKIE} !^.*wordpress_logged_in_.*$
                 RewriteCond %{HTTP_REFERER} !^http://maps\.googleapis\.com(.*)$
                 RewriteRule ^(.*)$ - [F]
-                
+
                 # Rules to block foreign characters in URLs
                 RewriteCond %{QUERY_STRING} ^.*(%0|%A|%B|%C|%D|%E|%F).* [NC]
                 RewriteRule ^(.*)$ - [F]
@@ -143,40 +143,27 @@
 
     </Directory>
 
-    <Directory /home/owl/wordpress/_meta>
+    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/_meta>
         Order Deny,Allow
         deny from all
     </Directory>
 
-    <Directory /home/owl/wordpress/_deploy/>
+    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/_deploy/>
         AuthName "Secure Area"
         AuthType Basic
-        AuthUserFile /home/owl/.htpasswd
-        require valid-user 
+        AuthUserFile /var/www/hoxtonowl.com/subdomains/www/.htpasswd
+        require valid-user
     </Directory>
 
-    <Directory /home/owl/wordpress/mediawiki/images/>
+    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/mediawiki/images/>
         <Files *.php>
             deny from all
         </Files>
     </Directory>
 
-    <Directory /home/owl/wordpress/wp-content/upload/>
+    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/wp-content/upload/>
         <Files *.php>
             deny from all
         </Files>
     </Directory>
-
-#    # Password protect wp-admin directory:
-#    <Directory "/home/owl/wordpress/wp-admin">
-#        AuthName "Are you an evil sp4mb0t?"
-#        AuthType Basic
-#        AuthUserFile /home/owl/.htpasswd
-#        require valid-user
-#        <Files "admin-ajax.php">
-#            Order allow,deny
-#            Allow from all
-#            Satisfy any
-#        </Files>
-#    </Directory>
 </VirtualHost>
