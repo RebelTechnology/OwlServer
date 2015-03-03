@@ -22,30 +22,22 @@ while [ -h "$SOURCE" ]; do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-function usage {
-    echo "Usage: $0 {production|staging}" 1>&2
-    exit 1
-}
-
 # Work out environment
-if [ "$#" -ne 1 ]; then
-    usage
-fi
-
-# Determine target environment
-if [[ "$1" = "staging" || "$1" = "production" ]]; then
-    TARGET_ENV="$1"
+HOSTNAME=`hostname`
+if [ "$HOSTNAME" = "bella" ]
+then
+    TARGET_ENV='staging'
+    GIT_BRANCH='dev'
+elif [ "$HOSTNAME" = "nestor" ]
+then
+    TARGET_ENV='production'
+    GIT_BRANCH='master'
 else
-    usage
+    echo "Unknown hostname $HOSTNAME. Cannot determine target environment."
+    echo "Aborting."
+    exit 1
 fi
-echo "Target environment is $TARGET_ENV."
-
-# Determine git branch to use
-if [[ "$1" = "staging" ]]; then
-    GIT_BRANCH="dev"
-elif [[ "$1" = "production" ]]; then
-    GIT_BRANCH="master"
-fi
+echo "This is $HOSTNAME, assuming $TARGET_ENV environment."
 
 # Delete previous clone
 rm -rf $DIR/$CLONE_DIR
