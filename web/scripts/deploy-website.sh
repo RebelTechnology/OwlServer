@@ -55,7 +55,6 @@ cd - > /dev/null
 echo "Updating Wordpress files..."
 #rsync --quiet -avz $DIR/OwlServer/web/wordpress/wp-content $DIR/../httpdocs/
 rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
-echo $DIR
 mv $DIR/OwlServer/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
 chown -R root:root $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
 find $DIR/../httpdocs/wp-content -type f -exec chmod 644 '{}' \;
