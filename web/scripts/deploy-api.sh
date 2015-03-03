@@ -65,6 +65,17 @@ cd $DIR/../$TARGET_ENV
 npm install
 cd - > /dev/null
 
+# Update deployment script
+echo "Updating deployment script..."
+cp $DIR/$CLONE_DIR/web/scripts/deploy-api.sh $DIR/../deployment/
+
+# Delete temp repo clone
+echo "Deleting temp repo clone..."
 rm -rf $DIR/$CLONE_DIR
+
+# Restart service
+echo "Restarting service..."
+service owl-api.production stop
+service owl-api.production start
 
 echo "Done."

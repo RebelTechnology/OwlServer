@@ -74,6 +74,12 @@ find $DIR/../httpdocs/mediawiki/skins/HoxtonOWL2014 -type d -exec chmod 755 '{}'
 echo "Cleaning up..."
 chown -R www-data:www-data $DIR/../httpdocs/wp-content/uploads
 
+# Update deployment script
+echo "Updating deployment script..."
+cp $DIR/$CLONE_DIR/web/scripts/deploy-website.sh $DIR/../deployment/
+
+# Delete temp repo clone
+echo "Deleting temp repo clone..."
 rm -rf $DIR/$CLONE_DIR
 
 echo "Done."
