@@ -70,9 +70,10 @@ chown -R root:root $DIR/../httpdocs/mediawiki/skins/HoxtonOWL2014
 find $DIR/../httpdocs/mediawiki/skins/HoxtonOWL2014 -type f -exec chmod 644 '{}' \;
 find $DIR/../httpdocs/mediawiki/skins/HoxtonOWL2014 -type d -exec chmod 755 '{}' \;
 
-# Set privileges on "wp-content/uploads" directory
+# Set privileges
 echo "Cleaning up..."
 chown -R www-data:www-data $DIR/../httpdocs/wp-content/uploads
+chown -R www-data:www-data $DIR/../httpdocs/mediawiki/cache
 
 # Update deployment script
 echo "Updating deployment script..."
