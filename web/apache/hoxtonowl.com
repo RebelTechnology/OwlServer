@@ -37,8 +37,8 @@
      ProxyRequests Off
      ProxyVia On
      <Location /api/>
-         ProxyPass http://localhost:3001/
-         ProxyPassReverse http://localhost:3001/
+         ProxyPass http://localhost:3000/
+         ProxyPassReverse http://localhost:3000/
          Order allow,deny
          Allow from all
      </Location>
