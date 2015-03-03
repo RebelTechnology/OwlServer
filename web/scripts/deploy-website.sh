@@ -77,7 +77,7 @@ chown -R www-data:www-data $DIR/../httpdocs/mediawiki/cache
 
 # Update deployment script
 echo "Updating deployment script..."
-cp $DIR/$CLONE_DIR/web/scripts/deploy-website.sh $DIR/../deployment/
+cp -a $DIR/$CLONE_DIR/web/scripts/deploy-website.sh $DIR/
 
 # Delete temp repo clone
 echo "Deleting temp repo clone..."
