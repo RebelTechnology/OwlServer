@@ -254,7 +254,7 @@ HoxtonOwl.patchManager = {
                             cnt++;
                             $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
                             $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint"></pre></div>');
-                            $('#github-files pre.prettyprint').text(contents);
+                            $('#github-files pre.prettyprint').eq(HoxtonOwl.patchManager.getGithubFile.count - 1).text(contents);
                             if (HoxtonOwl.patchManager.getGithubFile.count == max) {
                                 // no more files to be loaded
                                 prettyPrint();
