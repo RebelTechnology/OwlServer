@@ -102,7 +102,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
             </div>
             <div class="patch-instructions">
                 <h2>Instructions</h2>
-                <p data-bind="text: description"></p>
+                <p data-bind="text: instructions"></p>
             </div>
             <!-- <div class="video-wrapper1">
                 <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
