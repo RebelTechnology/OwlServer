@@ -28,10 +28,12 @@ if [ "$HOSTNAME" = "bella" ]
 then
     TARGET_ENV='staging'
     GIT_BRANCH='dev'
+    SITE_URL='http://staging.hoxtonowl.com'
 elif [ "$HOSTNAME" = "nestor" ]
 then
     TARGET_ENV='production'
     GIT_BRANCH='master'
+    SITE_URL='http://www.hoxtonowl.com'
 else
     echo "Unknown hostname $HOSTNAME. Cannot determine target environment."
     echo "Aborting."
@@ -84,8 +86,8 @@ rm -rf $DIR/$CLONE_DIR
 
 echo "Done."
 
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo " REMEMBER TO CLEAR APC CACHE @ http://www.hoxtonowl.com/apc.php !!! "
-echo
-echo " Unfortunately I cannot do this for you...                          "
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo " REMEMBER TO CLEAR APC CACHE @ $SITE_URL/apc.php !!! "
+echo "                                                                        "
+echo " Unfortunately I cannot do this for you...                              "
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
