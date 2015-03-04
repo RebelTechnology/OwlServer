@@ -87,7 +87,7 @@ rm -rf $DIR/$CLONE_DIR
 echo "Done."
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo " REMEMBER TO CLEAR APC CACHE @ $SITE_URL/apc.php !!! "
+echo " REMEMBER TO CLEAR APC CACHE @ $SITE_URL/apc.php !!!                    "
 echo "                                                                        "
 echo " Unfortunately I cannot do this for you...                              "
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
