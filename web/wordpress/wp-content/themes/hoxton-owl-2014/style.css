@@ -6,7 +6,7 @@ Description:    Made for the OWL 2014 redesign
 Version:        0.1
 Author:         Jonny Kates
 Author URI:     http://jonnykates.com
-Tags:           
+Tags:
 */
 
 @import "css/app-style.css";
@@ -118,7 +118,7 @@ h1, h2, h3 {
 h1 {
     font-weight: 700;
     color: #fff;
-    font-size: 24px;    
+    font-size: 24px;
     display: inline-flex;
     background: #231f20;
     padding: 10px;
@@ -191,12 +191,12 @@ img {
     margin:10px 0;
     overflow:hidden;
 }
- 
+
 #breadcrumbs li{
     float:left;
     margin-right:15px;
 }
- 
+
 #breadcrumbs .separator{
     color:#ccc;
 }
@@ -279,10 +279,10 @@ ul.menu li ul {
   -o-transition: opacity 0.2s;
   -transition: opacity 0.2s;
 }
-ul.menu li ul li { 
+ul.menu li ul li {
   background: #555;
-  width: 100%; 
-  display: block; 
+  width: 100%;
+  display: block;
   color: #fff;
   text-shadow: 0 -1px 0 #000;
 }
@@ -443,7 +443,7 @@ div.wp-social-login-widget {
 
 /* bbpress forum */
 
-form[class^="bbp"] input[type=text], 
+form[class^="bbp"] input[type=text],
 form[class^="bbp"] input[type=password] {
   border: 1px solid #d3d3d3;
   border-radius: 5px;
@@ -601,5 +601,15 @@ form[class^="bbp"] input[type=password] {
 }
 
 #github-files pre.prettyprint {
-  border: none !important; 
+  border: none !important;
+}
+
+pre.prettyprint {
+    overflow: scroll;
+    font-family: "Droid Sans Mono", "Lucida Console", "Monaco", "Courier New", monospace;
+    font-size: 13px;
+}
+
+span.patch-title, span.author-name, div.tag, .tag-filter-button, .secondary-nav-item {
+    cursor: pointer;
 }

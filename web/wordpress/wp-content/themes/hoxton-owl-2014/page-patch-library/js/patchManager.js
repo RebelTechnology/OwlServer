@@ -13,14 +13,14 @@ if (!HoxtonOwl) {
 
 /**
  * Conveniently groups some utility functions to handle patches.
- * 
+ *
  * @namespace
  */
 HoxtonOwl.patchManager = {
 
     /**
      * Fetches a file from GitHub.
-     * 
+     *
      * @param {string} url
      *     The URL.
      * @param {Function} callback
@@ -31,28 +31,28 @@ HoxtonOwl.patchManager = {
      *     Selection end.
      */
     getGithubFile: function(url, callback, startLineNum, endLineNum) {
-        
+
         startLineNum = (typeof startLineNum == "undefined") ? 1 : startLineNum;
         endLineNum = (typeof endLineNum == "undefined") ? 0 : endLineNum;
-        
+
         // input:
-        // 
+        //
         // https://github.com/pingdynasty/OwlPatches/blob/master/Contest/ConnyPatch.hpp
         //                    [+++++++++] [++++++++]      [++++] [++++++++++++++++++++]
         //                    owner       repo            branch file path
-        //                    
+        //
         // output:
         // https://api.github.com/repos/pingdynasty/OwlPatches/contents/Contest/ConnyPatch.hpp?ref=master
         //                              [+++++++++] [++++++++]          [++++++++++++++++++++]     [++++]
         //                              owner       repo                path                       branch
-        
+
         var bits     = url.split('/');
         var repo     = bits.slice(3,5).join('/');
         var branch   = bits[6];
         var path     = bits.slice(7).join('/');
         var filename = bits[bits.length-1];
         var endpoint = 'https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=' + branch;
-        
+
         $.ajax({
             type:     "GET",
             url:      endpoint,
@@ -80,10 +80,10 @@ HoxtonOwl.patchManager = {
             }
         })
     },
-    
+
     /**
      * Contains the code that operates the patches page.
-     * 
+     *
      * @param {Object[]} patches
      *     An array of objects that represent patches.
      * @param {string[]} authors
@@ -92,10 +92,10 @@ HoxtonOwl.patchManager = {
      *     The tags.
      */
     main: function(patches, authors, tags) {
-        
+
         var that = this;
         var pm = HoxtonOwl.patchManager;
-        
+
         that.selectedPatch = ko.observable();       // currently selected patch
         that.patches = ko.observableArray(patches); // all patches
         that.authors = ko.observableArray(authors); // all authors
@@ -128,13 +128,13 @@ HoxtonOwl.patchManager = {
         that.selectAllPatches = function() {
             //console.log('selectAllPatches');
             pm.updateBreadcrumbs();
-            
+
             that.selectedPatch(null);
             that.search('all');
             that.searchItems.removeAll();
             that.searchItems.push('All');
         };
-        
+
         that.selectFilter = function(item) {
             //console.log("select filter "+item+" searching "+that.search());
             if(that.search() === "author") {
@@ -165,7 +165,7 @@ HoxtonOwl.patchManager = {
                     that.searchItems.removeAll();
                     that.searchItems.push('All'); // added by Sam
                 } else {
-                    that.searchItems.remove("All"); 
+                    that.searchItems.remove("All");
                     that.searchItems.push(author);
                 }
             }
@@ -188,7 +188,7 @@ HoxtonOwl.patchManager = {
                     that.searchItems.removeAll();
                     that.searchItems.push('All'); // added by Sam
                 } else {
-                    that.searchItems.remove("All"); 
+                    that.searchItems.remove("All");
                     that.searchItems.push(tag);
                 }
             }
@@ -220,12 +220,12 @@ HoxtonOwl.patchManager = {
 
         that.selectPatch = function(patch) {
             pm.updateBreadcrumbs(patch);
-            
+
             var patchId = patch._id;
             var apiClient = new HoxtonOwl.ApiClient();
             apiClient.getSinglePatch(patchId, function(patch) {
-                
-                
+
+
                 if (name.name) {
                     name = name.name;
                 }
@@ -234,22 +234,23 @@ HoxtonOwl.patchManager = {
                 that.searchItems.removeAll();
                 $("#gitsource").empty();
                 that.selectedPatch(patch);
-                
+
                 //var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().github;
-                
+
                 $('#github-files').empty();
-                if (that.selectedPatch().github) {
+                $('#git-code').hide();
+                if (that.selectedPatch().github.length) {
                     for (var i = 0, max = that.selectedPatch().github.length; i < max; i++) {
-                        
+
                         pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename) {
-                            
+
                             var cnt;
-                            
+
                             if (0 === $('#github-files > ul').length) {
                                 $('#github-files').html('<ul></ul>');
                             }
                             cnt = $('#github-files > ul > li').length;
-                            
+
                             cnt++;
                             $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
                             $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint"></pre></div>');
@@ -258,23 +259,22 @@ HoxtonOwl.patchManager = {
                                 // no more files to be loaded
                                 prettyPrint();
                                 $('#github-files').tabs({ active: 0 }); // jQuery-UI tabs
+                                $('#git-code').show();
                             }
-                            
+
                             //$("#gitsource").text(contents).removeClass("prettyprinted").parent();
                         });
                     }
-                } else {
-                    $('#github-files').append('<p>No code available.</p>');
                 }
-                
+
                 knobify();
-                
+
             });
         };
 
         that.soundcloud = ko.computed(function() {
             if(that.selectedPatch() && that.selectedPatch().soundcloud && that.selectedPatch().soundcloud.length) {
-                
+
                 var iframeSrcs = [];
                 for (var i = 0, max = that.selectedPatch().soundcloud.length; i < max; i++) {
                     iframeSrcs.push(
@@ -284,14 +284,14 @@ HoxtonOwl.patchManager = {
                     );
                 }
                 return iframeSrcs;
-                
+
             } else {
                 return "";
             }
         });
 
         ko.applyBindings(that);
-        
+
         var url = location.pathname;
         var matches = url.match(/^\/patch-library\/patch\/.+\/?$/g);
         if (matches) {
@@ -303,21 +303,21 @@ HoxtonOwl.patchManager = {
             that.search("all");
         }
     },
-    
+
     /**
      * Navigates to a patch page.
      */
     openPatch: function(patch) {
         location = '/patch-library/patch/' + patch.seoName;
     },
-    
+
     /**
      * Navigates to the patch edit page.
      */
     editPatch: function(patch) {
         location = '/edit-patch/' + patch.seoName;
     },
-    
+
     updateBreadcrumbs: function(patch) {
         $('#breadcrumbs li').slice(2).remove();
         if (patch) {
@@ -333,7 +333,7 @@ HoxtonOwl.patchManager = {
 HoxtonOwl.patchManager.getGithubFile.count = 0;
 
 $(function() {
-    
+
     var pm = HoxtonOwl.patchManager;
     var apiClient = new HoxtonOwl.ApiClient();
     apiClient.getAllPatches(pm.main);

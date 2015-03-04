@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <!-- saved from url=(0026)http://jonnykates.com/owl/ -->
 <html>
-  <head>
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <link href="style.css" rel="stylesheet" type="text/css" rel="stylesheet">
+
     <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700' rel='stylesheet' type='text/css'>
+
     <script src="js3rdparty/less-1.2.1.min.js"></script>
     <script src="js3rdparty/jquery-1.7.1.min.js"></script>
     <script src="js3rdparty/bootstrap-tabs.js"></script>
@@ -14,8 +16,8 @@
     <script src="js/knob.js"></script>
     <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
     <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
-  </head>
-  <body>
+</head>
+<body>
 
 <div id="primary-nav-bar">
     <div id="primary-nav-container">
@@ -36,178 +38,191 @@
 </div>
 
 <div id="secondary-nav-bar">
-
     <div id="secondary-nav-bar-content">
-    
-      <div class="secondary-nav-item">
-        <img src="images/browse-all-icon.png" width="40" height="40" alt="icon">
-        <p>Browse all</p>
-      </div>
-      <div class="secondary-nav-item">
-        <img src="images/latest-icon.png" width="40" height="40" alt="icon">
-        <p>Latest</p>
-      </div>
-      <div class="secondary-nav-item">
-        <img src="images/popular-icon.png" width="40" height="40" alt="icon">
-        <p>Popular</p>
-      </div>
-    <div class="secondary-nav-item" data-bind="css: { active: search() === 'tag' }, click: selectAllTags">
-      <img src="images/tags-icon.png" width="40" height="40" alt="icon">
-      <p>Tags</p>
-    </div>
-    <div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }, click: selectAllAuthors">
-        <img src="images/authors-icon.png" width="40" height="40" alt="icon">
-        <p>Authors</p>
-    </div>
-    <div class="secondary-nav-item">
-        <img src="images/my-patches-icon.png" width="40" height="40" alt="icon">
-        <p>My patches</p>
-    </div>
-    <div class="secondary-nav-item">
-        <img src="images/my-rigs-icon.png" width="40" height="40" alt="icon">
-        <p>My rigs</p>
-    </div>
-        
+        <div class="secondary-nav-item">
+            <img src="images/browse-all-icon.png" width="40" height="40" alt="icon">
+            <p>Browse all</p>
+        </div>
+        <div class="secondary-nav-item">
+            <img src="images/latest-icon.png" width="40" height="40" alt="icon">
+            <p>Latest</p>
+        </div>
+        <div class="secondary-nav-item">
+            <img src="images/popular-icon.png" width="40" height="40" alt="icon">
+            <p>Popular</p>
+        </div>
+        <div class="secondary-nav-item" data-bind="css: { active: search() === 'tag' }, click: selectAllTags">
+            <img src="images/tags-icon.png" width="40" height="40" alt="icon">
+            <p>Tags</p>
+        </div>
+        <div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }, click: selectAllAuthors">
+            <img src="images/authors-icon.png" width="40" height="40" alt="icon">
+            <p>Authors</p>
+        </div>
+        <div class="secondary-nav-item">
+            <img src="images/my-patches-icon.png" width="40" height="40" alt="icon">
+            <p>My patches</p>
+        </div>
+        <div class="secondary-nav-item">
+            <img src="images/my-rigs-icon.png" width="40" height="40" alt="icon">
+            <p>My rigs</p>
+        </div>
     </div>
 </div>
-    
+
 <div id="filter-bar">
-  <div class="wrapper" data-bind="foreach: search() === 'author' ? authors : tags">
-    <div class="tag-filter-button" 
-	 data-bind="text: $data, click: selectFilter, css: { active: searchItems.indexOf($data) > -1 }">
+    <div class="wrapper" data-bind="foreach: search() === 'author' ? authors : tags">
+        <div class="tag-filter-button" data-bind="text: $data, click: selectFilter, css: { active: searchItems.indexOf($data) > -1 }"></div>
     </div>
-  </div>
 </div>
 
 <div class="wrapper flexbox">
-
-    <div id="breadcrumb"></div>
-    
     <div class="content-container">
+        <!-- ko if: selectedPatch -->
 
-      <!-- ko if: selectedPatch -->
+        <!-- #one-third -->
         <div id="one-third" data-bind="with: selectedPatch">
             <div class="patch-tile-small" id="sticker">
                 <table class="patch-title-controls">
-                <tr>
-                    <td><span class="patch-title" data-bind="text: name"></span></td>
-                    <td width="40"><div class="add-button"><span>+</span></div></td>
-                </tr>
-                <tr>
-                    <td style="padding-top: 20px;">
-		      <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
-		    </td>
-                    <td>&nbsp;</td>
-                </tr>
-            </table>
-            </div>            
+                    <tr>
+                        <td><span class="patch-title" data-bind="text: name"></span></td>
+                        <td width="40"><div class="add-button"><span>+</span></div></td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 20px;">
+                            <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+            </div>
             <div class="patch-description">
+                <h2>Description</h2>
                 <p data-bind="text: description"></p>
             </div>
-            <div class="patch-stats">
-              <table width="100%">
-                <tr>
-                  <td width="30%"><span class="parameter-label">Channels</span></td>
-                  <td><p data-bind="text: (inputs + ' in / ' + outputs + ' out')"></p></td>
-                </tr>
-                <tr>
-                  <td><span class="parameter-label">CPU</span></td>
-                  <td><p data-bind="text: cycles"></p></td>
-                </tr>
-                <tr>
-                  <td><span class="parameter-label">Memory</span></td>
-                  <td><p data-bind="text: (bytes + ' / 1Mb')"></p></td>
-                </tr>
-                <tr>
-                  <td><span class="parameter-label">Version</span></td>
-                  <td><p>v.1.1.0 - 21/04/2014</p></td>
-                </tr>
-                <tr>
-                  <td><span class="parameter-label">Used in</span></td>
-                  <td><p>123 rigs</p></td>
-                </tr>
-              </table>
-            </div>                        
-	    <!-- ko foreach: tags -->
+            <div class="patch-instructions">
+                <h2>Instructions</h2>
+                <p data-bind="text: description"></p>
+            </div>
+            <div class="video-wrapper1">
+                <!-- Youtube embed here -->
+                <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <!-- <div class="patch-stats"> -->
+            <!--     <table width="100%"> -->
+            <!--         <tr> -->
+            <!--             <td width="30%"><span class="parameter-label">Channels</span></td> -->
+            <!--             <td><p data-bind="text: (inputs + ' in / ' + outputs + ' out')"></p></td> -->
+            <!--         </tr> -->
+            <!--         <tr> -->
+            <!--             <td><span class="parameter-label">CPU</span></td> -->
+            <!--             <td><p data-bind="text: cycles"></p></td> -->
+            <!--         </tr> -->
+            <!--         <tr> -->
+            <!--             <td><span class="parameter-label">Memory</span></td> -->
+            <!--             <td><p data-bind="text: (bytes + ' / 1Mb')"></p></td> -->
+            <!--         </tr> -->
+            <!--         <tr> -->
+            <!--             <td><span class="parameter-label">Version</span></td> -->
+            <!--             <td><p>v.1.1.0 - 21/04/2014</p></td> -->
+            <!--         </tr> -->
+            <!--         <tr> -->
+            <!--             <td><span class="parameter-label">Used in</span></td> -->
+            <!--             <td><p>123 rigs</p></td> -->
+            <!--         </tr> -->
+            <!--     </table> -->
+            <!-- </div> -->
+            <!-- ko foreach: tags -->
             <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
-	    <!-- /ko -->
-        </div>        
+            <!-- /ko -->
+        </div>
+        <!-- /#one-third -->
+
+        <!-- #two-thirds -->
         <div id="two-thirds">
             <!-- Soundcloud embed here -->
-            <iframe width="100%" height="250" scrolling="no" frameborder="no" 
-		    data-bind="if: soundcloud, attr: { src: soundcloud }">
-	    </iframe>
-            <div class="clear"></div>
+            <iframe width="100%" height="250" scrolling="no" frameborder="no" data-bind="if: soundcloud, attr: { src: soundcloud }"></iframe>
+            <div class="video-wrapper2">
+                <!-- Youtube embed here -->
+                <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <!-- Patch stats row here -->
+            <div class="patch-stats2">
+                <span class="parameter-label">Channels</span>
+                <span class="parameter-value">1.2</span>
+                <span class="parameter-label">CPU</span>
+                <span class="parameter-value">1.2</span>
+                <span class="parameter-label">Memory</span>
+                <span class="parameter-value">1.2</span>
+                <span class="parameter-label">Version</span>
+                <span class="parameter-value">v.1.1.0 - 21/04/2014</span>
+                <span class="parameter-label">Used in</span>
+                <span class="parameter-value">123 rigs</span>
+            </div>
             <div class="white-box" data-bind="with: selectedPatch">
                 <h2>Parameters</h2>
                 <div class="flexbox flex-center">
-                  <div class="knob-container">
-                    <input class="knob" data-angleOffset="-125" data-angleArc="250" 
-			   data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
-			   data-rotation="clockwise" data-readOnly="true" value="35">
-                    <p class="parameter-label" data-bind="text: parameters[0]"></p>
-                  </div>
-                  <div class="knob-container">
-                    <input class="knob" data-angleOffset="-125" data-angleArc="250" 
-			   data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
-			   data-rotation="clockwise" data-readOnly="true" value="35">
-                    <p class="parameter-label" data-bind="text: parameters[1]"></p>
-                  </div>
-                  <div class="knob-container">
-                    <input class="knob" data-angleOffset="-125" data-angleArc="250" 
-			   data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
-			   data-rotation="clockwise" data-readOnly="true" value="35">
-                    <p class="parameter-label" data-bind="text: parameters[2]"></p>
-                  </div>
-                  <div class="knob-container">
-                    <input class="knob" data-angleOffset="-125" data-angleArc="250" 
-			   data-fgColor="#ed7800" data-linecap="round" data-width="100%" 
-			   data-rotation="clockwise" data-readOnly="true" value="35">
-                    <p class="parameter-label" data-bind="text: parameters[3]"></p>
-                  </div>
+                    <div class="knob-container">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                        <p class="parameter-label" data-bind="text: parameters[0]"></p>
+                    </div>
+                    <div class="knob-container">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                        <p class="parameter-label" data-bind="text: parameters[1]"></p>
+                    </div>
+                    <div class="knob-container">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                        <p class="parameter-label" data-bind="text: parameters[2]"></p>
+                    </div>
+                    <div class="knob-container">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                        <p class="parameter-label" data-bind="text: parameters[3]"></p>
+                    </div>
                 </div>
-            </div>        
-            
-            <div class="white-box">
+            </div>
+            <div class="white-box" id="git-code">
                 <h2>Patch code</h2>
-		<pre id="gitsource" class="prettyprint"></pre>
-            </div>                
+                <pre id="gitsource" class="prettyprint"></pre>
+            </div>
         </div>
-	<!-- /ko -->
+        <!-- /#two-thirds -->
+        <!-- /ko -->
 
-      <!-- ko foreach: filteredPatches -->
-      <!-- Start of a tile here -->
-	<div class="patch-tile">
-        <table class="patch-title-controls">
-          <tbody><tr>
-              <td width="40"><div class="play-button">&gt;</div></td>
-              <td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td>
-              <td width="40"><div class="add-button"><span>+</span></div></td>
-            </tr>
-            <tr>
-              <td>&nbsp;</td>
-              <td style="padding-top: 20px;">
-		  <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
-	      </td>
-              <td>&nbsp;</td>
-            </tr>
-        </tbody></table>
-        <div class="patch-baseline">
-	  <!-- ko foreach: tags -->
-          <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
-	  <!-- /ko -->
-          <span class="add-counter">215</span>
+        <!-- ko foreach: filteredPatches -->
+
+        <!-- div.patch-tile -->
+        <div class="patch-tile">
+            <table class="patch-title-controls">
+                <tbody>
+                    <tr>
+                        <td width="40"><div class="play-button">&gt;</div></td>
+                        <td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td>
+                        <td width="40"><div class="add-button"><span>+</span></div></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td style="padding-top: 20px;">
+                            <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="patch-baseline">
+                <!-- ko foreach: tags -->
+                <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
+                <!-- /ko -->
+                <span class="add-counter">215</span>
+            </div>
         </div>
-      </div>
-        <!-- End of the tile -->
-	<!-- /ko -->
-    </div>
-    
-</div>
-    
+        <!-- /div.patch-tile -->
 
+        <!-- /ko -->
+    </div> <!-- /div.content-container -->
+</div> <!-- /div.wrapper.flexbox -->
+
+<script src="js/vertxbus.js"></script>
+<script src="js/spreadsheet_client_app.js"></script>
+<script src="https://spreadsheets.google.com/feeds/list/1ocSb1dTeOm8YgeqDOAGsfLddZrGxzAbymuq0bz5ZQ3Q/od6/public/values?alt=json-in-script&callback=importGSS"></script>
 </body>
-    <script src="js/vertxbus.js"></script>
-    <script src="js/spreadsheet_client_app.js"></script>
-    <script src="https://spreadsheets.google.com/feeds/list/1ocSb1dTeOm8YgeqDOAGsfLddZrGxzAbymuq0bz5ZQ3Q/od6/public/values?alt=json-in-script&callback=importGSS"></script>
 </html>
