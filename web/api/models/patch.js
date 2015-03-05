@@ -3,33 +3,33 @@
  */
 
 var patchModel = {
-    
+
     fields: {
-        
+
         _id: {
             required: false,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: '_id', error: { status: 400 }};
-                
+
                 if (typeof val !== 'string' || !(/^[0-9a-f]{24}$/i.test(val))) {
                     err.message = 'Value not valid.';
                     throw err;
                 }
             }
         },
-        
+
         name: {
             required: true,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'name', error: { status: 400 }};
-                
+
                 if (typeof val !== 'string') {
                     err.message = 'Value not valid.';
                     throw err;
                 };
-                
+
                 if(val.length < 1 || val.length > 255) {
                     err.message = 'This field should be at least 1 and at most 255 characters long.';
                     throw err;
@@ -37,44 +37,85 @@ var patchModel = {
             },
             sanitize: function(val) { return val.trim(); }
         },
-        
+
         seoName: {
             required: false,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'seoName', error: { status: 400 }};
-                
+
                 if (typeof val !== 'string' || !(/^[a-z0-9\_]+$/i.test(val))) {
                     err.message = 'Value not valid.';
                     throw err;
                 }
-                
+
                 if(val.length < 1 || val.length > 255) {
                     err.message = 'This field should be at least 1 and at most 255 characters long.';
                     throw err;
                 }
             }
         },
-        
+
         author: {
-            required: false, // FIXME-----------------------------------------------------------------------------------
-            validate: function(val) {
-                var err = { type: 'not_valid', field: 'author', error: { status: 400 }};
-                // FIXME - complete this function
+            required: true,
+            validate: function (val) {
+
+                var err = { type: 'not_valid', field: 'parameters', error: { status: 400 }};
+
+                if (typeof val !== 'object') {
+                    err.message = 'Value not valid.';
+                    throw err;
+                }
+
+                if (!('name' in val) || typeof val.name !== 'string' ||
+                    val.name.length < 1 || val.name.length > 255) {
+                    err.message = 'Invalid author name.';
+                    throw err;
+                }
+
+                if ('type' in val && val.type !== 'wordpress') {
+                    err.message = 'Invalid author name.';
+                    throw err;
+                }
+
+                if ('type' in val && 'wordpress' === val.type) {
+                    if (!('wordpressId' in val)) {
+                        err.message = 'Wordpress user ID not specified.';
+                        throw err;
+                    }
+                }
+
+                if ('wordpressId' in val) {
+                    if (!('type' in val) || val.type !== 'wordpress') {
+                        err.message = 'Invalid author object';
+                        throw err;
+                    }
+                }
+            },
+            sanitize: function (val) {
+                for (var key in val) {
+                    if ('type' !== key && 'wordpressId' !== key && 'name' !== key) {
+                        delete val[key];
+                    }
+                }
+                if ('wordpressId' in val) {
+                    val.wordpressId = parseInt(val.wordpressId);
+                }
+                return val;
             }
         },
-        
+
         description: {
             required: true,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'description', error: { status: 400 }};
-                
+
                 if (typeof val !== 'string') {
                     err.message = 'Value not valid.';
                     throw err;
                 }
-                
+
                 if(val.length < 1 || val.length > 1023) {
                     err.message = 'This field should be at least 1 and at most 1023 characters long.';
                     throw err;
@@ -82,18 +123,18 @@ var patchModel = {
             },
             sanitize: function(val) { return val.trim(); }
         },
-        
+
         instructions: {
             required: true,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'instructions', error: { status: 400 }};
-                
+
                 if (typeof val !== 'string') {
                     err.message = 'Value not valid.';
                     throw err;
                 }
-                
+
                 if(val.length < 1 || val.length > 1023) {
                     err.message = 'This field should be at least 1 and at most 1023 characters long.';
                     throw err;
@@ -101,13 +142,13 @@ var patchModel = {
             },
             sanitize: function(val) { return val.trim(); }
         },
-        
+
         parameters: {
             required: false,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'parameters', error: { status: 400 }};
-                
+
                 if (typeof val !== 'object') {
                     err.message = 'Value not valid.';
                     throw err;
@@ -134,27 +175,11 @@ var patchModel = {
                 return val;
             }
         },
-        
+
         inputs: {
             required: true,
             validate: function(val) {
-                
-                var err = { type: 'not_valid', field: 'inputs', error: { status: 400 }};
-                
-                if (val != 0 && val != 1 && val != 2) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-            },
-            sanitize: function(val) {
-                return parseInt(val);
-            }
-        },
-        
-        outputs: {
-            required: true,
-            validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'inputs', error: { status: 400 }};
 
                 if (val != 0 && val != 1 && val != 2) {
@@ -166,17 +191,33 @@ var patchModel = {
                 return parseInt(val);
             }
         },
-        
+
+        outputs: {
+            required: true,
+            validate: function(val) {
+
+                var err = { type: 'not_valid', field: 'inputs', error: { status: 400 }};
+
+                if (val != 0 && val != 1 && val != 2) {
+                    err.message = 'Value not valid.';
+                    throw err;
+                }
+            },
+            sanitize: function(val) {
+                return parseInt(val);
+            }
+        },
+
         soundcloud: {
             required: false,
             validate: function(val) {
-                
+
                 if ('undefined' === typeof val) {
                     return;
                 }
-                
+
                 var err = { type: 'not_valid', field: 'soundcloud', error: { status: 400 }};
-                
+
                 if ('object' !== typeof val || val.constructor !== Array) {
                     err.message = 'Value not valid.';
                     throw err;
@@ -195,18 +236,18 @@ var patchModel = {
                 }
             }
         },
-        
+
         github: {
             required: false,
             validate: function(val) {
-                
+
                 if ('undefined' === typeof val) {
                     return;
                 }
-                
+
                 var err = { type: 'not_valid', field: 'github', error: { status: 400 }};
-                
-                if (val.constructor !== Array) {
+
+                if ('object' !== typeof val || val.constructor !== Array) {
                     err.message = 'Value not valid.';
                     throw err;
                 }
@@ -224,13 +265,13 @@ var patchModel = {
                 }
             }
         },
-        
+
         cycles: {
             required: false,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'cycles', error: { status: 400 }};
-                
+
                 if (val < 0) {
                     err.message = 'Value not valid.';
                     throw err;
@@ -240,13 +281,13 @@ var patchModel = {
                 return Math.round(val);
             }
         },
-        
+
         bytes: {
             required: false,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'bytes', error: { status: 400 }};
-                
+
                 if (val < 0) {
                     err.message = 'Value not valid.';
                     throw err;
@@ -256,14 +297,14 @@ var patchModel = {
                 return Math.round(val);
             }
         },
-        
+
         tags: {
             required: false,
             validate: function(val) {
-                
+
                 var err = { type: 'not_valid', field: 'tags', error: { status: 400 }};
-                
-                if (val.constructor !== Array) {
+
+                if ('object' !== typeof val || val.constructor !== Array) {
                     err.message = 'Value not valid.';
                     throw err;
                 }
@@ -286,23 +327,23 @@ var patchModel = {
             }
         }
     },
-    
+
     validate: function(patch) {
-        
+
         for (var key in patchModel.fields) {
-            
+
             var err = { type: 'not_valid', error: { status: 400 }};
-            
+
             // Check if patch is an object
             if (typeof patch !== 'object') {
                 err.message = 'Invalid data.';
                 throw err;
             }
-            
+
             if (typeof patch[key] === 'undefined') {
                 // Check for required fields
                 if (patchModel.fields[key].required === true) {
-                    
+
                     err.message = 'This field is required.';
                     err.type = 'field_required';
                     err.field = key;
@@ -320,20 +361,20 @@ var patchModel = {
             }
         }
     },
-    
+
     sanitize: function(patch) {
-        
+
         var keys = Object.keys(patchModel.fields);
-        
+
         for (key in patch) {
             if (-1 === keys.indexOf(key)) {
                 delete patch[key];
             }
         }
-        
+
         return patch;
     },
-    
+
     generateSeoName: function(patch) {
         return patch.name.replace(/[^a-z0-9]/i, '_');
     }

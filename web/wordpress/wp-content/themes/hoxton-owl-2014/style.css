@@ -580,6 +580,21 @@ form[class^="bbp"] input[type=password] {
   margin-left: 0;
 }
 
+#patch-add-edit-form label.frm-patch-author-radio {
+  float: left;
+  width: auto;
+  display: block;
+  text-align: left;
+  color: #5d5d5d;
+}
+
+#frm-patch-author-name {
+  float: left;
+  font-family: Ubuntu, sans-serif;
+  font-size: 16px;
+  color: #5d5d5d;
+}
+
 /* GitHub file tabs */
 #github-files.ui-widget-content {
   border: none;
