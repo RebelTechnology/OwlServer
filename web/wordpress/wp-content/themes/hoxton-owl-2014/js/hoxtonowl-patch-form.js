@@ -150,8 +150,10 @@ HoxtonOwl.patchForm = {
             author.type = 'wordpress';
             author.wordpressId = $('#frm-patch-author-wordpressId').val();
             author.name = $.trim($('#frm-patch-author-wordpressId option[value="' + author.wordpressId + '"]').text());
+            $('#frm-patch-author-name').val('');
         } else if ($('#frm-patch-author-type-other').prop('checked')) {
             author.name = $.trim($('#frm-patch-author-name').val());
+            $('#frm-patch-author-wordpressId').empty().val(null).trigger('change');
         }
 
         if (!('name' in author) || '' === author.name) {
