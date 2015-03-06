@@ -27,8 +27,13 @@
             DirectoryIndex index.php
 
             <Files "xmlrpc.php">
-                Order Allow,Deny
+                Order deny,allow
                 deny from all
+                allow from 127.0.0.1
+                allow from localhost
+                allow from staging.hoxtonowl.com
+                allow from 192.168.1.20
+                allow from 212.159.64.38
             </Files>
 
             <IfModule mod_rewrite.c>

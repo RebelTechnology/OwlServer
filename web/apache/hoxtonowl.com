@@ -48,10 +48,18 @@
         #AllowOverride Limit Options FileInfo
         AllowOverride None
         DirectoryIndex index.php
+        Order allow,deny
+        allow from all
 
         <Files "xmlrpc.php">
-            Order Allow,Deny
+            Order deny,allow
             deny from all
+            allow from 127.0.0.1
+            allow from localhost
+            allow from 46.226.111.228
+            allow from nestor.pingdynasty.com
+            allow from hoxtonowl.com
+            allow from www.hoxtonowl.com
         </Files>
 
         <IfModule mod_rewrite.c>
@@ -97,10 +105,10 @@
             Order allow,deny
             Deny from all
         </Files>
-         <Files install.php>
-             Order allow,deny
-             Deny from all
-         </Files>
+#        <Files install.php>
+#            Order allow,deny
+#            Deny from all
+#        </Files>
         <Files wp-config.php>
             Order allow,deny
             Deny from all
@@ -149,6 +157,20 @@
                 RewriteCond %{QUERY_STRING} ^.*(%0|%A|%B|%C|%D|%E|%F).* [NC]
                 RewriteRule ^(.*)$ - [F]
         </IfModule>
+
+
+    </Directory>
+
+    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/_meta>
+        Order Deny,Allow
+        deny from all
+    </Directory>
+
+    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/_deploy/>
+        AuthName "Secure Area"
+        AuthType Basic
+        AuthUserFile /var/www/hoxtonowl.com/subdomains/www/.htpasswd
+        require valid-user
     </Directory>
 
     <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/mediawiki/images/>
