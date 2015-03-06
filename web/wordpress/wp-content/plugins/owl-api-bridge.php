@@ -18,12 +18,32 @@ define('DOING_AJAX', true);
  * to validate a WordPress authentication cookie.
  */
 
-function owl_validateAuthCookie($cookie, $scheme = 'logged_in') {
+/**
+ * Validates a WordPress `logged_in_*` authentication cookie.
+ *
+ * @param string $cookie
+ *     Value of the WordPress `logged_in_*` cookie.
+ * @param string $scheme
+ * @return boolean
+ *     Whether the cookie is valid.
+ */
+function owl_validateAuthCookie($cookie, $scheme = 'logged_in')
+{
     return wp_validate_auth_cookie($cookie, $scheme);
 }
 
-function owl_new_xmlrpc_methods($methods) {
+/**
+ * Registers a new XML-RPC method,
+ *
+ * @param array $methods
+ *     Methods array.
+ * @return array
+ *     Methods array.
+ */
+function owl_new_xmlrpc_methods($methods)
+{
     $methods['owl.validateAuthCookie'] = 'owl_validateAuthCookie';
+
     return $methods;
 }
 add_filter('xmlrpc_methods', 'owl_new_xmlrpc_methods');
@@ -36,17 +56,30 @@ add_filter('xmlrpc_methods', 'owl_new_xmlrpc_methods');
  * added it here because I didn't feel like creating a new plugin.
  */
 
-function owl_usernameAutocomplete() {
+/**
+ * Provides an AJAX endpoint for the username autocomplete functionality of the
+ * add/edit patch form.
+ */
+function owl_usernameAutocomplete()
+{
 
     global $wpdb;
 
     $pattern = $_POST['q'];
 
     $args = array(
-        'search'         => $pattern,
-        'search_columns' => array('display_name')
+        'search_columns' => array( 'nickname' ),
+        'orderby' => 'nickname',
+        'order' => 'ASC',
+        'meta_query' => array(
+            array(
+                'key'     => 'nickname',
+                'value'   => $pattern,
+                'compare' => 'LIKE',
+            ),
+        ), 'count_total' => true,
     );
-    $user_query = new WP_User_Query($args);
+    $userQuery = new WP_User_Query($args);
 
     $result = array(
         //'total_count' => ?,
@@ -60,13 +93,13 @@ function owl_usernameAutocomplete() {
     );
 
     //$result['total_count'] = count($users);
-    $result['items'] = $user_query->results;
+    $result['items'] = $userQuery->results;
 
     wp_send_json($result);
     wp_die();
 }
 
 add_action('wp_ajax_owl-username-autocomplete', 'owl_usernameAutocomplete');
-add_action( 'wp_ajax_nopriv_owl-username-autocomplete', 'owl_usernameAutocomplete');
+add_action('wp_ajax_nopriv_owl-username-autocomplete', 'owl_usernameAutocomplete');
 
 // EOF

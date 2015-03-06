@@ -90,7 +90,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     </tr>
                     <tr>
                         <td style="padding-top: 20px;">
-                            <span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span>
+                            <span class="author-name" data-bind="text: author.name, click: selectOnlyAuthor"></span>
                         </td>
                         <td>&nbsp;</td>
                     </tr>
@@ -100,10 +100,12 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                 <h2>Description</h2>
                 <p data-bind="text: description"></p>
             </div>
+            <!-- ko if: instructions -->
             <div class="patch-instructions">
                 <h2>Instructions</h2>
                 <p data-bind="text: instructions"></p>
             </div>
+            <!-- /ko -->
             <!-- <div class="video-wrapper1">
                 <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
             </div> -->
@@ -213,7 +215,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     </tr>
                     <tr>
                         <!-- <td>&nbsp;</td> -->
-                        <td style="padding-top: 20px;"><span class="author-name" data-bind="text: author, click: selectOnlyAuthor"></span></td>
+                        <td style="padding-top: 20px;"><span class="author-name" data-bind="text: author.name, click: selectOnlyAuthor"></span></td>
                         <!-- <td>&nbsp;</td> -->
                     </tr>
                 </tbody>

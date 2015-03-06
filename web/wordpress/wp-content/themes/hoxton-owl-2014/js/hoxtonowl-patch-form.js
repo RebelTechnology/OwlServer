@@ -41,6 +41,23 @@ HoxtonOwl.patchForm = {
 
         $('#frm-patch-id').val(patch._id);
         if (patch.name) $('#frm-patch-name').val(patch.name);
+
+        // Author
+        var wordPressIdRadio = $('#frm-patch-author-type-wordpress');
+        var patchAuthorNameRadio = $('#frm-patch-author-type-other');
+        if (wordPressIdRadio.length && patchAuthorNameRadio.length) {
+            if ('wordpress' === patch.author.type && !!patch.author.wordpressId) {
+                $('#frm-patch-author-wordpressId').
+                    append('<option value="' + patch.author.wordpressId + '">' + patch.author.name + '</option>').
+                    trigger('change');
+                wordPressIdRadio.prop('checked', true);
+            } else {
+                $('#frm-patch-author-name').val(patch.author.name);
+                patchAuthorNameRadio.prop('checked', true);
+            }
+        }
+
+        // Description & instructions
         if (patch.description) $('#frm-patch-description').val(patch.description);
         if (patch.instructions) $('#frm-patch-instructions').val(patch.instructions);
 
@@ -115,8 +132,7 @@ HoxtonOwl.patchForm = {
             nextAll('div.error-message').
             hide();
 
-        var name = $.trim($('#frm-patch-name').val());
-        var description = $.trim($('#frm-patch-description').val());
+        var name = $.trim($('#frm-patch-name').val());var description = $.trim($('#frm-patch-description').val());
         var instructions = $.trim($('#frm-patch-instructions').val());
 
         if ('' === name) {
@@ -124,6 +140,35 @@ HoxtonOwl.patchForm = {
                 addClass('invalid').
                 next('div.error-message').
                 text('This field is required.').
+                show();
+            location = '#form-top';
+            return;
+        }
+
+        var author = {};
+        if ($('#frm-patch-author-type-wordpress').prop('checked')) {
+            author.type = 'wordpress';
+            author.wordpressId = $('#frm-patch-author-wordpressId').val();
+            author.name = $.trim($('#frm-patch-author-wordpressId option[value="' + author.wordpressId + '"]').text());
+        } else if ($('#frm-patch-author-type-other').prop('checked')) {
+            author.name = $.trim($('#frm-patch-author-name').val());
+        }
+
+        if (!('name' in author) || '' === author.name) {
+            $('#frm-patch-author-name').
+                addClass('invalid').
+                next('div.error-message').
+                text('Invalid author.').
+                show();
+            location = '#form-top';
+            return;
+        }
+
+        if (('type' in author) && (author.type !== 'wordpress' || !('wordpressId' in author) || !author.wordpressId)) {
+            $('#frm-patch-author-name').
+                addClass('invalid').
+                next('div.error-message').
+                text('Invalid author.').
                 show();
             location = '#form-top';
             return;
@@ -151,7 +196,7 @@ HoxtonOwl.patchForm = {
 
         var patch = {
             name: name,
-            // author: '', // FIXME
+            author: author,
             description: description,
             instructions: instructions,
             inputs: parseInt($('#frm-patch-inputs').val()),
@@ -214,6 +259,8 @@ HoxtonOwl.patchForm = {
             }
         });
 
+        console.log(patch); // FIXME
+        return false;       // FIXME
         return patch;
 
     },
@@ -241,6 +288,12 @@ HoxtonOwl.patchForm = {
                             addClass('invalid').
                             nextAll('div.error-message').
                             text(response.message).
+                            show();
+                    } else if (response.field == 'author') {
+                        $('#frm-patch-author-name').
+                            addClass('invalid').
+                            next('div.error-message').
+                            text('Invalid author.').
                             show();
                     } else {
                         $('#frm-patch-' + response.field).
@@ -275,27 +328,54 @@ HoxtonOwl.patchForm = {
             $('#frm-patch-outputs').select2({
                 minimumResultsForSearch: Infinity
             });
-            $('#frm-patch-author-wordpressId').select2({
-                ajax: {
-                    url: '/wp-admin/admin-ajax.php',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            q: params.term, // search term
-                            page: params.page,
-                            action: 'owl-username-autocomplete'
-                        };
+
+            var wordPressIdRadio = $('#frm-patch-author-wordpressId');
+            if (wordPressIdRadio.length) {
+                var $eventSelect = wordPressIdRadio.select2({
+                        ajax: {
+                            url: '/wp-admin/admin-ajax.php',
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    q: params.term, // search term
+                                    page: params.page,
+                                    action: 'owl-username-autocomplete'
+                                };
+                            },
+                            processResults: function (data, page) {
+
+                                var results = [];
+
+                                for (var i = 0, max = data.items.length; i < max; i++) {
+                                    results.push({
+                                        id: parseInt(data.items[i].ID),
+                                        text: data.items[i].data.display_name
+                                    });
+                                }
+
+                            return { results: results };
+                        },
+                        type: 'POST',
+                        cache: true
                     },
-                    processResults: function (data, page) {
-                        return {
-                            results: data.items
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 1
-            });
+                    minimumInputLength: 1
+                });
+                var checkWordPressIdRadio = function () {
+                    $('#frm-patch-author-type-wordpress').prop('checked', true);
+                };
+                $eventSelect.on("select2:open", function (e) { checkWordPressIdRadio(); });
+                $eventSelect.on("select2:close", function (e) { checkWordPressIdRadio(); });
+                $eventSelect.on("select2:select", function (e) { checkWordPressIdRadio(); });
+                $eventSelect.on("select2:unselect", function (e) { checkWordPressIdRadio(); });
+            }
+
+            var patchAuthorNameRadio = $('#frm-patch-author-name');
+            if (patchAuthorNameRadio.length) {
+                $('#frm-patch-author-name').focus(function (e) {
+                    $('#frm-patch-author-type-other').prop('checked', true);
+                });
+            }
 
             // tag multi select
             HoxtonOwl.patchForm.tagMulti = $(".chosen-select").chosen({

@@ -119,7 +119,7 @@ HoxtonOwl.patchManager = {
                         }
                     }
                 } else if(that.search() === "author") {
-                    return that.searchItems.indexOf(r.author) > -1;
+                    return that.searchItems.indexOf(r.author.name) > -1;
                 }
                 return false;
             });
@@ -127,7 +127,8 @@ HoxtonOwl.patchManager = {
 
         that.selectAllPatches = function() {
             //console.log('selectAllPatches');
-            pm.updateBreadcrumbs();
+
+            //pm.updateBreadcrumbs();
 
             that.selectedPatch(null);
             that.search('all');
@@ -145,11 +146,12 @@ HoxtonOwl.patchManager = {
         };
 
         that.selectAuthor = function(author) {
-            pm.updateBreadcrumbs();
-            if(author.author) {
-                author = author.author;
-            }
+
+            console.log(author);
+
+            //pm.updateBreadcrumbs();
             //console.log("select author "+author);
+
             that.selectedPatch(null);
             if(that.search() != "author") {
                 that.search("author");
@@ -201,8 +203,11 @@ HoxtonOwl.patchManager = {
         };
 
         that.selectAllTags = function(tag) {
+
             //console.log('selectAllTags');
-            pm.updateBreadcrumbs();
+
+            //pm.updateBreadcrumbs();
+
             selectTag('All');
         };
 
@@ -213,13 +218,19 @@ HoxtonOwl.patchManager = {
         };
 
         that.selectAllAuthors = function(tag) {
+
             //console.log('selectAllAuthors');
-            pm.updateBreadcrumbs();
+
+            //pm.updateBreadcrumbs();
+
             selectAuthor('All');
         };
 
         that.selectPatch = function(patch) {
-            pm.updateBreadcrumbs(patch);
+
+            console.log(patch);
+
+            //pm.updateBreadcrumbs(patch);
 
             var patchId = patch._id;
             var apiClient = new HoxtonOwl.ApiClient();
@@ -318,16 +329,16 @@ HoxtonOwl.patchManager = {
         location = '/edit-patch/' + patch.seoName;
     },
 
-    updateBreadcrumbs: function(patch) {
-        $('#breadcrumbs li').slice(2).remove();
-        if (patch) {
-            document.title = 'The OWL | ' + patch.name;
-            $('#breadcrumbs').append('<li><a href="/patch-library/" rel="category tag">Patches</a></li><li class="separator"> / </li><li>' + patch.name + '</li>');
-        } else {
-            $('#breadcrumbs').append('<li><strong>Patches</strong></li>');
-            document.title = 'The OWL | Patch Library';
-        }
-    }
+    //updateBreadcrumbs: function(patch) {
+    //    $('#breadcrumbs li').slice(2).remove();
+    //    if (patch) {
+    //        document.title = 'The OWL | ' + patch.name;
+    //        $('#breadcrumbs').append('<li><a href="/patch-library/" rel="category tag">Patches</a></li><li class="separator"> / </li><li>' + patch.name + '</li>');
+    //    } else {
+    //        $('#breadcrumbs').append('<li><strong>Patches</strong></li>');
+    //        document.title = 'The OWL | Patch Library';
+    //    }
+    //}
 };
 
 HoxtonOwl.patchManager.getGithubFile.count = 0;
