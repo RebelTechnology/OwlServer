@@ -64,12 +64,17 @@ cp $DIR/OwlServer/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../ht
 echo "Updating Mediawiki files..."
 rsync --quiet -avz $DIR/OwlServer/web/mediawiki/skins/HoxtonOWL2014 $DIR/../httpdocs/mediawiki/skins/
 
+# Update deployment script
+echo "Updating deployment script..."
+cp -a $DIR/$CLONE_DIR/web/scripts/deploy-website.sh $DIR/
+cp -a $DIR/$CLONE_DIR/web/scripts/README.md $DIR/..
+
 # Set privileges
 echo "Setting up permissions..."
 chown -R root $DIR/../httpdocs
 chgrp -R hoxtonowl $DIR/../httpdocs
 chmod -R 775 $DIR/../httpdocs
-chmod g+s $DIR/../httpdocs
+find $DIR/../httpdocs -type d -exec chmod g+s '{}' \;
 chown -R www-data $DIR/../httpdocs/wp-content/uploads
 chown -R www-data $DIR/../httpdocs/mediawiki/images
 
@@ -79,10 +84,6 @@ chmod 744 $DIR/../deployment/deploy-website.sh
 
 chown -R www-data:www-data $DIR/../logs
 chmod 664 $DIR/../logs/*
-
-# Update deployment script
-echo "Updating deployment script..."
-cp -a $DIR/$CLONE_DIR/web/scripts/deploy-website.sh $DIR/
 
 # Delete temp repo clone
 echo "Deleting temp repo clone..."
