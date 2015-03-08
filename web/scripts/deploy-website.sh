@@ -55,26 +55,29 @@ cd - > /dev/null
 
 # Update Wordpress
 echo "Updating Wordpress files..."
-#rsync --quiet -avz $DIR/OwlServer/web/wordpress/wp-content $DIR/../httpdocs/
 rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
 mv $DIR/OwlServer/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
-chown -R root:root $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
-find $DIR/../httpdocs/wp-content -type f -exec chmod 644 '{}' \;
-find $DIR/../httpdocs/wp-content -type d -exec chmod 755 '{}' \;
 cp -a $DIR/OwlServer/web/wordpress/robots.txt $DIR/../httpdocs/
-chown root:root $DIR/../httpdocs/robots.txt
 
 # Update Mediawiki
 echo "Updating Mediawiki files..."
 rsync --quiet -avz $DIR/OwlServer/web/mediawiki/skins/HoxtonOWL2014 $DIR/../httpdocs/mediawiki/skins/
-chown -R root:root $DIR/../httpdocs/mediawiki/skins/HoxtonOWL2014
-find $DIR/../httpdocs/mediawiki/skins/HoxtonOWL2014 -type f -exec chmod 644 '{}' \;
-find $DIR/../httpdocs/mediawiki/skins/HoxtonOWL2014 -type d -exec chmod 755 '{}' \;
 
 # Set privileges
-echo "Cleaning up..."
-chown -R www-data:www-data $DIR/../httpdocs/wp-content/uploads
-chown -R www-data:www-data $DIR/../httpdocs/mediawiki/cache
+echo "Setting up permissions..."
+chown -R root $DIR/../httpdocs
+chgrp -R hoxtonowl $DIR/../httpdocs
+chmod -R 775 $DIR/../httpdocs
+chmod g+s $DIR/../httpdocs
+chown -R www-data $DIR/../httpdocs/wp-content/uploads
+chown -R www-data $DIR/../httpdocs/mediawiki/images
+
+chown -R root:root $DIR/../deployment
+chmod 755 $DIR/../deployment
+chmod 744 $DIR/../deployment/deploy-website.sh
+
+chown -R www-data:www-data $DIR/../logs
+chmod 664 $DIR/../logs/*
 
 # Update deployment script
 echo "Updating deployment script..."
