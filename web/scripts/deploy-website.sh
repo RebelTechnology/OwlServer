@@ -58,6 +58,7 @@ echo "Updating Wordpress files..."
 rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
 mv $DIR/OwlServer/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
 cp -a $DIR/OwlServer/web/wordpress/robots.txt $DIR/../httpdocs/
+cp $DIR/OwlServer/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../httpdocs/wp-content/plugins/
 
 # Update Mediawiki
 echo "Updating Mediawiki files..."
