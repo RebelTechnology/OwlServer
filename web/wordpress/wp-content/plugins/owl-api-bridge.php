@@ -39,16 +39,17 @@ function owl_validateAuthCookie($cookie, $scheme = 'logged_in')
  *
  * Exposed as an XML-RPC method.
  *
- * @param string $userId
+ * @param string $username
  *     The user ID.
  * @return boolean
  *     Whether the specified user ID belongs to a website administrator.
  */
-function owl_isAdmin($userId)
+function owl_isAdmin($username)
 {
     $args = array(
-        'include' => intval($userId),
-        'role' => 'Administrator'
+        'role'           => 'Administrator',
+        'search'         => $username,
+        'search_columns' => 'user_login'
     );
     $userQuery = new WP_User_Query($args);
 

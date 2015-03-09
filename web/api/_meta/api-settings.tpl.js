@@ -1,9 +1,9 @@
 /**
  * Template for api-settings.js file.
- * 
+ *
  * You should save a copy of this file in the root directory of this project,
  * where it will NOT be tracked by Git.
- * 
+ *
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
@@ -16,6 +16,10 @@ MONGO_USER       = '';
 MONGO_PASS       = '';
 MONGO_DATABASE   = 'owl_staging';
 MONGO_COLLECTION = 'patches';
+
+module.exports.WORDPRESS_XML_RPC_ENDPOINT = 'hoxtonowl.localhost:8000';
+module.exports.WORDPRESS_XML_RPC_USERNAME = 'owlapi';
+module.exports.WORDPRESS_XML_RPC_PASSWORD = 'secret';
 
 // Do not edit below
 
