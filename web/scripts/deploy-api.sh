@@ -53,30 +53,31 @@ cd - > /dev/null
 
 # Copy files
 echo "Copying files..."
-rsync --quiet -avz $DIR/OwlServer/web/api/* $DIR/../$TARGET_ENV/
+rm -rf $DIR/../api
+cp -a $DIR/OwlServer/web/api $DIR/../
 
 # Install node modules
 echo "Installing node.js modules..."
-cd $DIR/../$TARGET_ENV
+cd $DIR/../api
 npm install
 cd - > /dev/null
 
 # Update deployment script
 echo "Updating deployment script..."
-cp $DIR/$CLONE_DIR/web/scripts/deploy-api.sh $DIR/../deployment/
+cp $DIR/$CLONE_DIR/web/scripts/deploy-api.sh $DIR/
 
 # Set privileges
 echo "Setting up permissions..."
-chown -R root /srv/owl/api
-chgrp -R hoxtonowl /srv/owl/api
-find /srv/owl/api -type f -exec chmod 664 '{}' \;
-find /srv/owl/api -type d -exec chmod 775 '{}' \;
-find /srv/owl/api -type d -exec chmod g+s '{}' \;
-chmod o+x /srv/owl/api/bin/www
+chown -R root $DIR/../api
+chgrp -R hoxtonowl $DIR/../api
+find $DIR/../api -type f -exec chmod 664 '{}' \;
+find $DIR/../api -type d -exec chmod 775 '{}' \;
+find $DIR/../api -type d -exec chmod g+s '{}' \;
+chmod o+x $DIR/../api/bin/www
 touch /var/log/owl-api.log
 chmod o+w /var/log/owl-api.log
-chown root:root /srv/owl/deployment/deploy-api.sh
-chmod 744 /srv/owl/deployment/deploy-api.sh
+chown root:root $DIR/deploy-api.sh
+chmod 744 $DIR/deploy-api.sh
 
 # Delete temp repo clone
 echo "Deleting temp repo clone..."
