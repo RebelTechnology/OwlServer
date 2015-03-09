@@ -21,6 +21,8 @@ define('DOING_AJAX', true);
 /**
  * Validates a WordPress `logged_in_*` authentication cookie.
  *
+ * Exposed as an XML-RPC method.
+ *
  * @param string $cookie
  *     Value of the WordPress `logged_in_*` cookie.
  * @param string $scheme
@@ -33,7 +35,28 @@ function owl_validateAuthCookie($cookie, $scheme = 'logged_in')
 }
 
 /**
- * Registers a new XML-RPC method,
+ * Returnd whether the specified user ID belongs to a website administrator.
+ *
+ * Exposed as an XML-RPC method.
+ *
+ * @param string $userId
+ *     The user ID.
+ * @return boolean
+ *     Whether the specified user ID belongs to a website administrator.
+ */
+function owl_isAdmin($userId)
+{
+    $args = array(
+        'include' => intval($userId),
+        'role' => 'Administrator'
+    );
+    $userQuery = new WP_User_Query($args);
+
+    return 1 === count($userQuery->results);
+}
+
+/**
+ * Registers a new XML-RPC methods,
  *
  * @param array $methods
  *     Methods array.
@@ -43,19 +66,12 @@ function owl_validateAuthCookie($cookie, $scheme = 'logged_in')
 function owl_new_xmlrpc_methods($methods)
 {
     $methods['owl.validateAuthCookie'] = 'owl_validateAuthCookie';
+    $methods['owl.isAdmin'] = 'owl_isAdmin';
 
     return $methods;
 }
 
 add_filter('xmlrpc_methods', 'owl_new_xmlrpc_methods');
-
-/*
- * Provides an AJAX endpoint that returns all the usernames that start with
- * that character sequence. Used by the add/edit patch form.
- *
- * NOTE; This part of this plugin isn't related to the OWL API really, but I
- * added it here because I didn't feel like creating a new plugin.
- */
 
 /**
  * Provides an AJAX endpoint for the username autocomplete functionality of the
