@@ -1,59 +1,98 @@
 #!/bin/sh
 #
-# A SysV init script to manage the OWL API.
+# A SysV init script to manage to OWL API.
 #
-# Written by Sam Artuso <sam@highoctanedev.co.uk>
-# and extensively based on https://gist.github.com/naholyr/4275302
-
+# Extensively based on https://github.com/fhd/init-script-template
+#
 ### BEGIN INIT INFO
 # Provides:          owl-api
 # Required-Start:    $network $local_fs mongodb
 # Required-Stop:     $network $local_fs mongodb
-# Should-Start:      $named
-# Should-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: The OWL API.
 ### END INIT INFO
 
-SCRIPT=/srv/owl/api/bin/www
-RUNAS=nobody
+DIR='/srv/owl/api'
+USER='nobody'
+CMD='node bin/www'
 
-PIDFILE=/var/run/owl-api.pid
-LOGFILE=/var/log/owl-api.log
+NAME=`basename $0`
+PID_FILE='/var/run/$NAME.pid'
+STDOUT_LOG='/var/log/$NAME.log'
+STDERR_LOG='/var/log/$NAME.err'
 
-start() {
-  if [ -f /var/run/$PIDNAME ] && kill -0 $(cat /var/run/$PIDNAME); then
-    echo 'Service already running' >&2
-    return 1
-  fi
-  echo 'Starting service...' >&2
-  local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
-  su -c "$CMD" $RUNAS > "$PIDFILE"
-  echo 'Service started.' >&2
+get_pid() {
+    cat "$PID_FILE"
 }
 
-stop() {
-  if [ ! -f "$PIDFILE" ] || ! kill -0 $(cat "$PIDFILE"); then
-    echo 'Service not running' >&2
-    return 1
-  fi
-  echo 'Stopping service...' >&2
-  kill -15 $(cat "$PIDFILE") && rm -f "$PIDFILE"
-  echo 'Service stopped.' >&2
+is_running() {
+    [ -f "$PID_FILE" ] && ps `get_pid` > /dev/null 2>&1
 }
 
 case "$1" in
-  start)
-    start
+    start)
+    if is_running; then
+        echo "Already started."
+    else
+        echo "Starting $NAME..."
+        cd "$DIR"
+        sudo -u "$USER" $CMD >> "$STDOUT_LOG" 2>> "$STDERR_LOG" &
+        echo $! > "$PID_FILE"
+        if ! is_running; then
+            echo "Unable to start, see $STDOUT_LOG and $STDERR_LOG."
+            exit 1
+        fi
+    fi
     ;;
-  stop)
-    stop
+    stop)
+    if is_running; then
+        echo -n "Stopping $NAME..."
+        kill `get_pid`
+        for i in {1..10}
+        do
+            if ! is_running; then
+                break
+            fi
+
+            echo -n "."
+            sleep 1
+        done
+        echo
+
+        if is_running; then
+            echo "Not stopped; may still be shutting down or shutdown may have failed."
+            exit 1
+        else
+            echo "Stopped"
+            if [ -f "$PID_FILE" ]; then
+                rm "$PID_FILE"
+            fi
+        fi
+    else
+        echo "Not running."
+    fi
     ;;
-  restart)
-    stop
-    start
+    restart)
+    $0 stop
+    if is_running; then
+        echo "Unable to stop, will not attempt to start."
+        exit 1
+    fi
+    $0 start
     ;;
-  *)
-    echo "Usage: $0 {start|stop|restart}"
+    status)
+    if is_running; then
+        echo "Running."
+    else
+        echo "Stopped."
+        exit 1
+    fi
+    ;;
+    *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
 esac
+
+exit 0
