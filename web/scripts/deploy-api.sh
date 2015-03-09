@@ -54,10 +54,6 @@ cd - > /dev/null
 # Copy files
 echo "Copying files..."
 rsync --quiet -avz $DIR/OwlServer/web/api/* $DIR/../$TARGET_ENV/
-chown -R root:root $DIR/../$TARGET_ENV/
-find $DIR/../$TARGET_ENV/ -type f -exec chmod 644 '{}' \;
-find $DIR/../$TARGET_ENV/ -type d -exec chmod 755 '{}' \;
-chmod u+x $DIR/../$TARGET_ENV/bin/www
 
 # Install node modules
 echo "Installing node.js modules..."
@@ -68,6 +64,17 @@ cd - > /dev/null
 # Update deployment script
 echo "Updating deployment script..."
 cp $DIR/$CLONE_DIR/web/scripts/deploy-api.sh $DIR/../deployment/
+
+# Set privileges
+echo "Setting up permissions..."
+chown -R root /srv/owl/api
+chgrp -R hoxtonowl /srv/owl/api
+find /srv/owl/api -type f -exec chmod 664 '{}' \;
+find /srv/owl/api -type d -exec chmod 775 '{}' \;
+find /srv/owl/api -type d -exec chmod g+s '{}' \;
+chmod o+x /srv/owl/api/bin/www
+touch /var/log/owl-api.log
+chmod o+w /var/log/owl-api.log
 
 # Delete temp repo clone
 echo "Deleting temp repo clone..."
