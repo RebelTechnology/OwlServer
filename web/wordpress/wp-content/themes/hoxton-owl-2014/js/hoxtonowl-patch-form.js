@@ -81,7 +81,10 @@ HoxtonOwl.patchForm = {
                 return $(this).text() === patch.tags[i];
             }).prop('selected', true);
         }
-        HoxtonOwl.patchForm.tagMulti.trigger("chosen:updated");
+        //HoxtonOwl.patchForm.tagMulti.trigger("chosen:updated");
+        HoxtonOwl.patchForm.tagMulti.select2({
+            placeholder: 'Pick one or more tags...'
+        });
 
         // Soundcloud
         if (patch.soundcloud && patch.soundcloud.length) {
@@ -380,9 +383,10 @@ HoxtonOwl.patchForm = {
             }
 
             // tag multi select
-            HoxtonOwl.patchForm.tagMulti = $(".chosen-select").chosen({
-                no_results_text: "Oops, nothing found!"
-            });
+            //HoxtonOwl.patchForm.tagMulti = $(".chosen-select").chosen({
+            //    no_results_text: "Oops, nothing found!"
+            //});
+            HoxtonOwl.patchForm.tagMulti = $('#frm-patch-tags');
 
             var options = {
                 separator: '',
@@ -403,7 +407,7 @@ HoxtonOwl.patchForm = {
                 for (var i = 0, max = tags.length; i < max; i++) {
                     $('#frm-patch-tags').append('<option>' + tags[i] + '</option>');
                 }
-                HoxtonOwl.patchForm.tagMulti.trigger("chosen:updated");
+                //HoxtonOwl.patchForm.tagMulti.trigger("chosen:updated");
             });
 
             $('#frm-patch-btn-submit').click(function(e) {

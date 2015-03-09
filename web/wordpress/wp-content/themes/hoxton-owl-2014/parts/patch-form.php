@@ -2,8 +2,8 @@
 
 wp_enqueue_script('owl-api-client', get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array(), false, true);
 wp_enqueue_script('owl-patch',      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
-wp_enqueue_script('owl-patches-add-edit-form-chosen-js', get_template_directory_uri() . '/js/chosen/chosen.jquery.min.js', array('jquery'));
-wp_enqueue_style('owl-patches-add-edit-form-chosen-css', get_template_directory_uri() . '/js/chosen/chosen.css');
+// wp_enqueue_script('owl-patches-add-edit-form-chosen-js', get_template_directory_uri() . '/js/chosen/chosen.jquery.min.js', array('jquery'));
+// wp_enqueue_style('owl-patches-add-edit-form-chosen-css', get_template_directory_uri() . '/js/chosen/chosen.css');
 wp_enqueue_script('owl-patches-add-edit-form-sheepit', get_template_directory_uri() . '/js/jquery.sheepItPlugin-1.1.1.min.js', array('jquery'));
 wp_enqueue_script('owl-patch-form', get_template_directory_uri() . '/js/hoxtonowl-patch-form.js', array('jquery'), false, true);
 wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
