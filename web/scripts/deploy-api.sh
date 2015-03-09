@@ -75,6 +75,8 @@ find /srv/owl/api -type d -exec chmod g+s '{}' \;
 chmod o+x /srv/owl/api/bin/www
 touch /var/log/owl-api.log
 chmod o+w /var/log/owl-api.log
+chown root:root /srv/owl/deployment/deploy-api.sh
+chmod 744 /srv/owl/deployment/deploy-api.sh
 
 # Delete temp repo clone
 echo "Deleting temp repo clone..."
