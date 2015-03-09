@@ -85,7 +85,7 @@ rm -rf $DIR/$CLONE_DIR
 
 # Restart service
 echo "Restarting service..."
-service owl-api.production stop
-service owl-api.production start
+service owl-api stop
+service owl-api start
 
 echo "Done."
