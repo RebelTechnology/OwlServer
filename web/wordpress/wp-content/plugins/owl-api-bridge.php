@@ -46,6 +46,7 @@ function owl_new_xmlrpc_methods($methods)
 
     return $methods;
 }
+
 add_filter('xmlrpc_methods', 'owl_new_xmlrpc_methods');
 
 /*

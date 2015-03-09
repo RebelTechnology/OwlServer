@@ -73,7 +73,8 @@ cp -a $DIR/$CLONE_DIR/web/scripts/README.md $DIR/..
 echo "Setting up permissions..."
 chown -R root $DIR/../httpdocs
 chgrp -R hoxtonowl $DIR/../httpdocs
-chmod -R 775 $DIR/../httpdocs
+find $DIR/../httpdocs -type f -exec chmod 664 '{}' \;
+find $DIR/../httpdocs -type d -exec chmod 775 '{}' \;
 find $DIR/../httpdocs -type d -exec chmod g+s '{}' \;
 chown -R www-data $DIR/../httpdocs/wp-content/uploads
 chown -R www-data $DIR/../httpdocs/mediawiki/images
@@ -90,9 +91,7 @@ echo "Deleting temp repo clone..."
 rm -rf $DIR/$CLONE_DIR
 
 echo "Done."
-
+echo
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo " REMEMBER TO CLEAR APC CACHE @ $SITE_URL/apc.php !!!                    "
-echo "                                                                        "
-echo " Unfortunately I cannot do this for you...                              "
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
