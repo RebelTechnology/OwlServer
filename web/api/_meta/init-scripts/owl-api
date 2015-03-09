@@ -16,12 +16,11 @@
 # Short-Description: The OWL API.
 ### END INIT INFO
 
-ENVIRONMENT='staging'
-SCRIPT=/srv/owl/api/$ENVIRONMENT/bin/www
-RUNAS=owlapi
+SCRIPT=/srv/owl/api/bin/www
+RUNAS=nobody
 
-PIDFILE=/var/run/owl-api.$ENVIRONMENT.pid
-LOGFILE=/var/log/owl-api.$ENVIRONMENT.log
+PIDFILE=/var/run/owl-api.pid
+LOGFILE=/var/log/owl-api.log
 
 start() {
   if [ -f /var/run/$PIDNAME ] && kill -0 $(cat /var/run/$PIDNAME); then
