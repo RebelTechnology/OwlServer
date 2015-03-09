@@ -53,8 +53,10 @@ cd - > /dev/null
 
 # Copy files
 echo "Copying files..."
+mv $DIR/../api/api-settings.js /tmp
 rm -rf $DIR/../api
 cp -a $DIR/OwlServer/web/api $DIR/../
+mv /tmp/api-settings.js $DIR/../api/
 
 # Install node modules
 echo "Installing node.js modules..."
