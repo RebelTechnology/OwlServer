@@ -57,7 +57,7 @@ var patchModel = {
         },
 
         author: {
-            required: true,
+            required: false,
             validate: function (val) {
 
                 var err = { type: 'not_valid', field: 'parameters', error: { status: 400 }};

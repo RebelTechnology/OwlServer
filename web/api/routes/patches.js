@@ -4,9 +4,11 @@
 
 var express = require('express');
 var router = express.Router();
+var url = require('url');
+
 var patchModel = require('../models/patch');
 
-var summaryFields = { 
+var summaryFields = {
     _id: 1,
     name: 1,
     'author.name': 1,
@@ -21,15 +23,26 @@ var regExpEscape = function(str) {
 
 /**
  * Retrieves all patches.
- * 
- * GET /patches
+ *
+ * GET /patches?author.name=
  */
 router.get('/', function(req, res) {
+
+    var urlParts = url.parse(req.url, true);
+    var query = urlParts.query;
+
     var collection = req.db.get('patches');
     var nativeCol = collection.col;
+
     var summaryFields2 = summaryFields;
     summaryFields2.lowercase = { $toLower: '$name' };
-    nativeCol.aggregate({ $project: summaryFields2 }, { $sort: { lowercase: 1 }}, function (err, result) {
+
+    var filter = { $match: {}};
+    if (query['author.name']) {
+        filter.$match['author.name'] = query['author.name'];
+    }
+
+    nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, function (err, result) {
         if (err !== null) {
             return res.status(500).json({error: err});
         } else {
@@ -43,14 +56,14 @@ router.get('/', function(req, res) {
 
 /**
  * Creates a new patch.
- * 
+ *
  * POST /patches
  */
 router.post('/', function(req, res) {
-    
+
     var collection = req.db.get('patches');
     var patch = req.body;
-    
+
     patch.seoName = patchModel.generateSeoName(patch);
     patch.author = { name: 'OWL' }; // FIXME
     try {
@@ -62,27 +75,27 @@ router.post('/', function(req, res) {
             return res.status(err.error.status).json(err);
         }
     }
-    
+
     // we make sure that no other patches are named the same (in a case insensitive fashion)
     var nameRegexp = new RegExp(regExpEscape(patch.name), 'i');
     var seoNameRegexp = new RegExp(regExpEscape(patch.seoName), 'i');
     collection.findOne({ $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] }, function(err, doc) {
-        
+
         if (null !== err) {
             // database returned an error
             return res.status(500).json({ message: err, error: { status: 500 }});
         } else {
-            
+
             if (null !== doc) {
-                
+
                 var err = { message: 'This name is already taken.', type: 'not_valid', field: 'name', error: { status: 400 }};
                 return res.status(err.error.status).json(err);
-                
+
             } else {
-                
+
                 patch = patchModel.sanitize(patch);
                 collection.insert(patch, function(err, newlyInsertedPatch) {
-                    
+
                     if (null !== err) {
                         // database returned an error
                         return res.status(500).json({
@@ -97,65 +110,5 @@ router.post('/', function(req, res) {
         }
     });
 });
-
-///*
-// * GET /patches/findByTag
-// */
-//router.get('/findByTag/:tagList', function(req, res) {
-//    
-//    var tags = req.params.tagList.split(',');
-//    var collection = req.db.get('patches');
-//    var orClause = [];
-//    for (var i = 0; i < tags.length; i++) {
-//        orClause.push({ tags: new RegExp(RegExp.escape(tags[i]), 'i')}); // case insensitive search
-//    }
-//    collection.find({$or: orClause }, { fields: summaryFields }, function(err, patchSummaries) {
-//        var response = { error: null === err ? 0 : err };
-//        if (null === err) {
-//            response.count = patchSummaries.length;
-//            response.result = patchSummaries;
-//        }
-//        res.json(response);
-//    });
-//});
-//
-///*
-// * GET /patches/findByAuthor
-// */
-//router.get('/findByAuthor/:authorList', function(req, res) {
-//    
-//    var authors = req.params.authorList.split(',');
-//    var collection = req.db.get('patches');
-//    var orClause = [];
-//    for (var i = 0; i < authors.length; i++) {
-//        orClause.push({ 'author.name': new RegExp(RegExp.escape(authors[i]), 'i')}); // case insensitive search
-//    }
-//    collection.find({$or: orClause }, { fields: summaryFields }, function(err, patchSummaries) {
-//        var response = { error: null === err ? 0 : err };
-//        if (null === err) {
-//            response.count = patchSummaries.length;
-//            response.result = patchSummaries;
-//        }
-//        res.json(response);
-//    });
-//});
-//
-///*
-// * GET /patches/findOneBySeoName
-// * 
-// * FIXME: make this search case-insensitive
-// */
-//router.get('/findOneBySeoName/:seoName', function(req, res) {
-//    
-//    var seoName = req.params.seoName;
-//    var collection = req.db.get('patches');
-//    collection.findOne({ seoName: seoName }, function(err, patch) {
-//        var response = { error: null === err ? 0 : err };
-//        if (null === err) {
-//            response.result = patch;
-//        }
-//        res.json(response);
-//    });
-//});
 
 module.exports = router;
