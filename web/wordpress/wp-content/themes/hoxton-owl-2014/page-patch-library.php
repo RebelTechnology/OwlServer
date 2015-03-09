@@ -59,10 +59,12 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
             <img src="<?= $resUri ?>images/authors-icon.png" width="40" height="40" alt="icon">
             <p>Authors</p>
         </div>
-        <div class="secondary-nav-item">
+        <?php if (is_user_logged_in()): ?>
+        <div class="secondary-nav-item" data-bind="css: { active: search() === 'myPatches' }, click: selectMyPatches">
             <img src="<?= $resUri ?>images/my-patches-icon.png" width="40" height="40" alt="icon">
             <p>My patches</p>
         </div>
+        <?php endif; ?>
         <!-- <div class="secondary-nav-item"> -->
         <!--     <img src="<?= $resUri ?>images/my-rigs-icon.png" width="40" height="40" alt="icon"> -->
         <!--     <p>My rigs</p> -->
@@ -70,7 +72,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
     </div>
 </div>
 
-<div id="filter-bar" data-bind="if: search() != 'patch' && search() != 'all'">
+<div id="filter-bar" data-bind="if: search() != 'patch' && search() != 'all' && search() != 'myPatches'">
     <div id="filter-wrapper" class="wrapper" data-bind="foreach: search() === 'author' ? authors : tags">
         <div class="tag-filter-button" data-bind="text: $data, click: selectFilter, css: { active: searchItems.indexOf($data) > -1 }"></div>
     </div>
@@ -215,7 +217,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     </tr>
                     <tr>
                         <!-- <td>&nbsp;</td> -->
-                        <td style="padding-top: 20px;"><span class="author-name" data-bind="text: author.name, click: selectOnlyAuthor"></span></td>
+                        <td style="padding-top: 20px;"><span class="author-name" data-bind="visible: search() !== 'myPatches', text: author.name, click: selectOnlyAuthor"></span></td>
                         <!-- <td>&nbsp;</td> -->
                     </tr>
                 </tbody>
@@ -232,5 +234,12 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
 
     </div> <!-- /div.content-container -->
 </div> <!-- /div.wrapper.flexbox -->
+
+<?php
+global $current_user;
+
+if (is_user_logged_in()):
+?><div id="wordpress-username" style="display: none;"><?= $current_user->user_login; ?></div>
+<?php endif; ?>
 
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/footer','parts/shared/html-footer') ); ?>

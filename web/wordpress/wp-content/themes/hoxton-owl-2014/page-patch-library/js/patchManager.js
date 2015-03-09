@@ -101,7 +101,7 @@ HoxtonOwl.patchManager = {
         that.authors = ko.observableArray(authors); // all authors
         that.tags = ko.observableArray(tags);       // all tags
 
-        that.search = ko.observable();              // one of 'all', 'search', 'tag' or 'patch'
+        that.search = ko.observable();              // one of 'all', 'author', 'tag', 'patch' or 'myPatches'
         that.searchItems = ko.observableArray();
 
         that.filteredPatches = ko.computed(function() {
@@ -109,16 +109,18 @@ HoxtonOwl.patchManager = {
             //console.log(that.searchItems());
             return ko.utils.arrayFilter(that.patches(), function(r) {
                 //console.log(that.searchItems);
-                if(that.searchItems.indexOf("All") > -1) {
+                if (that.searchItems.indexOf("All") > -1) {
                     return true;
                 }
-                if(that.search() === "tag") {
+                if (that.search() === "tag") {
                     for (i=0; i<r.tags.length; ++i) {
                         if(that.searchItems.indexOf(r.tags[i]) > -1) {
                             return true;
                         }
                     }
-                } else if(that.search() === "author") {
+                } else if (that.search() === "author") {
+                    return that.searchItems.indexOf(r.author.name) > -1;
+                } else if (that.search() === 'myPatches') {
                     return that.searchItems.indexOf(r.author.name) > -1;
                 }
                 return false;
@@ -147,10 +149,9 @@ HoxtonOwl.patchManager = {
 
         that.selectAuthor = function(author) {
 
-            console.log(author);
+            //console.log(author);
 
             //pm.updateBreadcrumbs();
-            //console.log("select author "+author);
 
             that.selectedPatch(null);
             if(that.search() != "author") {
@@ -175,6 +176,10 @@ HoxtonOwl.patchManager = {
 
         that.selectTag = function(tag) {
             //console.log("select tag " + tag);
+
+            // console.log("select tag ");
+            // console.log(tag);
+
             that.selectedPatch(null);
             if (that.search() != "tag") {
                 that.search("tag");
@@ -211,10 +216,9 @@ HoxtonOwl.patchManager = {
             selectTag('All');
         };
 
-        that.selectOnlyAuthor = function(author) {
-            //console.log('selectOnlyAuthor');
+        that.selectOnlyAuthor = function(authorsPatch) {
             that.searchItems.removeAll();
-            selectAuthor(author);
+            selectAuthor(authorsPatch.author.name);
         };
 
         that.selectAllAuthors = function(tag) {
@@ -226,9 +230,20 @@ HoxtonOwl.patchManager = {
             selectAuthor('All');
         };
 
+        that.selectMyPatches = function() {
+
+            that.search('myPatches');
+            var author = $('#wordpress-username').text();
+            //console.log(author);
+            that.searchItems.removeAll();
+            that.selectedPatch(null);
+            that.searchItems.push(author);
+
+        },
+
         that.selectPatch = function(patch) {
 
-            console.log(patch);
+            //console.log(patch);
 
             //pm.updateBreadcrumbs(patch);
 
