@@ -376,7 +376,7 @@ var patchModel = {
     },
 
     generateSeoName: function(patch) {
-        return patch.name.replace(/[^a-z0-9]/i, '_');
+        return patch.name.replace(/[^a-z0-9]+/i, '_');
     }
 };
 
