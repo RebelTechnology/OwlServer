@@ -271,8 +271,6 @@ HoxtonOwl.patchForm = {
             }
         });
 
-        console.log(patch); // FIXME
-        return false;       // FIXME
         return patch;
 
     },

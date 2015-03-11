@@ -191,8 +191,8 @@ HoxtonOwl.ApiClient.prototype.savePatch = function (patch, callback) {
                 cookie: authCookieVal
             };
 
-            jQuery.when(client._query(path, method, patch)).always(function (result) {
-                callback(data);
+            jQuery.when(client._query(path, method, { patch: patch, credentials: credentials })).always(function (result) {
+                callback(result);
             });
         },
 
@@ -202,10 +202,6 @@ HoxtonOwl.ApiClient.prototype.savePatch = function (patch, callback) {
             callback(false);
         }
     );
-
-    jQuery.when(client._query(path, method, patch)).always(function (data) {
-        callback(data);
-    });
 
 };
 

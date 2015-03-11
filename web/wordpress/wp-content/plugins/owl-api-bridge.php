@@ -35,25 +35,34 @@ function owl_validateAuthCookie($cookie, $scheme = 'logged_in')
 }
 
 /**
- * Returnd whether the specified user ID belongs to a website administrator.
+ * Returns some information on the specified user.
  *
  * Exposed as an XML-RPC method.
  *
  * @param string $username
  *     The user ID.
- * @return boolean
- *     Whether the specified user ID belongs to a website administrator.
+ * @return array|boolean
+ *     An array whose keys are 'admin' and 'id' and whose values are
+ *     respectively a boolean telling whether the user is a WP admin and the
+ *     user ID of the user. Returns false if the user could not be found or if
+ *     an error occurred.
  */
-function owl_isAdmin($username)
+function owl_getUserInfo($username)
 {
     $args = array(
-        'role'           => 'Administrator',
         'search'         => $username,
         'search_columns' => 'user_login'
     );
     $userQuery = new WP_User_Query($args);
 
-    return 1 === count($userQuery->results);
+    if (1 !== count($userQuery->results)) {
+        return false;
+    } else {
+        return array(
+            'id'    => $userQuery->results[0]->ID,
+            'admin' => in_array('administrator', $userQuery->results[0]->roles)
+        );
+    }
 }
 
 /**
@@ -67,7 +76,7 @@ function owl_isAdmin($username)
 function owl_new_xmlrpc_methods($methods)
 {
     $methods['owl.validateAuthCookie'] = 'owl_validateAuthCookie';
-    $methods['owl.isAdmin'] = 'owl_isAdmin';
+    $methods['owl.getUserInfo'] = 'owl_getUserInfo';
 
     return $methods;
 }

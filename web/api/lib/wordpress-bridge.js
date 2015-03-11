@@ -22,9 +22,9 @@ module.exports.validateAuthCookie = function(cookie, callback) {
     });
 };
 
-module.exports.isWordPressAdmin = function (username, callback) {
+module.exports.getUserInfo = function (username, callback) {
 
-    client.call('owl.isAdmin', username, function (error, data) {
+    client.call('owl.getUserInfo', username, function (error, data) {
         if (error) {
             callback(error);
         } else {
