@@ -1,5 +1,4 @@
 /**
- * @author Martin Klang <mars@pingdynasty.com>
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
@@ -150,35 +149,38 @@ HoxtonOwl.patchForm = {
             return;
         }
 
-        var author = {};
-        if ($('#frm-patch-author-type-wordpress').prop('checked')) {
-            author.type = 'wordpress';
-            author.wordpressId = $('#frm-patch-author-wordpressId').val();
-            author.name = $.trim($('#frm-patch-author-wordpressId option[value="' + author.wordpressId + '"]').text());
-            $('#frm-patch-author-name').val('');
-        } else if ($('#frm-patch-author-type-other').prop('checked')) {
-            author.name = $.trim($('#frm-patch-author-name').val());
-            $('#frm-patch-author-wordpressId').empty().val(null).trigger('change');
-        }
+        if ($('#frm-patch-author-type-wordpress').length) {
 
-        if (!('name' in author) || '' === author.name) {
-            $('#frm-patch-author-name').
-                addClass('invalid').
-                next('div.error-message').
-                text('Invalid author.').
-                show();
-            location = '#form-top';
-            return;
-        }
+            var author = {};
+            if ($('#frm-patch-author-type-wordpress').prop('checked')) {
+                author.type = 'wordpress';
+                author.wordpressId = $('#frm-patch-author-wordpressId').val();
+                author.name = $.trim($('#frm-patch-author-wordpressId option[value="' + author.wordpressId + '"]').text());
+                $('#frm-patch-author-name').val('');
+            } else if ($('#frm-patch-author-type-other').prop('checked')) {
+                author.name = $.trim($('#frm-patch-author-name').val());
+                $('#frm-patch-author-wordpressId').empty().val(null).trigger('change');
+            }
 
-        if (('type' in author) && (author.type !== 'wordpress' || !('wordpressId' in author) || !author.wordpressId)) {
-            $('#frm-patch-author-name').
-                addClass('invalid').
-                next('div.error-message').
-                text('Invalid author.').
-                show();
-            location = '#form-top';
-            return;
+            if (!('name' in author) || '' === author.name) {
+                $('#frm-patch-author-name').
+                    addClass('invalid').
+                    next('div.error-message').
+                    text('Invalid author.').
+                    show();
+                location = '#form-top';
+                return;
+            }
+
+            if (('type' in author) && (author.type !== 'wordpress' || !('wordpressId' in author) || !author.wordpressId)) {
+                $('#frm-patch-author-name').
+                    addClass('invalid').
+                    next('div.error-message').
+                    text('Invalid author.').
+                    show();
+                location = '#form-top';
+                return;
+            }
         }
 
         if ('' === description) {
@@ -203,12 +205,15 @@ HoxtonOwl.patchForm = {
 
         var patch = {
             name: name,
-            author: author,
             description: description,
             instructions: instructions,
             inputs: parseInt($('#frm-patch-inputs').val()),
             outputs: parseInt($('#frm-patch-outputs').val())
         };
+
+        if (author) {
+            patch.author = author;
+        }
 
         var percent = $.trim($('#frm-patch-cycles').val());
         if ('' !== percent) {
