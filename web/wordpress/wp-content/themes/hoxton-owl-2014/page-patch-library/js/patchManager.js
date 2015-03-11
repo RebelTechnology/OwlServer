@@ -332,6 +332,9 @@ HoxtonOwl.patchManager = {
 
     /**
      * Navigates to a patch page.
+     *
+     * @param  {HoxtonOwl.Patch} patch
+     *     The patch to view.
      */
     openPatch: function(patch) {
         location = '/patch-library/patch/' + patch.seoName;
@@ -339,9 +342,42 @@ HoxtonOwl.patchManager = {
 
     /**
      * Navigates to the patch edit page.
+     *
+     * @param  {HoxtonOwl.Patch} patch
+     *     The patch to edit.
      */
     editPatch: function(patch) {
         location = '/edit-patch/' + patch.seoName;
+    },
+
+    /**
+     * Deletes a patch.
+     *
+     * @param  {HoxtonOwl.Patch} patch
+     *     The patch to delete.
+     */
+    deletePatch: function(patch) {
+
+        if (confirm('Are you sure you want to delete this patch?')) {
+
+            var pm = HoxtonOwl.patchManager;
+            var apiClient = new HoxtonOwl.ApiClient();
+            apiClient.deletePatch(patch._id, function (success) {
+                if (success) {
+                    alert('Patch deleted successfully.');
+                    location = '/patch-library';
+                } else {
+                    alert('Unexpected error. Patch could not be deleted.');
+                }
+            });
+        }
+    },
+
+    /**
+     * Adds a new patch
+     */
+    addPatch: function() {
+        location = '/add-patch/';
     },
 
     //updateBreadcrumbs: function(patch) {
