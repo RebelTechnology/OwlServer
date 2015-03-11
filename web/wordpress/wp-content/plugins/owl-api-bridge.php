@@ -120,4 +120,26 @@ function owl_usernameAutocomplete()
 add_action('wp_ajax_owl-username-autocomplete', 'owl_usernameAutocomplete');
 add_action('wp_ajax_nopriv_owl-username-autocomplete', 'owl_usernameAutocomplete');
 
+/**
+ * Provides an AJAX endpoint for retrieving WordPress's authentication cookie.
+ */
+function owl_getAuthCookie()
+{
+    $cookies = $_COOKIE;
+    $result = null;
+    $cookieSig = 'wordpress_logged_in_';
+    foreach ($cookies as $name => $value) {
+        if (substr($name, 0, strlen($cookieSig)) === $cookieSig) {
+            $result = $value;
+            break;
+        }
+    }
+
+    wp_send_json($result);
+    wp_die();
+}
+
+add_action('wp_ajax_owl-get-auth-cookie', 'owl_getAuthCookie');
+add_action('wp_ajax_nopriv_owl-get-auth-cookie', 'owl_getAuthCookie');
+
 // EOF
