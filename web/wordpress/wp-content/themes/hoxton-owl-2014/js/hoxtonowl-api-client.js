@@ -12,10 +12,10 @@ if (!HoxtonOwl) {
 
 /**
  * API client
- * 
+ *
  * @class
  */
-HoxtonOwl.ApiClient = function() {
+HoxtonOwl.ApiClient = function () {
     // Determine API endpoint
     this.apiEndPoint = window.location.protocol + '//' + window.location.host + '/api';
     if ('hoxtonowl.localhost' == window.location.hostname) { // for local debugging
@@ -25,7 +25,7 @@ HoxtonOwl.ApiClient = function() {
 
 /**
  * Calls an API method.
- * 
+ *
  * @param  {string}       path
  *     The path to the API method.
  * @param  {string} [verb=get]
@@ -34,15 +34,13 @@ HoxtonOwl.ApiClient = function() {
  *     An optional object containing the payload for the API call. Used with
  *     methods like POST and PUT.
  * @return Object
- *     An object representing an ajax request.
+ *     An promise-like object representing an ajax request.
+ * @private
  */
-HoxtonOwl.ApiClient.prototype.query = function(path, method, data) {
+HoxtonOwl.ApiClient.prototype._query = function (path, method, data) {
+
     method = method || 'GET';
-    //if (data) {
-    //    return jQuery[method](, data, null, 'json');
-    //} else {
-    //    return jQuery[method](this.apiEndPoint + path);
-    //}
+
     var settings = {
         type: method,
         dataType: 'json'
@@ -50,59 +48,74 @@ HoxtonOwl.ApiClient.prototype.query = function(path, method, data) {
     if (data) {
         settings.data = data;
     }
-    return $.ajax(this.apiEndPoint + path, settings);
+
+    return $.ajax(this.apiEndPoint + path, settings); // returns a promise-like object
+
+};
+
+/**
+ * Finds the WP authentication cookie,
+ *
+ * @return Object
+ *     An promise-like object representing an ajax request.
+ * @private
+ */
+HoxtonOwl.ApiClient.prototype._getWpAuthCookie = function () {
+
+    return $.get('/wp-admin/admin-ajax.php', { action: 'owl-get-auth-cookie' });
+
 };
 
 /**
  * Retrieves all patch data by calling the OWL API.
- * 
+ *
  * @param {Function} callback
  *     A callback that will be invoked once data is loaded.
  */
-HoxtonOwl.ApiClient.prototype.getAllPatches = function(callback) {
-    
+HoxtonOwl.ApiClient.prototype.getAllPatches = function (callback) {
+
     var client = this;
-    
+
     jQuery.when(
-        client.query('/patches/'),
-        client.query('/authors/'),
-        client.query('/tags/')
-    ).done(function(patchData, authorData, tagData) {
-        
+        client._query('/patches/'),
+        client._query('/authors/'),
+        client._query('/tags/')
+    ).done(function (patchData, authorData, tagData) {
+
         var patches = patchData[0].result;
-        
+
         for (var i = 0; i < patches.length; i++) {
             patches[i] = new HoxtonOwl.Patch(patches[i]);
         }
-        
+
         var authors = [];
         for(var i = 0; i < authorData[0].result.length; i++) {
             authors.push(authorData[0].result[i].name);
         }
         authors.unshift("All");
-        
+
         var tags = tagData[0].result;
         tags.unshift("All");
-        
+
         callback(patches, authors, tags);
-        
+
     });
 };
 
 /**
  * Get data for the patch with the specified ID by calling the OWL API.
- * 
+ *
  * @param  {string} patchId
  *     The patch ID.
  * @param  {Function} callback
  *     A callback that will be invoked once data is loaded. This function will
  *     be passed the freshly loaded patch.
  */
-HoxtonOwl.ApiClient.prototype.getSinglePatch = function(patchId, callback) {
-    
+HoxtonOwl.ApiClient.prototype.getSinglePatch = function (patchId, callback) {
+
     var client = this;
-    
-    jQuery.when(client.query('/patch/' + patchId)).done(function(patchData) {
+
+    jQuery.when(client._query('/patch/' + patchId)).done(function (patchData) {
         var patch = patchData.result;
         patch = new HoxtonOwl.Patch(patch);
         callback(patch);
@@ -110,49 +123,19 @@ HoxtonOwl.ApiClient.prototype.getSinglePatch = function(patchId, callback) {
 };
 
 /**
- * Saves a patch. This method will determine wheter to create a new patch or
- * update an existing one based on the presence of the '_id' property in the
- * 'patch' object.
- * 
- * @param  {object}   patch
- *     A patch object.
- * @param  {function} callback
- *     A callback that will be invoked when the API sends a response. The
- *     response will be passed to the callback as an argument.
- */
-HoxtonOwl.ApiClient.prototype.savePatch = function(patch, callback) {
-    
-    var client = this;
-    var path, method;
-    
-    if ('undefined' === typeof patch._id) {
-        path = '/patches/';
-        method = 'POST';
-    } else {
-        path = '/patch/' + patch._id;
-        method = 'PUT';
-    }
-    
-    jQuery.when(client.query(path, method, patch)).always(function(data) {
-        callback(data);
-    });
-    
-};
-
-/**
  * Get data for the patch with the specified ID by calling the OWL API.
- * 
+ *
  * @param  {string} patchSeoName
  *     The patch's SEO name.
  * @param  {Function} callback
  *     A callback that will be invoked once data is loaded. This function will
  *     be passed the freshly loaded patch.
  */
-HoxtonOwl.ApiClient.prototype.getSinglePatchBySeoName = function(patchSeoName, callback) {
-    
+HoxtonOwl.ApiClient.prototype.getSinglePatchBySeoName = function (patchSeoName, callback) {
+
     var client = this;
-    
-    jQuery.when(client.query('/patch/?seoName=' + encodeURIComponent(patchSeoName))).done(function(patchData) {
+
+    jQuery.when(client._query('/patch/?seoName=' + encodeURIComponent(patchSeoName))).done(function (patchData) {
         var patch = patchData.result;
         patch = new HoxtonOwl.Patch(patch);
         callback(patch);
@@ -161,16 +144,112 @@ HoxtonOwl.ApiClient.prototype.getSinglePatchBySeoName = function(patchSeoName, c
 
 /**
  * Retrieves all tags.
- * 
+ *
  * @param {Function} callback
  *     A callback that will be invoked once data is loaded.
  */
-HoxtonOwl.ApiClient.prototype.getAllTags = function(callback) {
-    
+HoxtonOwl.ApiClient.prototype.getAllTags = function (callback) {
+
     var client = this;
-    
-    jQuery.when(client.query('/tags/')).done(function(tagData) {
+
+    jQuery.when(client._query('/tags/')).done(function (tagData) {
         var tags = tagData.result;
         callback(tags);
     });
+};
+
+/**
+ * Saves a patch. This method will determine wheter to create a new patch or
+ * update an existing one based on the presence of the '_id' property in the
+ * 'patch' object.
+ *
+ * @param  {object}   patch
+ *     A patch object.
+ * @param  {function} callback
+ *     A callback that will be invoked when the API sends a response. The
+ *     response will be passed to the callback as an argument.
+ */
+HoxtonOwl.ApiClient.prototype.savePatch = function (patch, callback) {
+
+    var client = this;
+    var path, method;
+
+    if ('undefined' === typeof patch._id) {
+        path = '/patches/';
+        method = 'POST';
+    } else {
+        path = '/patch/' + patch._id;
+        method = 'PUT';
+    }
+
+    jQuery.when(client._getWpAuthCookie()).then(
+
+        function (authCookieVal) {
+
+            var credentials = {
+                type: 'wordpress',
+                cookie: authCookieVal
+            };
+
+            jQuery.when(client._query(path, method, patch)).always(function (result) {
+                callback(data);
+            });
+        },
+
+        function (reason) {
+            // Unable to retrieve authentication cookie
+            //console.log(reason);
+            callback(false);
+        }
+    );
+
+    jQuery.when(client._query(path, method, patch)).always(function (data) {
+        callback(data);
+    });
+
+};
+
+/**
+ * Deletes a patch.
+ *
+ * @param  {string} patchId
+ *     The ID of the patch to delete.
+ * @param {Function} callback
+ *     A function to be called after the attempt to delete the patch. This
+ *     callback will be passed a boolean argument saying whether the deletion
+ *     succeeded or not.
+ */
+HoxtonOwl.ApiClient.prototype.deletePatch = function (patchId, callback) {
+
+    var client = this;
+
+    jQuery.when(client._getWpAuthCookie()).then(
+
+        function (authCookieVal) {
+
+            var credentials = {
+                type: 'wordpress',
+                cookie: authCookieVal
+            };
+
+            jQuery.when(client._query('/patch/' + patchId, 'DELETE', credentials)).then(
+
+                function (result) {
+                    callback(true);
+                },
+
+                function (reason) {
+                    // deletion failed
+                    //console.log(reason);
+                    callback(false);
+                }
+            );
+        },
+
+        function (reason) {
+            // Unable to retrieve authentication cookie
+            //console.log(reason);
+            callback(false);
+        }
+    );
 };
