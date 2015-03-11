@@ -145,7 +145,8 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                     </div>
                     <div class="row">
                         <label for="frm-patch-tags">Tags</label>
-                        <select data-placeholder="Pick one or more tags..." class="form-control chosen-select" id="frm-patch-tags" name="tags" multiple="multiple"></select>
+                        <!--select data-placeholder="Pick one or more tags..." class="form-control chosen-select" id="frm-patch-tags" name="tags" multiple="multiple"></select-->
+                        <select class="form-control" id="frm-patch-tags" name="tags" multiple="multiple"></select>
                         <div class="error-message" style="margin-top: 13px;"></div>
                     </div>
                     <div class="row btn-row">
