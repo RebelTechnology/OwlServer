@@ -13,7 +13,7 @@ var client = wordpress.createClient({
 
 module.exports.validateAuthCookie = function(cookie, callback) {
 
-    client.call('owl.validateAuthCookie', cookie, function(error, data) {
+    client.call('owl.validateAuthCookie', cookie, function (error, data) {
        if (error) {
            callback(error);
        } else {
@@ -24,7 +24,7 @@ module.exports.validateAuthCookie = function(cookie, callback) {
 
 module.exports.isWordPressAdmin = function (username, callback) {
 
-    client.call('owl.isAdmin', username, function(error, data) {
+    client.call('owl.isAdmin', username, function (error, data) {
         if (error) {
             callback(error);
         } else {
