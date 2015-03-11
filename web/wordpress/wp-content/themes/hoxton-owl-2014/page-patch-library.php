@@ -122,14 +122,18 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         <td width="30%"><span class="parameter-label">Channels</span></td>
                         <td><p data-bind="text: (inputs + ' in / ' + outputs + ' out')"></p></td>
                     </tr>
+                    <!-- ko if: cycles -->
                     <tr>
                         <td><span class="parameter-label">CPU</span></td>
                         <td><p data-bind="text: cycles + '%'"></p></td>
                     </tr>
+                    <!-- /ko -->
+                    <!-- ko if: bytes -->
                     <tr>
                         <td><span class="parameter-label">Memory</span></td>
                         <td><p data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></p></td>
                     </tr>
+                    <!-- /ko -->
                     <!-- <tr> -->
                     <!--     <td><span class="parameter-label">Version</span></td> -->
                     <!--     <td><p>v.1.1.0 - 21/04/2014</p></td> -->
@@ -158,10 +162,14 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
             <div class="patch-stats2" data-bind="with: selectedPatch">
                 <span class="parameter-label">Channels</span>
                 <span class="parameter-value" data-bind="text: (inputs + ' in / ' + outputs + ' out')"></span>
+                <!-- ko if: cycles -->
                 <span class="parameter-label">CPU</span>
                 <span class="parameter-value" data-bind="text: cycles + '%'"></span>
+                <!-- /ko -->
+                <!-- ko if: cycles -->
                 <span class="parameter-label">Memory</span>
                 <span class="parameter-value" data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></span>
+                <!-- /ko -->
                 <!-- <span class="parameter-label">Version</span> -->
                 <!-- <span class="parameter-value">v.1.1.0 - 21/04/2014</span> -->
                 <!-- <span class="parameter-label">Used in</span> -->
@@ -242,11 +250,11 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
         <!-- /ko -->
 
         <!-- ko if: search() === 'myPatches' -->
-        <div class="patch-tile patch-tile-new">
+        <div class="patch-tile patch-tile-new" data-bind="click: HoxtonOwl.patchManager.addPatch">
             <table class="patch-title-controls patch-title-controls-new">
                 <tbody>
                     <tr>
-                        <td><span class="patch-title" data-bind="click: HoxtonOwl.patchManager.addPatch">+ Add a new patch</span></td>
+                        <td><span class="patch-title">Add a new patch</span></td>
                     </tr>
                     <tr>
                         <td style="padding-top: 20px;"></td>
