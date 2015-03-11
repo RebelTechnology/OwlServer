@@ -88,7 +88,12 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                 <table class="patch-title-controls">
                     <tr>
                         <td><span class="patch-title no-pseudo-link" data-bind="text: name"></span></td>
-                        <td width="40"><div class="edit-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div></td>
+                        <?php if (current_user_can('administrator')): ?>
+                        <td width="80">
+                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
+                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.deletePatch"><img src="<?= $resUri ?>images/bin.png" alt="Delete patch" /></div>
+                        </td>
+                        <?php endif; ?>
                     </tr>
                     <tr>
                         <td style="padding-top: 20px;">
@@ -212,8 +217,12 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <tr>
                         <!-- <td width="40"><div class="play-button">&gt;</div></td> -->
                         <td><span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': _id }"></span></td>
-                        <!--td><span class="patch-title" data-bind="text: name, click: selectPatch"></span></td-->
-                        <!-- <td width="40"><div class="add-button"><span>+</span></div></td> -->
+                        <!-- ko if: search() === 'myPatches' -->
+                        <td width="80">
+                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
+                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.deletePatch"><img src="<?= $resUri ?>images/bin.png" alt="Delete patch" /></div>
+                        </td>
+                        <!-- /ko -->
                     </tr>
                     <tr>
                         <!-- <td>&nbsp;</td> -->
@@ -230,6 +239,22 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
             </div>
         </div>
         <!-- /div.patch-tile -->
+        <!-- /ko -->
+
+        <!-- ko if: search() === 'myPatches' -->
+        <div class="patch-tile patch-tile-new">
+            <table class="patch-title-controls patch-title-controls-new">
+                <tbody>
+                    <tr>
+                        <td><span class="patch-title" data-bind="click: HoxtonOwl.patchManager.addPatch">+ Add a new patch</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 20px;"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="patch-baseline"></div>
+        </div>
         <!-- /ko -->
 
     </div> <!-- /div.content-container -->
