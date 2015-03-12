@@ -18,6 +18,28 @@ if (!HoxtonOwl) {
  */
 HoxtonOwl.patchManager = {
 
+    sortPatchesByName: function () {
+
+        if ('name' === window.patchSortOrder()) {
+            return;
+        }
+        window.patchSortOrder ('name');
+        window.patches.sort(function (left, right) {
+            return left.name.localeCompare(right.name);
+        });
+    },
+
+    sortPatchesByCreationTimeUtc: function () {
+
+        if ('creationTimeUtc' === window.patchSortOrder()) {
+            return;
+        }
+        window.patchSortOrder('creationTimeUtc');
+        window.patches.sort(function (left, right) {
+            return right.creationTimeUtc - left.creationTimeUtc;
+        });
+    },
+
     /**
      * Fetches a file from GitHub.
      *
@@ -103,6 +125,7 @@ HoxtonOwl.patchManager = {
 
         that.search = ko.observable();              // one of 'all', 'author', 'tag', 'patch' or 'myPatches'
         that.searchItems = ko.observableArray();
+        that.patchSortOrder = ko.observable('name');
 
         that.filteredPatches = ko.computed(function() {
             //console.log('filteredPatches');
@@ -127,10 +150,13 @@ HoxtonOwl.patchManager = {
             });
         });
 
-        that.selectAllPatches = function() {
+        that.selectAllPatches = function(dummy, e) {
+
             //console.log('selectAllPatches');
 
             //pm.updateBreadcrumbs();
+
+            HoxtonOwl.patchManager['sortPatchesBy' + e.currentTarget.id.split('-')[3]]();
 
             that.selectedPatch(null);
             that.search('all');
@@ -210,9 +236,9 @@ HoxtonOwl.patchManager = {
         that.selectAllTags = function(tag) {
 
             //console.log('selectAllTags');
-
             //pm.updateBreadcrumbs();
 
+            HoxtonOwl.patchManager.sortPatchesByName();
             selectTag('All');
         };
 
@@ -224,14 +250,15 @@ HoxtonOwl.patchManager = {
         that.selectAllAuthors = function(tag) {
 
             //console.log('selectAllAuthors');
-
             //pm.updateBreadcrumbs();
 
+            HoxtonOwl.patchManager.sortPatchesByName();
             selectAuthor('All');
         };
 
         that.selectMyPatches = function() {
 
+            HoxtonOwl.patchManager.sortPatchesByName();
             that.search('myPatches');
             var author = $('#wordpress-username').text();
             //console.log(author);

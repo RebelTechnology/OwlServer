@@ -39,14 +39,14 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
 
 <div id="secondary-nav-bar">
     <div id="secondary-nav-bar-content">
-        <div class="secondary-nav-item" data-bind="css: { active: search() === 'all' }, click: selectAllPatches">
+        <div class="secondary-nav-item" id="sort-patches-by-Name" data-bind="css: { active: (search() === 'all' && patchSortOrder() === 'name') }, click: selectAllPatches">
             <img src="<?= $resUri ?>images/browse-all-icon.png" width="40" height="40" alt="icon">
             <p>Browse all</p>
         </div>
-        <!-- <div class="secondary-nav-item"> -->
-        <!--   <img src="<?= $resUri ?>images/latest-icon.png" width="40" height="40" alt="icon"> -->
-        <!--   <p>Latest</p> -->
-        <!-- </div> -->
+        <div class="secondary-nav-item" id="sort-patches-by-CreationTimeUtc" data-bind="css: { active: (search() === 'all' && patchSortOrder() === 'creationTimeUtc') }, click: selectAllPatches">
+          <img src="<?= $resUri ?>images/latest-icon.png" width="40" height="40" alt="icon">
+          <p>Latest</p>
+        </div>
         <!-- <div class="secondary-nav-item"> -->
         <!--   <img src="<?= $resUri ?>images/popular-icon.png" width="40" height="40" alt="icon"> -->
         <!--   <p>Popular</p> -->
