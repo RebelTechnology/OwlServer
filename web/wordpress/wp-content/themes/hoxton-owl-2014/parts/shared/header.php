@@ -12,7 +12,7 @@
 if (!is_user_logged_in()) {
 ?>
             <li><a href="<?php echo wp_registration_url(); ?>">Register</a></li>
-            <li><a href="<?php echo wp_login_url( $redirect ); ?>">Sign In</a></li>
+            <li><a href="<?php echo wp_login_url(); ?>">Sign In</a></li>
 <?php
 
 } else {
