@@ -60,7 +60,7 @@ var patchModel = {
             required: false,
             validate: function (val) {
 
-                var err = { type: 'not_valid', field: 'parameters', error: { status: 400 }};
+                var err = { type: 'not_valid', field: 'author', error: { status: 400 }};
 
                 if (typeof val !== 'object') {
                     err.message = 'Value not valid.';
@@ -196,7 +196,7 @@ var patchModel = {
             required: true,
             validate: function(val) {
 
-                var err = { type: 'not_valid', field: 'inputs', error: { status: 400 }};
+                var err = { type: 'not_valid', field: 'outputs', error: { status: 400 }};
 
                 if (val != 0 && val != 1 && val != 2) {
                     err.message = 'Value not valid.';
@@ -324,6 +324,23 @@ var patchModel = {
                     val[i] = val[i].trim();
                 }
                 return val;
+            }
+        },
+
+        creationTimeUtc: {
+            required: false,
+            validate: function (val) {
+
+                var err = { type: 'not_valid', field: 'creationTimeUtc', error: { status: 400 }};
+
+                if (!/^\d+$/.test(val)) {
+                    err.message = 'Value not valid.';
+                    throw err;
+                }
+
+            },
+            sanitize: function (val) {
+                return parseInt(val);
             }
         }
     },

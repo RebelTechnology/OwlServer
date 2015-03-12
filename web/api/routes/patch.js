@@ -295,6 +295,14 @@ router.put('/:id', function(req, res) {
                 updatedPatch.author = patchAuthor;
             }
 
+            if (!isAdmin) {
+                updatedPatch.creationTimeUtc = patch.creationTimeUtc;
+            } else {
+                if (!updatedPatch.creationTimeUtc) {
+                    updatedPatch.creationTimeUtc = patch.creationTimeUtc;
+                }
+            }
+
             console.log('Patch to be updated: \n' + JSON.stringify(updatedPatch, null, 4));
             return collection.updateById(updatedPatch._id, updatedPatch);
 
@@ -302,15 +310,15 @@ router.put('/:id', function(req, res) {
 
     ).then(
 
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check that the new patch was actually inserted
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         *  Confirms that the patch was actually inserted
+         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
         function (patch) {
 
             console.log('Patch ' + updatedPatch._id + ' updated.');
             return res.status(200).json({
-                message: 'New patch saved.',
-                _id: updatedPatch._id,
+                message: 'Patch updated.',
+                _id:     updatedPatch._id,
                 seoName: updatedPatch.seoName
             });
 
