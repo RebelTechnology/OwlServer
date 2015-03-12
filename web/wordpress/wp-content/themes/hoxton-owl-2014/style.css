@@ -655,3 +655,7 @@ span.patch-title, span.author-name, div.tag, .tag-filter-button, .secondary-nav-
 .select2-container--default.select2-container--focus .select2-selection--multiple {
   border: 1px solid #d3d3d3;
 }
+
+body.login {
+  padding: 0 !important;
+}
