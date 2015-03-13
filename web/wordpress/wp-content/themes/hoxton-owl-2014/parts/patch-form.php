@@ -9,13 +9,13 @@ wp_enqueue_script('owl-patch-form', get_template_directory_uri() . '/js/hoxtonow
 wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
 wp_enqueue_style('select2', get_template_directory_uri() . '/js/select2/css/select2.min.css');
 
-
 $pagename = get_query_var('pagename');
+$patch = get_query_var('patch');
+$mode = 'add';
 if ($pagename == 'edit-patch') {
-    $patch = get_query_var('patch');
-    if (!empty($patch)) {
-    }
+    $mode = 'edit';
 }
+$isAdmin = current_user_can('administrator');
 
 Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'parts/shared/header' ) );
 ?>
@@ -40,7 +40,7 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         <div class="error-message"></div>
                     </div>
 
-                    <?php if (current_user_can('administrator')): ?>
+                    <?php if ($isAdmin): ?>
                     <div class="row">
                         <label class="required">Author</label>
                         <label class="frm-patch-author-radio"><input type="radio" id="frm-patch-author-type-wordpress" name="author-type"> WordPress user:</label>
@@ -149,6 +149,14 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         <select class="form-control" id="frm-patch-tags" name="tags" multiple="multiple"></select>
                         <div class="error-message" style="margin-top: 13px;"></div>
                     </div>
+                    <?php if ($isAdmin): ?>
+                    <div class="row">
+                        <label for="frm-patch-creationTimeUtc">Creation time</label>
+                        <input type="text" class="form-control" id="frm-patch-creationTimeUtc" name="creationTimeUtc" value="">
+                        <div class="error-message"></div>
+                        <div class="info-message">Please use ISO 8601 combined date/time format. If left blank, it will default to the current time.</div>
+                    </div>
+                    <?php endif; ?>
                     <div class="row btn-row">
                         <input type="button" id="frm-patch-btn-submit" value="Save">
                         <input type="button" id="frm-patch-btn-cancel" value="Cancel">

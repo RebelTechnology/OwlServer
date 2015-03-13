@@ -580,6 +580,15 @@ form[class^="bbp"] input[type=password] {
   margin-left: 0;
 }
 
+#patch-add-edit-form div.info-message {
+  clear: both;
+  float: left;
+  margin-left: 21%;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #5d5d5d  ;
+}
+
 #patch-add-edit-form label.frm-patch-author-radio {
   float: left;
   width: auto;

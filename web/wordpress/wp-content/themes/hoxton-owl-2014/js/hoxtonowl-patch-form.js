@@ -106,6 +106,11 @@ HoxtonOwl.patchForm = {
                 $('#frm-patch-github_' + i).val(patch.github[i]);
             }
         }
+
+        // Creation time
+        if ($('#frm-patch-creationTimeUtc').length) {
+            $('#frm-patch-creationTimeUtc').val(new Date(patch.creationTimeUtc).toISOString());
+        }
     },
 
     /**
@@ -271,6 +276,21 @@ HoxtonOwl.patchForm = {
             }
         });
 
+        // creation time
+        var $creationTimeUtc = $('#frm-patch-creationTimeUtc');
+        if ($creationTimeUtc.length && $creationTimeUtc.val() !== '') {
+            var creationTimeUtc = new Date($creationTimeUtc.val()).getTime();
+            if (isNaN(creationTimeUtc)) {
+                $creationTimeUtc.
+                    addClass('invalid').
+                    next('div.error-message').
+                    text('Invalid date/time.').
+                    show();
+                location = '#form-top';
+                return;
+            }
+            patch.creationTimeUtc = creationTimeUtc;
+        }
         return patch;
 
     },
@@ -421,7 +441,7 @@ HoxtonOwl.patchForm = {
             $('#frm-patch-btn-submit').click(function(e) {
                 var patch = HoxtonOwl.patchForm.make();
                 if (patch) {
-                    HoxtonOwl.patchForm.save(patch);
+                    //HoxtonOwl.patchForm.save(patch); // FIXME ++++++++++++++++
                 }
             });
 
