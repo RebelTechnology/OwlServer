@@ -33,17 +33,17 @@ connectionString +=MONGO_HOST + ':' + MONGO_PORT + '/' + MONGO_DATABASE;
 
 // Connect to Mongo
 MongoClient.connect(connectionString, function(err, db) {
-    
+
     assert.equal(null, err);
     console.log('Connected to MongoDB.');
-    
+
     var collection = db.collection(MONGO_COLLECTION);
     collection.find().toArray(function(err, results) {
-        
+
         console.log('Found %d patches.', results.length);
         console.log();
         console.log('Generating SEO friendly names...');
-        
+
         for (var i = 0, max = results.length, patch = {}, seoName = '', updated = 0; i < max; i++) {
             patch = results[i];
             seoName = makeSeoFriendlyName(patch.name);
@@ -51,39 +51,11 @@ MongoClient.connect(connectionString, function(err, db) {
                 if (err) {
                     console.warn(err.message);
                 } else {
-                    console.log(object.name + ' => ' + object.seoName);
+                    console.log(object.name + ' => ' + seoName);
                 }
                 updated++;
                 if (updated === results.length) db.close();
             });
         }
     });
-    
-    //var rl = readline.createInterface(process.stdin, process.stdout);
-    //
-    //rl.question('WARNING: This script will regenerate all SEO friendly names for all patches, overwriting the old ones. Continue? (y/N): ', function(answer) {
-    //    
-    //    if(answer === 'y' || answer === 'Y') {
-    //    
-    //        // Delete previous data
-    //        collection.remove({}, function(err, result) {
-    //            console.log('Cleaning up database...');
-    //            assert.equal(err, null);
-    //            
-    //            // Insert data
-    //            collection.insert(patches, function(err, result) {
-    //                assert.equal(err, null);
-    //                console.log('Added %d patches to the database.', result.length);
-    //                db.close();
-    //                process.exit(0);
-    //            });
-    //        });
-    //    
-    //    } else {
-    //        
-    //        console.log ('Aborting.');
-    //        process.exit(1);
-    //        
-    //    }
-    //});
 });
