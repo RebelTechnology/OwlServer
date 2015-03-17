@@ -67,7 +67,7 @@ body { background: #f4f4f4; }
     height: 60px;
     width: 100%;
     background: #231f20;
-    border-bottom: 1px solid #000000;
+    /* border-bottom: 1px solid #000000; */
 }
 
 #primary-nav-container {
