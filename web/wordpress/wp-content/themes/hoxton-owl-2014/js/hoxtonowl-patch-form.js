@@ -441,7 +441,7 @@ HoxtonOwl.patchForm = {
             $('#frm-patch-btn-submit').click(function(e) {
                 var patch = HoxtonOwl.patchForm.make();
                 if (patch) {
-                    //HoxtonOwl.patchForm.save(patch); // FIXME ++++++++++++++++
+                    HoxtonOwl.patchForm.save(patch);
                 }
             });
 
