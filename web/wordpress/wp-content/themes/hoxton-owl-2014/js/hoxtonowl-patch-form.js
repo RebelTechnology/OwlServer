@@ -107,6 +107,11 @@ HoxtonOwl.patchForm = {
             }
         }
 
+        // Published field
+        if ('published' in patch) {
+            $('#frm-patch-published').val(patch.published).trigger('change');
+        }
+
         // Creation time
         if ($('#frm-patch-creationTimeUtc').length) {
             $('#frm-patch-creationTimeUtc').val(new Date(patch.creationTimeUtc).toISOString());
@@ -276,6 +281,9 @@ HoxtonOwl.patchForm = {
             }
         });
 
+        // published
+        patch.published = $('#frm-patch-published').val();
+
         // creation time
         var $creationTimeUtc = $('#frm-patch-creationTimeUtc');
         if ($creationTimeUtc.length && $creationTimeUtc.val() !== '') {
@@ -291,6 +299,7 @@ HoxtonOwl.patchForm = {
             }
             patch.creationTimeUtc = creationTimeUtc;
         }
+
         return patch;
 
     },
@@ -356,6 +365,9 @@ HoxtonOwl.patchForm = {
                 minimumResultsForSearch: Infinity
             });
             $('#frm-patch-outputs').select2({
+                minimumResultsForSearch: Infinity
+            });
+            $('#frm-patch-published').select2({
                 minimumResultsForSearch: Infinity
             });
 

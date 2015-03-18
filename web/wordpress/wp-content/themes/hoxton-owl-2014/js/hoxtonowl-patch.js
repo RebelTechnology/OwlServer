@@ -58,6 +58,11 @@ HoxtonOwl.Patch = function(p) {
         }
     }
 
+    this.published = 0;
+    if ('published' in p) {
+        this.published = p.published === true ? 1 : 0;
+    }
+
     this.creationTimeUtc = 0;
     if (p.creationTimeUtc) {
         this.creationTimeUtc = p.creationTimeUtc;

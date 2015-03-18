@@ -133,7 +133,8 @@ HoxtonOwl.patchManager = {
             return ko.utils.arrayFilter(that.patches(), function(r) {
                 //console.log(that.searchItems);
                 if (that.searchItems.indexOf("All") > -1) {
-                    return true;
+                    //return true;
+                    return r.published;
                 }
                 if (that.search() === "tag") {
                     for (i=0; i<r.tags.length; ++i) {

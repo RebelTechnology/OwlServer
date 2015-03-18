@@ -46,12 +46,6 @@ router.get('/', function(req, res) {
     if ('author.name' in query) {
         filter.$match['author.name'] = query['author.name'];
     }
-    filter.$match['published'] = true;
-    if ('published' in query) {
-        console.log('---' + query['published']); // FIXME
-        console.log('---' + typeof query['published']); // FIXME
-        filter.$match['published'] = !!query['published'];
-    }
 
     nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, function (err, result) {
         if (err !== null) {

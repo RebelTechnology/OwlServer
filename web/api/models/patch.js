@@ -350,7 +350,8 @@ var patchModel = {
                 // no validation needed
             },
             sanitize: function (val) {
-                return !!val;
+                // val will usually be '0', '1' (string), 0 or 1 (integer)
+                return val == '0' ? false : true;
             }
         }
     },

@@ -223,8 +223,11 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
             <table class="patch-title-controls">
                 <tbody>
                     <tr>
-                        <!-- <td width="40"><div class="play-button">&gt;</div></td> -->
-                        <td><span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': _id }"></span></td>
+                        <td>
+                            <span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': _id }"></span>
+                            <div class="patch-visibility" data-bind="visible: !published"><img src="<?= $resUri ?>images/lock.png"> PRIVATE</div>
+                        </td>
+
                         <!-- ko if: search() === 'myPatches' -->
                         <td width="80">
                             <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
@@ -233,9 +236,9 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         <!-- /ko -->
                     </tr>
                     <tr>
-                        <!-- <td>&nbsp;</td> -->
-                        <td style="padding-top: 20px;"><span class="author-name" data-bind="visible: search() !== 'myPatches', text: author.name, click: selectOnlyAuthor"></span></td>
-                        <!-- <td>&nbsp;</td> -->
+                        <td style="padding-top: 20px;">
+                            <span class="author-name" data-bind="visible: search() !== 'myPatches', text: author.name, click: selectOnlyAuthor"></span>
+                        </td>
                     </tr>
                 </tbody>
             </table>

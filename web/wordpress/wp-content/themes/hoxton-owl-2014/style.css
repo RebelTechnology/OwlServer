@@ -638,6 +638,18 @@ span.patch-title, span.author-name, div.tag, .tag-filter-button, .secondary-nav-
     cursor: pointer;
 }
 
+div.patch-visibility {
+  color: white;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+div.patch-visibility img {
+  display: inline;
+  margin: 0 5px;
+}
+
 /* restyling of select2 elements */
 .select2-container--default .select2-selection--single {
   border-radius: 5px !important;
