@@ -215,8 +215,8 @@ router.put('/:id', function(req, res) {
 
         function () {
 
-            var nameRegexp = new RegExp(regExpEscape(updatedPatch.name), 'i');
-            var seoNameRegexp = new RegExp(regExpEscape(updatedPatch.seoName), 'i');
+            var nameRegexp = new RegExp('^' + regExpEscape(updatedPatch.name) + '$', 'i');
+            var seoNameRegexp = new RegExp('^' + regExpEscape(updatedPatch.seoName) + '$', 'i');
             return collection.findOne({
                 $and: [
                     {
