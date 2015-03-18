@@ -148,8 +148,8 @@ router.post('/', function(req, res) {
 
         function() {
 
-            var nameRegexp = new RegExp(regExpEscape(newPatch.name), 'i');
-            var seoNameRegexp = new RegExp(regExpEscape(newPatch.seoName), 'i');
+            var nameRegexp = new RegExp('^' + regExpEscape(newPatch.name) + '$', 'i');
+            var seoNameRegexp = new RegExp('^' + regExpEscape(newPatch.seoName) + '$', 'i');
             return collection.findOne({ $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] });
 
         }

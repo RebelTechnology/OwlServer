@@ -219,21 +219,8 @@ router.put('/:id', function(req, res) {
             var seoNameRegexp = new RegExp('^' + regExpEscape(updatedPatch.seoName) + '$', 'i');
             return collection.findOne({
                 $and: [
-                    {
-                        _id: {
-                            $ne: collection.id(updatedPatch._id)
-                        }
-                    },
-                    {
-                        $or: [
-                            {
-                                name: nameRegexp
-                            },
-                            {
-                                seoName: seoNameRegexp
-                            }
-                        ]
-                    }
+                    { _id: { $ne: collection.id(updatedPatch._id) } },
+                    { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] }
                 ]
             });
 
