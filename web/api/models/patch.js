@@ -342,6 +342,16 @@ var patchModel = {
             sanitize: function (val) {
                 return parseInt(val);
             }
+        },
+
+        published: {
+            require: false,
+            validate: function (val) {
+                // no validation needed
+            },
+            sanitize: function (val) {
+                return !!val;
+            }
         }
     },
 
