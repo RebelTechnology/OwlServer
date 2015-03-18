@@ -1,2 +1,2 @@
-// adding new "public" field
-db.patches.update({}, { $set: { public: true}}, { multi: true });
+// adding new "published" field
+db.patches.update({}, { $set: { published: true}}, { multi: true });
