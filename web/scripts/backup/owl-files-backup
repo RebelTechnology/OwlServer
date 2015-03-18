@@ -1,0 +1,15 @@
+#!/bin/bash
+# Written by Sam Artuso <sam@highoctanedev.co.uk>
+
+BACKUP_FILE="owl-files.$(date +%Y-%m-%d).tar.bz2"
+DST_DIR="/var/backups/owl/files"
+
+cd /var/www/hoxtonowl.com/subdomains/www/httpdocs
+rm -rf /tmp/owl-files
+mkdir -p /tmp/owl-files/{mediawiki,wp-content}
+cp -a mediawiki/images /tmp/owl-files/mediawiki
+cp -a wp-content/uploads /tmp/owl-files/wp-content/
+cd /tmp
+tar -cjf $BACKUP_FILE owl-files
+mv $BACKUP_FILE $DST_DIR
+find $DST_DIR -mtime +30 -exec rm -f '{}' \;

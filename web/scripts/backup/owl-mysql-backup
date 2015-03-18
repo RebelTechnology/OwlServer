@@ -1,0 +1,10 @@
+#!/usr/bin/php
+<?php
+# Written by Sam Artuso <sam@highoctanedev.co.uk>
+
+require_once '/var/www/hoxtonowl.com/subdomains/www/httpdocs/wp-config.php';
+
+define('BACKUP_DIR', '/var/backups/owl/mysql/');
+
+$cmd = '/usr/local/bin/owl-mysql-backup.sh ' . escapeshellarg(DB_HOST) . ' ' . escapeshellarg(DB_USER) . ' ' . escapeshellarg(DB_PASSWORD) . ' ' . escapeshellarg(DB_NAME);
+system($cmd);
