@@ -6,7 +6,7 @@ var express = require('express');
 var router  = express.Router();
 var url     = require('url'); // FIXME - is this really necessary?
 var Q       = require('q');
-Q.longStackSupport = true; // FIXME - To be enabled only when debugging
+Q.longStackSupport = true; // To be enabled only when debugging
 
 var patchModel = require('../models/patch');
 var wordpressBridge = require('../lib/wordpress-bridge.js');
@@ -18,7 +18,8 @@ var summaryFields = {
     'author.url': 1,
     tags: 1,
     seoName: 1,
-    creationTimeUtc: 1
+    creationTimeUtc: 1,
+    published: 1
 };
 
 var regExpEscape = function(str) {

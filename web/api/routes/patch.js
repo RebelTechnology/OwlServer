@@ -5,7 +5,7 @@
 var express         = require('express');
 var router          = express.Router();
 var Q               = require('q');
-Q.longStackSupport  = true; // FIXME - To be enabled only when debugging
+Q.longStackSupport  = false; // To be enabled only when debugging
 
 var patchModel      = require('../models/patch');
 var wordpressBridge = require('../lib/wordpress-bridge.js');
