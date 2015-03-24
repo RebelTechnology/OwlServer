@@ -18,9 +18,9 @@ USER='nobody'
 CMD='node bin/www'
 
 NAME=`basename $0`
-PID_FILE='/var/run/$NAME.pid'
-STDOUT_LOG='/var/log/$NAME.log'
-STDERR_LOG='/var/log/$NAME.err'
+PID_FILE="/var/run/$NAME.pid"
+STDOUT_LOG="/var/log/$NAME.log"
+STDERR_LOG="/var/log/$NAME.err"
 
 get_pid() {
     cat "$PID_FILE"
@@ -64,7 +64,7 @@ case "$1" in
             echo "Not stopped; may still be shutting down or shutdown may have failed."
             exit 1
         else
-            echo "Stopped"
+            echo "Stopped."
             if [ -f "$PID_FILE" ]; then
                 rm "$PID_FILE"
             fi
