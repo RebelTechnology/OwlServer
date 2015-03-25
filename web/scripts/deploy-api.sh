@@ -68,7 +68,7 @@ fi
 
 # Update deployment script
 echo "Updating deployment script..."
-cp $DIR/$CLONE_DIR/web/scripts/deploy-api.sh $DIR/
+cp $DIR/$CLONE_DIR/web/scripts/deployment/deploy-api.sh $DIR/
 
 # Set privileges
 echo "Setting up permissions..."

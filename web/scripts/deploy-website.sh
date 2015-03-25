@@ -66,7 +66,7 @@ rsync --quiet -avz $DIR/OwlServer/web/mediawiki/skins/HoxtonOWL2014 $DIR/../http
 
 # Update deployment script
 echo "Updating deployment script..."
-cp -a $DIR/$CLONE_DIR/web/scripts/deploy-website.sh $DIR/
+cp -a $DIR/$CLONE_DIR/web/scripts/deployment/deploy-website.sh $DIR/
 cp -a $DIR/$CLONE_DIR/web/README.md $DIR/..
 
 # Set privileges
