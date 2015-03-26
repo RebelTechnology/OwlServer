@@ -8,6 +8,6 @@
         }
     ],
     "require": {
-        "symfony/process": "3.0.*@dev"
+        "symfony/process": "2.7.*@dev"
     }
 }
