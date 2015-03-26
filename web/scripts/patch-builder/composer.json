@@ -1,0 +1,13 @@
+{
+    "name": "owl/patch-builder",
+    "description": "Hoxton OWL online patch builder.",
+    "authors": [
+        {
+            "name": "Sam Artuso",
+            "email": "sam@highoctanedev.co.uk"
+        }
+    ],
+    "require": {
+        "symfony/process": "3.0.*@dev"
+    }
+}

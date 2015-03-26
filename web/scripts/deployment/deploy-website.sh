@@ -56,13 +56,18 @@ cd - > /dev/null
 # Update Wordpress
 echo "Updating Wordpress files..."
 rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
-mv $DIR/OwlServer/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
-cp -a $DIR/OwlServer/web/wordpress/robots.txt $DIR/../httpdocs/
-cp $DIR/OwlServer/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../httpdocs/wp-content/plugins/
+mv $DIR/$CLONE_DIR/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
+cp -a $DIR/$CLONE_DIR/web/wordpress/robots.txt $DIR/../httpdocs/
+cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../httpdocs/wp-content/plugins/
 
 # Update Mediawiki
 echo "Updating Mediawiki files..."
-rsync --quiet -avz $DIR/OwlServer/web/mediawiki/skins/HoxtonOWL2014 $DIR/../httpdocs/mediawiki/skins/
+rsync --quiet -avz $DIR/$CLONE_DIR/web/mediawiki/skins/HoxtonOWL2014 $DIR/../httpdocs/mediawiki/skins/
+
+# Update patch builder script
+echo "Updating patch builder script..."
+rm -rf $DIR/../patch-builder
+cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder $DIR/..
 
 # Update deployment script
 echo "Updating deployment script..."
@@ -78,6 +83,9 @@ find $DIR/../httpdocs -type d -exec chmod 775 '{}' \;
 find $DIR/../httpdocs -type d -exec chmod g+s '{}' \;
 chown -R www-data $DIR/../httpdocs/wp-content/uploads
 chown -R www-data $DIR/../httpdocs/mediawiki/images
+chown -R www-data:www-data $DIR/../patch-builder
+chmod -R a+r $DIR/../patch-builder
+chmod a+x $DIR/../patch-builder
 
 chown -R root:root $DIR/../deployment
 chmod 755 $DIR/../deployment
