@@ -68,11 +68,15 @@ rsync --quiet -avz $DIR/$CLONE_DIR/web/mediawiki/skins/HoxtonOWL2014 $DIR/../htt
 echo "Updating patch builder script..."
 rm -rf $DIR/../patch-builder
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder $DIR/..
+cd $DIR/../patch-builder
+
 
 # Update deployment script
 echo "Updating deployment script..."
 cp -a $DIR/$CLONE_DIR/web/scripts/deployment/deploy-website.sh $DIR/
 cp -a $DIR/$CLONE_DIR/web/README.md $DIR/..
+composer install
+cd - > /dev/null
 
 # Set privileges
 echo "Setting up permissions..."
