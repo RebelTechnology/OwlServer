@@ -40,7 +40,7 @@ while ($patch = $p->getNext()) {
     }
 
     echo 'Compiling "' . $patch['name'] .' (' . $patch['_id'] . ')"... ';
-    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'];
+    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ' > /tmp/build.' . $patch['seoName'] . '.log &2>1';
     $process = new Process($cmd);
     $process->run();
     if ($process->isSuccessful()) {
@@ -48,8 +48,6 @@ while ($patch = $p->getNext()) {
     } else {
         echo 'Failed!';
     }
-    echo PHP_EOL;
-    echo $process->getOutput();
     echo PHP_EOL;
 
 }
