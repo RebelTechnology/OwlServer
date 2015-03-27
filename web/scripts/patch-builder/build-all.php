@@ -33,7 +33,13 @@ $p = $patches->find();
 echo 'Found ' . $p->count() . ' patches.' . PHP_EOL;
 
 while ($patch = $p->getNext()) {
-    echo 'Compiling "' . $patch['name'] .'"... ';
+
+    // Don't try to compile patches with no source code available
+    if (!isset($patch['github']) || count($patch['github']) < 1) {
+        continue;
+    }
+
+    echo 'Compiling "' . $patch['name'] .' (' . $patch['_id'] . ')"... ';
     $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'];
     $process = new Process($cmd);
     $process->run();
