@@ -51,6 +51,16 @@ function usage() {
 /**
  * Outputs an error messge to stdout.
  *
+ * @param  string $msg The message.
+ */
+function outputMessage($msg) {
+    $stderr = fopen('php://stdout', 'w+');
+    fwrite($stderr, 'INFO: ' . $msg . PHP_EOL);
+}
+
+/**
+ * Outputs an error messge to stderr.
+ *
  * @param  string $msg The error message.
  */
 function outputError($msg) {
@@ -171,6 +181,7 @@ if (strlen($patchId) !== 24 || !ctype_xdigit($patchId)) {
 /*
  * Get patch
  */
+
 $mongoClient = new MongoClient('mongodb://localhost:27017'); // FIXME !!!
 $db = $mongoClient->owl_staging;                             // FIXME !!!
 $patches = $db->patches;
@@ -183,6 +194,7 @@ if (null === $patch) {
 /*
  * Create temporary directory
  */
+
 $tempDir = tempdir(TMP_DIR_PREFIX);
 if (!$onlyDloadFiles) {
     register_shutdown_function(function () use ($tempDir) {
@@ -193,6 +205,7 @@ if (!$onlyDloadFiles) {
 /*
  * Get GitHub files
  */
+
 if (!isset($patch['github']) || count($patch['github']) === 0) {
     outputError('No source code available for this patch.');
 }
@@ -224,6 +237,7 @@ if ($onlyDloadFiles) {
  *
  * See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-85998573
  */
+
 $cmd = 'make BUILD=' . $tempDir . ' ';
 
 // We hash-include only the first file
@@ -238,6 +252,7 @@ $cmd .= 'ONLINE_REGISTER=\'REGISTER_PATCH(' . $className . ', \\"' . $patch['nam
 /*
  * Compile patch
  */
+
 $process = new Process($cmd, OWL_SRC_DIR, null, null, COMPILE_TIMEOUT);
 try {
     $process->start();
@@ -251,6 +266,37 @@ try {
     });
 } catch (ProcessTimedOutException $e) {
     outputError('Patch build timed out!');
+    exit(3);
 }
+
+$exitCode = $process->getExitCode();
+outputMessage('make exit code is ' . $exitCode . '.');
+if (0 !== $exitCode) {
+    outputError('Patch build failed.');
+    exit(4);
+}
+
+/*
+ * Move .syx file to download location
+ */
+
+$syxFilePath = $tempDir . '/online.syx';
+echo $syxFilePath . '################################################ FIXME ##';
+if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
+    outputError('Unable to access ' . $syxFilePath . '.');
+    exit(5);
+}
+
+$dstDir = __DIR__ . '/build/';
+echo $dstDir . '##################################################### FIXME ##';
+echo $dstDir . '/' . $patch['seoName'] . '.syx' . '################## FIXME ##';
+$r = rename($syxFilePath, $dstDir . '/' . $patch['seoName'] . '.syx');
+if (!$r) {
+    outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
+    exit(6);
+}
+
+// Determine if .syx file is available, readable and not empty
+// Move .syx file to its download location, and rename it in a sensible way
 
 // EOF
