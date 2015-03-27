@@ -36,6 +36,9 @@ define('TMP_DIR_PREFIX', 'owl-patch-');
 define('OWL_SRC_DIR', '/opt/OwlProgram.online/');
 define('COMPILE_TIMEOUT', 30); // time-out in seconds
 
+$stdout = fopen('php://stdout', 'w+');
+$stderr = fopen('php://stderr', 'w+');
+
 /**
  * Prints info on how to invoke this script.
  */
@@ -55,8 +58,8 @@ function usage() {
  * @param  string $msg The message.
  */
 function outputMessage($msg) {
-    $stderr = fopen('php://stdout', 'w+');
-    fwrite($stderr, 'INFO: ' . $msg . PHP_EOL);
+    global $stdout;
+    fwrite($stdout, 'INFO: ' . $msg . PHP_EOL);
 }
 
 /**
@@ -65,7 +68,7 @@ function outputMessage($msg) {
  * @param  string $msg The error message.
  */
 function outputError($msg) {
-    $stderr = fopen('php://stderr', 'w+');
+    global $stderr;
     fwrite($stderr, 'ERROR: ' . $msg . PHP_EOL);
 }
 
@@ -272,9 +275,9 @@ try {
     $process->start();
     $process->wait(function ($type, $buffer) use ($process) {
         if (Process::ERR === $type) {
-            echo 'ERR > ' . $buffer;
+            fwrite($stderr, $buffer);
         } else {
-            echo 'OUT > ' . $buffer;
+            fwrite($stdout, $buffer);
         }
         $process->checkTimeout();
     });
