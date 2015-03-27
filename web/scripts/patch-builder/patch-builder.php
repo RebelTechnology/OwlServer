@@ -30,10 +30,11 @@
 use Symfony\Component\Process\Process;
 
 require_once 'vendor/autoload.php';
+require_once __DIR__ . '/settings.php';
 
 define('TMP_DIR_PREFIX', 'owl-patch-');
-define('OWL_SRC_DIR', '/opt/OwlProgram.online/'); // FIXME
-define('COMPILE_TIMEOUT', 30); // seconds
+define('OWL_SRC_DIR', '/opt/OwlProgram.online/');
+define('COMPILE_TIMEOUT', 30); // time-out in seconds
 
 /**
  * Prints info on how to invoke this script.
@@ -182,9 +183,22 @@ if (strlen($patchId) !== 24 || !ctype_xdigit($patchId)) {
  * Get patch
  */
 
-$mongoClient = new MongoClient('mongodb://localhost:27017'); // FIXME !!!
-$db = $mongoClient->owl_staging;                             // FIXME !!!
-$patches = $db->patches;
+$mongoConnectionString  = 'mongodb://';
+if (MONGO_USE_AUTH) {
+    $mongoConnectionString .= MONGO_USER . ':' . MONGO_PASS . '@';
+}
+$mongoConnectionString .= MONGO_HOST . ':' . MONGO_PORT;
+$mongoDb = MONGO_DATABASE;
+$collection = MONGO_COLLECTION;
+
+try {
+    $mongoClient = new MongoClient($mongoConnectionString);
+    $db = $mongoClient->$mongoDb;
+    $patches = $db->$collection;
+} catch (Exception $e) {
+    outputError('Unable to connect to MongoDb.');
+    exit(1);
+}
 $patch = $patches->findOne(array('_id' => new MongoId($patchId)));
 if (null === $patch) {
     outputError('Patch not found.');
@@ -221,7 +235,7 @@ foreach ($patch['github'] as $githubFile) {
     $r = downloadGithubFile($githubFile, $tempDir);
     if (!$r) {
         outputError('Download of ' . $githubFile . ' failed.');
-        exit(2);
+        exit(1);
     }
     $sourceFiles[] = $r;
 }
@@ -266,14 +280,14 @@ try {
     });
 } catch (ProcessTimedOutException $e) {
     outputError('Patch build timed out!');
-    exit(3);
+    exit(1);
 }
 
 $exitCode = $process->getExitCode();
 outputMessage('make exit code is ' . $exitCode . '.');
 if (0 !== $exitCode) {
     outputError('Patch build failed.');
-    exit(4);
+    exit(1);
 }
 outputMessage('Build successful!');
 
@@ -284,14 +298,14 @@ outputMessage('Build successful!');
 $syxFilePath = $tempDir . '/online.syx';
 if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
     outputError('Unable to access ' . $syxFilePath . '.');
-    exit(5);
+    exit(1);
 }
 
 $dstDir = __DIR__ . '/build/';
 $r = rename($syxFilePath, $dstDir . $patch['seoName'] . '.syx');
 if (!$r) {
     outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
-    exit(6);
+    exit(1);
 }
 
 // EOF
