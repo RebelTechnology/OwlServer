@@ -67,16 +67,16 @@ rsync --quiet -avz $DIR/$CLONE_DIR/web/mediawiki/skins/HoxtonOWL2014 $DIR/../htt
 # Update patch builder script
 echo "Updating patch builder script..."
 rm -rf $DIR/../patch-builder
-cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder $DIR/..
-cd $DIR/../patch-builder
-
+cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/patch-builder.php $DIR/../patch-builder/
+cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/composer.json $DIR/../patch-builder/
+cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/composer.lock $DIR/../patch-builder/
+composer install
+cd - > /dev/null
 
 # Update deployment script
 echo "Updating deployment script..."
 cp -a $DIR/$CLONE_DIR/web/scripts/deployment/deploy-website.sh $DIR/
 cp -a $DIR/$CLONE_DIR/web/README.md $DIR/..
-composer install
-cd - > /dev/null
 
 # Set privileges
 echo "Setting up permissions..."
