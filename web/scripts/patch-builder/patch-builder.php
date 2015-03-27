@@ -273,7 +273,7 @@ $cmd .= 'ONLINE_REGISTER=\'REGISTER_PATCH(' . $className . ', \\"' . $patch['nam
 $process = new Process($cmd, OWL_SRC_DIR, null, null, COMPILE_TIMEOUT);
 try {
     $process->start();
-    $process->wait(function ($type, $buffer) use ($process) {
+    $process->wait(function ($type, $buffer) use ($process, $stdout, $stderr) {
         if (Process::ERR === $type) {
             fwrite($stderr, $buffer);
         } else {
