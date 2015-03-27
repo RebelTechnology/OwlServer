@@ -46,7 +46,7 @@ while ($patch = $p->getNext()) {
     if ($process->getExitCode() == 0) {
         echo 'OK!';
     } else {
-        echo 'Failed!';
+        echo 'Failed! (' . $process->getExitCode() . ')';
     }
     echo PHP_EOL;
 
