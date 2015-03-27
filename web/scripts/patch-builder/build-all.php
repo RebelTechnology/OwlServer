@@ -40,10 +40,10 @@ while ($patch = $p->getNext()) {
     }
 
     echo 'Compiling "' . $patch['name'] .' (' . $patch['_id'] . ')"... ';
-    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ' > /tmp/build.' . $patch['seoName'] . '.log &2>1';
+    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'];
     $process = new Process($cmd);
     $process->run();
-    if ($process->isSuccessful()) {
+    if ($process->getExitCode() == 0) {
         echo 'OK!';
     } else {
         echo 'Failed!';
