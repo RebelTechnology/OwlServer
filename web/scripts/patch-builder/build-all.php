@@ -49,4 +49,7 @@ while ($patch = $p->getNext()) {
         echo 'Failed!';
     }
     echo PHP_EOL;
+    echo $process->getOutput();
+    echo PHP_EOL;
+
 }
