@@ -275,28 +275,23 @@ if (0 !== $exitCode) {
     outputError('Patch build failed.');
     exit(4);
 }
+outputMessage('Build successful!');
 
 /*
  * Move .syx file to download location
  */
 
 $syxFilePath = $tempDir . '/online.syx';
-echo $syxFilePath . '################################################ FIXME ##';
 if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
     outputError('Unable to access ' . $syxFilePath . '.');
     exit(5);
 }
 
 $dstDir = __DIR__ . '/build/';
-echo $dstDir . '##################################################### FIXME ##';
-echo $dstDir . '/' . $patch['seoName'] . '.syx' . '################## FIXME ##';
-$r = rename($syxFilePath, $dstDir . '/' . $patch['seoName'] . '.syx');
+$r = rename($syxFilePath, $dstDir . $patch['seoName'] . '.syx');
 if (!$r) {
     outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
     exit(6);
 }
-
-// Determine if .syx file is available, readable and not empty
-// Move .syx file to its download location, and rename it in a sensible way
 
 // EOF
