@@ -41,12 +41,12 @@ while ($patch = $p->getNext()) {
 
     echo 'Compiling "' . $patch['name'] .' (' . $patch['_id'] . ')"... ';
     $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'];
-    $process = new Process($cmd);
-    $process->run();
-    if ($process->getExitCode() == 0) {
+    $exitStatus = 0;
+    system($cmd, $exitStatus);
+    if ($exitStatus == 0) {
         echo 'OK!';
     } else {
-        echo 'Failed! (' . $process->getExitCode() . ')';
+        echo 'Failed! (' . $exitStatus. ')';
     }
     echo PHP_EOL;
 
