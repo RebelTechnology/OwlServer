@@ -67,6 +67,14 @@ HoxtonOwl.Patch = function(p) {
     if (p.creationTimeUtc) {
         this.creationTimeUtc = p.creationTimeUtc;
     }
+
+    this.sysExAvailable = false;
+    if (p.sysExAvailable) {
+        this.sysExAvailable = p.sysExAvailable;
+    }
+    if (p.sysExLastUpdated) {
+        this.sysExLastUpdated = p.sysExLastUpdated;
+    }
 };
 
 /**

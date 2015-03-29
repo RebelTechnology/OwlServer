@@ -22,6 +22,7 @@ var patch   = require('./routes/patch');
 var patches = require('./routes/patches');
 var tag     = require('./routes/tag');
 var tags    = require('./routes/tags');
+var sysex   = require('./routes/sysex');
 
 var app = express();
 app.use(cors());
@@ -38,7 +39,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Make our db accessible to our router 
+// Make our db accessible to our router
 app.use(function(req,res,next) {
     req.db = db; next();
 });
@@ -49,6 +50,7 @@ app.use('/patch', patch);
 app.use('/patches', patches);
 app.use('/tag', tag);
 app.use('/tags', tags);
+app.use('/sysex', sysex);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

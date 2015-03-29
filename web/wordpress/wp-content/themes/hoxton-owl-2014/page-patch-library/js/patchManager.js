@@ -322,6 +322,9 @@ HoxtonOwl.patchManager = {
                 }
 
                 knobify();
+                if (that.selectedPatch().sysExAvailable) {
+                    $('#sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/sysex/' + that.selectedPatch()._id);
+                }
 
             });
         };

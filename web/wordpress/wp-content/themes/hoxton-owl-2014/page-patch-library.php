@@ -134,14 +134,18 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         <td><p data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></p></td>
                     </tr>
                     <!-- /ko -->
-                    <!-- <tr> -->
-                    <!--     <td><span class="parameter-label">Version</span></td> -->
-                    <!--     <td><p>v.1.1.0 - 21/04/2014</p></td> -->
-                    <!-- </tr> -->
-                    <!-- <tr> -->
-                    <!--   <td><span class="parameter-label">Used in</span></td> -->
-                    <!--   <td><p>123 rigs</p></td> -->
-                    <!-- </tr> -->
+                    <!-- ko if: sysExAvailable -->
+                    <tr>
+                        <td><span class="parameter-label">SysEx</span></td>
+                        <td><p><a id="sysExDownloadLink" href="#">Download</a></p></td>
+                    </tr>
+                        <!-- ko if: sysExLastUpdated -->
+                        <tr>
+                            <td><span class="parameter-label">Last updated on</span></td>
+                            <td><p data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></p></td>
+                        </tr>
+                        <!-- /ko -->
+                    <!-- /ko -->
                 </table>
             </div>
             <!-- ko foreach: tags -->
