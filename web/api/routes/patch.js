@@ -4,11 +4,15 @@
 
 var express         = require('express');
 var router          = express.Router();
+var fs              = require('fs');
+var path            = require('path');
 var Q               = require('q');
 Q.longStackSupport  = false; // To be enabled only when debugging
 
 var patchModel      = require('../models/patch');
 var wordpressBridge = require('../lib/wordpress-bridge.js');
+
+var apiSettings     = require('../api-settings.js');
 
 var regExpEscape = function(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -53,6 +57,15 @@ var apply = function(id, collection, res, callback) {
             } else {
 
                 // patch found
+
+                // get patch sysex
+                patch['sysExAvailable'] = false;
+                var sysexFile = path.join(apiSettings.SYSEX_PATH, patch['seoName'] + '.syx');
+                if (fs.existsSync(sysexFile)) {
+                    patch['sysExAvailable'] = true;
+                    patch['sysExLastUpdated'] = fs.statSync(sysexFile).mtime;
+                }
+
                 callback(patch);
 
             }
