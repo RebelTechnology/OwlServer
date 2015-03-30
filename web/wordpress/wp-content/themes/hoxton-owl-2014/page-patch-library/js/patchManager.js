@@ -371,6 +371,11 @@ HoxtonOwl.patchManager = {
 
             var apiClient = new HoxtonOwl.ApiClient();
             apiClient.compilePatch($('#selected-patch-id').text(), function (data) {
+
+                if (false === data) {
+                    $('#compile-dialog textarea').first().text('Patch compilation failed. Please check the logs for errors.');
+                }
+
                 if (data.success) {
                      $('#compile-dialog textarea').first().text('Patch compiled successfully.');
                 } else {
