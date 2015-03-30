@@ -700,6 +700,7 @@ body.login {
   margin-top: 10px;
 }
 
-#compile-tabs pre {
+#compile-tabs textarea {
   overflow: scroll;
+  height: 130px;
 }

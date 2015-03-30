@@ -287,10 +287,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
             <li><a href="#tabs-stderr">stderr</a></li>
         </ul>
         <div id="tabs-stdout">
-            <pre></pre>
+            <textarea readonly></textarea>
         </div>
         <div id="tabs-stderr">
-            <pre></pre>
+            <textarea readonly></textarea>
         </div>
     </div>
     <div id="compile-dialog-button-container">

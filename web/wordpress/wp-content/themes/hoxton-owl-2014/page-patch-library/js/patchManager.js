@@ -362,12 +362,12 @@ HoxtonOwl.patchManager = {
                 modal: true,
                 closeOnEscape: false
             });
-            $('#compile-dialog pre').empty().first().text('Please wait...');
+            $('#compile-dialog textarea').empty().first().text('Please wait...');
 
             var apiClient = new HoxtonOwl.ApiClient();
             apiClient.compilePatch($('#selected-patch-id').text(), function (data) {
-                $('#tabs-stdout pre').text(data.stdout);
-                $('#tabs-stderr pre').text(data.stderr);
+                $('#tabs-stdout textarea').text(data.stdout);
+                $('#tabs-stderr textarea').text(data.stderr);
             });
 
             return false;
