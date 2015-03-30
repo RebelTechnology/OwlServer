@@ -137,7 +137,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <!-- ko if: sysExAvailable -->
                     <tr>
                         <td><span class="parameter-label">SysEx</span></td>
-                        <td><p><a id="sysExDownloadLink" href="#">Download</a> - <a id="compileLink" href="#">Compile</a></p></td> <!-- FIXME: compile link must be visible only to patch author or admins -->
+                        <td><p><a id="sysExDownloadLink" href="#">Download</a>
                     </tr>
                         <!-- ko if: sysExLastUpdated -->
                         <tr>
@@ -146,6 +146,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         </tr>
                         <!-- /ko -->
                     <!-- /ko -->
+                    <tr>
+                        <td><span class="parameter-label">Compile</span></td>
+                        <td><p><a id="compileLink" href="#">Compile</a></p></td> <!-- FIXME: compile link must be visible only to patch author or admins -->
+                    </tr>
                 </table>
             </div>
             <!-- ko foreach: tags -->
