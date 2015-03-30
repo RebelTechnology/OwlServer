@@ -54,9 +54,11 @@ cd - > /dev/null
 # Copy files
 echo "Copying files..."
 mv $DIR/../api/api-settings.js /tmp
+mv $DIR/../api/node_modules /tmp
 rm -rf $DIR/../api
 cp -a $DIR/OwlServer/web/api $DIR/../
 mv /tmp/api-settings.js $DIR/../api/
+mv /tmp/node_modules $DIR/../api/
 
 ## Install node modules
 #if [ ! -d "$DIR/../api/node_modules" ]; then
