@@ -359,7 +359,7 @@ HoxtonOwl.patchManager = {
         $(document).on('click', '#compileLink', function(e) {
 
             if (!confirm('Are you sure you want to compile this patch?')) {
-                return;
+                return false;
             }
 
             $('#compile-dialog').dialog({
