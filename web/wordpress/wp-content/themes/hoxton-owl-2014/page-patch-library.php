@@ -147,9 +147,9 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         </tr>
                         <!-- /ko -->
                     <!-- /ko -->
-                    <tr>
+                    <tr id="tr-compile-patch" style="display: none;">
                         <td><span class="parameter-label">Compile</span></td>
-                        <td><p><a id="compileLink" href="#">Compile</a></p></td> <!-- FIXME: compile link must be visible only to patch author or admins -->
+                        <td><p><a id="compileLink" href="#">Compile</a></p></td>
                     </tr>
                 </table>
             </div>
@@ -305,8 +305,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
 <?php
 global $current_user;
 
-if (is_user_logged_in()):
-?><div id="wordpress-username" style="display: none;"><?= $current_user->user_login; ?></div>
+if (is_user_logged_in()): ?>
+<div id="wordpress-username" style="display: none;"><?= $current_user->user_login; ?></div>
+<div id="wordpress-user-id" style="display: none;"><?= $current_user->ID; ?></div>
+<div id="wordpress-user-is-admin" style="display: none;"><?= current_user_can('administrator') ? 1 : 0 ?></div>
 <?php endif; ?>
 
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/footer','parts/shared/html-footer') ); ?>

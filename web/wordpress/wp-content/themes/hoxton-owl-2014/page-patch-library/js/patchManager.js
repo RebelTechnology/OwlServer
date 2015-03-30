@@ -326,6 +326,25 @@ HoxtonOwl.patchManager = {
                     $('#sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/sysex/' + that.selectedPatch()._id);
                 }
 
+                // Show compile patch button:
+                $('#tr-compile-patch').css('display', 'none');
+                var isAdmin = false;
+                var $isAdmin = $('#wordpress-user-is-admin');
+                if ($isAdmin) {
+                    isAdmin = $isAdmin.text() == 1;
+                }
+
+                var authorWpId = null;
+                $wpUserId = $('#wordpress-user-id');
+                if ($wpUserId) {
+                    authorWpId = $wpUserId.text();
+                }
+
+                if (that.selectedPatch().github && that.selectedPatch().github.length &&
+                    (isAdmin || that.selectedPatch().author.wordpressId == authorWpId)) {
+                    $('#tr-compile-patch').css('display', 'table-row');
+                }
+
             });
         };
 
