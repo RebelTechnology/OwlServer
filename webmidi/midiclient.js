@@ -1,6 +1,14 @@
 var midiAccess = null;  // global MIDIAccess object
+var midiInputs = [];
+var midiInput = null;
 var midiOutputs = [];
 var midiOutput = null;
+
+function logMidiEvent(ev){
+  var arr = [];
+  for(var i=0; i<ev.data.length; i++) arr.push((ev.data[i]<16 ? '0' : '') + ev.data[i].toString(16));
+  console.log('MIDI:', arr.join(' '));
+}
 
 function onMIDIInit(midi, options) {
     console.log("MIDI sysex options: "+options);
@@ -8,32 +16,18 @@ function onMIDIInit(midi, options) {
     midiAccess = midi;
 
     var i = 0;
-    var iterator = midiAccess.inputs.values();
-    var data;
-    while((data = iterator.next()).done === false){
-        port = data.value;
-        console.log( i++ + ": " + port.name + "; manufacturer: " + port.manufacturer + "; version: " + port.version + "\n");
-    }
-
     var inputs = midiAccess.inputs.values();
-    if(inputs.size === 0)
-    	console.log("No MIDI input devices present.")
     for(var input = inputs.next(); input && !input.done; input = inputs.next()) {
-	input.value.onmidimessage = MIDIMessageEventHandler;
+        midiInputs.push(input.value);
+	registerMidiInput(i++, input.value.name);
 	console.log("added MIDI input "+input.value.name+" ("+input.value.manufacturer+") "+input.value.id);
     }
+    if(inputs.size === 0)
+    	console.log("No MIDI input devices present.")
+    selectMidiInput(0);    
 
-    // var inputs = midiAccess.inputs.values();
-    // if(inputs.size === 0)
-    // 	console.log("No MIDI input devices present.")
-    // else { // Hook the message handler for all MIDI inputs
-    // 	for (var i=0;i<inputs.size;i++){
-    // 	    inputs.values()[i].onmidimessage = MIDIMessageEventHandler;
-    // 	    console.log("added MIDI input "+inputs[i].name+" ("+inputs[i].manufacturer+") "+inputs[i].id);
-    // 	}
-    // }
+    i = 0;
     var outputs = midiAccess.outputs.values();
-    var i = 0;
     for(var output = outputs.next(); output && !output.done; output = outputs.next()) {
         midiOutputs.push(output.value);
 	registerMidiOutput(i++, output.value.name);
@@ -53,7 +47,8 @@ function onMIDIReject(err) {
 
 var sysexMessage = [];
 function MIDIMessageEventHandler(event) {
-    console.log("MIDI 0x"+event.data[0].toString(16)+" "+event.data.length+" bytes");
+    // console.log("MIDI 0x"+event.data[0].toString(16)+" "+event.data.length+" bytes");
+    logMidiEvent(event);
     switch(event.data[0] & 0xf0) {
     case 0x90:
 	if(event.data[2] != 0) {  // if velocity != 0, this is a note-on message
@@ -76,6 +71,16 @@ function MIDIMessageEventHandler(event) {
 	//     sysexMessage = [];
 	// }
 	return;
+    }
+}
+
+function selectMidiInput(index) {
+    if(midiInput)
+	midiInput.onmidimessage = undefined;
+    midiInput = midiInputs[index];
+    if(midiInput){
+	console.log("selecting MIDI input "+index+": "+midiInput.name+" ("+midiInput.manufacturer+")");
+	midiInput.onmidimessage = MIDIMessageEventHandler;
     }
 }
 

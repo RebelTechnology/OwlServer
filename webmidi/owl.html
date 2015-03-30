@@ -64,6 +64,11 @@ function systemExclusive(data) {
   }
 }
 
+function registerMidiInput(index, name){
+  var select = document.getElementById("midiInputs");
+  select.options[index] = new Option(name, index);
+}
+
 function registerMidiOutput(index, name){
   var select = document.getElementById("midiOutputs");
   select.options[index] = new Option(name, index);
@@ -184,7 +189,13 @@ function controlChange(cc, value) {
 
   <h2><span id="firmwareVersion">OpenWareLaboratory</span></h2>
 
-  <p>MIDI 
+  <p>MIDI In
+  <select id="midiInputs" onChange="selectMidiInput(this.selectedIndex)">
+    <option>...</option>
+  </select>
+  </p>
+
+  <p>MIDI Out
   <select id="midiOutputs" onChange="changeMidiOutput(this.selectedIndex)">
     <option>...</option>
   </select>
