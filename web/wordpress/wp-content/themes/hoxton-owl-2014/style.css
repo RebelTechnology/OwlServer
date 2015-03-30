@@ -709,6 +709,6 @@ body.login {
   padding: 3px;
 }
 
-#tabs-stdout, #tabs-stderr {
+#tabs-result, #tabs-stdout, #tabs-stderr {
   padding: 0;
 }

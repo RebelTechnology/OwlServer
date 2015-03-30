@@ -276,7 +276,7 @@ HoxtonOwl.ApiClient.prototype.compilePatch = function (patchId, callback) {
                 cookie: authCookieVal
             };
 
-            jQuery.when(client._query('/sysex/' + patchId, 'PUT', { patch: patch, credentials: credentials })).always(function (result) {
+            jQuery.when(client._query('/sysex/' + patchId, 'PUT', { credentials: credentials })).always(function (result) {
                 callback(result);
             });
         },
