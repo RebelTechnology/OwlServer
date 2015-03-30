@@ -366,7 +366,8 @@ HoxtonOwl.patchManager = {
 
             var apiClient = new HoxtonOwl.ApiClient();
             apiClient.compilePatch($('#selected-patch-id').text(), function (data) {
-                console.log(data);
+                $('#tabs-stdout pre').text(data.stdout);
+                $('#tabs-stderr pre').text(data.stderr);
             });
 
             return false;

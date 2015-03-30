@@ -699,3 +699,7 @@ body.login {
   text-align: right;
   margin-top: 10px;
 }
+
+#compile-tabs pre {
+  overflow: scroll;
+}
