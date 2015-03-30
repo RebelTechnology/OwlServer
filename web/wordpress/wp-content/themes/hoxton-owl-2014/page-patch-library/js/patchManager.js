@@ -358,15 +358,24 @@ HoxtonOwl.patchManager = {
         });
         $(document).on('click', '#compileLink', function(e) {
 
+            if (!confirm('Are you sure you want to compile this patch?')) {
+                return;
+            }
+
             $('#compile-dialog').dialog({
                 width: 600,
                 modal: true,
                 closeOnEscape: false
             });
-            $('#compile-dialog textarea').empty().first().text('Please wait...');
+            $('#compile-dialog textarea').empty().text('Please wait...');
 
             var apiClient = new HoxtonOwl.ApiClient();
             apiClient.compilePatch($('#selected-patch-id').text(), function (data) {
+                if (data.success) {
+                     $('#compile-dialog textarea').first().text('Patch compiled successfully.');
+                } else {
+                    $('#compile-dialog textarea').first().text('Patch compilation failed. Please check the logs for errors.');
+                }
                 $('#tabs-stdout textarea').text(data.stdout);
                 $('#tabs-stderr textarea').text(data.stderr);
             });

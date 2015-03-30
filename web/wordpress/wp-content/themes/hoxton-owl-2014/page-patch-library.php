@@ -283,9 +283,13 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
 <div id="compile-dialog" title="Compile patch">
     <div id="compile-tabs">
         <ul>
+            <li><a href="#tabs-msg">Result</a></li>
             <li><a href="#tabs-stdout">stdout</a></li>
             <li><a href="#tabs-stderr">stderr</a></li>
         </ul>
+        <div id="tabs-msg">
+            <textarea readonly></textarea>
+        </div>
         <div id="tabs-stdout">
             <textarea readonly></textarea>
         </div>
