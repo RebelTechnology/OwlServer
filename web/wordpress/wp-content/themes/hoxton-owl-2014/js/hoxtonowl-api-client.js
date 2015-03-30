@@ -264,6 +264,6 @@ HoxtonOwl.ApiClient.prototype.compilePatch = function (patchId, callback) {
     var client = this;
 
     jQuery.when(client._query('/sysex/' + patchId, 'PUT')).done(function (data) {
-        callback(data.result);
+        callback(data);
     });
 };
