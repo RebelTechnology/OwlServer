@@ -13,14 +13,14 @@ $resUri = get_template_directory_uri() . '/page-patch-library/';
 // <link rel="stylesheet"> tags to be placed in <head>
 wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), 5);
 wp_enqueue_style('owl-patches-page_fonts_googleapis', 'http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700');
-wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.min.css');
-wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.structure.min.css');
-wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.theme.min.css');
+wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
+wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
+wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
 
 // <script> tags to be placed in <head>
 wp_enqueue_script('owl-patches-page_knockout',      $resUri . 'js3rdparty/knockout-2.0.0.js');
 wp_enqueue_script('jquery',                         $resUri . 'js3rdparty/jquery-1.7.1.min.js');
-wp_enqueue_script('jquery-ui',                      get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.min.js', array('jquery'));
+wp_enqueue_script('jquery-ui',                      get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_jquery_knob',   $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
 
@@ -137,7 +137,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <!-- ko if: sysExAvailable -->
                     <tr>
                         <td><span class="parameter-label">SysEx</span></td>
-                        <td><p><a id="sysExDownloadLink" href="#">Download</a></p></td>
+                        <td><p><a id="sysExDownloadLink" href="#">Download</a> - <a id="compileLink" href="#">Compile</a></p></td> <!-- FIXME: compile link must be visible only to patch author or admins -->
                     </tr>
                         <!-- ko if: sysExLastUpdated -->
                         <tr>
@@ -274,6 +274,24 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
 
     </div> <!-- /div.content-container -->
 </div> <!-- /div.wrapper.flexbox -->
+
+<div id="compile-dialog" title="Compile patch">
+    <div id="compile-tabs">
+        <ul>
+            <li><a href="#tabs-stdout">stdout</a></li>
+            <li><a href="#tabs-stderr">stderr</a></li>
+        </ul>
+        <div id="tabs-stdout">
+            <pre></pre>
+        </div>
+        <div id="tabs-stderr">
+            <pre></pre>
+        </div>
+    </div>
+    <div id="compile-dialog-button-container">
+        <button id="compile-dialog-btn-done">Done</button>
+    </div>
+</div>
 
 <?php
 global $current_user;
