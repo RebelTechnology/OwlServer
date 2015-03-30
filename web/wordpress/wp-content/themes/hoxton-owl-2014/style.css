@@ -680,3 +680,22 @@ div.patch-visibility img {
 body.login {
   padding: 0 !important;
 }
+
+.ui-widget-overlay {
+  opacity: .70 !important; /* Make sure to change both of these, as IE only sees the second one */
+  filter: Alpha(Opacity=70) !important;
+}
+
+#compile-dialog {
+  display: none;
+  width: 60%;
+}
+
+#compile-tabs {
+  height: 200px;
+}
+
+#compile-dialog-button-container {
+  text-align: right;
+  margin-top: 10px;
+}

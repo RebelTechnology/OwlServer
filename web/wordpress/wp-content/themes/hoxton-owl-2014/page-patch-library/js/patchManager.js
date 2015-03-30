@@ -349,6 +349,20 @@ HoxtonOwl.patchManager = {
 
         ko.applyBindings(that);
 
+        $('#compile-tabs').tabs();
+        $('#compile-dialog-btn-done').click(function () {
+            $('#compile-dialog').dialog('close');
+        });
+        $(document).on('click', '#compileLink', function(e) {
+            $('#compile-dialog').dialog({
+                width: 600,
+                modal: true,
+                closeOnEscape: false
+            });
+            $('#compile-dialog pre').empty().first().text('Please wait...');
+            return false;
+        });
+
         var url = location.pathname;
         var matches = url.match(/^\/patch-library\/patch\/.+\/?$/g);
         if (matches) {
@@ -430,6 +444,7 @@ $(function() {
     var pm = HoxtonOwl.patchManager;
     var apiClient = new HoxtonOwl.ApiClient();
     apiClient.getAllPatches(pm.main);
+
 });
 
 // EOF

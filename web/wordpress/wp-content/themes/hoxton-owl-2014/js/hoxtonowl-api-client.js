@@ -249,3 +249,21 @@ HoxtonOwl.ApiClient.prototype.deletePatch = function (patchId, callback) {
         }
     );
 };
+
+/**
+ * Compiles a patch and returns the output of make.
+ *
+ * @param {string} patchId
+ *     The patch ID.
+ * @param {Function} callback
+ *     A callback that will be invoked once data is loaded. This function will
+ *     be passed the freshly loaded patch.
+ */
+HoxtonOwl.ApiClient.prototype.compilePatch = function (patchId, callback) {
+
+    var client = this;
+
+    jQuery.when(client._query('/sysex/' + patchId, 'PUT')).done(function (data) {
+        callback(data.result);
+    });
+};
