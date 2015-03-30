@@ -701,6 +701,14 @@ body.login {
 }
 
 #compile-tabs textarea {
-  overflow: scroll;
   height: 130px;
+  font-family: 'Droid Sans Mono', monospace;
+  font-size: 12px;
+  border: none;
+  width: 99%;
+  padding: 3px;
+}
+
+#tabs-stdout, #tabs-stderr {
+  padding: 0;
 }

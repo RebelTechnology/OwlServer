@@ -354,6 +354,7 @@ HoxtonOwl.patchManager = {
         $('#compile-tabs').tabs();
         $('#compile-dialog-btn-done').click(function () {
             $('#compile-dialog').dialog('close');
+            window.location.reload();
         });
         $(document).on('click', '#compileLink', function(e) {
 
