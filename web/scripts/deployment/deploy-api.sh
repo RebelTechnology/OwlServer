@@ -58,13 +58,13 @@ rm -rf $DIR/../api
 cp -a $DIR/OwlServer/web/api $DIR/../
 mv /tmp/api-settings.js $DIR/../api/
 
-# Install node modules
-if [ ! -d "$DIR/../api/node_modules" ]; then
-    echo "Installing node.js modules..."
-    cd $DIR/../api
-    npm install
-    cd - > /dev/null
-fi
+## Install node modules
+#if [ ! -d "$DIR/../api/node_modules" ]; then
+#    echo "Installing node.js modules..."
+#    cd $DIR/../api
+#    npm install
+#    cd - > /dev/null
+#fi
 
 # Update deployment script
 echo "Updating deployment script..."
