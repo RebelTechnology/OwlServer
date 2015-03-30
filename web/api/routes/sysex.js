@@ -192,21 +192,18 @@ router.put('/:id', function(req, res) {
 
         });
 
-    ).fail(
+    }).fail(function (error) {
 
-        function (error) {
+        console.log(error);
 
-            console.log(error);
-
-            if (!error.error) {
-                error.error = { status: 500 };
-            }
-            if (!error.error.status) {
-                error.error.status = 500;
-            }
-            return res.status(error.error.status).json(error);
+        if (!error.error) {
+            error.error = { status: 500 };
         }
-    );
+        if (!error.error.status) {
+            error.error.status = 500;
+        }
+        return res.status(error.error.status).json(error);
+    });
 });
 
 module.exports = router;
