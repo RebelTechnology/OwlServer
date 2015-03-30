@@ -225,6 +225,7 @@ if (!$onlyDloadFiles) {
 
 if (!isset($patch['github']) || count($patch['github']) === 0) {
     outputError('No source code available for this patch.');
+    exit(1);
 }
 
 if ($onlyShowFiles) {
