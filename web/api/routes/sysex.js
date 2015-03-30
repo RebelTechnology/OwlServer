@@ -10,6 +10,7 @@ var exec = require('child_process').exec;
 var Q = require('q');
 Q.longStackSupport = false; // To be enabled only when debugging
 
+var wordpressBridge = require('../lib/wordpress-bridge.js');
 var apiSettings = require('../api-settings.js');
 
 /**
@@ -76,6 +77,19 @@ router.get('/:id', function(req, res) {
  */
 router.put('/:id', function(req, res) {
 
+    var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
+    var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
+
+    var credentials = req.body.credentials;
+    var wpCookie;
+    var username;
+    var isAdmin = false;
+    var wpUserId;
+
+    var collection = req.db.get('patches');
+    var updatedPatch = req.body.patch;
+    var patchAuthor = {};
+
     var id = req.params.id;
     if (!/^[a-f\d]{24}$/i.test(id)) {
         return res.status(500).json({
@@ -84,21 +98,115 @@ router.put('/:id', function(req, res) {
         });
     }
 
-    var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH + ' ' + id;
+    Q.fcall(function () {
 
-    exec(cmd, function (error, stdout, stderr) {
+        /* ~~~~~~~~~~~~~~~~~~~
+         *  Check credentials
+         * ~~~~~~~~~~~~~~~~~~~ */
 
-        var response = {
-            stdout: stdout,
-            stderr: stderr,
-            success: error === null
-        };
-        if (error !== null) {
-            response.error = { status: 500 };
+        console.log('Checking credentials...');
+
+        if (!credentials) {
+            throw { message: 'Access denied (1).', status: 401 };
         }
-        return res.status(error !== null ? 500 : 200).json(response);
 
-    });
+        if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
+            throw { message: 'Access denied (2).', status: 401 };
+        }
+
+        wpCookie = credentials.cookie;
+
+        return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
+
+    }).then(function() {
+
+        /* ~~~~~~~~~~~~~~~~~~
+         *  Get WP user info
+         * ~~~~~~~~~~~~~~~~~~ */
+
+        console.log('Getting WP user info...');
+        username = wpCookie.split('|')[0];
+        return getUserInfo(username);
+
+    }).then(function (wpUserInfo) {
+
+        isAdmin = wpUserInfo.admin;
+        wpUserId = wpUserInfo.id;
+        console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
+        console.log('WP user ID is ' + wpUserId + '');
+
+        // If not an admin, we set the current WP user as patch author,
+        // disregarding any authorship info s/he sent. If an admin,
+        // we blindy trust the authorship information. Not ideal, but
+        // at least keeps code leaner.
+        if (!isAdmin) {
+            patchAuthor.type = 'wordpress';
+            patchAuthor.name = username;
+            patchAuthor.wordpressId = wpUserId;
+        }
+
+        /*
+         * Retrieve patch from database
+         */
+
+        return collection.findById(id);
+
+    }).then(function (patch) {
+
+        if (null === patch) {
+            throw {
+                message: 'Patch not found.',
+                error: { status: 400 }
+            };
+        }
+
+        /*
+         * Check if user can compile patch
+         */
+
+        if (!isAdmin) {
+            if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
+                throw {
+                    message: 'You are not authorized to edit compile patch.',
+                    error: { status: 401 }
+                };
+            }
+        }
+
+        /*
+         * Compile patch
+         */
+
+        var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH + ' ' + id;
+        exec(cmd, function (error, stdout, stderr) {
+
+            var response = {
+                stdout: stdout,
+                stderr: stderr,
+                success: error === null
+            };
+            if (error !== null) {
+                response.error = { status: 500 };
+            }
+            return res.status(error !== null ? 500 : 200).json(response);
+
+        });
+
+    ).fail(
+
+        function (error) {
+
+            console.log(error);
+
+            if (!error.error) {
+                error.error = { status: 500 };
+            }
+            if (!error.error.status) {
+                error.error.status = 500;
+            }
+            return res.status(error.error.status).json(error);
+        }
+    );
 });
 
 module.exports = router;

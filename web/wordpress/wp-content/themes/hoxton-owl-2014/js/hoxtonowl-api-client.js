@@ -263,7 +263,29 @@ HoxtonOwl.ApiClient.prototype.compilePatch = function (patchId, callback) {
 
     var client = this;
 
-    jQuery.when(client._query('/sysex/' + patchId, 'PUT')).done(function (data) {
-        callback(data);
-    });
+    //jQuery.when(client._query('/sysex/' + patchId, 'PUT')).done(function (data) {
+    //    callback(data);
+    //});
+
+    jQuery.when(client._getWpAuthCookie()).then(
+
+        function (authCookieVal) {
+
+            var credentials = {
+                type: 'wordpress',
+                cookie: authCookieVal
+            };
+
+            jQuery.when(client._query('/sysex/' + patchId, 'PUT', { patch: patch, credentials: credentials })).always(function (result) {
+                callback(result);
+            });
+        },
+
+        function (reason) {
+            // Unable to retrieve authentication cookie
+            //console.log(reason);
+            callback(false);
+        }
+    );
+
 };
