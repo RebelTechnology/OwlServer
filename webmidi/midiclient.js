@@ -5,8 +5,11 @@ var midiOutputs = [];
 var midiOutput = null;
 
 function logMidiEvent(ev){
+    logMidiData(ev.data);
+}
+function logMidiData(data){
   var arr = [];
-  for(var i=0; i<ev.data.length; i++) arr.push((ev.data[i]<16 ? '0' : '') + ev.data[i].toString(16));
+  for(var i=0; i<data.length; i++) arr.push((data[i]<16 ? '0' : '') + data[i].toString(16));
   console.log('MIDI:', arr.join(' '));
 }
 
@@ -42,10 +45,12 @@ function onMIDIInit(midi, options) {
 }
 
 function onMIDIReject(err) {
-    alert("The MIDI system failed to start.");
+    var retry = confirm("The MIDI system failed to start.\nRetry?");
+    if(retry)
+	initialiseMidi();
 }
 
-var sysexMessage = [];
+// var sysexMessage = [];
 function MIDIMessageEventHandler(event) {
     // console.log("MIDI 0x"+event.data[0].toString(16)+" "+event.data.length+" bytes");
     logMidiEvent(event);
@@ -96,13 +101,24 @@ function sendCc(cc, value) {
       midiOutput.send([0xB0, cc, value], 0);
 }
 
+function sendSysex(command) {
+    console.log("sending sysex");
+    var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, command, 0xf7];
+    logMidiData(msg);
+    if(midiOutput)
+      midiOutput.send(msg, 0);
+}
+
 window.addEventListener('load', function() {
-    // patch up prefixes
+    initialiseMidi();
+} );
+
+function initialiseMidi(){
     window.AudioContext = window.AudioContext||window.webkitAudioContext;
     context = new AudioContext();
     var options = { sysex: true };
-    if (navigator.requestMIDIAccess)
+    if(navigator.requestMIDIAccess)
 	navigator.requestMIDIAccess( { sysex: true } ).then( onMIDIInit, onMIDIReject );
     else
 	alert("No MIDI support present in your browser.")
-} );
+}
