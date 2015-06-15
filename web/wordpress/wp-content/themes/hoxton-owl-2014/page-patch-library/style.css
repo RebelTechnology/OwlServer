@@ -189,6 +189,7 @@ body { background: #f4f4f4; }
     padding: 10px;
     line-height: 1.4;
     margin-top: 10px;
+    display: none;
 }
 
 span.parameter-label {
@@ -736,6 +737,9 @@ div.patch-library h2.bolder {
         display: none;
     }
     .video-wrapper2 {
+        display: block;
+    }
+    .patch-stats2 {
         display: block;
     }
 }

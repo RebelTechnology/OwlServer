@@ -138,18 +138,18 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <!-- ko if: sysExAvailable -->
                     <tr>
                         <td><span class="parameter-label">SysEx</span></td>
-                        <td><p><a id="sysExDownloadLink" href="#">Download</a>
+                        <td><p><a class="sysExDownloadLink" href="#">Download</a>
                     </tr>
-                        <!-- ko if: sysExLastUpdated -->
-                        <tr>
-                            <td><span class="parameter-label">Last updated on</span></td>
-                            <td><p data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></p></td>
-                        </tr>
-                        <!-- /ko -->
+                    <!-- ko if: sysExLastUpdated -->
+                    <tr>
+                        <td><span class="parameter-label">Last updated on</span></td>
+                        <td><p data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></p></td>
+                    </tr>
                     <!-- /ko -->
-                    <tr id="tr-compile-patch" style="display: none;">
+                    <!-- /ko -->
+                    <tr class="compile-patch-container" style="display: none;">
                         <td><span class="parameter-label">Compile</span></td>
-                        <td><p><a id="compileLink" href="#">Compile</a></p></td>
+                        <td><p><a class="compileLink" href="#">Compile</a></p></td>
                     </tr>
                 </table>
             </div>
@@ -179,6 +179,11 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                 <span class="parameter-label">Memory</span>
                 <span class="parameter-value" data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></span>
                 <!-- /ko -->
+                <!-- ko if: sysExAvailable -->
+                <span class="parameter-value"><a class="sysExDownloadLink" href="#">Download</a></span>
+                <!-- /ko -->
+                <span class="parameter-value compile-patch-container" style="display: none;"><a class="compileLink" href="#">Compile</a></span>
+
                 <!-- <span class="parameter-label">Version</span> -->
                 <!-- <span class="parameter-value">v.1.1.0 - 21/04/2014</span> -->
                 <!-- <span class="parameter-label">Used in</span> -->

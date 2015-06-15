@@ -323,11 +323,11 @@ HoxtonOwl.patchManager = {
 
                 knobify();
                 if (that.selectedPatch().sysExAvailable) {
-                    $('#sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/sysex/' + that.selectedPatch()._id);
+                    $('.sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/sysex/' + that.selectedPatch()._id);
                 }
 
                 // Show compile patch button:
-                $('#tr-compile-patch').css('display', 'none');
+                $('.compile-patch-container').css('display', 'none');
                 var isAdmin = false;
                 var $isAdmin = $('#wordpress-user-is-admin');
                 if ($isAdmin) {
@@ -342,7 +342,8 @@ HoxtonOwl.patchManager = {
 
                 if (that.selectedPatch().github && that.selectedPatch().github.length &&
                     (isAdmin || that.selectedPatch().author.wordpressId == authorWpId)) {
-                    $('#tr-compile-patch').css('display', 'table-row');
+                    $('tr.compile-patch-container').css('display', 'table-row');
+                    $('span.compile-patch-container').css('display', 'inline');
                 }
 
             });
@@ -375,7 +376,7 @@ HoxtonOwl.patchManager = {
             $('#compile-dialog').dialog('close');
             window.location.reload();
         });
-        $(document).on('click', '#compileLink', function(e) {
+        $(document).on('click', '.compileLink', function(e) {
 
             if (!confirm('Are you sure you want to compile this patch?')) {
                 return false;
