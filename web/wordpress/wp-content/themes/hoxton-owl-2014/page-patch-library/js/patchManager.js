@@ -392,17 +392,15 @@ HoxtonOwl.patchManager = {
             var apiClient = new HoxtonOwl.ApiClient();
             apiClient.compilePatch($('#selected-patch-id').text(), function (data) {
 
-                if (false === data) {
-                    $('#compile-dialog textarea').first().text('Patch compilation failed. Please check the logs for errors.');
-                }
-
-                if (data.success) {
-                     $('#compile-dialog textarea').first().text('Patch compiled successfully.');
+                if (data.success === true) {
+                    $('#compile-dialog textarea').first().text('Patch compiled successfully.');
+                    $('#tabs-stdout textarea').text(data.stdout);
+                    $('#tabs-stderr textarea').text(data.stderr);
                 } else {
                     $('#compile-dialog textarea').first().text('Patch compilation failed. Please check the logs for errors.');
+                    $('#tabs-stdout textarea').text(data.responseJSON.stdout);
+                    $('#tabs-stderr textarea').text(data.responseJSON.stderr);
                 }
-                $('#tabs-stdout textarea').text(data.stdout);
-                $('#tabs-stderr textarea').text(data.stderr);
             });
 
             return false;

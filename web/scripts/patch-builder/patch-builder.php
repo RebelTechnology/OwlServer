@@ -284,14 +284,14 @@ try {
     });
 } catch (ProcessTimedOutException $e) {
     outputError('Patch build timed out!');
-    exit(1);
+    exit(255);
 }
 
 $exitCode = $process->getExitCode();
 outputMessage('make exit code is ' . $exitCode . '.');
 if (0 !== $exitCode) {
     outputError('Patch build failed.');
-    exit(1);
+    exit(255);
 }
 outputMessage('Build successful!');
 
