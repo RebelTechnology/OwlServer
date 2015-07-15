@@ -48,8 +48,11 @@ function usage() {
     echo PHP_EOL;
     echo 'Options:' . PHP_EOL;
     echo '  -h, --help          Show this help and exit.' . PHP_EOL;
+    echo PHP_EOL;
+    echo 'Debug options:' . PHP_EOL;
     echo '  --only-show-files   Only show files that would be downloaded from GitHub.' . PHP_EOL;
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
+    echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
 }
 
 /**
@@ -157,6 +160,7 @@ $longopts  = array(
     'help',
     'only-show-files',
     'only-dload-files',
+    'show-build-cmd',
 );
 $options = getopt($shortopts, $longopts);
 
@@ -174,6 +178,11 @@ $onlyDloadFiles = false;
 if (isset($options['only-dload-files']) && false === $options['only-dload-files']) {
     $onlyShowFiles = false;
     $onlyDloadFiles = true;
+}
+
+$showBuildCmd = false;
+if (isset($options['show-build-cmd']) && false === $options['show-build-cmd']) {
+    $showBuildCmd = true;
 }
 
 $patchId = $argv[count($argv) - 1];
@@ -253,6 +262,9 @@ if ($onlyDloadFiles) {
 /*
  * Work out crazy command needed to compile patch
  *
+ * make BUILD=/tmp/foo ONLINE_INCLUDES='#include \"PhaserPatch.hpp\"' \
+ * ONLINE_REGISTER='REGISTER_PATCH(PhaserPatch, \"Phaser\", 2, 2);' online
+ *
  * See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-85998573
  */
 
@@ -266,6 +278,11 @@ $cmd .= 'ONLINE_INCLUDES=\'#include \\"' . $sourceFile . '\\"\' ';
 // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86669862
 $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
 $cmd .= 'ONLINE_REGISTER=\'REGISTER_PATCH(' . $className . ', \\"' . $patch['name'] . '\\", 2, 2);\' online';
+
+if ($showBuildCmd) {
+    echo 'Build command: ' . $cmd . PHP_EOL;
+    exit(1);
+}
 
 /*
  * Compile patch
