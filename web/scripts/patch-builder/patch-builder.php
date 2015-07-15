@@ -168,6 +168,7 @@ $longopts  = array(
     'only-show-files',
     'only-dload-files',
     'show-build-cmd',
+    'make-online',
 );
 $options = getopt($shortopts, $longopts);
 
