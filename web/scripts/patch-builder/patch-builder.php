@@ -351,7 +351,11 @@ outputMessage('Build successful!');
  * Move .syx file to download location
  */
 
-$syxFilePath = $tempDir . '/online.syx';
+if ($buildCmd == 'make sysx') {
+    $syxFilePath = $tempDir . '/patch.syx';
+} else {
+    $syxFilePath = $tempDir . '/online.syx';
+}
 if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
     outputError('Unable to access ' . $syxFilePath . '.');
     exit(1);
