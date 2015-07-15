@@ -283,7 +283,7 @@ if ($localPatchFiles) {
         exit(1);
     }
 } else {
-    $localPatchFileDir = '/tmp/' . str_replace(['/', ' '], $patch['name']);
+    $localPatchFileDir = '/tmp/' . str_replace(['/', ' '], '_', $patch['name']);
     if (!file_exists($localPatchFileDir) || !is_dir($localPatchFileDir)
        || !is_readable($localPatchFileDir)) {
 
