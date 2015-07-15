@@ -40,7 +40,7 @@ while ($patch = $p->getNext()) {
     }
 
     echo 'Compiling "' . $patch['name'] .' (' . $patch['_id'] . ')"... ';
-    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'];
+    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ' > /dev/null 2> /dev/null';
     $exitStatus = 0;
     system($cmd, $exitStatus);
     if ($exitStatus == 0) {
