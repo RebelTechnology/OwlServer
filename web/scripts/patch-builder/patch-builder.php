@@ -267,7 +267,7 @@ if ($onlyShowFiles) {
 }
 
 $sourceFiles = [];
-if ($localPatchFiles) {
+if (!$localPatchFiles) {
     foreach ($patch['github'] as $githubFile) {
         $r = downloadGithubFile($githubFile, $tempDir);
         if (!$r) {
