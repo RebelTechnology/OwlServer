@@ -26,6 +26,12 @@
 // --------------------------
 // db.patches.find({ github: { $exists: true, $size: 3 }}).pretty();
 // 54b55ccb14601612321d0c9c
+//
+// `make online` example:
+// make BUILD=/tmp/owl-patch-xxx ONLINE_INCLUDES='#include \"OverdrivePatch.hpp\"' ONLINE_REGISTER='REGISTER_PATCH(OverdrivePatch, \"Overdrive\", 2, 2);' online
+//
+// `make sysx` example:
+// make BUILD='/tmp/owl-patch-xxx' PATCHSOURCE='/tmp/owl-patch-xxx' PATCHFILE='OverdrivePatch.hpp' PATCHNAME='Overdrive' PATCHCLASS='OverdrivePatch' PATCHIN=2 PATCHOUT=2 sysex
 
 use Symfony\Component\Process\Process;
 
@@ -53,6 +59,7 @@ function usage() {
     echo '  --only-show-files   Only show files that would be downloaded from GitHub.' . PHP_EOL;
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
+    echo '  --make-online       Use the old `make online` command instead of the newer `make sysx`.' . PHP_EOL;
 }
 
 /**
@@ -107,7 +114,7 @@ function downloadGithubFile($githubFile, $dstPath) {
         return false;
     }
 
-    $bits     = explode('/', $githubFile);
+    $bits = explode('/', $githubFile);
     if (count($bits) < 8) {
         outputError('Invalid URL (3).');
         return false;
@@ -183,6 +190,11 @@ if (isset($options['only-dload-files']) && false === $options['only-dload-files'
 $showBuildCmd = false;
 if (isset($options['show-build-cmd']) && false === $options['show-build-cmd']) {
     $showBuildCmd = true;
+}
+
+$buildCmd = 'make sysx';
+if (isset($options['make-online']) && false === $options['make-online']) {
+    $buildCmd = 'make online';
 }
 
 $patchId = $argv[count($argv) - 1];
@@ -268,16 +280,38 @@ if ($onlyDloadFiles) {
  * See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-85998573
  */
 
-$cmd = 'make BUILD=' . $tempDir . ' ';
+if ($buildCmd == 'make online') {
 
-// We hash-include only the first file
-// See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
-$sourceFile = $sourceFiles[0];
-$cmd .= 'ONLINE_INCLUDES=\'#include \\"' . $sourceFile . '\\"\' ';
-// The filename must be ClassName.hpp
-// See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86669862
-$className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
-$cmd .= 'ONLINE_REGISTER=\'REGISTER_PATCH(' . $className . ', \\"' . $patch['name'] . '\\", 2, 2);\' online';
+    $cmd = 'make BUILD=' . $tempDir . ' ';
+
+    // We hash-include only the first file
+    // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
+    $sourceFile = $sourceFiles[0];
+    $cmd .= 'ONLINE_INCLUDES=\'#include \\"' . $sourceFile . '\\"\' ';
+    // The filename must be ClassName.hpp
+    // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86669862
+    $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
+    $cmd .= 'ONLINE_REGISTER=\'REGISTER_PATCH(' . $className . ', \\"' . $patch['name'] . '\\", 2, 2);\' online';
+
+} elseif ($buildCmd = 'make sysx') {
+
+    // First source file only
+    // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
+    $sourceFile = $sourceFiles[0];
+
+    $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
+    $cmd  = 'make BUILD=\'' .  $tempDir          . '\' ';
+    $cmd .= 'PATCHSOURCE=\'' . $tempDir          . '\' ';
+    $cmd .= 'PATCHFILE=\'' .   $sourceFile       . '\' ';
+    $cmd .= 'PATCHNAME=\'' .   $patch['name']    . '\' ';
+    $cmd .= 'PATCHCLASS=\'' .  $className        . '\' ';
+    $cmd .= 'PATCHIN=' .       $patch['inputs']  .' ';
+    $cmd .= 'PATCHOUT='.       $patch['outputs'] .' ';
+    $cmd .= 'sysex';
+} else {
+    echo 'Unexpected error!' . PHP_EOL;
+    exit;
+}
 
 if ($showBuildCmd) {
     echo 'Build command: ' . $cmd . PHP_EOL;
