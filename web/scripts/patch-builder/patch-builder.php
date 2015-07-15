@@ -60,6 +60,7 @@ function usage() {
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
     echo '  --make-online       Use the old `make online` command instead of the newer `make sysx`.' . PHP_EOL;
+    echo '  --local-patch-files Use all patch files in /tmp/patch-name/* instead of downloading them from GitHub.' . PHP_EOL;
 }
 
 /**
@@ -128,10 +129,12 @@ function downloadGithubFile($githubFile, $dstPath) {
     $endpoint = 'https://api.github.com/repos/' . $repo . '/contents/' . $path . '?ref=' . $branch;
 
     // Make HTTPS request
-    $opts = array('http' => array(
-        'method' => 'GET',
-        'header' => "User-agent: Mozilla/5.0\r\n",
-    ));
+    $opts = [
+        'http' => [
+            'method' => 'GET',
+            'header' => "User-agent: Mozilla/5.0\r\n",
+        ]
+    ];
     $context = stream_context_create($opts);
     $data = file_get_contents($endpoint, false, $context);
 
@@ -163,13 +166,14 @@ function downloadGithubFile($githubFile, $dstPath) {
  */
 
 $shortopts  = 'h';
-$longopts  = array(
+$longopts  = [
     'help',
     'only-show-files',
     'only-dload-files',
     'show-build-cmd',
     'make-online',
-);
+    'patch-files:',
+];
 $options = getopt($shortopts, $longopts);
 
 if ((isset($options['h']) && false === $options['h']) || (isset($options['help']) && false === $options['help'])) {
@@ -198,6 +202,12 @@ if (isset($options['make-online']) && false === $options['make-online']) {
     $buildCmd = 'make online';
 }
 
+$localPatchFiles = false;
+if (isset($options['local-patch-files']) && false === $options['local-patch-files']) {
+    $localPatchFiles = true;
+    $onlyDloadFiles = false;
+}
+
 $patchId = $argv[count($argv) - 1];
 if (strlen($patchId) !== 24 || !ctype_xdigit($patchId)) {
     usage();
@@ -224,7 +234,7 @@ try {
     outputError('Unable to connect to MongoDb.');
     exit(1);
 }
-$patch = $patches->findOne(array('_id' => new MongoId($patchId)));
+$patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
 if (null === $patch) {
     outputError('Patch not found.');
     exit(1);
@@ -251,25 +261,53 @@ if (!isset($patch['github']) || count($patch['github']) === 0) {
 }
 
 if ($onlyShowFiles) {
-    outputError('DEBUG: Showing source code file URLs. Aborting...');
+    outputError('DEBUG: Showing patch file URLs. Aborting...');
     var_dump($patch['github']);
     exit(1);
 }
 
-$sourceFiles = array();
-foreach ($patch['github'] as $githubFile) {
-    $r = downloadGithubFile($githubFile, $tempDir);
-    if (!$r) {
-        outputError('Download of ' . $githubFile . ' failed.');
+$sourceFiles = [];
+if ($localPatchFiles) {
+    foreach ($patch['github'] as $githubFile) {
+        $r = downloadGithubFile($githubFile, $tempDir);
+        if (!$r) {
+            outputError('Download of ' . $githubFile . ' failed.');
+            exit(1);
+        }
+        $sourceFiles[] = $r;
+    }
+
+    if ($onlyDloadFiles) {
+        outputError('DEBUG: Downloaded source files to ' . $tempDir . '. Aborting...');
+        var_dump($patch['github']);
         exit(1);
     }
-    $sourceFiles[] = $r;
-}
+} else {
+    $localPatchFileDir = '/tmp/' . $patch['name'];
+    if (!file_exists($localPatchFileDir) || !is_dir($localPatchFileDir)
+       || !is_readable($localPatchFileDir)) {
 
-if ($onlyDloadFiles) {
-    outputError('DEBUG: Downloaded source files to ' . $tempDir . '. Aborting...');
-    var_dump($patch['github']);
-    exit(1);
+        echo 'ERROR: Unable to find directory ' . $localPatchFileDir . '.' . PHP_EOL;
+        exit(1);
+    }
+    if ($dirHandle = opendir($localPatchFileDir)) {
+        while (false !== ($entry = readdir($dirHandle))) {
+            if ($entry == '.' || $entry == '..') {
+                continue;
+            }
+            $sourceFile = $localPatchFileDir . '/' . $entry;
+            if (is_file($sourceFile) && is_readable($sourceFile)) {
+                $sourceFiles[] = $entry;
+                if (!copy($sourceFile, $tempDir . '/' . $entry)) {
+                    echo 'ERROR: Unable to copy ' . $sourceFile . ' to ' . $tempDir . ' .' . PHP_EOL;
+                    exit(1);
+                }
+            }
+        }
+    } else {
+        echo 'ERROR: Unable to open directory ' . $localPatchFileDir . '.' . PHP_EOL;
+        exit(1);
+    }
 }
 
 /*
