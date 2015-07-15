@@ -33,7 +33,7 @@ require_once 'vendor/autoload.php';
 require_once __DIR__ . '/settings.php';
 
 define('TMP_DIR_PREFIX', 'owl-patch-');
-define('OWL_SRC_DIR', '/opt/OwlProgram.online/');
+define('OWL_SRC_DIR', '/opt/OwlProgram/');
 define('COMPILE_TIMEOUT', 30); // time-out in seconds
 
 $stdout = fopen('php://stdout', 'w+');
