@@ -132,7 +132,9 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <!-- ko if: bytes -->
                     <tr>
                         <td><span class="parameter-label">Memory</span></td>
-                        <td><p data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></p></td>
+                        <td>
+                            <p data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></p>
+                        </td>
                     </tr>
                     <!-- /ko -->
                     <!-- ko if: sysExAvailable -->
@@ -161,8 +163,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
 
         <!-- #two-thirds -->
         <div id="two-thirds" class="patch-library">
-            <div data-bind="foreach: soundcloud">
-                <iframe width="100%" height="250" scrolling="no" frameborder="no" data-bind="attr: { src: $data }"></iframe>
+            <div data-bind="if: location.hostname != 'hoxtonowl.localhost'">
+                <div data-bind="foreach: soundcloud">
+                    <iframe width="100%" height="250" scrolling="no" frameborder="no" data-bind="attr: { src: $data }"></iframe>
+                </div>
             </div>
             <!-- <div class="video-wrapper2"> -->
             <!--     <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe> -->
@@ -175,7 +179,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                 <span class="parameter-label">CPU</span>
                 <span class="parameter-value" data-bind="text: cycles + '%'"></span>
                 <!-- /ko -->
-                <!-- ko if: cycles -->
+                <!-- ko if: bytes -->
                 <span class="parameter-label">Memory</span>
                 <span class="parameter-value" data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></span>
                 <!-- /ko -->

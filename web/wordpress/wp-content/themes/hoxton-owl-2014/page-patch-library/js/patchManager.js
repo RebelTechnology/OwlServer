@@ -344,6 +344,8 @@ HoxtonOwl.patchManager = {
                     (isAdmin || that.selectedPatch().author.wordpressId == authorWpId)) {
                     $('tr.compile-patch-container').css('display', 'table-row');
                     $('span.compile-patch-container').css('display', 'inline');
+                } else {
+                    $('span.compile-patch-container').remove();
                 }
 
             });
