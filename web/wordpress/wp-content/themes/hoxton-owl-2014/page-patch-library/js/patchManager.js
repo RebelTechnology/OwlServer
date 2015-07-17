@@ -340,14 +340,50 @@ HoxtonOwl.patchManager = {
                     authorWpId = $wpUserId.text();
                 }
 
-                if (that.selectedPatch().github && that.selectedPatch().github.length &&
-                    (isAdmin || that.selectedPatch().author.wordpressId == authorWpId)) {
+                // Patch compile button
+                var github = that.selectedPatch().github;
+                if (github && github.length && (isAdmin || that.selectedPatch().author.wordpressId == authorWpId)) {
                     $('tr.compile-patch-container').css('display', 'table-row');
                     $('span.compile-patch-container').css('display', 'inline');
                 } else {
                     $('span.compile-patch-container').remove();
                 }
 
+                // PD patch render button
+                if (github && github[0].substr(github[0].length - 3) === '.pd') {
+
+                    var $patchRenderLink = $('a.pdPatchRenderLink');
+                    $patchRenderLink.closest('span').show();
+                    $('tr.render-patch-container').show();
+
+                    $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js3rdparty/pd-fileutils-latest.min.js', function (data, textStatus, jqxhr) {
+                        $patchRenderLink.click(function () {
+
+                            if ($('body > .pd-patch-svg').length) {
+                                $('body > .pd-patch-svg').show();
+                                $.featherlight($('body > .pd-patch-svg'));
+                                $('body > .pd-patch-svg').hide();
+                            } else {
+                                pm.getGithubFile(that.selectedPatch().github[0], function(contents, filename) {
+                                    var patch = pdfu.parse(contents);
+                                    var rendered = pdfu.renderSvg(patch, {svgFile: false});
+                                    var $svgEl = $('div.pd-patch-svg');
+                                    if (!$svgEl.length) {
+                                        $('body').append('<div class="pd-patch-svg"></div>');
+                                    }
+                                    $svgEl = $('div.pd-patch-svg');
+                                    $svgEl.html(rendered);
+                                    $.featherlight($svgEl);
+                                    $($svgEl).hide();
+                                });
+                            }
+
+                            return false;
+                        });
+                    });
+                } else {
+                    $('span.pd-patch-render').remove();
+                }
             });
         };
 

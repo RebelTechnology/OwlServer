@@ -16,6 +16,7 @@ wp_enqueue_style('owl-patches-page_fonts_googleapis', 'http://fonts.googleapis.c
 wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
 wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
 wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
+wp_enqueue_style('featherlight-style', $resUri . 'js3rdparty/featherlight/featherlight.min.css');
 
 // <script> tags to be placed in <head>
 wp_enqueue_script('owl-patches-page_knockout',      $resUri . 'js3rdparty/knockout-2.0.0.js');
@@ -31,6 +32,7 @@ wp_enqueue_script('owl-patches-page_run_prettify',  'https://google-code-prettif
 wp_enqueue_script('owl-api-client',                 get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
 wp_enqueue_script('owl-patch',                      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
 wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'jquery-ui', 'owl-patch', 'owl-api-client'), false, true);
+wp_enqueue_script('featherlight',                   $resUri . 'js3rdparty/featherlight/featherlight.min.js', array('jquery', 'owl-patch', 'owl-api-client'), false, true);
 
 ?>
 
@@ -153,6 +155,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         <td><span class="parameter-label">Compile</span></td>
                         <td><p><a class="compileLink" href="#">Compile</a></p></td>
                     </tr>
+                    <tr class="render-patch-container" style="display: none;">
+                        <td><span class="parameter-label">Render</span></td>
+                        <td><p><a class="pdPatchRenderLink" href="#">Render PD patch</a></p></td>
+                    </tr>
                 </table>
             </div>
             <!-- ko foreach: tags -->
@@ -187,11 +193,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                 <span class="parameter-value"><a class="sysExDownloadLink" href="#">Download</a></span>
                 <!-- /ko -->
                 <span class="parameter-value compile-patch-container" style="display: none;"><a class="compileLink" href="#">Compile</a></span>
-
-                <!-- <span class="parameter-label">Version</span> -->
-                <!-- <span class="parameter-value">v.1.1.0 - 21/04/2014</span> -->
-                <!-- <span class="parameter-label">Used in</span> -->
-                <!-- <span class="parameter-value">123 rigs</span> -->
+                <span class="parameter-value pd-patch-render" style="display: none;"><a class="pdPatchRenderLink" href="#">Render PD patch</a></span>
             </div>
             <div class="white-box2" data-bind="with: selectedPatch">
                 <h2 class="bolder">Parameters</h2>
