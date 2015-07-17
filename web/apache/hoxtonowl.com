@@ -2,50 +2,42 @@
 
     # Basic settings
     ServerName www.hoxtonowl.com
-    ServerAlias hoxtonowl.com owl.pingdynasty.com
+    ServerAlias hoxtonowl.com owl.pingdynasty.com nestor.pingdinasty.com
     DocumentRoot /var/www/hoxtonowl.com/subdomains/www/httpdocs
 
     # Logging
     ErrorLog /var/www/hoxtonowl.com/subdomains/www/logs/error.log
-    LogLevel debug
+    LogLevel warn
     CustomLog /var/www/hoxtonowl.com/subdomains/www/logs/access.log combined
 
-#    # PHP dev settings:
-#    php_flag display_errors On
-#    php_flag display_startup_errors On
-#    php_value error_reporting  2147483647
-#    php_flag log_errors On
-#    SetEnv APPLICATION_ENV staging
+    # PHP production settings:
+    php_flag display_errors Off
+    php_flag display_startup_errors Off
+    php_value error_reporting  0
+    php_flag log_errors On
+    SetEnv APPLICATION_ENV production
 
-     # PHP production settings:
-     php_flag display_errors Off
-     php_flag display_startup_errors Off
-     php_value error_reporting  0
-     php_flag log_errors On
-     SetEnv APPLICATION_ENV production
+    # Prevent direct access to /wp-login.php (i.e. no HTTP referrer)
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+        RewriteCond %{REQUEST_URI} .wp-login\.php*
+        RewriteCond %{HTTP_REFERER} !.*hoxtonowl.com.* [OR]
+        RewriteCond %{HTTP_USER_AGENT} ^$
+        RewriteRule (.*) http://www.example.com/ [R=301,L]
+    </IfModule>
 
-     # Prevent direct access to /wp-login.php (i.e. no HTTP referrer)
-     <IfModule mod_rewrite.c>
-         RewriteEngine On
-         RewriteCond %{REQUEST_URI} .wp-login\.php*
-         RewriteCond %{HTTP_REFERER} !.*hoxtonowl.com.* [OR]
-         RewriteCond %{HTTP_USER_AGENT} ^$
-         RewriteRule (.*) http://www.example.com/ [R=301,L]
-     </IfModule>
-
-     # Reverse proxy for REST API
-     ProxyRequests Off
-     ProxyVia On
-     <Location /api/>
-         ProxyPass http://localhost:3000/
-         ProxyPassReverse http://localhost:3000/
-         Order allow,deny
-         Allow from all
-     </Location>
+    # Reverse proxy for REST API
+    ProxyRequests Off
+    ProxyVia On
+    <Location /api/>
+        ProxyPass http://localhost:3000/
+        ProxyPassReverse http://localhost:3000/
+        Order allow,deny
+        Allow from all
+    </Location>
 
     <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs>
         Options FollowSymLinks -Indexes
-        #AllowOverride Limit Options FileInfo
         AllowOverride None
         DirectoryIndex index.php
         Order allow,deny
@@ -54,6 +46,8 @@
         <Files "xmlrpc.php">
             Order deny,allow
             deny from all
+
+            # Heads-up! This is needed by the API so that it can authenticate WordPress users!
             allow from 127.0.0.1
             allow from localhost
             allow from 46.226.111.228
@@ -105,10 +99,10 @@
             Order allow,deny
             Deny from all
         </Files>
-#        <Files install.php>
-#            Order allow,deny
-#            Deny from all
-#        </Files>
+        <Files install.php>
+            Order allow,deny
+            Deny from all
+        </Files>
         <Files wp-config.php>
             Order allow,deny
             Deny from all
@@ -157,21 +151,9 @@
                 RewriteCond %{QUERY_STRING} ^.*(%0|%A|%B|%C|%D|%E|%F).* [NC]
                 RewriteRule ^(.*)$ - [F]
         </IfModule>
-
-
     </Directory>
 
-    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/_meta>
-        Order Deny,Allow
-        deny from all
-    </Directory>
-
-    <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/_deploy/>
-        AuthName "Secure Area"
-        AuthType Basic
-        AuthUserFile /var/www/hoxtonowl.com/subdomains/www/.htpasswd
-        require valid-user
-    </Directory>
+    # More security settings
 
     <Directory /var/www/hoxtonowl.com/subdomains/www/httpdocs/mediawiki/images/>
         <Files *.php>
@@ -184,4 +166,14 @@
             deny from all
         </Files>
     </Directory>
+
+    # Hide all `dot` files
+    <FilesMatch "^\.">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+    <DirectoryMatch "^\.|\/\.">
+        Order allow,deny
+        Deny from all
+    </DirectoryMatch>
 </VirtualHost>
