@@ -47,7 +47,7 @@ HoxtonOwl.patchManager = {
      *     Whether the browser supports HTML5 storage.
      */
     supportsHtml5Storage: function () {
-        return false; // <------------------------------------------------------
+        return false; // <----------------------------------------------------
         try {
             return 'localStorage' in window && window['localStorage'] !== null;
         } catch (e) {
@@ -117,8 +117,8 @@ HoxtonOwl.patchManager = {
                             endLineNum = contentArray.length;
                         }
 
+                        var cacheMe = contentArray.slice(startLineNum - 1, endLineNum).join("\n");
                         if (supportsHtml5Storage) {
-                            var cacheMe = contentArray.slice(startLineNum - 1, endLineNum).join("\n");
                             localStorage.setItem(url, cacheMe);
                         }
 
