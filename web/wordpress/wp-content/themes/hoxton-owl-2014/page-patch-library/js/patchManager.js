@@ -90,7 +90,7 @@ HoxtonOwl.patchManager = {
                         if (endLineNum == 0) {
                             endLineNum = contentArray.length;
                         }
-                        callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"), filename);
+                        callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"), filename, url);
                         return;
                     }
                 }
@@ -296,7 +296,7 @@ HoxtonOwl.patchManager = {
                 if (that.selectedPatch().github.length) {
                     for (var i = 0, max = that.selectedPatch().github.length; i < max; i++) {
 
-                        pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename) {
+                        pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename, url) {
 
                             var cnt;
 
@@ -307,7 +307,7 @@ HoxtonOwl.patchManager = {
 
                             cnt++;
                             $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
-                            $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint"></pre></div>');
+                            $('#github-files').append('<div id="tabs-' + cnt + '"><a href="' + url + '" target="_new" class="github-link">Open this file in GitHub</a><pre class="prettyprint"></pre></div>');
                             $('#github-files pre.prettyprint').eq(HoxtonOwl.patchManager.getGithubFile.count - 1).text(contents);
                             if (HoxtonOwl.patchManager.getGithubFile.count == max) {
                                 // no more files to be loaded

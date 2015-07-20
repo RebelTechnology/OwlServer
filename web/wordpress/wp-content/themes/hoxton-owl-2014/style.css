@@ -712,3 +712,12 @@ body.login {
 #tabs-result, #tabs-stdout, #tabs-stderr {
   padding: 0;
 }
+
+a.github-link {
+    display: block;
+    position: absolute;
+    top: 40px;
+    right: 30px;
+    text-decoration: underline;
+    color: #ed7800;
+}
