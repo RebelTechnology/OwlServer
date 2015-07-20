@@ -41,11 +41,26 @@ HoxtonOwl.patchManager = {
     },
 
     /**
+     * Detects browser support for HTML5 storage.
+     *
+     * @return {boolean}
+     *     Whether the browser supports HTML5 storage.
+     */
+    supportsHtml5Storage: function () {
+        return false; // <------------------------------------------------------
+        try {
+            return 'localStorage' in window && window['localStorage'] !== null;
+        } catch (e) {
+            return false;
+        }
+    },
+
+    /**
      * Fetches a file from GitHub.
      *
      * @param {string} url
      *     The URL.
-     * @param {Function} callback
+     * @param {Function} callback(content, filename, url)
      *     A callback returned data will be passed to.
      * @param {number} startLineNum
      *     Selection start.
@@ -75,6 +90,16 @@ HoxtonOwl.patchManager = {
         var filename = bits[bits.length-1];
         var endpoint = 'https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=' + branch;
 
+        var supportsHtml5Storage = HoxtonOwl.patchManager.supportsHtml5Storage();
+        if (supportsHtml5Storage) {
+            var cachedContent = localStorage.getItem(url);
+            if (cachedContent) {
+                HoxtonOwl.patchManager.getGithubFile.count++;
+                callback(cachedContent, filename, url);
+                return;
+            }
+        }
+
         $.ajax({
             type:     "GET",
             url:      endpoint,
@@ -83,6 +108,7 @@ HoxtonOwl.patchManager = {
                 HoxtonOwl.patchManager.getGithubFile.count++;
                 if (typeof data.data.content != "undefined") {
                     if (data.data.encoding == "base64") {
+
                         var base64EncodedContent = data.data.content;
                         base64EncodedContent = base64EncodedContent.replace(/\n/g, "");
                         var content = window.atob(base64EncodedContent);
@@ -90,7 +116,13 @@ HoxtonOwl.patchManager = {
                         if (endLineNum == 0) {
                             endLineNum = contentArray.length;
                         }
-                        callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"), filename, url);
+
+                        if (supportsHtml5Storage) {
+                            var cacheMe = contentArray.slice(startLineNum - 1, endLineNum).join("\n");
+                            localStorage.setItem(url, cacheMe);
+                        }
+
+                        callback(cacheMe, filename, url);
                         return;
                     }
                 }
@@ -277,6 +309,7 @@ HoxtonOwl.patchManager = {
 
             var patchId = patch._id;
             var apiClient = new HoxtonOwl.ApiClient();
+            var pdGraphs = [];
             apiClient.getSinglePatch(patchId, function(patch) {
 
 
@@ -308,15 +341,30 @@ HoxtonOwl.patchManager = {
                             cnt++;
                             $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
                             $('#github-files').append('<div id="tabs-' + cnt + '"><a href="' + url + '" target="_new" class="github-link">Open this file in GitHub</a><pre class="prettyprint"></pre></div>');
-                            $('#github-files pre.prettyprint').eq(HoxtonOwl.patchManager.getGithubFile.count - 1).text(contents);
-                            if (HoxtonOwl.patchManager.getGithubFile.count == max) {
-                                // no more files to be loaded
+
+                            if (/\.pd$/.test(filename)) {
+                                var p = pdfu.parse(contents);
+                                var r = pdfu.renderSvg(p, {svgFile: false});
+                                pdGraphs[cnt] = r;
+                                $('body').append('<div id="svg-' + cnt + '"></div>');
+                            } else {
+                                $('#github-files pre.prettyprint').eq(HoxtonOwl.patchManager.getGithubFile.count - 1).text(contents);
+                            }
+
+                            if (HoxtonOwl.patchManager.getGithubFile.count == max) { // no more files to be loaded
+
+                                // Pretty print source code
                                 prettyPrint();
                                 $('#github-files').tabs({ active: 0 }); // jQuery-UI tabs
                                 $('#git-code').show();
-                            }
 
-                            //$("#gitsource").text(contents).removeClass("prettyprinted").parent();
+                                // Render PD patches
+                                for (var key in pdGraphs) {
+                                    var $tab = $('#tabs-' + key);
+                                    $tab.find('pre.prettyprint').remove();
+                                    $('#svg-' + key).html(pdGraphs[key]).appendTo($tab);
+                                }
+                            }
                         });
                     }
                 }
@@ -349,41 +397,6 @@ HoxtonOwl.patchManager = {
                     $('span.compile-patch-container').remove();
                 }
 
-                // PD patch render button
-                if (github && github[0].substr(github[0].length - 3) === '.pd') {
-
-                    var $patchRenderLink = $('a.pdPatchRenderLink');
-                    $patchRenderLink.closest('span').show();
-                    $('tr.render-patch-container').show();
-
-                    $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js3rdparty/pd-fileutils-latest.min.js', function (data, textStatus, jqxhr) {
-                        $patchRenderLink.click(function () {
-
-                            if ($('body > .pd-patch-svg').length) {
-                                $('body > .pd-patch-svg').show();
-                                $.featherlight($('body > .pd-patch-svg'));
-                                $('body > .pd-patch-svg').hide();
-                            } else {
-                                pm.getGithubFile(that.selectedPatch().github[0], function(contents, filename) {
-                                    var patch = pdfu.parse(contents);
-                                    var rendered = pdfu.renderSvg(patch, {svgFile: false});
-                                    var $svgEl = $('div.pd-patch-svg');
-                                    if (!$svgEl.length) {
-                                        $('body').append('<div class="pd-patch-svg"></div>');
-                                    }
-                                    $svgEl = $('div.pd-patch-svg');
-                                    $svgEl.html(rendered);
-                                    $.featherlight($svgEl);
-                                    $($svgEl).hide();
-                                });
-                            }
-
-                            return false;
-                        });
-                    });
-                } else {
-                    $('span.pd-patch-render').remove();
-                }
             });
         };
 
