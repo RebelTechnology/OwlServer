@@ -24,7 +24,7 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 # Work out environment
 HOSTNAME=`hostname`
-if [ "$HOSTNAME" = "bella" ]
+if [ "$HOSTNAME" = "ulrike" -o "$HOSTNAME" = "bella" ]
 then
     TARGET_ENV='staging'
     GIT_BRANCH='dev'
