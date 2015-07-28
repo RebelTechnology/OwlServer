@@ -21,6 +21,9 @@ module.exports.WORDPRESS_XML_RPC_ENDPOINT = 'hoxtonowl.localhost:8000';
 module.exports.WORDPRESS_XML_RPC_USERNAME = 'owlapi';
 module.exports.WORDPRESS_XML_RPC_PASSWORD = 'secret';
 
+module.exports.SYSEX_PATH = '/var/www/hoxtonowl.com/subdomains/staging/patch-builder/build';
+module.exports.PATCH_BUILDER_PATH = '/var/www/hoxtonowl.com/subdomains/staging/patch-builder/patch-builder.php';
+
 // Do not edit below
 
 var mongoConnectionString = 'mongodb://';
@@ -29,5 +32,5 @@ if (MONGO_USE_AUTH) {
 }
 mongoConnectionString += MONGO_HOST + ':' + MONGO_PORT + '/' + MONGO_DATABASE;
 
-exports.mongoConnectionString = mongoConnectionString;
-exports.port = API_PORT;
+module.exports.mongoConnectionString = mongoConnectionString;
+module.exports.port = API_PORT;
