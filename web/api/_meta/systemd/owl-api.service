@@ -1,0 +1,11 @@
+[Service]
+ExecStart=/usr/bin/nodejs /srv/owl/api/bin/www
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=owl-api
+User=nobody
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.target
