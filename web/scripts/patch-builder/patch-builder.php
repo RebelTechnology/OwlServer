@@ -4,29 +4,6 @@
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
-// Patches without GitHub files
-// ----------------------------
-// db.patches.find({ $or: [ { github: { $exists: false }}, { $where: 'this.github.length === 0' }]}).pretty();
-//
-// Patches with at least a GitHub file
-// -----------------------------------
-// db.patches.find({ $or: [ { github: { $exists: true }}, { $where: 'this.github && this.github.length > 0' }]}).pretty();
-//
-// Patches with 1 GitHub file
-// --------------------------
-// db.patches.find({ github: { $exists: true, $size: 1 }}).pretty();
-// 54b55ccb14601612321d0ccd
-//
-// Patches with 2 GitHub file
-// --------------------------
-// db.patches.find({ github: { $exists: true, $size: 2 }}).pretty();
-// 54b55ccb14601612321d0c93
-//
-// Patches with 3 GitHub file
-// --------------------------
-// db.patches.find({ github: { $exists: true, $size: 3 }}).pretty();
-// 54b55ccb14601612321d0c9c
-//
 // `make online` example:
 // make BUILD=/tmp/owl-patch-xxx ONLINE_INCLUDES='#include \"OverdrivePatch.hpp\"' ONLINE_REGISTER='REGISTER_PATCH(OverdrivePatch, \"Overdrive\", 2, 2);' online
 //
@@ -38,7 +15,8 @@ use Symfony\Component\Process\Process;
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/settings.php';
 
-define('TMP_DIR_PREFIX', 'owl-patch-');
+define('PATCH_SRC_DIR_PREFIX', 'owl-src-');
+define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
 define('OWL_SRC_DIR', '/opt/OwlProgram.online/');
 define('COMPILE_TIMEOUT', 30); // time-out in seconds
 
@@ -241,13 +219,15 @@ if (null === $patch) {
 }
 
 /*
- * Create temporary directory
+ * Create temporary directories
  */
 
-$tempDir = tempdir(TMP_DIR_PREFIX);
+$patchSourceDir = tempdir(PATCH_SRC_DIR_PREFIX);
+$patchBuildDir = tempdir(PATCH_BUILD_DIR_PREFIX);
 if (!$onlyDloadFiles) {
-    register_shutdown_function(function () use ($tempDir) {
-        exec('rm -rf ' . $tempDir);
+    register_shutdown_function(function () use ($patchSourceDir, $patchBuildDir) {
+        exec('rm -rf ' . $patchSourceDir);
+        exec('rm -rf ' . $patchBuildDir);
     });
 }
 
@@ -269,7 +249,7 @@ if ($onlyShowFiles) {
 $sourceFiles = [];
 if (!$localPatchFiles) {
     foreach ($patch['github'] as $githubFile) {
-        $r = downloadGithubFile($githubFile, $tempDir);
+        $r = downloadGithubFile($githubFile, $patchSourceDir);
         if (!$r) {
             outputError('Download of ' . $githubFile . ' failed.');
             exit(1);
@@ -278,7 +258,7 @@ if (!$localPatchFiles) {
     }
 
     if ($onlyDloadFiles) {
-        outputError('DEBUG: Downloaded source files to ' . $tempDir . '. Aborting...');
+        outputError('DEBUG: Downloaded source files to ' . $patchSourceDir . '. Aborting...');
         var_dump($patch['github']);
         exit(1);
     }
@@ -298,8 +278,8 @@ if (!$localPatchFiles) {
             $sourceFile = $localPatchFileDir . '/' . $entry;
             if (is_file($sourceFile) && is_readable($sourceFile)) {
                 $sourceFiles[] = $entry;
-                if (!copy($sourceFile, $tempDir . '/' . $entry)) {
-                    echo 'ERROR: Unable to copy ' . $sourceFile . ' to ' . $tempDir . ' .' . PHP_EOL;
+                if (!copy($sourceFile, $patchSourceDir . '/' . $entry)) {
+                    echo 'ERROR: Unable to copy ' . $sourceFile . ' to ' . $patchSourceDir . ' .' . PHP_EOL;
                     exit(1);
                 }
             }
@@ -321,7 +301,7 @@ if (!$localPatchFiles) {
 
 if ($buildCmd == 'make online') {
 
-    $cmd = 'make BUILD=' . $tempDir . ' ';
+    $cmd = 'make BUILD=' . $patchBuildDir . ' ';
 
     // We hash-include only the first file
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
@@ -339,8 +319,8 @@ if ($buildCmd == 'make online') {
     $sourceFile = $sourceFiles[0];
 
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
-    $cmd  = 'make BUILD=\'' .  $tempDir          . '\' ';
-    $cmd .= 'PATCHSOURCE=\'' . $tempDir          . '\' ';
+    $cmd  = 'make BUILD=\'' .  $patchBuildDir    . '\' ';
+    $cmd .= 'PATCHSOURCE=\'' . $patchSourceDir   . '\' ';
     $cmd .= 'PATCHFILE=\'' .   $sourceFile       . '\' ';
     $cmd .= 'PATCHNAME=\'' .   $patch['name']    . '\' ';
     $cmd .= 'PATCHCLASS=\'' .  $className        . '\' ';
@@ -390,9 +370,9 @@ outputMessage('Build successful!');
  */
 
 if ($buildCmd == 'make sysx') {
-    $syxFilePath = $tempDir . '/patch.syx';
+    $syxFilePath = $patchBuildDir . '/patch.syx';
 } else {
-    $syxFilePath = $tempDir . '/online.syx';
+    $syxFilePath = $patchBuildDir . '/online.syx';
 }
 if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
     outputError('Unable to access ' . $syxFilePath . '.');
