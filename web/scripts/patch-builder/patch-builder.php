@@ -39,6 +39,7 @@ function usage() {
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
     echo '  --make-online       Use the old `make online` command instead of the newer `make sysx`.' . PHP_EOL;
     echo '  --local-patch-files Use all patch files in /tmp/patch-name/* instead of downloading them from GitHub.' . PHP_EOL;
+    echo '  --keep-tmp-files    Do not delete temporary source and build directories once the build has finished.' . PHP_EOL;
 }
 
 /**
@@ -151,6 +152,7 @@ $longopts  = [
     'show-build-cmd',
     'make-online',
     'patch-files:',
+    'keep-tmp-files',
 ];
 $options = getopt($shortopts, $longopts);
 
@@ -184,6 +186,11 @@ $localPatchFiles = false;
 if (isset($options['local-patch-files']) && false === $options['local-patch-files']) {
     $localPatchFiles = true;
     $onlyDloadFiles = false;
+}
+
+$keepTmpFiles = false;
+if (isset($options['keep-tmp-files']) && false === $options['keep-tmp-files']) {
+    $keepTmpFiles = true;
 }
 
 $patchId = $argv[count($argv) - 1];
@@ -224,7 +231,7 @@ if (null === $patch) {
 
 $patchSourceDir = tempdir(PATCH_SRC_DIR_PREFIX);
 $patchBuildDir = tempdir(PATCH_BUILD_DIR_PREFIX);
-if (!$onlyDloadFiles) {
+if (!$onlyDloadFiles && !$keepTmpFiles) {
     register_shutdown_function(function () use ($patchSourceDir, $patchBuildDir) {
         exec('rm -rf ' . $patchSourceDir);
         exec('rm -rf ' . $patchBuildDir);
