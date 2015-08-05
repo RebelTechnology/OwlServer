@@ -80,8 +80,8 @@ while ($patch = $p->getNext()) {
 
     echo 'Compiling "' . $patch['name'] .' (' . $patch['_id'] . ')"... ' . PHP_EOL;
     $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ' > /dev/null 2> /dev/null';
-    $exitStatus = 1;
-    //system($cmd, $exitStatus);
+    $exitStatus = 0;
+    system($cmd, $exitStatus);
     if ($exitStatus == 0) {
         echo 'OK! Patch built successfully!' . PHP_EOL;
     } else {
@@ -90,7 +90,14 @@ while ($patch = $p->getNext()) {
     }
     echo PHP_EOL;
     echo 'Now sleeping for ' . $interval . ' seconds... zZzZzZzZz...' . PHP_EOL;
-    sleep($interval);
+    $remaining = $interval;
+    while ($remaining) {
+        echo "\r" . '-' . $remaining . '...';
+        sleep(1);
+        $remaining--;
+    }
+    echo "\r         " . PHP_EOL;
+    //sleep($interval);
 }
 
 if (count($failedPatches)) {
