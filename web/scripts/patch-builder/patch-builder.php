@@ -34,6 +34,7 @@ function usage() {
     echo '  -h, --help          Show this help and exit.' . PHP_EOL;
     echo PHP_EOL;
     echo 'Debug options:' . PHP_EOL;
+    echo '  --name=<patch-name> Finds patch by name.';
     echo '  --only-show-files   Only show files that would be downloaded from GitHub.' . PHP_EOL;
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
@@ -153,6 +154,7 @@ $longopts  = [
     'make-online',
     'patch-files:',
     'keep-tmp-files',
+    'name:'
 ];
 $options = getopt($shortopts, $longopts);
 
@@ -193,10 +195,15 @@ if (isset($options['keep-tmp-files']) && false === $options['keep-tmp-files']) {
     $keepTmpFiles = true;
 }
 
-$patchId = $argv[count($argv) - 1];
-if (strlen($patchId) !== 24 || !ctype_xdigit($patchId)) {
-    usage();
-    exit(1);
+if (isset($options['name'])) {
+    $patchName = $options['name']; // if patch name is specified as a command line option,
+                                   // we will search for patch ID later on in this script
+} else {
+    $patchId = $argv[count($argv) - 1];
+    if (strlen($patchId) !== 24 || !ctype_xdigit($patchId)) {
+        usage();
+        exit(1);
+    }
 }
 
 /*
@@ -219,10 +226,22 @@ try {
     outputError('Unable to connect to MongoDb.');
     exit(1);
 }
-$patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
+
+if (isset($patchName)) {
+    // Patch name was provided in command line
+    $patch = $patches->findOne([ 'name' => $patchName ]);
+} else {
+    // Patch ID was provided in command line
+    $patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
+}
+
 if (null === $patch) {
     outputError('Patch not found.');
     exit(1);
+}
+
+if (!isset($patchId)) { // patch name was provided in command line
+    $patchId = $patch['_id'];
 }
 
 /*
