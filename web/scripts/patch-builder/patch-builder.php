@@ -345,14 +345,30 @@ if ($buildCmd == 'make online') {
     $sourceFile = $sourceFiles[0];
 
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
+    $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
+
     $cmd  = 'make BUILD=\'' .  $patchBuildDir    . '\' ';
     $cmd .= 'PATCHSOURCE=\'' . $patchSourceDir   . '\' ';
-    $cmd .= 'PATCHFILE=\'' .   $sourceFile       . '\' ';
     $cmd .= 'PATCHNAME=\'' .   $patch['name']    . '\' ';
     $cmd .= 'PATCHCLASS=\'' .  $className        . '\' ';
     $cmd .= 'PATCHIN=' .       $patch['inputs']  .' ';
     $cmd .= 'PATCHOUT='.       $patch['outputs'] .' ';
+
+    switch ($patchSourceFileExt) {
+
+    case 'dsp': // Faust
+        $cmd .= 'PATCHFILE=\'' .   $className       . '.hpp\' ';
+        break;
+
+    case 'pd': // PureData
+        $cmd .= 'PATCHFILE=\'' .   $sourceFile       . '\' ';
+        break;
+
+    default: // C/C++ patch
+        $cmd .= 'PATCHFILE=\'' .   $sourceFile       . '\' ';
+    }
     $cmd .= 'sysex';
+
 } else {
     echo 'Unexpected error!' . PHP_EOL;
     exit;
