@@ -358,6 +358,7 @@ if ($buildCmd == 'make online') {
 
     case 'dsp': // Faust
         $cmd .= 'PATCHFILE=\'' .   $className       . '.hpp\' ';
+        $cmd .= 'FAUST=\'' . $className . '\' ';
         break;
 
     case 'pd': // PureData
