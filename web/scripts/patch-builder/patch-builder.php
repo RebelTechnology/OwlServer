@@ -350,23 +350,35 @@ if ($buildCmd == 'make online') {
     $cmd  = 'make BUILD=\'' .  $patchBuildDir    . '\' ';
     $cmd .= 'PATCHSOURCE=\'' . $patchSourceDir   . '\' ';
     $cmd .= 'PATCHNAME=\'' .   $patch['name']    . '\' ';
-    $cmd .= 'PATCHCLASS=\'' .  $className        . '\' ';
     $cmd .= 'PATCHIN=' .       $patch['inputs']  .' ';
     $cmd .= 'PATCHOUT='.       $patch['outputs'] .' ';
 
     switch ($patchSourceFileExt) {
 
     case 'dsp': // Faust
-        $cmd .= 'PATCHFILE=\'' .   $className       . '.hpp\' ';
-        $cmd .= 'FAUST=\'' . $className . '\' ';
+        // make
+        //  BUILD=/tmp/build
+        //  PATCHSOURCE=/tmp/src
+        //  FAUST=Crybaby
+        //  PATCHNAME='Faust/Crybaby'
+        //  PATCHCLASS=CrybabyPatch
+        //  PATCHFILE=CrybabyPatch.hpp
+        //  sysex
+
+        $className .= 'Patch';
+        $cmd .= 'PATCHFILE=\'' .  $className . '.hpp\' ';
+        $cmd .= 'PATCHCLASS=\'' . $className . '\' ';
+        $cmd .= 'FAUST=\'' .      $className . '\' ';
         break;
 
     case 'pd': // PureData
-        $cmd .= 'PATCHFILE=\'' .   $sourceFile       . '\' ';
+        $cmd .= 'PATCHFILE=\'' .  $sourceFile . '\' ';
+        $cmd .= 'PATCHCLASS=\'' . $className  . '\' ';
         break;
 
     default: // C/C++ patch
-        $cmd .= 'PATCHFILE=\'' .   $sourceFile       . '\' ';
+        $cmd .= 'PATCHFILE=\'' .  $sourceFile . '\' ';
+        $cmd .= 'PATCHCLASS=\'' . $className  . '\' ';
     }
     $cmd .= 'sysex';
 
