@@ -356,19 +356,10 @@ if ($buildCmd == 'make online') {
     switch ($patchSourceFileExt) {
 
     case 'dsp': // Faust
-        // make
-        //  BUILD=/tmp/build
-        //  PATCHSOURCE=/tmp/src
-        //  FAUST=Crybaby
-        //  PATCHNAME='Faust/Crybaby'
-        //  PATCHCLASS=CrybabyPatch
-        //  PATCHFILE=CrybabyPatch.hpp
-        //  sysex
-
+        $cmd .= 'FAUST=\'' .      $className . '\' ';
         $className .= 'Patch';
         $cmd .= 'PATCHFILE=\'' .  $className . '.hpp\' ';
         $cmd .= 'PATCHCLASS=\'' . $className . '\' ';
-        $cmd .= 'FAUST=\'' .      $className . '\' ';
         break;
 
     case 'pd': // PureData
