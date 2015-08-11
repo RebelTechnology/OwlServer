@@ -363,8 +363,6 @@ if ($buildCmd == 'make online') {
         break;
 
     case 'pd': // PureData
-        $cmd .= 'PATCHFILE=\'HeavyPatch.hpp\' ';
-        $cmd .= 'PATCHCLASS=\'HeavyPatch\' ';
         $cmd .= 'HEAVY=\'$className\' ';
         $cmd .= 'heavy ';
         break;
