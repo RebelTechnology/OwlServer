@@ -363,7 +363,7 @@ if ($buildCmd == 'make online') {
         break;
 
     case 'pd': // PureData
-        $cmd .= 'HEAVY=\'$className\' ';
+        $cmd .= 'HEAVY=\'' . $className . '\' ';
         $cmd .= 'heavy ';
         break;
 
