@@ -391,7 +391,7 @@ if ($showBuildCmd) {
 // The first build will fail, and the second one will (hopefully) succeed.
 // See: https://github.com/pingdynasty/OwlServer/issues/80#issuecomment-128419020
 if ($patchSourceFileExt == 'pd') {
-    system($cmd); // we just ignore the result of this command, whatever it is
+    system('cd ' . escapeshellarg(OWL_SRC_DIR) . ' ; ' . $cmd); // we just ignore the result of this command, whatever it is
 }
 
 $process = new Process($cmd, OWL_SRC_DIR, null, null, COMPILE_TIMEOUT);
