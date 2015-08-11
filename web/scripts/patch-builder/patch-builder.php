@@ -365,6 +365,8 @@ if ($buildCmd == 'make online') {
     case 'pd': // PureData
         $cmd .= 'PATCHFILE=\'HeavyPatch.hpp\' ';
         $cmd .= 'PATCHCLASS=\'HeavyPatch\' ';
+        $cmd .= 'HEAVY=\'$className\' ';
+        $cmd .= 'heavy ';
         break;
 
     default: // C/C++ patch
