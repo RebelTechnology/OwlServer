@@ -101,13 +101,15 @@ while ($patch = $p->getNext()) {
         echo ($colouredOutput ? Color::RED : '') . 'Ooops! patch did not build! (make exit status = ' . $exitStatus. ')' . PHP_EOL;
     }
     $count++;
+    $pc = 100 * $count / $total;
     $pc = 100 * $successfull / $total;
     echo sprintf(
-        'Tried to compile %d out of %d patches so far, of which %d compiled successfully (%.1f%%).' . PHP_EOL,
+        'Tried to compile %d out of %d patches so far (%.1f%%), of which %d compiled successfully (%.1f%%).' . PHP_EOL,
         $count,
         $total,
+        $pc,
         $successfull,
-        $pc
+        $pcSuccessfull
     );
     echo PHP_EOL;
     echo 'Now sleeping for ' . $interval . ' seconds... zZzZzZzZz...' . PHP_EOL;
