@@ -5,6 +5,7 @@
  */
 
 use Symfony\Component\Process\Process;
+use Lijinma\Color;
 
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/settings.php';
@@ -23,12 +24,14 @@ function usage() {
     echo PHP_EOL;
     echo 'Options:' . PHP_EOL;
     echo '  --interval=<seconds> Interval in seconds before compiling the next patch. Defaults ' . DEFAULT_INTERVAL . ' to seconds.' . PHP_EOL;
+    echo '  --no-color           Suppresses coloured output.' . PHP_EOL;
 }
 
 $shortopts  = 'h';
 $longopts  = [
     'help',
     'interval:',
+    'no-color',
 ];
 $options = getopt($shortopts, $longopts);
 
@@ -44,6 +47,11 @@ if (isset($options['interval'])) {
         echo 'ERROR: Interval cannot be 0 seconds.' . PHP_EOL;
         exit(1);
     }
+}
+
+$colouredOutput = true;
+if (isset($options['no-color']) && false === $options['no-color']) {
+    $colouredOutput = false;
 }
 
 
@@ -68,9 +76,12 @@ try {
     exit(1);
 }
 $p = $patches->find();
-echo 'Found ' . $p->count() . ' patches.' . PHP_EOL;
+$total = $p->count();
+echo 'Found ' . $total . ' patches.' . PHP_EOL;
 
 $failedPatches = [];
+$count = 0;
+$successfull = 0;
 while ($patch = $p->getNext()) {
 
     // Don't try to compile patches with no source code available
@@ -78,16 +89,26 @@ while ($patch = $p->getNext()) {
         continue;
     }
 
-    echo 'Compiling "' . $patch['name'] .' (' . $patch['_id'] . ')"... ' . PHP_EOL;
+    echo 'Compiling ' . $patch['name'] .' (' . $patch['_id'] . ')... ' . PHP_EOL;
     $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ' > /dev/null 2> /dev/null';
     $exitStatus = 0;
     system($cmd, $exitStatus);
     if ($exitStatus == 0) {
-        echo 'OK! Patch built successfully!' . PHP_EOL;
+        echo ($colouredOutput ? Color::GREEN : '') . 'Patch built successfully!' . PHP_EOL;
+        $successfull++;
     } else {
         $failedPatches[] = $patch['name'];
-        echo 'Ooops! patch did not build! (make exit status = ' . $exitStatus. ')' . PHP_EOL;
+        echo ($colouredOutput ? Color::RED : '') . 'Ooops! patch did not build! (make exit status = ' . $exitStatus. ')' . PHP_EOL;
     }
+    $count++;
+    $pc = 100 * $successfull / $total;
+    echo sprintf(
+        'Tried to compile %d out of %d patches so far, of which %d compiled successfully (%.1f%%).' . PHP_EOL,
+        $count,
+        $total,
+        $successfull,
+        $pc
+    );
     echo PHP_EOL;
     echo 'Now sleeping for ' . $interval . ' seconds... zZzZzZzZz...' . PHP_EOL;
     $remaining = $interval;
@@ -97,7 +118,6 @@ while ($patch = $p->getNext()) {
         $remaining--;
     }
     echo "\r         " . PHP_EOL;
-    //sleep($interval);
 }
 
 if (count($failedPatches)) {

@@ -1,11 +1,49 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "85ceaa52a48850842d4056c5a66f3eda",
+    "hash": "44d4ab84c295be355c515342a7964688",
     "packages": [
+        {
+            "name": "lijinma/php-cli-color",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lijinma/php-cli-color.git",
+                "reference": "5ee4f7414882b26a4a657428e9a15872bde99b38"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lijinma/php-cli-color/zipball/5ee4f7414882b26a4a657428e9a15872bde99b38",
+                "reference": "5ee4f7414882b26a4a657428e9a15872bde99b38",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Lijinma\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jinma li",
+                    "email": "lijinma@126.com",
+                    "homepage": "http://www.lijinma.com"
+                }
+            ],
+            "description": "Make colorful CLI output easy",
+            "homepage": "https://github.com/lijinma/php-cli-color",
+            "time": "2014-12-23 07:14:16"
+        },
         {
             "name": "symfony/process",
             "version": "2.7.x-dev",
@@ -17,7 +55,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Process/zipball/e68470654c6ad2c402f3df90a4461966dfd38bec",
+                "url": "https://api.github.com/repos/symfony/Process/zipball/48aeb0e48600321c272955132d7606ab0a49adb3",
                 "reference": "e68470654c6ad2c402f3df90a4461966dfd38bec",
                 "shasum": ""
             },
