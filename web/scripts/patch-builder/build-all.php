@@ -94,15 +94,15 @@ while ($patch = $p->getNext()) {
     $exitStatus = 0;
     system($cmd, $exitStatus);
     if ($exitStatus == 0) {
-        echo ($colouredOutput ? Color::GREEN : '') . 'Patch built successfully!' . PHP_EOL;
+        echo ($colouredOutput ? Color::GREEN : '') . 'Patch built successfully!' . "\033[0m" . PHP_EOL;
         $successfull++;
     } else {
         $failedPatches[] = $patch['name'];
-        echo ($colouredOutput ? Color::RED : '') . 'Ooops! patch did not build! (make exit status = ' . $exitStatus. ')' . PHP_EOL;
+        echo ($colouredOutput ? Color::RED : '') . 'Ooops! patch did not build! (make exit status = ' . $exitStatus. ')' . "\033[0m" . PHP_EOL;
     }
     $count++;
     $pc = 100 * $count / $total;
-    $pc = 100 * $successfull / $total;
+    $pcSuccessfull = 100 * $successfull / $total;
     echo sprintf(
         'Tried to compile %d out of %d patches so far (%.1f%%), of which %d compiled successfully (%.1f%%).' . PHP_EOL,
         $count,
