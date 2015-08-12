@@ -118,6 +118,18 @@ function downloadGithubFile($githubFile, $dstPath) {
     $context = stream_context_create($opts);
     $data = file_get_contents($endpoint, false, $context);
 
+    // Write GitHub rate limit to disk:
+    $rateLimitHeader = 'X-RateLimit-Remaining';
+    foreach ($http_response_header as $header) {
+        if (substr($header, 0, strlen($rateLimitHeader)) == $rateLimitHeader) {
+            $bits = explode(':', $header);
+            $limit = trim($bits[1]);
+            file_put_contents('/tmp/github-rate-limit', $limit . PHP_EOL);
+            @chmod('/tmp/github-rate-limit', 0666);
+            break;
+        }
+    }
+
     // Decode data
     $json = json_decode($data);
     if (null === $json) {
