@@ -124,8 +124,9 @@ function downloadGithubFile($githubFile, $dstPath) {
         if (substr($header, 0, strlen($rateLimitHeader)) == $rateLimitHeader) {
             $bits = explode(':', $header);
             $limit = trim($bits[1]);
-            file_put_contents('/tmp/github-rate-limit', $limit . PHP_EOL);
+            $f = fopen('/tmp/github-rate-limit', 'a');
             @chmod('/tmp/github-rate-limit', 0666);
+            fwrite($f, sprintf('%s - %d', date('c'), $limit) . PHP_EOL);
             break;
         }
     }
