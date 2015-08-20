@@ -170,7 +170,7 @@ router.put('/:id', function(req, res) {
         if (!isAdmin) {
             if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
                 throw {
-                    message: 'You are not authorized to edit compile patch.',
+                    message: 'You are not authorized to compile this patch.',
                     error: { status: 401 }
                 };
             }
