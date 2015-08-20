@@ -181,6 +181,7 @@ router.put('/:id', function(req, res) {
          */
 
         var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH + ' ' + id;
+        console.log('Running command "' + cmd + '"...');
         exec(cmd, function (error, stdout, stderr) {
 
             var response = {
