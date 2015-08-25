@@ -249,6 +249,15 @@ if (isset($patchName)) {
     $patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
 }
 
+// Sanitize some values later used as command line arguments:
+if (isset($patch['inputs'])) {
+    $patch['inputs']  = intval($patch['inputs']);
+}
+
+if (isset($patch['outputs'])) {
+    $patch['outputs'] = intval($patch['outputs']);
+}
+
 if (null === $patch) {
     outputError('Patch not found.');
     exit(1);
@@ -341,16 +350,16 @@ if (!$localPatchFiles) {
 
 if ($buildCmd == 'make online') {
 
-    $cmd = 'make BUILD=' . $patchBuildDir . ' ';
+    $cmd = 'make BUILD=' . escapeshellarg($patchBuildDir) . ' ';
 
     // We hash-include only the first file
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
     $sourceFile = $sourceFiles[0];
-    $cmd .= 'ONLINE_INCLUDES=\'#include \\"' . $sourceFile . '\\"\' ';
+    $cmd .= 'ONLINE_INCLUDES=' . escapeshellarg('#include \\"' . $sourceFile . '\\"') . ' ';
     // The filename must be ClassName.hpp
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86669862
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
-    $cmd .= 'ONLINE_REGISTER=\'REGISTER_PATCH(' . $className . ', \\"' . $patch['name'] . '\\", 2, 2);\' online';
+    $cmd .= 'ONLINE_REGISTER=' . escapeshellarg('REGISTER_PATCH(' . $className . ', \\"' . $patch['name'] . '\\", 2, 2);') . ' online';
 
 } elseif ($buildCmd = 'make sysx') {
 
@@ -361,30 +370,30 @@ if ($buildCmd == 'make online') {
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
-    $cmd  = 'make BUILD=\'' .  $patchBuildDir    . '\' ';
-    $cmd .= 'PATCHSOURCE=\'' . $patchSourceDir   . '\' ';
-    $cmd .= 'PATCHNAME=\'' .   $patch['name']    . '\' ';
-    $cmd .= 'PATCHIN=' .       $patch['inputs']  .' ';
-    $cmd .= 'PATCHOUT='.       $patch['outputs'] .' ';
+    $cmd  = 'make BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
+    $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
+    $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
+    $cmd .= 'PATCHIN=' .     $patch['inputs']  .' ';
+    $cmd .= 'PATCHOUT='.     $patch['outputs'] .' ';
 
     switch ($patchSourceFileExt) {
 
     case 'dsp': // Faust
-        $cmd .= 'FAUST=\'' .      $className . '\' ';
+        $cmd .= 'FAUST=' . escapeshellarg($className) . ' ';
         $className .= 'Patch';
-        $cmd .= 'PATCHFILE=\'' .  $className . '.hpp\' ';
-        $cmd .= 'PATCHCLASS=\'' . $className . '\' ';
+        $cmd .= 'PATCHFILE=' .  escapeshellarg($className . '.hpp') . ' ';
+        $cmd .= 'PATCHCLASS=' . escapeshellarg($className) . ' ';
         break;
 
     case 'pd': // PureData
-        $cmd .= 'HEAVY=\'' . $className . '\' ';
-        $cmd .= 'HEAVYTOKEN=' . HEAVY_TOKEN . ' ';
+        $cmd .= 'HEAVY=' . escapeshellarg($className) . ' ';
+        $cmd .= 'HEAVYTOKEN=' . escapeshellarg(HEAVY_TOKEN) . ' ';
         $cmd .= 'heavy ';
         break;
 
     default: // C/C++ patch
-        $cmd .= 'PATCHFILE=\'' .  $sourceFile . '\' ';
-        $cmd .= 'PATCHCLASS=\'' . $className  . '\' ';
+        $cmd .= 'PATCHFILE=' . escapeshellarg($sourceFile) . ' ';
+        $cmd .= 'PATCHCLASS=' . escapeshellarg($className) . ' ';
     }
     $cmd .= 'sysex';
 
