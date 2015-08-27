@@ -481,7 +481,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
         exit(1);
     }
 
-} elseif (MAKE_TARGET_SYSX == $makeTarget) {
+} elseif (MAKE_TARGET_WEB == $makeTarget) {
 
     /*
      * Move `patch.js` to download location
