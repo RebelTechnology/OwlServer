@@ -142,6 +142,7 @@ function downloadGithubFile($githubFile, $dstPath) {
     $json = json_decode($data);
     if (null === $json) {
         outputError('Invalid JSON.');
+        echo $data . PHP_EOL;
         return false;
     }
     $data = base64_decode($json->content);
