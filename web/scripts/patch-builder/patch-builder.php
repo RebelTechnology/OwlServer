@@ -232,7 +232,7 @@ if (isset($options['web']) && false === $options['web']) {
         outputError('The --make-online and --web options cannot be used together.');
         exit(1);
     }
-    $makeTarget = MAKE_TARGET_WEB;
+    $makeTarget = MAKE_TARGET_MINIFY;
 }
 
 /*
@@ -480,7 +480,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
         exit(1);
     }
 
-} elseif (MAKE_TARGET_WEB == $makeTarget) {
+} elseif (MAKE_TARGET_WEB == $makeTarget || MAKE_TARGET_MINIFY == $makeTarget) {
 
     /*
      * Move `patch.js` to download location
@@ -492,7 +492,8 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     }
 
     $dstDir = __DIR__ . '/build-js/';
-    $r = rename($jsFilePath, $dstDir . $patch['seoName'] . '.js');
+    $ext = MAKE_TARGET_WEB == $makeTarget ? '.js' : '.min.js';
+    $r = rename($jsFilePath, $dstDir . $patch['seoName'] . $ext);
     if (!$r) {
         outputError('Unable to move ' . $jsFilePath . ' to ' . $dstDir . '.');
         exit(1);

@@ -10,6 +10,7 @@ const PATCH_TYPE_UNKNOWN   = 'unknown';
 
 const MAKE_TARGET_SYSX     = 'sysex';
 const MAKE_TARGET_WEB      = 'web';
+const MAKE_TARGET_MINIFY   = 'web';
 
 /**
  * Returns the patch type.
