@@ -15,11 +15,16 @@ use Symfony\Component\Process\Process;
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/settings.php';
 
-define('PATCH_SRC_DIR_PREFIX', 'owl-src-');
+define('PATCH_SRC_DIR_PREFIX',   'owl-src-');
 define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
-define('OWL_SRC_DIR', '/opt/OwlProgram.online/');
-define('COMPILE_TIMEOUT', 30); // time-out in seconds
-define('HEAVY_TOKEN', 'FNPHpsCYj0Jxa8Fwh5cDV1MU1M8OHghK');
+define('OWL_SRC_DIR',            '/opt/OwlProgram.online/');
+define('COMPILE_TIMEOUT',        30); // time-out in seconds
+define('HEAVY_TOKEN',            'FNPHpsCYj0Jxa8Fwh5cDV1MU1M8OHghK');
+define('SYSX_DST_PATH',          __DIR__ . '/build/');
+define('JS_DST_PATH',            __DIR__ . '/build-js/')
+
+define('MAKE_TARGET_SYSX',       'sysex');
+define('MAKE_TARGET_WEB',        'web');
 
 $stdout = fopen('php://stdout', 'w+');
 $stderr = fopen('php://stderr', 'w+');
@@ -33,9 +38,10 @@ function usage() {
     echo PHP_EOL;
     echo 'Options:' . PHP_EOL;
     echo '  -h, --help          Show this help and exit.' . PHP_EOL;
+    echo '  --name=<patch-name> Finds patch by name.' . PHP_EOL;
+    echo '  --web               Builds a JavaScript file instead of a .syx file.' . PHP_EOL;
     echo PHP_EOL;
     echo 'Debug options:' . PHP_EOL;
-    echo '  --name=<patch-name> Finds patch by name.';
     echo '  --only-show-files   Only show files that would be downloaded from GitHub.' . PHP_EOL;
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
@@ -168,7 +174,8 @@ $longopts  = [
     'make-online',
     'patch-files:',
     'keep-tmp-files',
-    'name:'
+    'name:',
+    'web',
 ];
 $options = getopt($shortopts, $longopts);
 
@@ -218,6 +225,15 @@ if (isset($options['name'])) {
         usage();
         exit(1);
     }
+}
+
+$makeTarget = MAKE_TARGET_SYSX;
+if (isset($options['web']) && false === $options['web']) {
+    if (isset($options['make-online']) && false === $options['make-online']) {
+        outputError('The --make-online and --web options cannot be used together.');
+        exit(1);
+    }
+    $makeTarget = MAKE_TARGET_WEB;
 }
 
 /*
@@ -395,7 +411,7 @@ if ($buildCmd == 'make online') {
         $cmd .= 'PATCHFILE=' . escapeshellarg($sourceFile) . ' ';
         $cmd .= 'PATCHCLASS=' . escapeshellarg($className) . ' ';
     }
-    $cmd .= 'sysex';
+    $cmd .= $makeTarget;
 
 } else {
     echo 'Unexpected error!' . PHP_EOL;
@@ -442,25 +458,46 @@ if (0 !== $exitCode) {
 }
 outputMessage('Build successful!');
 
-/*
- * Move .syx file to download location
- */
+if (MAKE_TARGET_SYSX == $makeTarget) {
 
-if ($buildCmd == 'make sysx') {
-    $syxFilePath = $patchBuildDir . '/patch.syx';
-} else {
-    $syxFilePath = $patchBuildDir . '/online.syx';
-}
-if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
-    outputError('Unable to access ' . $syxFilePath . '.');
-    exit(1);
-}
+    /*
+     * Move .syx file to download location
+     */
 
-$dstDir = __DIR__ . '/build/';
-$r = rename($syxFilePath, $dstDir . $patch['seoName'] . '.syx');
-if (!$r) {
-    outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
-    exit(1);
+    if ($buildCmd == 'make sysx') {
+        $syxFilePath = $patchBuildDir . '/patch.syx';
+    } else {
+        $syxFilePath = $patchBuildDir . '/online.syx';
+    }
+    if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
+        outputError('Unable to access ' . $syxFilePath . '.');
+        exit(1);
+    }
+
+    $dstDir = __DIR__ . '/build/';
+    $r = rename($syxFilePath, $dstDir . $patch['seoName'] . '.syx');
+    if (!$r) {
+        outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
+        exit(1);
+    }
+
+} elseif (MAKE_TARGET_SYSX == $makeTarget) {
+
+    /*
+     * Move `patch.js` to download location
+     */
+
+    $jsFilePath = $patchBuildDir . '/patch.js';
+    if (!$file_exists($jsFilePath) || !is_file($jsFilePath) || !is_readable($jsFilePath)) {
+        outputError('Unable to access ' . $jsFilePath . '.');
+    }
+
+    $dstDir = __DIR__ . '/build-js/';
+    $r = rename($jsFilePath, $dstDir, $patch['seoName'] . 'js');
+    if (!$r) {
+        outputError('Unable to move ' . $jsFilePath . ' to ' . $dstDir . '.');
+        exit(1);
+    }
 }
 
 // EOF
