@@ -68,6 +68,7 @@ rsync --quiet -avz $DIR/$CLONE_DIR/web/mediawiki/skins/HoxtonOWL2014 $DIR/../htt
 echo "Updating patch builder script..."
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/patch-builder.php $DIR/../patch-builder/
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/build-all.php $DIR/../patch-builder/
+cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/common.php $DIR/../patch-builder/
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/composer.json $DIR/../patch-builder/
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/composer.lock $DIR/../patch-builder/
 cd $DIR/../patch-builder/
