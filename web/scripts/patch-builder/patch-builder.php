@@ -493,7 +493,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     }
 
     $dstDir = __DIR__ . '/build-js/';
-    $r = rename($jsFilePath, $dstDir . $patch['seoName'] . 'js');
+    $r = rename($jsFilePath, $dstDir . $patch['seoName'] . '.js');
     if (!$r) {
         outputError('Unable to move ' . $jsFilePath . ' to ' . $dstDir . '.');
         exit(1);
