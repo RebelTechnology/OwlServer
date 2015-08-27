@@ -9,6 +9,7 @@ use Lijinma\Color;
 
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/settings.php';
+require_once __DIR__ . '/common.php';
 
 const DEFAULT_INTERVAL = 120; // 2 minutes
 
@@ -24,8 +25,10 @@ function usage() {
     echo PHP_EOL;
     echo 'Options:' . PHP_EOL;
     echo '  --interval=<seconds> Interval in seconds before compiling the next patch. Defaults ' . DEFAULT_INTERVAL . ' to seconds.' . PHP_EOL;
+    echo '  --web                Compiles a patch into JavaScript instead of into .sysx.' . PHP_EOL;
     echo '  --no-color           Suppresses coloured output.' . PHP_EOL;
-}
+    echo '  --dry-run            Dry run.' . PHP_EOL;
+} // function usage
 
 $shortopts  = 'h';
 $longopts  = [
@@ -40,13 +43,15 @@ if ((isset($options['h']) && false === $options['h']) || (isset($options['help']
     exit(1);
 }
 
+$makeTarget = MAKE_TARGET_SYSX;
+if (isset($options['web']) && false === $options['web']) {
+    $makeTarget = MAKE_TARGET_WEB;
+}
+
+
 $interval = DEFAULT_INTERVAL;
 if (isset($options['interval'])) {
     $interval = intval($options['interval']);
-    if (0 === $interval) {
-        echo 'ERROR: Interval cannot be 0 seconds.' . PHP_EOL;
-        exit(1);
-    }
 }
 
 $colouredOutput = true;
@@ -54,6 +59,10 @@ if (isset($options['no-color']) && false === $options['no-color']) {
     $colouredOutput = false;
 }
 
+$dryRun = false;
+if (isset($options['dry-run']) && false === $options['dry-run']) {
+    $dryRun = true;
+}
 
 /*
  * Get all patches
@@ -85,19 +94,23 @@ $successful = 0;
 while ($patch = $p->getNext()) {
 
     // Don't try to compile patches with no source code available
-    if (!isset($patch['github']) || count($patch['github']) < 1) {
+    $patchType = getPatchType($patch);
+    if (PATCH_TYPE_UNKNOWN == $patchType) {
         continue;
     }
 
     echo 'Compiling ' . $patch['name'] .' (' . $patch['_id'] . ')... ' . PHP_EOL;
-    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ' > /dev/null 2> /dev/null';
+    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ($makeTarget == MAKE_TARGET_WEB ? ' --web' : '') . ' > /dev/null 2> /dev/null';
     $exitStatus = 0;
-    system($cmd, $exitStatus);
+    if (!$dryRun) {
+        system($cmd, $exitStatus);
+    }
+
     if ($exitStatus == 0) {
         echo ($colouredOutput ? Color::GREEN : '') . 'Patch built successfully!' . "\033[0m" . PHP_EOL;
         $successful++;
     } else {
-        $failedPatches[] = $patch['name'];
+        $failedPatches[] = [ $patch['name'], $patchType ];
         echo ($colouredOutput ? Color::RED : '') . 'Ooops! patch did not build! (make exit status = ' . $exitStatus. ')' . "\033[0m" . PHP_EOL;
     }
     $count++;
@@ -126,8 +139,9 @@ if (count($failedPatches)) {
 echo PHP_EOL;
 echo 'Patches that did not build' . PHP_EOL;
 echo '--------------------------' . PHP_EOL;
+$mask = '%11s   %-30s';
 foreach ($failedPatches as $failedPatch) {
-    echo $failedPatch . PHP_EOL;
+    printf($mask . PHP_EOL, $failedPatch[1], $failedPatch[0]);
 }
 } else {
     echo 'Hurray! All patches built successfully!' . PHP_EOL;

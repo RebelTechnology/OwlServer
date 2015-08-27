@@ -14,6 +14,7 @@ use Symfony\Component\Process\Process;
 
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/settings.php';
+require_once __DIR__ . '/common.php';
 
 define('PATCH_SRC_DIR_PREFIX',   'owl-src-');
 define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
@@ -22,9 +23,6 @@ define('COMPILE_TIMEOUT',        30); // time-out in seconds
 define('HEAVY_TOKEN',            'FNPHpsCYj0Jxa8Fwh5cDV1MU1M8OHghK');
 define('SYSX_DST_PATH',          __DIR__ . '/build/');
 define('JS_DST_PATH',            __DIR__ . '/build-js/');
-
-define('MAKE_TARGET_SYSX',       'sysex');
-define('MAKE_TARGET_WEB',        'web');
 
 $stdout = fopen('php://stdout', 'w+');
 $stderr = fopen('php://stderr', 'w+');
