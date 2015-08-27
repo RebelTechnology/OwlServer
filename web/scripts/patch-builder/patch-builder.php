@@ -486,13 +486,13 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
      * Move `patch.js` to download location
      */
 
-    $jsFilePath = $patchBuildDir . '/patch.js';
+    $ext = MAKE_TARGET_WEB == $makeTarget ? '.js' : '.min.js';
+    $jsFilePath = $patchBuildDir . '/patch' . $ext;
     if (!file_exists($jsFilePath) || !is_file($jsFilePath) || !is_readable($jsFilePath)) {
         outputError('Unable to access ' . $jsFilePath . '.');
     }
 
     $dstDir = __DIR__ . '/build-js/';
-    $ext = MAKE_TARGET_WEB == $makeTarget ? '.js' : '.min.js';
     $r = rename($jsFilePath, $dstDir . $patch['seoName'] . $ext);
     if (!$r) {
         outputError('Unable to move ' . $jsFilePath . ' to ' . $dstDir . '.');
