@@ -103,8 +103,11 @@ chmod 664 $DIR/../logs/*
 echo "Deleting temp repo clone..."
 rm -rf $DIR/$CLONE_DIR
 
-echo "Done."
-echo
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo " REMEMBER TO CLEAR APC CACHE @ $SITE_URL/apc.php !!!                    "
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+if [ "$TARGET_ENV" = "staging" ]
+then
+    echo "Done."
+    echo
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo " REMEMBER TO CLEAR APC CACHE @ $SITE_URL/apc.php !!!                    "
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+fi
