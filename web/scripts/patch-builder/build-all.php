@@ -45,7 +45,7 @@ if ((isset($options['h']) && false === $options['h']) || (isset($options['help']
 
 $makeTarget = MAKE_TARGET_SYSX;
 if (isset($options['web']) && false === $options['web']) {
-    $makeTarget = MAKE_TARGET_WEB;
+    $makeTarget = MAKE_TARGET_MINIFY;
 }
 
 
@@ -100,7 +100,7 @@ while ($patch = $p->getNext()) {
     }
 
     echo 'Compiling ' . $patch['name'] .' (' . $patch['_id'] . ')... ' . PHP_EOL;
-    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ($makeTarget == MAKE_TARGET_WEB ? ' --web' : '') . ' > /dev/null 2> /dev/null';
+    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ($makeTarget == MAKE_TARGET_MINIFY ? ' --web' : '') . ' > /dev/null 2> /dev/null';
     $exitStatus = 0;
     if (!$dryRun) {
         system($cmd, $exitStatus);
