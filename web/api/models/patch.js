@@ -125,7 +125,7 @@ var patchModel = {
         },
 
         instructions: {
-            required: true,
+            required: false, // ...but required, if published == true
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'instructions', error: { status: 400 }};
@@ -135,8 +135,8 @@ var patchModel = {
                     throw err;
                 }
 
-                if(val.length < 1 || val.length > 1023) {
-                    err.message = 'This field should be at least 1 and at most 1023 characters long.';
+                if(val.length > 1023) {
+                    err.message = 'This field should be at most 1023 characters long.';
                     throw err;
                 }
             },
@@ -267,7 +267,7 @@ var patchModel = {
         },
 
         cycles: {
-            required: false,
+            required: false, // ...but required, if published == true
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'cycles', error: { status: 400 }};
@@ -283,7 +283,7 @@ var patchModel = {
         },
 
         bytes: {
-            required: false,
+            required: false, // ...but required, if published == true
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'bytes', error: { status: 400 }};
@@ -368,7 +368,12 @@ var patchModel = {
                 throw err;
             }
 
+            if (patch.published == true && ('instructions' == key || 'cycles' == key || 'bytes' == key)) {
+                patchModel.fields[key].required = true;
+            }
+
             if (typeof patch[key] === 'undefined') {
+
                 // Check for required fields
                 if (patchModel.fields[key].required === true) {
 
@@ -377,6 +382,7 @@ var patchModel = {
                     err.field = key;
                     throw err;
                 }
+
             } else {
                 // Validate single fields
                 patchModel.fields[key].validate(patch[key]);

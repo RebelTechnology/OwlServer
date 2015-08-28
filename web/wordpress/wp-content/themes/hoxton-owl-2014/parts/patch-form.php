@@ -56,6 +56,16 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                     <?php endif; ?>
 
                     <div class="row">
+                        <label for="frm-patch-published" class="required">Published?</label>
+                        <select class="form-control" id="frm-patch-published" name="published" required>
+                            <option value="1">Yes</option>
+                            <option value="0" selected>No</option>
+                        </select>
+                        <div class="error-message"></div>
+                        <div class="info-message">Unpublished patches will be visible only to their authors.</div>
+                    </div>
+
+                    <div class="row">
                         <label for="frm-patch-description" class="required">Description</label> <textarea class="form-control" id="frm-patch-description" name="description" required></textarea>
                         <div class="error-message"></div>
                     </div>
@@ -148,15 +158,6 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         <!--select data-placeholder="Pick one or more tags..." class="form-control chosen-select" id="frm-patch-tags" name="tags" multiple="multiple"></select-->
                         <select class="form-control" id="frm-patch-tags" name="tags" multiple="multiple"></select>
                         <div class="error-message" style="margin-top: 13px;"></div>
-                    </div>
-                    <div class="row">
-                        <label for="frm-patch-published" class="required">Published?</label>
-                        <select class="form-control" id="frm-patch-published" name="published" required>
-                            <option value="1">Yes</option>
-                            <option value="0" selected>No</option>
-                        </select>
-                        <div class="error-message"></div>
-                        <div class="info-message">Unpublished patches will be visible only to their authors.</div>
                     </div>
                     <?php if ($isAdmin): ?>
                     <div class="row">

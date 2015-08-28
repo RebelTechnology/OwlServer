@@ -23,7 +23,7 @@ HoxtonOwl.patchForm = {
      * @param {string} seoName
      *     The SEO name of the patch to load.
      */
-    load: function(seoName) {
+    load: function (seoName) {
 
         var apiClient = new HoxtonOwl.ApiClient();
         apiClient.getSinglePatchBySeoName(seoName, HoxtonOwl.patchForm.populate);
@@ -36,7 +36,9 @@ HoxtonOwl.patchForm = {
      * @param {HoxtonOwl.Patch} patch
      *     An object that represents a patch.
      */
-    populate: function(patch) {
+    populate: function (patch) {
+
+        var form = HoxtonOwl.patchForm;
 
         $('#frm-patch-id').val(patch._id);
         if (patch.name) $('#frm-patch-name').val(patch.name);
@@ -54,6 +56,12 @@ HoxtonOwl.patchForm = {
                 $('#frm-patch-author-name').val(patch.author.name);
                 patchAuthorNameRadio.prop('checked', true);
             }
+        }
+
+        // Published field
+        if ('published' in patch) {
+            $('#frm-patch-published').val(patch.published).trigger('change');
+            form.updateMandatoryFields();
         }
 
         // Description & instructions
@@ -78,19 +86,19 @@ HoxtonOwl.patchForm = {
         var tagData = [];
         for (var i = 0, max = patch.tags.length; i < max; i++) {
 
-            $('#frm-patch-tags option').filter(function() {
+            $('#frm-patch-tags option').filter(function () {
                 return $(this).text() === patch.tags[i];
             }).prop('selected', true);
 
             tagData.push([{ id: patch.tags[i], text: patch.tags[i] }]);
         }
-        //HoxtonOwl.patchForm.tagMulti.trigger("chosen:updated");
-        HoxtonOwl.patchForm.tagMulti.select2({ data: tagData });
+        //form.tagMulti.trigger("chosen:updated");
+        form.tagMulti.select2({ data: tagData });
 
         // Soundcloud
         if (patch.soundcloud && patch.soundcloud.length) {
             if (patch.soundcloud.length !== 1) {
-                HoxtonOwl.patchForm.sampleCtrl.addNForms(patch.soundcloud.length - 1);
+                form.sampleCtrl.addNForms(patch.soundcloud.length - 1);
             }
             for (var i = 0, max = patch.soundcloud.length; i < max; i++) {
                 $('#frm-patch-samples_' + i).val(patch.soundcloud[i]);
@@ -100,16 +108,11 @@ HoxtonOwl.patchForm = {
         // GitHub
         if (patch.github && patch.github.length) {
             if (patch.github.length !== 1) {
-                HoxtonOwl.patchForm.gitHubCtrl.addNForms(patch.github.length - 1);
+                form.gitHubCtrl.addNForms(patch.github.length - 1);
             }
             for (var i = 0, max = patch.github.length; i < max; i++) {
                 $('#frm-patch-github_' + i).val(patch.github[i]);
             }
-        }
-
-        // Published field
-        if ('published' in patch) {
-            $('#frm-patch-published').val(patch.published).trigger('change');
         }
 
         // Creation time
@@ -125,17 +128,17 @@ HoxtonOwl.patchForm = {
      * @return {HoxtonOwl.Patch}
      *     An object that represents a patch.
      */
-    make: function() {
+    make: function () {
 
         $('#patch-add-edit-form input').
           add('#patch-add-edit-form textarea').
-          add('#patch-add-edit-form select').focus(function(e) {
+          add('#patch-add-edit-form select').focus(function (e) {
             var $target = $(e.target);
             $target.removeClass('invalid');
         });
-        $('#patch-add-edit-form input').next('div.error-message').hide();
-        $('#patch-add-edit-form textarea').next('div.error-message').hide();
-        $('#patch-add-edit-form select').next('div.error-message').hide();
+        $('#patch-add-edit-form input').siblings('div.error-message').hide();
+        $('#patch-add-edit-form textarea').siblings('div.error-message').hide();
+        $('#patch-add-edit-form select').siblings('div.error-message').hide();
 
         $('[id^=frm-patch-samples_]').
             removeClass('invalid').
@@ -146,13 +149,14 @@ HoxtonOwl.patchForm = {
             nextAll('div.error-message').
             hide();
 
-        var name = $.trim($('#frm-patch-name').val());var description = $.trim($('#frm-patch-description').val());
+        var name = $.trim($('#frm-patch-name').val());
+        var description = $.trim($('#frm-patch-description').val());
         var instructions = $.trim($('#frm-patch-instructions').val());
 
         if ('' === name) {
             $('#frm-patch-name').
                 addClass('invalid').
-                next('div.error-message').
+                siblings('div.error-message').
                 text('This field is required.').
                 show();
             location = '#form-top';
@@ -175,7 +179,7 @@ HoxtonOwl.patchForm = {
             if (!('name' in author) || '' === author.name) {
                 $('#frm-patch-author-name').
                     addClass('invalid').
-                    next('div.error-message').
+                    siblings('div.error-message').
                     text('Invalid author.').
                     show();
                 location = '#form-top';
@@ -185,7 +189,7 @@ HoxtonOwl.patchForm = {
             if (('type' in author) && (author.type !== 'wordpress' || !('wordpressId' in author) || !author.wordpressId)) {
                 $('#frm-patch-author-name').
                     addClass('invalid').
-                    next('div.error-message').
+                    siblings('div.error-message').
                     text('Invalid author.').
                     show();
                 location = '#form-top';
@@ -193,21 +197,24 @@ HoxtonOwl.patchForm = {
             }
         }
 
+        // published
+        var published = $('#frm-patch-published').val() == 0 ? '' : true;
+
         if ('' === description) {
             $('#frm-patch-description').
                 addClass('invalid').
-                next('div.error-message').
+                siblings('div.error-message').
                 text('This field is required.').
                 show();
             location = '#form-top';
             return;
         }
 
-        if ('' === instructions) {
+        if (published && '' === instructions) {
             $('#frm-patch-instructions').
                 addClass('invalid').
-                next('div.error-message').
-                text('This field is required.').
+                siblings('div.error-message').
+                text('This field is required for published patches.').
                 show();
             location = '#form-top';
             return;
@@ -218,7 +225,8 @@ HoxtonOwl.patchForm = {
             description: description,
             instructions: instructions,
             inputs: parseInt($('#frm-patch-inputs').val()),
-            outputs: parseInt($('#frm-patch-outputs').val())
+            outputs: parseInt($('#frm-patch-outputs').val()),
+            published: published ? 1 : 0
         };
 
         if (author) {
@@ -226,11 +234,29 @@ HoxtonOwl.patchForm = {
         }
 
         var percent = $.trim($('#frm-patch-cycles').val());
+        if (published && '' === percent) {
+            $('#frm-patch-cycles').
+                addClass('invalid').
+                siblings('div.error-message').
+                text('This field is required for published patches.').
+                show();
+            location = '#form-top';
+            return;
+        }
         if ('' !== percent) {
             patch.cycles = HoxtonOwl.Patch.prototype.percentToCycles(percent); // FIXME - what precision is required here?
         }
 
         var bytes = $('#frm-patch-bytes').val();
+        if (published && '' === bytes) {
+            $('#frm-patch-bytes').
+                addClass('invalid').
+                siblings('div.error-message').
+                text('This field is required for published patches.').
+                show();
+            location = '#form-top';
+            return;
+        }
         if ('' !== bytes) {
             patch.bytes = Math.round(bytes);
         }
@@ -265,7 +291,7 @@ HoxtonOwl.patchForm = {
 
         // soundcloud
         patch.soundcloud = [];
-        $('input[type=url][id^=frm-patch-samples_]').each(function(i, el) {
+        $('input[type=url][id^=frm-patch-samples_]').each(function (i, el) {
             var val = $.trim($(el).val());
             if ('' != val) {
                 patch.soundcloud.push(val);
@@ -274,15 +300,12 @@ HoxtonOwl.patchForm = {
 
         // github
         patch.github = [];
-        $('input[type=url][id^=frm-patch-github_]').each(function(i, el) {
+        $('input[type=url][id^=frm-patch-github_]').each(function (i, el) {
             var val = $.trim($(el).val());
             if ('' != val) {
                 patch.github.push(val);
             }
         });
-
-        // published
-        patch.published = $('#frm-patch-published').val();
 
         // creation time
         var $creationTimeUtc = $('#frm-patch-creationTimeUtc');
@@ -291,7 +314,7 @@ HoxtonOwl.patchForm = {
             if (isNaN(creationTimeUtc)) {
                 $creationTimeUtc.
                     addClass('invalid').
-                    next('div.error-message').
+                    siblings('div.error-message').
                     text('Invalid date/time.').
                     show();
                 location = '#form-top';
@@ -310,10 +333,10 @@ HoxtonOwl.patchForm = {
      * @return {HoxtonOwl.Patch}
      *     An object that represents a patch.
      */
-    save: function(patch) {
+    save: function (patch) {
 
         var apiClient = new HoxtonOwl.ApiClient;
-        apiClient.savePatch(patch, function(data) {
+        apiClient.savePatch(patch, function (data) {
             if (data._id) {
                 // patch saved
                 location = '/patch-library/patch/' + data.seoName;
@@ -331,13 +354,13 @@ HoxtonOwl.patchForm = {
                     } else if (response.field == 'author') {
                         $('#frm-patch-author-name').
                             addClass('invalid').
-                            next('div.error-message').
+                            siblings('div.error-message').
                             text('Invalid author.').
                             show();
                     } else {
                         $('#frm-patch-' + response.field).
                             addClass('invalid').
-                            next('div.error-message').
+                            siblings('div.error-message').
                             text(response.message).
                             show();
                     }
@@ -352,13 +375,52 @@ HoxtonOwl.patchForm = {
     },
 
     /**
+     * Updates mandatory fields.
+     *
+     * Some fields are mandatory based on whether the patch is published or not.
+     */
+    updateMandatoryFields: function () {
+
+        if (0 == $('#frm-patch-published.form-control').val()) { // not published
+
+            // Instructions
+            $('label[for=frm-patch-instructions]').removeClass('required');
+            $('#frm-patch-instructions').removeAttr('required');
+
+            // CPU
+            $('label[for=frm-patch-cycles]').removeClass('required');
+            $('#frm-patch-cycles').removeAttr('required');
+
+            // Memory
+            $('label[for=frm-patch-bytes]').removeClass('required');
+            $('#frm-patch-bytes').removeAttr('required');
+
+        } else { // published
+
+            // Instructions
+            $('label[for=frm-patch-instructions]').addClass('required');
+            $('#frm-patch-instructions').attr('required', '');
+
+            // CPU
+            $('label[for=frm-patch-cycles]').addClass('required');
+            $('#frm-patch-cycles').attr('required', '');
+
+            // Memory
+            $('label[for=frm-patch-bytes]').addClass('required');
+            $('#frm-patch-bytes').attr('required', '');
+
+        }
+    },
+
+    /**
      * Initializes the form.
      */
-    init: function() {
+    init: function () {
 
-        jQuery(function() {
+        jQuery(function () {
 
             var $ = jQuery;
+            var form = HoxtonOwl.patchForm;
 
             // Selects
             $('#frm-patch-inputs').select2({
@@ -369,6 +431,10 @@ HoxtonOwl.patchForm = {
             });
             $('#frm-patch-published').select2({
                 minimumResultsForSearch: Infinity
+            });
+
+            $('#frm-patch-published').change(function () {
+                form.updateMandatoryFields();
             });
 
             var wordPressIdRadio = $('#frm-patch-author-wordpressId');
@@ -420,11 +486,11 @@ HoxtonOwl.patchForm = {
             }
 
             // tag multi select
-            //HoxtonOwl.patchForm.tagMulti = $(".chosen-select").chosen({
+            //form.tagMulti = $(".chosen-select").chosen({
             //    no_results_text: "Oops, nothing found!"
             //});
-            HoxtonOwl.patchForm.tagMulti = $('#frm-patch-tags');
-            HoxtonOwl.patchForm.tagMulti.select2({
+            form.tagMulti = $('#frm-patch-tags');
+            form.tagMulti.select2({
                 placeholder: 'Pick one or more tags...'
             });
 
@@ -439,25 +505,25 @@ HoxtonOwl.patchForm = {
                 minFormsCount: 1,
                 iniFormsCount: 1
             };
-            HoxtonOwl.patchForm.sampleCtrl = $('#frm-patch-samples').sheepIt(options);
-            HoxtonOwl.patchForm.gitHubCtrl = $('#frm-patch-github').sheepIt(options);
+            form.sampleCtrl = $('#frm-patch-samples').sheepIt(options);
+            form.gitHubCtrl = $('#frm-patch-github').sheepIt(options);
 
             var client = new HoxtonOwl.ApiClient();
-            client.getAllTags(function(tags) {
+            client.getAllTags(function (tags) {
                 for (var i = 0, max = tags.length; i < max; i++) {
                     $('#frm-patch-tags').append('<option>' + tags[i] + '</option>');
                 }
-                //HoxtonOwl.patchForm.tagMulti.trigger("chosen:updated");
+                //form.tagMulti.trigger("chosen:updated");
             });
 
-            $('#frm-patch-btn-submit').click(function(e) {
-                var patch = HoxtonOwl.patchForm.make();
+            $('#frm-patch-btn-submit').click(function (e) {
+                var patch = form.make();
                 if (patch) {
-                    HoxtonOwl.patchForm.save(patch);
+                    form.save(patch);
                 }
             });
 
-            $('#frm-patch-btn-cancel').click(function(e) {
+            $('#frm-patch-btn-cancel').click(function (e) {
                 location = '/patch-library/';
             });
 
@@ -468,9 +534,9 @@ HoxtonOwl.patchForm = {
     }
 };
 
-(function() {
+(function () {
 
-    $(document).on('formInited', function(e) {
+    $(document).on('formInited', function (e) {
         var url = location.pathname;
         var matches = url.match(/^\/edit-patch\/.+\/?$/g);
         if (matches) {
@@ -480,6 +546,5 @@ HoxtonOwl.patchForm = {
     });
 
     HoxtonOwl.patchForm.init();
-
 
 })();
