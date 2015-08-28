@@ -468,6 +468,7 @@ HoxtonOwl.patchManager = {
         } else {
             selectTag("All");
             that.search("all");
+            HoxtonOwl.patchManager.sortPatchesByCreationTimeUtc();
         }
     },
 

@@ -40,10 +40,6 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
 
 <div id="secondary-nav-bar">
     <div id="secondary-nav-bar-content">
-        <div class="secondary-nav-item" id="sort-patches-by-Name" data-bind="css: { active: (search() === 'all' && patchSortOrder() === 'name') }, click: selectAllPatches">
-            <img src="<?= $resUri ?>images/browse-all-icon.png" width="40" height="40" alt="icon">
-            <p>Browse all</p>
-        </div>
         <div class="secondary-nav-item" id="sort-patches-by-CreationTimeUtc" data-bind="css: { active: (search() === 'all' && patchSortOrder() === 'creationTimeUtc') }, click: selectAllPatches">
           <img src="<?= $resUri ?>images/latest-icon.png" width="40" height="40" alt="icon">
           <p>Latest</p>
@@ -59,6 +55,10 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
         <div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }, click: selectAllAuthors">
             <img src="<?= $resUri ?>images/authors-icon.png" width="40" height="40" alt="icon">
             <p>Authors</p>
+        </div>
+        <div class="secondary-nav-item" id="sort-patches-by-Name" data-bind="css: { active: (search() === 'all' && patchSortOrder() === 'name') }, click: selectAllPatches">
+            <img src="<?= $resUri ?>images/browse-all-icon.png" width="40" height="40" alt="icon">
+            <p>All</p>
         </div>
         <?php if (is_user_logged_in()): ?>
         <div class="secondary-nav-item" data-bind="css: { active: search() === 'myPatches' }, click: selectMyPatches">
