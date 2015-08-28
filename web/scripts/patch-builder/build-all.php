@@ -100,7 +100,7 @@ while ($patch = $p->getNext()) {
     }
 
     echo 'Compiling ' . $patch['name'] .' (' . $patch['_id'] . ')... ' . PHP_EOL;
-    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . $patch['_id'] . ($makeTarget == MAKE_TARGET_MINIFY ? ' --web' : '') . ' > /dev/null 2> /dev/null';
+    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . ($makeTarget == MAKE_TARGET_MINIFY ? ' --web ' : ' ') . $patch['_id'] . ' > /dev/null 2> /dev/null';
     $exitStatus = 0;
     if (!$dryRun) {
         system($cmd, $exitStatus);
