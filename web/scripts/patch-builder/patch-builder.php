@@ -487,7 +487,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
      */
 
     $ext = MAKE_TARGET_WEB == $makeTarget ? '.js' : '.min.js';
-    $jsFilePath = $patchBuildDir . 'web/patch' . $ext;
+    $jsFilePath = $patchBuildDir . '/web/patch' . $ext;
     if (!file_exists($jsFilePath) || !is_file($jsFilePath) || !is_readable($jsFilePath)) {
         outputError('Unable to access ' . $jsFilePath . '.');
     }
