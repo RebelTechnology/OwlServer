@@ -35,6 +35,7 @@ $longopts  = [
     'help',
     'interval:',
     'no-color',
+    'web',
 ];
 $options = getopt($shortopts, $longopts);
 
@@ -47,7 +48,6 @@ $makeTarget = MAKE_TARGET_SYSX;
 if (isset($options['web']) && false === $options['web']) {
     $makeTarget = MAKE_TARGET_MINIFY;
 }
-
 
 $interval = DEFAULT_INTERVAL;
 if (isset($options['interval'])) {
