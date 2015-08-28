@@ -94,7 +94,7 @@ chmod -R a+r $DIR/../patch-builder
 chmod a+x $DIR/../patch-builder
 if [ "$TARGET_ENV" = "production" ]
 then
-    chmod o+w $DIR/../httpdocs/piwik/tmp
+    chmod -R o+w $DIR/../httpdocs/piwik/tmp
 fi
 
 chown -R root:root $DIR/../deployment
