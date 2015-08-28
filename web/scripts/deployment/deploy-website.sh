@@ -92,7 +92,10 @@ chown -R www-data $DIR/../httpdocs/mediawiki/images
 chown -R www-data:www-data $DIR/../patch-builder
 chmod -R a+r $DIR/../patch-builder
 chmod a+x $DIR/../patch-builder
-chmod o+w $DIR/../httpdocs/piwik/tmp
+if [ "$TARGET_ENV" = "production" ]
+then
+    chmod o+w $DIR/../httpdocs/piwik/tmp
+fi
 
 chown -R root:root $DIR/../deployment
 chmod 755 $DIR/../deployment
