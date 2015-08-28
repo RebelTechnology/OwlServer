@@ -92,6 +92,7 @@ chown -R www-data $DIR/../httpdocs/mediawiki/images
 chown -R www-data:www-data $DIR/../patch-builder
 chmod -R a+r $DIR/../patch-builder
 chmod a+x $DIR/../patch-builder
+chmod o+w $DIR/../httpdocs/piwik/tmp
 
 chown -R root:root $DIR/../deployment
 chmod 755 $DIR/../deployment
