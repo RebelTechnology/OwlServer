@@ -754,7 +754,7 @@ body.resetpass #pass1-text {
 body.login #user_login,
 body.register-2 #user_login,
 body.login #user_pass,
-body.register-2 #user_pass {
+body.register-2 #user_email {
     display: block;
 }
 
