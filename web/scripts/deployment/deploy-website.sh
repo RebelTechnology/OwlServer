@@ -59,6 +59,7 @@ rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
 mv $DIR/$CLONE_DIR/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
 cp -a $DIR/$CLONE_DIR/web/wordpress/robots.txt $DIR/../httpdocs/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../httpdocs/wp-content/plugins/
+cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/README.owl.md $DIR/../httpdocs/wp-content/plugins/
 
 # Update Mediawiki
 echo "Updating Mediawiki files..."
