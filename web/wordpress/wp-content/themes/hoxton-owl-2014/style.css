@@ -722,7 +722,7 @@ a.github-link {
     color: #ed7800;
 }
 
-/* Fix for Social login plugin */
+/* Fix for login, register and reset pass pages */
 
 body.login .wp-social-login-provider-list a,
 body.register-2 .wp-social-login-provider-list a {
@@ -741,4 +741,27 @@ body.lostpassword div.sharedaddy,
 body.resetpass div.sharedaddy,
 body.register-2 div.sharedaddy {
     display: none;
+}
+
+body.login ul.tml-action-links {
+    margin-top: 40px;
+}
+
+body.resetpass #pass1-text {
+    display: none;
+}
+
+body.login #user_login,
+body.login #user_pass {
+    display: block;
+}
+
+#theme-my-login p.message {
+    background-color: #fcf8e3;
+    padding: 10px;
+}
+
+#theme-my-login p.error {
+    background-color: #f2dede;
+    padding: 10px;
 }
