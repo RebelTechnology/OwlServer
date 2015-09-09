@@ -724,13 +724,17 @@ a.github-link {
 
 /* Fix for Social login plugin */
 
-.wp-social-login-provider-list a {
+body.login .wp-social-login-provider-list a {
     display: block;
     float: left;
     margin-right: 10px;
 }
 
-p.forgetmenot {
+body.login p.forgetmenot {
     clear: both;
     padding-top: 20px;
+}
+
+body.login div.sharedaddy {
+    display: none;
 }
