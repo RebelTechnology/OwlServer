@@ -724,7 +724,8 @@ a.github-link {
 
 /* Fix for Social login plugin */
 
-body.login .wp-social-login-provider-list a {
+body.login .wp-social-login-provider-list a,
+body.register-2 .wp-social-login-provider-list a {
     display: block;
     float: left;
     margin-right: 10px;
@@ -736,6 +737,8 @@ body.login p.forgetmenot {
 }
 
 body.login div.sharedaddy,
-body.lostpassword div.sharedaddy {
+body.lostpassword div.sharedaddy,
+body.resetpass div.sharedaddy,
+body.register-2 div.sharedaddy {
     display: none;
 }
