@@ -735,6 +735,7 @@ body.login p.forgetmenot {
     padding-top: 20px;
 }
 
-body.login div.sharedaddy {
+body.login div.sharedaddy,
+body.lostpassword div.sharedaddy {
     display: none;
 }
