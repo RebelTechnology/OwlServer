@@ -165,7 +165,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
         <!-- #two-thirds -->
         <div id="two-thirds" class="patch-library">
             <div data-bind="if: location.hostname != 'hoxtonowl.localhost'">
-                <div data-bind="foreach: soundcloud">
+                <div class="patch-soundcloud" data-bind="foreach: soundcloud">
                     <iframe width="100%" height="250" scrolling="no" frameborder="no" data-bind="attr: { src: $data }"></iframe>
                 </div>
             </div>
