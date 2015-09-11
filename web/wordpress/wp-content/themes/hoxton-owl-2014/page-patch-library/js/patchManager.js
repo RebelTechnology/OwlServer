@@ -183,6 +183,18 @@ HoxtonOwl.patchManager = {
             });
         });
 
+        that.filteredPatchAuthorNo = ko.computed(function () {
+            var stringified;
+            var distinctAuthors = [];
+            for (var i = 0, max = filteredPatches().length; i < max; i++) {
+                stringified = JSON.stringify(filteredPatches()[i].author); // not very performant, but should be ok
+                if (distinctAuthors.indexOf(stringified) == -1) {
+                    distinctAuthors.push(stringified);
+                }
+            }
+            return distinctAuthors.length;
+        });
+
         that.selectAllPatches = function(dummy, e) {
 
             //console.log('selectAllPatches');

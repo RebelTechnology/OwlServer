@@ -231,6 +231,13 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
         <!-- /#two-thirds -->
         <!-- /ko -->
 
+        <div id="patch-counter">
+            <span data-bind="text: filteredPatches().length">0</span> public
+            patch<span data-bind="text: filteredPatches().length == 1 ? '' : 'es'"></span> from
+            <span data-bind="text: filteredPatchAuthorNo()">0</span>
+            author<span data-bind="text: filteredPatchAuthorNo().length == 1 ? '' : 's'"></span>.
+        </div>
+
         <!-- ko foreach: filteredPatches -->
         <!-- div.patch-tile -->
         <div class="patch-tile">
