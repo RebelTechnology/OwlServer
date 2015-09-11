@@ -92,7 +92,6 @@ HoxtonOwl.patchForm = {
 
             tagData.push([{ id: patch.tags[i], text: patch.tags[i] }]);
         }
-        //form.tagMulti.trigger("chosen:updated");
         form.tagMulti.select2({ data: tagData });
 
         // Soundcloud
@@ -485,10 +484,6 @@ HoxtonOwl.patchForm = {
                 });
             }
 
-            // tag multi select
-            //form.tagMulti = $(".chosen-select").chosen({
-            //    no_results_text: "Oops, nothing found!"
-            //});
             form.tagMulti = $('#frm-patch-tags');
             form.tagMulti.select2({
                 placeholder: 'Pick one or more tags...'
@@ -513,7 +508,6 @@ HoxtonOwl.patchForm = {
                 for (var i = 0, max = tags.length; i < max; i++) {
                     $('#frm-patch-tags').append('<option>' + tags[i] + '</option>');
                 }
-                //form.tagMulti.trigger("chosen:updated");
             });
 
             $('#frm-patch-btn-submit').click(function (e) {
