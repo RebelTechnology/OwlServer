@@ -719,6 +719,7 @@ a.github-link {
     right: 30px;
     text-decoration: underline;
     color: #ed7800;
+    background: white;
 }
 
 /* Fix for login, register and reset pass pages */

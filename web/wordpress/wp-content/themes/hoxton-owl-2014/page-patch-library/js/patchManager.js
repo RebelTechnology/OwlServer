@@ -41,21 +41,6 @@ HoxtonOwl.patchManager = {
     },
 
     /**
-     * Detects browser support for HTML5 storage.
-     *
-     * @return {boolean}
-     *     Whether the browser supports HTML5 storage.
-     */
-    supportsHtml5Storage: function () {
-        return false; // <----------------------------------------------------
-        try {
-            return 'localStorage' in window && window['localStorage'] !== null;
-        } catch (e) {
-            return false;
-        }
-    },
-
-    /**
      * Fetches a file from GitHub.
      *
      * @param {string} url
@@ -68,6 +53,30 @@ HoxtonOwl.patchManager = {
      *     Selection end.
      */
     getGithubFile: function(url, callback, startLineNum, endLineNum) {
+
+        // hack to see if this file is hosted on GitHub
+        var urlParser = document.createElement('a');
+        urlParser.href = url;
+        if (urlParser.host != 'github.com' && urlParser.host != 'www.github.com') {
+
+            var pieces = urlParser.pathname.split('/');
+            var filename = pieces[pieces.length - 1];
+
+            $.ajax({
+                type:     "GET",
+                url:      url,
+                dataType: "text",
+                success:  function(data) {
+                    HoxtonOwl.patchManager.getGithubFile.count++;
+                    callback(data, filename, url, false);
+                },
+                error: function(data) {
+                    HoxtonOwl.patchManager.getGithubFile.count++;
+                    callback('// This file could not be fetched because of an unexpected error.', filename, url, false);
+                }
+            });
+            return;
+        }
 
         startLineNum = (typeof startLineNum == "undefined") ? 1 : startLineNum;
         endLineNum = (typeof endLineNum == "undefined") ? 0 : endLineNum;
@@ -90,16 +99,6 @@ HoxtonOwl.patchManager = {
         var filename = bits[bits.length-1];
         var endpoint = 'https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=' + branch;
 
-        var supportsHtml5Storage = HoxtonOwl.patchManager.supportsHtml5Storage();
-        if (supportsHtml5Storage) {
-            var cachedContent = localStorage.getItem(url);
-            if (cachedContent) {
-                HoxtonOwl.patchManager.getGithubFile.count++;
-                callback(cachedContent, filename, url);
-                return;
-            }
-        }
-
         $.ajax({
             type:     "GET",
             url:      endpoint,
@@ -117,12 +116,7 @@ HoxtonOwl.patchManager = {
                             endLineNum = contentArray.length;
                         }
 
-                        var cacheMe = contentArray.slice(startLineNum - 1, endLineNum).join("\n");
-                        if (supportsHtml5Storage) {
-                            localStorage.setItem(url, cacheMe);
-                        }
-
-                        callback(cacheMe, filename, url);
+                        callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"), filename, url);
                         return;
                     }
                 }
@@ -132,7 +126,7 @@ HoxtonOwl.patchManager = {
                 HoxtonOwl.patchManager.getGithubFile.count++;
                 callback('// This file could not be fetched because of an unexpected error.', filename);
             }
-        })
+        });
     },
 
     /**
@@ -341,9 +335,13 @@ HoxtonOwl.patchManager = {
                 if (that.selectedPatch().github.length) {
                     for (var i = 0, max = that.selectedPatch().github.length; i < max; i++) {
 
-                        pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename, url) {
+                        pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename, url, actuallyFromGitHub) {
 
                             var cnt;
+
+                            if (typeof(actuallyFromGitHub) === 'undefined') {
+                                actuallyFromGitHub = true;
+                            }
 
                             if (0 === $('#github-files > ul').length) {
                                 $('#github-files').html('<ul></ul>');
@@ -352,7 +350,10 @@ HoxtonOwl.patchManager = {
 
                             cnt++;
                             $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
-                            $('#github-files').append('<div id="tabs-' + cnt + '"><a href="' + url + '" target="_new" class="github-link">Open this file in GitHub</a><pre class="prettyprint"></pre></div>');
+                            $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint"></pre></div>');
+                            if (actuallyFromGitHub) {
+                                $('#github-files #tabs-' + cnt).prepend('<a href="' + url + '" target="_new" class="github-link">Open this file in GitHub</a>');
+                            }
 
                             if (/\.pd$/.test(filename)) {
                                 var p = pdfu.parse(contents);
