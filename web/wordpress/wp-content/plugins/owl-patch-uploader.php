@@ -204,7 +204,7 @@ function owl_patchFileUpload()
         }
 
         // Check MIME type
-        if (mime_content_type($uploadedFile) == 'text/x-php') {
+        if (mime_content_type($_FILES['files']['tmp_name'][$i]) == 'text/x-php') {
             $result['files'][] = [
                 'name' => $uploadedFile,
                 'err'  => true,
