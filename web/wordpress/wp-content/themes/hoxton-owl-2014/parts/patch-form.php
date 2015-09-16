@@ -129,7 +129,8 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         </div>
                     </fieldset>
                     <fieldset id="frm-patch-github">
-                        <legend>GitHub files</legend>
+                        <legend>Source files</legend>
+                        <div class="info-message" style="margin-bottom: 15px;">Paste one or more files from GitHub, or use the upload button.</div>
                         <div id="frm-patch-github_template" class="row repeat">
                             <label for="frm-patch-github_#index#">File</label>
                             <div class="form-control">
@@ -141,6 +142,16 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         <div id="frm-patch-github_noforms_template"></div>
                         <div id="frm-patch-github_controls">
                             <div id="frm-patch-github_add" class="add"><a href="#"><span>Add</span></a></div>
+                        </div>
+
+                        <div class="row">
+                            <label>Upload a file</label>
+                            <div class="form-control">
+                                <div class="file-upload-container">
+                                    Choose files...
+                                    <input type="file" id="frm-patch-file" name="files[]" multiple />
+                                </div>
+                            </div>
                         </div>
                     </fieldset>
                     <div class="row">
@@ -161,7 +172,7 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         <label for="frm-patch-creationTimeUtc">Creation time</label>
                         <input type="text" class="form-control" id="frm-patch-creationTimeUtc" name="creationTimeUtc" value="">
                         <div class="error-message"></div>
-                        <div class="info-message">Please use ISO 8601 combined date/time format. If left blank, it will default to the current time.</div>
+                        <div class="info-message">This field is only visible to admins. Please use ISO 8601 combined date/time format. If left blank, it will default to the current time.</div>
                     </div>
                     <?php endif; ?>
                     <div class="row btn-row">
