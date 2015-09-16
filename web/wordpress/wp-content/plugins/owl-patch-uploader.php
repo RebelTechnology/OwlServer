@@ -183,11 +183,11 @@ function owl_patchFileUpload()
         }
 
         // Check file size (max: 256 kB) - see https://github.com/pingdynasty/OwlServer/issues/90#issuecomment-140127818
-        if (!isset($_FILES['files']['size']) || $_FILES['files']['size'] > 256000) {
+        if (!isset($_FILES['files']['size'][$i]) || $_FILES['files']['size'][$i] > 256000) {
             $result['files'][] = [
                 'name' => $uploadedFile,
                 'err'  => true,
-                'msg'  => 'File is too big.',
+                'msg'  => 'File is too large.',
             ];
             continue;
         }
