@@ -134,14 +134,14 @@ function owl_patchFileUpload()
 
     if (!file_exists($patchDirPath)) {
 
-        if (!is_dir($patchDirPath)) {
-            errorOut('Unexpected error (6).');
-        }
-
         $r = mkdir($patchDirPath, 02775, true); // 02775 = drwxrwsr-x
         if (!$r) {
             errorOut('Unable to create patch dir.');
         }
+    }
+
+    if (!is_dir($patchDirPath)) {
+        errorOut('Unexpected error (6).');
     }
 
     if (!is_readable($patchDirPath) || !is_writable($patchDirPath)) {
