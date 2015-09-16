@@ -2,6 +2,8 @@
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
+var urlParser = require('url');
+
 var patchModel = {
 
     fields: {
@@ -251,14 +253,54 @@ var patchModel = {
                     err.message = 'Value not valid.';
                     throw err;
                 }
+
+                var url;
+                var validHosts = [
+                    'hoxtonowl.localhost:8000',
+                    'staging.hoxtonowl.com',
+                    'hoxtonowl.com',
+                    'www.hoxtonowl.com',
+                    'github.com',
+                    'www.github.com'
+                ];
                 for (var i = 0, max = val.length; i < max; i++) {
+
                     if (typeof val[i] !== 'string') {
-                        err.message = 'Value not valid.';
+                        err.message = 'Invalid URL (1).';
                         throw err;
                     }
-                    // https://github.com/pingdynasty/OwlPatches/blob/master/PhaserPatch.hpp
-                    if (!/^https?:\/\/(?:www\.)?github\.com\/.+\/.+\/blob\/.+\/.+$/i.test(val[i])) {
-                        err.message = 'URL does not seem a valid GitHub blob.';
+
+                    url = urlParser.parse(val[i]);
+
+                    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+                        err.message = 'Invalid URL (2).';
+                        err.index = i;
+                        throw err;
+                    }
+
+                    if (validHosts.indexOf(url.host) === -1) {
+                        err.message = 'Source files can only be hosted on our servers or on GitHub.';
+                        err.index = i;
+                        throw err;
+                    }
+
+                    if (url.host.indexOf('hoxtonowl') !== -1) {
+                        // e.g.: http://hoxtonowl.localhost:8000/wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
+                        // url.path = /wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
+                        if (!/^\/wp-content\/uploads\/patch\-files\/[a-z0-9\.]+\/.+$/i.test(url.path)) {
+                            err.message = 'URL does not seem to belong to a source file hosted on our servers.';
+                            err.index = i;
+                            throw err;
+                        }
+                    } else if (url.host.indexOf('github') !== -1) {
+                        // e.g.: https://github.com/pingdynasty/OwlPatches/blob/master/PhaserPatch.hpp
+                        if (!/^https?:\/\/(?:www\.)?github\.com\/.+\/.+\/blob\/.+\/.+$/i.test(val[i])) {
+                            err.message = 'URL does not seem to be a valid GitHub blob URL.';
+                            err.index = i;
+                            throw err;
+                        }
+                    } else {
+                        err.message = 'Source files can only be hosted on our servers or on GitHub.';
                         err.index = i;
                         throw err;
                     }
