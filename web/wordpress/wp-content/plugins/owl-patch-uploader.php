@@ -26,14 +26,16 @@ function errorOut($msg)
  */
 function owl_patchFileUpload()
 {
-    // global $wpdb; // FIXME - is this needed?
-
     /*
      * Create base directory (if needed)
      */
 
     $baseDirPath = realpath(dirname(__FILE__) . '/../uploads');
+    if ($_SERVER['HTTP_HOST'] == 'hoxtonowl.localhost:8000') { // FIXME - Remove this if block
+        $baseDirPath = '/home/kyuzz/Projects/HoxtonOwl.com/wp-content/uploads';
+    }
     $baseDirPath .= '/patch-files';
+
 
     if (!file_exists($baseDirPath)) {
 
@@ -127,10 +129,11 @@ function owl_patchFileUpload()
      */
 
     if (isset($_REQUEST['patchId'])) { // if no patch ID is given, patch is assumed to be new
-        $patchDirPath = $baseDirPath . '/' . $_REQUEST['patchId'];
+        $patchDirPath0 = $_REQUEST['patchId'];
     } else {
-        $patchDirPath = $baseDirPath . '/' . uniqid('tmp', true);
+        $patchDirPath0 = uniqid('tmp', true);
     }
+    $patchDirPath = $baseDirPath . '/' . $patchDirPath0;
 
     if (!file_exists($patchDirPath)) {
 
@@ -176,7 +179,7 @@ function owl_patchFileUpload()
             $result['files'][] = [
                 'name' => $uploadedFile,
                 'err'  => true,
-                'msg'  => 'Error while uploading file.',
+                'msg'  => 'Error while uploading file (1).',
             ];
 
             continue;
@@ -219,6 +222,7 @@ function owl_patchFileUpload()
             // Uploaded file moved successfully
             $result['files'][] = [
                 'name' => $uploadedFile,
+                'path' => $patchDirPath0 . '/' . $uploadedFile,
                 'err'  => false,
                 'msg'  => 'File uploaded successfully.',
             ];
@@ -229,7 +233,7 @@ function owl_patchFileUpload()
             $result['files'][] = [
                 'name' => $uploadedFile,
                 'err'  => false,
-                'msg'  => 'Error while moving uploaded file.',
+                'msg'  => 'Error while uploading file (2).',
             ];
 
         }

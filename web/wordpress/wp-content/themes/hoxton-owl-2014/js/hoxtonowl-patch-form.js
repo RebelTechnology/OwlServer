@@ -530,6 +530,7 @@ HoxtonOwl.patchForm = {
             fileUpload.change(function (e) {
 
                 fileUpload.prop('disabled', true);
+                $('#frm-patch-file').closest('.form-control').next('.error-message').html('').hide();
 
                 var data = new FormData();
                 var files = fileUpload[0].files;
@@ -551,19 +552,63 @@ HoxtonOwl.patchForm = {
                     data: data,
                     processData: false,
                     cache: false
-                }).done(function (data) {
-                    fileUpload.prop('disabled', false);
-
-                    // reset file input (see http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery#13351234)
-                    fileUpload.wrap('<form>').closest('form').get(0).reset();
-                    fileUpload.unwrap();
-
-                    console.log(JSON.parse(data));
-                });
-
+                }).done(HoxtonOwl.patchForm.handleUploads);
             });
-
         });
+    },
+
+    handleUploads: function (data) {
+
+        var errorDiv = $('#frm-patch-file').closest('.form-control').next('.error-message');
+        var fileUpload = $('#frm-patch-file');
+
+        fileUpload.prop('disabled', false);
+
+        // reset file input (see http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery#13351234)
+        fileUpload.wrap('<form>').closest('form').get(0).reset();
+        fileUpload.unwrap();
+
+        if (data.err) {
+            errorDiv.html('Unexpected error during file upload.').show();
+        } else {
+
+            var files = [];
+            var errorMsg = '';
+            for (var i = 0, max = data.files.length; i < max; i++) {
+                if (data.files[i].err) {
+                    var errorMsg = errorDiv.html();
+                    errorDiv.html(errorMsg + data.files[i].name + ': ' + data.files[i].msg + '<br />');
+                    errorDiv.show();
+                } else {
+                    //console.log(location.protocol + '//' + location.host + '/wp-content/uploads/patch-files/' + data.files[i].path);
+                    files.push(location.protocol + '//' + location.host + '/wp-content/uploads/patch-files/' + data.files[i].path);
+                }
+            }
+
+            var fileFields = $('input[type=url][id^=frm-patch-github_]');
+            var currentFiles = Array.prototype.map.call(fileFields, function (e) { return e.value; });
+            currentFiles = currentFiles.filter(function (e) { return e != ''; });
+            files = files.filter(function (e) { return currentFiles.indexOf(e) == -1 });
+
+            // Populate any empty fields
+            var file;
+            for (var i = 0, max = fileFields.length; i < max; i++) {
+                if (!fileFields[i].value) {
+                    file = files.pop();
+                    if (file) {
+                        fileFields[i].value = file;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            // Create new fields for remaining elements
+            while (file = files.pop()) {
+                HoxtonOwl.patchForm.gitHubCtrl.addForm();
+                $('input[type=url][id^=frm-patch-github_]').last().val(file);
+            }
+        }
     }
 };
 

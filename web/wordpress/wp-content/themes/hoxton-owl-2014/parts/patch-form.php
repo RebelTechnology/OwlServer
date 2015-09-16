@@ -152,6 +152,7 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                                     <input type="file" id="frm-patch-file" name="files[]" multiple />
                                 </div>
                             </div>
+                            <div class="error-message" style="margin-top: 10px;"></div>
                         </div>
                     </fieldset>
                     <div class="row">
