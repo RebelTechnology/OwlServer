@@ -51,7 +51,7 @@ function owl_getUserInfo($username)
 {
     $args = array(
         'search'         => $username,
-        'search_columns' => 'user_login'
+        'search_columns' => [ 'user_login' ]
     );
     $userQuery = new WP_User_Query($args);
 

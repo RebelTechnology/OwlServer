@@ -14,11 +14,11 @@ var client = wordpress.createClient({
 module.exports.validateAuthCookie = function(cookie, callback) {
 
     client.call('owl.validateAuthCookie', cookie, function (error, data) {
-       if (error) {
-           callback(error);
-       } else {
-           callback(null, data);
-       }
+        if (error) {
+            callback(error);
+        } else {
+            callback(null, data);
+        }
     });
 };
 
