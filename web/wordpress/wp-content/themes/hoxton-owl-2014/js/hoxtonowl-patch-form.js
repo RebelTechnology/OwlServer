@@ -336,9 +336,23 @@ HoxtonOwl.patchForm = {
 
         var apiClient = new HoxtonOwl.ApiClient;
         apiClient.savePatch(patch, function (data) {
-            if (data._id) {
-                // patch saved
-                location = '/patch-library/patch/' + data.seoName;
+            if (data._id) { // patch saved
+                // clean up locally hosted source files:
+                $.ajax({
+                    url: '/wp-admin/admin-ajax.php',
+                    dataType: 'json',
+                    data: {
+                        action: 'owl-patch-file-cleanup',
+                        patchId: data._id
+                    },
+                    cache: false,
+                    error: function (jqXHR, textStatus, errorThrown ) {},
+                    complete: function (jqXHR, textStatus) { // Executed regardless of whethere the clean-up succeeded or not
+                        // Final redirect
+                        location = '/patch-library/patch/' + data.seoName;
+                    },
+                    success: function (data, textStatus, jqXHR) {}
+                });
             } else if (data.responseJSON) {
 
                 var response = data.responseJSON;
@@ -528,6 +542,12 @@ HoxtonOwl.patchForm = {
             // Source file upload
             var fileUpload = $('#frm-patch-file');
 
+            HoxtonOwl.patchForm.fileUploadToken = '';
+            var bag = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            for (var i = 0; i < 7; i++) {
+                HoxtonOwl.patchForm.fileUploadToken += bag.charAt(Math.floor(Math.random() * bag.length));
+            }
+
             fileUpload.change(function (e) {
 
                 fileUpload.prop('disabled', true);
@@ -542,6 +562,8 @@ HoxtonOwl.patchForm = {
                 var patchId = $('#frm-patch-id').val();
                 if (patchId) {
                     data.append('patchId', patchId);
+                } else {
+                    data.append('fileUploadToken', HoxtonOwl.patchForm.fileUploadToken);
                 }
 
                 data.append('action', 'owl-patch-file-upload'); // WordPress action
@@ -554,6 +576,7 @@ HoxtonOwl.patchForm = {
                     processData: false,
                     cache: false
                 }).done(HoxtonOwl.patchForm.handleUploads);
+
             });
         });
     },
