@@ -223,21 +223,39 @@ HoxtonOwl.ApiClient.prototype.deletePatch = function (patchId, callback) {
 
         function (authCookieVal) {
 
-            var credentials = {
-                type: 'wordpress',
-                cookie: authCookieVal
+            var ajaxConfig = {
+                url: '/wp-admin/admin-ajax.php',
+                data: {
+                    action: 'owl-patch-file-delete',
+                    cache: false,
+                    patchId: patchId
+                }
             };
-
-            jQuery.when(client._query('/patch/' + patchId, 'DELETE', credentials)).then(
+            jQuery.when(jQuery.ajax(ajaxConfig)).then(
 
                 function (result) {
-                    callback(true);
+
+                    var credentials = {
+                        type: 'wordpress',
+                        cookie: authCookieVal
+                    };
+
+                    jQuery.when(client._query('/patch/' + patchId, 'DELETE', credentials)).then(
+
+                        function (result) {
+                            callback(true);
+                        },
+
+                        function (reason) {
+                            // deletion failed
+                            //console.log(reason);
+                            callback(false);
+                        }
+                    );
                 },
 
                 function (reason) {
-                    // deletion failed
-                    //console.log(reason);
-                    callback(false);
+                    calback(false);
                 }
             );
         },

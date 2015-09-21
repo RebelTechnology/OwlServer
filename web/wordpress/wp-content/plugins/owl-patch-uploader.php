@@ -13,7 +13,7 @@ defined('ABSPATH') or die('No script kiddies please!');
 
 define('DOING_AJAX', true);
 
-define(TMP_DIR_PREFIX, 'tmp-'); // must meet regex /[a-z0-9\-]+/i
+define('TMP_DIR_PREFIX', 'tmp-'); // must meet regex /[a-z0-9\-]+/i
 
 /**
  * Sends JSON error response and terminates script.
@@ -593,7 +593,58 @@ function owl_patchFileCleanUp()
 
 } // function owl_patchFileCleanUp
 
-add_action('wp_ajax_owl-patch-file-cleanup', 'owl_patchFileCleanUp');
+/**
+ * Deletes all the locally hosted files for the specified patch.
+ *
+ * This function is meant to be called just before deleting a patch from the
+ * database.
+ */
+function owl_patchFileDelete()
+{
+
+    // Make sure patch ID is valid
+    if (!isset($_REQUEST['patchId'])) {
+        errorOut('Patch ID not provided.');
+    }
+
+    $patchId = $_REQUEST['patchId'];
+    if (!isPatchIdValid($patchId)) {
+        errorOut('Bad patch ID.');
+    }
+
+    // Get patch
+    $patch = getPatch($patchId);
+
+    // Check user can edit the patch
+    checkUserIsAuthorizedToEditPatch($patch);
+
+    $baseDirPath = getBaseDirPath();
+    $dstDir = $baseDirPath . '/' . $patchId;
+
+    $sourceFiles = $patch['github'];
+    foreach ($sourceFiles as $sourceFile) {
+        $sourceFileInfo = getSourceFileInfo($sourceFile);
+        if ('url' == $sourceFileInfo['type']) {
+            $fileToDeletePath = $dstDir . '/' . $sourceFileInfo['name'];
+            if (file_exists($fileToDeletePath) && is_writeable($fileToDeletePath)) {
+                @unlink($fileToDeletePath);
+            }
+        }
+    }
+
+    // If tmp directory is empty, delete it
+    if (is_readable($dstDir) && is_writeable($dstDir) && isDirEmpty($dstDir)) {
+        @rmdir($dstDir);
+    }
+
+    $result = [ 'error' => false, ];
+    wp_send_json($result);
+    wp_die();
+
+} // function owl_patchFileDelete
+
 add_action('wp_ajax_owl-patch-file-upload', 'owl_patchFileUpload');
+add_action('wp_ajax_owl-patch-file-cleanup', 'owl_patchFileCleanUp');
+add_action('wp_ajax_owl-patch-file-delete', 'owl_patchFileDelete');
 
 // EOF
