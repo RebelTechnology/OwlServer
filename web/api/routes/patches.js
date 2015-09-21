@@ -220,7 +220,6 @@ router.post('/', function(req, res) {
             if (!error.error.status) {
                 error.error.status = 500;
             }
-            error.message = 'Uncaught error.';
             return res.status(error.error.status).json(error);
         }
     );
