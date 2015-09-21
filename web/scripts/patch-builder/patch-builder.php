@@ -153,7 +153,44 @@ function downloadGithubFile($githubFile, $dstPath) {
     fwrite($f, $data);
 
     return $filename;
-}
+} // function downloadGithubFile
+
+/**
+ * Returns information about a source file.
+ *
+ * @todo FIXME This function is duplicated in `owl-patch-uploader.php`.
+ *
+ * @param  string  $url
+ *     The file URL.
+ * @return array
+ *     An associative array whose keys are:
+ *     * type (string) - Either 'github' or 'url'.
+ *     * dir  (string) - The directory where the file is hosted, relative to the WP upload directory.
+ *     * name (string) - The file name.
+ */
+function getSourceFileInfo($url)
+{
+    if (!is_string($url)) {
+        errorOut('Bad source file URL (1).');
+    }
+
+    $r = parse_url($url);
+    if (false === $r) {
+        errorOut('Bad source file URL (2).');
+    }
+
+    $result = [ 'type' => 'url' ];
+    if($r['host'] == 'github.com' || $r['host'] == 'www.github.com') {
+        $result['type'] = 'github';
+    } else {
+        $pieces = explode('/', $r['path']);
+        $result['dir'] = $pieces[count($pieces) - 2];
+        $result['name'] = $pieces[count($pieces) - 1];
+    }
+
+    return $result;
+
+} // function getSourceFileInfo
 
 /* ~~~~~~~~~~~~~~~~~~~~
  *  Script entry-point
@@ -305,12 +342,29 @@ if ($onlyShowFiles) {
 
 $sourceFiles = [];
 foreach ($patch['github'] as $githubFile) {
-    $r = downloadGithubFile($githubFile, $patchSourceDir);
-    if (!$r) {
-        outputError('Download of ' . $githubFile . ' failed.');
-        exit(1);
+
+    $sourceFileInfo = getSourceFileInfo($githubFile);
+    if ('url' === $sourceFileInfo['type']) {
+
+        $srcDir = realpath(dirname(__FILE__) . '/../httpdocs/wp-content/uploads/patch-files/');
+        $srcFile = $srcDir . '/' . $patchId . '/' . $sourceFileInfo['name'];
+        $dstFile = $patchSourceDir . '/' . $sourceFileInfo['name'];
+        if (!@copy($srcFile, $dstFile)) {
+            outputError('Unable to copy patch source file "' . $sourceFileInfo['name'] . '".');
+            exit(1);
+        }
+
+        $sourceFiles[] = $sourceFileInfo['name'];
+
+    } else {
+
+        $r = downloadGithubFile($githubFile, $patchSourceDir);
+        if (!$r) {
+            outputError('Download of ' . $githubFile . ' failed.');
+            exit(1);
+        }
+        $sourceFiles[] = $r;
     }
-    $sourceFiles[] = $r;
 }
 
 if ($onlyDloadFiles) {

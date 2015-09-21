@@ -195,6 +195,8 @@ function updatePatch($patch)
 /**
  * Returns information about a source file.
  *
+ * @todo FIXME This function is duplicated in `patch-builder.php`.
+ *
  * @param  string  $url
  *     The file URL.
  * @return array
@@ -225,7 +227,7 @@ function getSourceFileInfo($url)
 
     return $result;
 
-} // function isFileHostedOnOurServers
+} // function getSourceFileInfo
 
 /**
  * Checks that the current WordPress user is authorized to edit the specified
