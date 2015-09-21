@@ -44,7 +44,6 @@ function usage() {
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
     echo '  --make-online       Use the old `make online` command instead of the newer `make sysx`.' . PHP_EOL;
-    echo '  --local-patch-files Use all patch files in /tmp/patch-name/* instead of downloading them from GitHub.' . PHP_EOL;
     echo '  --keep-tmp-files    Do not delete temporary source and build directories once the build has finished.' . PHP_EOL;
 }
 
@@ -204,12 +203,6 @@ if (isset($options['make-online']) && false === $options['make-online']) {
     $buildCmd = 'make online';
 }
 
-$localPatchFiles = false;
-if (isset($options['local-patch-files']) && false === $options['local-patch-files']) {
-    $localPatchFiles = true;
-    $onlyDloadFiles = false;
-}
-
 $keepTmpFiles = false;
 if (isset($options['keep-tmp-files']) && false === $options['keep-tmp-files']) {
     $keepTmpFiles = true;
@@ -311,47 +304,19 @@ if ($onlyShowFiles) {
 }
 
 $sourceFiles = [];
-if (!$localPatchFiles) {
-    foreach ($patch['github'] as $githubFile) {
-        $r = downloadGithubFile($githubFile, $patchSourceDir);
-        if (!$r) {
-            outputError('Download of ' . $githubFile . ' failed.');
-            exit(1);
-        }
-        $sourceFiles[] = $r;
+foreach ($patch['github'] as $githubFile) {
+    $r = downloadGithubFile($githubFile, $patchSourceDir);
+    if (!$r) {
+        outputError('Download of ' . $githubFile . ' failed.');
+        exit(1);
     }
+    $sourceFiles[] = $r;
+}
 
-    if ($onlyDloadFiles) {
-        outputError('DEBUG: Downloaded source files to ' . $patchSourceDir . '. Aborting...');
-        var_dump($patch['github']);
-        exit(1);
-    }
-} else {
-    $localPatchFileDir = '/tmp/' . str_replace(['/', ' '], '_', $patch['name']);
-    if (!file_exists($localPatchFileDir) || !is_dir($localPatchFileDir)
-       || !is_readable($localPatchFileDir)) {
-
-        echo 'ERROR: Unable to find directory ' . $localPatchFileDir . '.' . PHP_EOL;
-        exit(1);
-    }
-    if ($dirHandle = opendir($localPatchFileDir)) {
-        while (false !== ($entry = readdir($dirHandle))) {
-            if ($entry == '.' || $entry == '..') {
-                continue;
-            }
-            $sourceFile = $localPatchFileDir . '/' . $entry;
-            if (is_file($sourceFile) && is_readable($sourceFile)) {
-                $sourceFiles[] = $entry;
-                if (!copy($sourceFile, $patchSourceDir . '/' . $entry)) {
-                    echo 'ERROR: Unable to copy ' . $sourceFile . ' to ' . $patchSourceDir . ' .' . PHP_EOL;
-                    exit(1);
-                }
-            }
-        }
-    } else {
-        echo 'ERROR: Unable to open directory ' . $localPatchFileDir . '.' . PHP_EOL;
-        exit(1);
-    }
+if ($onlyDloadFiles) {
+    outputError('DEBUG: Downloaded source files to ' . $patchSourceDir . '. Aborting...');
+    var_dump($patch['github']);
+    exit(1);
 }
 
 /*
