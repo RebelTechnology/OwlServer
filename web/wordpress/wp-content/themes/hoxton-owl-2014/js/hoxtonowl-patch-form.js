@@ -61,8 +61,8 @@ HoxtonOwl.patchForm = {
         // Published field
         if ('published' in patch) {
             $('#frm-patch-published').val(patch.published).trigger('change');
-            form.updateMandatoryFields();
         }
+        form.updateMandatoryFields();
 
         // Description & instructions
         if (patch.description) $('#frm-patch-description').val(patch.description);
@@ -435,6 +435,7 @@ HoxtonOwl.patchForm = {
             $('#frm-patch-published').change(function () {
                 form.updateMandatoryFields();
             });
+            form.updateMandatoryFields();
 
             var wordPressIdRadio = $('#frm-patch-author-wordpressId');
             if (wordPressIdRadio.length) {
