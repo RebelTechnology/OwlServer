@@ -25,7 +25,7 @@ router.get('/', function(req, res) {
 
         function(err, result) {
             if (err !== null) {
-                return res.status(500).json({error: err});
+                return res.status(500).json({message: err});
             } else {
                 var tags = [];
                 for (var i = 0; i < result.length; i++) {

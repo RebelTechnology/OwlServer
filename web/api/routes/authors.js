@@ -7,23 +7,23 @@ var router = express.Router();
 
 /**
  * Retrieves all authors.
- * 
+ *
  * GET /authors
  */
 router.get('/', function(req, res) {
-    
+
     var collection = req.db.get('patches');
     var nativeCol = collection.col;
     nativeCol.aggregate(
-        
+
         { $project: { "author": 1, lowercase: { $toLower: "$author.name" }}},
         { $group: { _id: "$author.name", url: { $first: "$author.url" }, lowercase: { $first: "$lowercase" }}},
-        { $sort: { lowercase: 1 }}, 
+        { $sort: { lowercase: 1 }},
         { $project: { _id: "$_id", url: "$url" }},
-        
+
         function(err, result) {
             if (err !== null) {
-                return res.status(500).json({error: err});
+                return res.status(500).json({message: err});
             } else {
                 var authors = [];
                 for (var i = 0; i < result.length; i++) {
@@ -37,8 +37,6 @@ router.get('/', function(req, res) {
             }
         }
     );
-    
-    
 });
 
 module.exports = router;

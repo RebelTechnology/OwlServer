@@ -18,8 +18,7 @@ var summaryFields = {
     'author.url': 1,
     tags: 1,
     seoName: 1,
-    creationTimeUtc: 1,
-    published: 1
+    creationTimeUtc: 1
 };
 
 var regExpEscape = function(str) {
@@ -39,17 +38,20 @@ router.get('/', function(req, res) {
     var collection = req.db.get('patches');
     var nativeCol = collection.col;
 
-    var summaryFields2 = summaryFields;
+    var summaryFields2 = {};
+    for (field in summaryFields) { // shallow copy
+        summaryFields2[field] = summaryFields[field];
+    }
     summaryFields2.lowercase = { $toLower: '$name' };
 
     var filter = { $match: {}};
-    if ('author.name' in query) {
+    if ('author.name' in query && query['author.name'] !== '') {
         filter.$match['author.name'] = query['author.name'];
     }
 
-    nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, function (err, result) {
+    nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, { $project: summaryFields }, function (err, result) {
         if (err !== null) {
-            return res.status(500).json({error: err});
+            return res.status(500).json({message: err});
         } else {
             var response = {};
             response.count = result.length;
