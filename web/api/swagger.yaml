@@ -5,7 +5,6 @@ info:
   version: 1.0.0
   contact:
     name: Sam Artuso
-    email: sam+owl@highoctanedev.co.uk
 host: 'hoxtonowl.localhost:3000'
 schemes:
   - http
@@ -34,7 +33,7 @@ paths:
           required: false
           type: string
       tags:
-        - Patches
+        - patches
       responses:
         '200':
           description: A summary of all public patches, alphabetically sorted by patch name.
@@ -60,6 +59,8 @@ paths:
       summary: List all authors.
       operationId: get_authors
       description: Returns a list of all authors.
+      tags:
+        - authors
       responses:
         '200':
           description: A list of all authors, alphabetically sorted.
@@ -85,6 +86,8 @@ paths:
       summary: List all tags.
       operationId: get_tags
       description: Returns a list of all tags.
+      tags:
+        - tags
       responses:
         '200':
           description: A list of all tags, alphabetically sorted.

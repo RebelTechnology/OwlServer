@@ -16,6 +16,8 @@ var monk = require('monk');
 var apiSettings = require('./api-settings');
 var db = monk(apiSettings.mongoConnectionString);
 
+var swaggerize = require('swaggerize-express');
+
 var author  = require('./routes/author');
 var authors = require('./routes/authors');
 var patch   = require('./routes/patch');
@@ -26,6 +28,11 @@ var sysex   = require('./routes/sysex');
 
 var app = express();
 app.use(cors());
+
+app.use(swaggerize({
+    api: './swagger.yaml',
+    handlers: './routes'
+}));
 
 //// view engine setup
 //app.set('views', path.join(__dirname, 'views'));
