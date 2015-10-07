@@ -7,20 +7,22 @@ var router = express.Router();
 
 /**
  * Retrieves all tags.
- * 
+ *
  * GET /tags
  */
 router.get('/', function(req, res) {
-    
+
     var collection = req.db.get('patches');
     var nativeCol = collection.col;
     nativeCol.aggregate(
-        
+
         { $project: { tags: 1 }},
         { $unwind: "$tags" },
         { $group: { _id: "$tags" }},
-        { $sort: { _id: 1}},
-        
+        { $project: { _id: 1, insensitive: { $toLower: "$_id" }}}, // case-insensitive ordering
+        { $sort: { insensitive: 1 }},
+        { $project: { _id: 1 }},
+
         function(err, result) {
             if (err !== null) {
                 return res.status(500).json({error: err});
@@ -34,8 +36,8 @@ router.get('/', function(req, res) {
             }
         }
     );
-    
-    
+
+
 });
 
 module.exports = router;
