@@ -92,7 +92,11 @@ HoxtonOwl.patchForm = {
 
             tagData.push([{ id: patch.tags[i], text: patch.tags[i] }]);
         }
-        form.tagMulti.select2({ data: tagData });
+        form.tagMulti.select2({
+            placeholder: 'Pick one or more tags...',
+            data: tagData,
+            tags: true
+        });
 
         // Soundcloud
         if (patch.soundcloud && patch.soundcloud.length) {
@@ -486,7 +490,8 @@ HoxtonOwl.patchForm = {
 
             form.tagMulti = $('#frm-patch-tags');
             form.tagMulti.select2({
-                placeholder: 'Pick one or more tags...'
+                placeholder: 'Pick one or more tags...',
+                tags: true
             });
 
             var options = {
