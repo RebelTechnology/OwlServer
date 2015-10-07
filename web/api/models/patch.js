@@ -220,7 +220,7 @@ var patchModel = {
 
                 var err = { type: 'not_valid', field: 'soundcloud', error: { status: 400 }};
 
-                if (Object.prototype.toString.call(val) === '[object Array]') {
+                if (Object.prototype.toString.call(val) !== '[object Array]') {
                     err.message = 'Value not valid.';
                     throw err;
                 }
@@ -250,8 +250,8 @@ var patchModel = {
 
                 var err = { type: 'not_valid', field: 'github', error: { status: 400 }};
 
-                if (Object.prototype.toString.call(val) === '[object Array]') {
-                    err.message = 'Value not valid.';
+                if (Object.prototype.toString.call(val) !== '[object Array]') {
+                    err.message = 'Value not valid (1).';
                     throw err;
                 }
 
@@ -347,7 +347,7 @@ var patchModel = {
 
                 var err = { type: 'not_valid', field: 'tags', error: { status: 400 }};
 
-                if (Object.prototype.toString.call(val) === '[object Array]') {
+                if (Object.prototype.toString.call(val) !== '[object Array]') {
                     err.message = 'Value not valid.';
                     throw err;
                 }
