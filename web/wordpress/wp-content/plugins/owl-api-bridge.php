@@ -131,8 +131,12 @@ add_action('wp_ajax_nopriv_owl-username-autocomplete', 'owl_usernameAutocomplete
 
 /**
  * Provides an AJAX endpoint for retrieving WordPress's authentication cookie.
+ *
+ * @param bool $return
+ *     This function can also called internally. In this case, set this param
+ *     to `true`.
  */
-function owl_getAuthCookie()
+function owl_getAuthCookie($return = false)
 {
     $cookies = $_COOKIE;
     $result = null;
@@ -142,6 +146,10 @@ function owl_getAuthCookie()
             $result = $value;
             break;
         }
+    }
+
+    if ($return) {
+        return $result;
     }
 
     wp_send_json($result);

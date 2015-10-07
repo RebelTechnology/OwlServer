@@ -13,7 +13,7 @@ defined('ABSPATH') or die('No script kiddies please!');
 
 define('DOING_AJAX', true);
 
-define(TMP_DIR_PREFIX, 'tmp-');
+define('TMP_DIR_PREFIX', 'tmp-'); // must meet regex /[a-z0-9\-]+/i
 
 /**
  * Sends JSON error response and terminates script.
@@ -40,6 +40,7 @@ function errorOut($msg)
  */
 function isDirEmpty($path)
 {
+    clearstatcache();
     $handle = opendir($path);
     while (false !== ($entry = readdir($handle))) {
         if ($entry != '.' && $entry != '..') {
@@ -65,6 +66,27 @@ function isPatchIdValid($patchId)
 } // function isPatchIdValid
 
 /**
+ * Retuns the API base URL.
+ *
+ * @return string
+ *     The API base URL.
+ */
+function getApiBaseUrl()
+{
+    $apiBaseUrl = 'http://hoxtonowl.localhost:3000';
+    if (isset($_SERVER['APPLICATION_ENV'])) {
+        if ($_SERVER['APPLICATION_ENV'] == 'staging') {
+            $apiBaseUrl = 'http://staging.hoxtonowl.com/api';
+        } elseif ($_SERVER['APPLICATION_ENV'] == 'production') {
+            $apiBaseUrl = 'http://www.hoxtonowl.com/api';
+        }
+    }
+
+    return $apiBaseUrl;
+
+} // function getApiBaseUrl
+
+/**
  * Returns a patch.
  *
  * @param string $patchId
@@ -76,18 +98,10 @@ function isPatchIdValid($patchId)
 function getPatch($patchId)
 {
     if (!function_exists('curl_version')) {
-        errorOut('cURL is needed for this functionality.');
+        errorOut('cURL is needed for this functionality (1).');
     }
 
-    $host = 'http://hoxtonowl.localhost:3000';
-    if (isset($_SERVER['APPLICATION_ENV'])) {
-        if ($_SERVER['APPLICATION_ENV'] == 'staging') {
-            $host = 'http://staging.hoxtonowl.com/api';
-        } elseif ($_SERVER['APPLICATION_ENV'] == 'production') {
-            $host = 'http://www.hoxtonowl.com/api';
-        }
-    }
-    $apiCallUrl = $host . '/patch/' . $patchId;
+    $apiCallUrl = getApiBaseUrl() . '/patch/' . $patchId;
 
     $curl = curl_init($apiCallUrl);
     if (false === $curl) {
@@ -116,7 +130,72 @@ function getPatch($patchId)
 } // function getPatch
 
 /**
+ * Updates a patch.
+ *
+ * @param array $patch
+ *     An associative array representing the patch to update.
+ */
+function updatePatch($patch)
+{
+    if (!function_exists('curl_version')) {
+        errorOut('cURL is needed for this functionality (1).');
+    }
+
+    $payload = [
+        'credentials' => [
+            'type' => 'wordpress',
+            'cookie' => owl_getAuthCookie(true),
+        ],
+        'patch' => $patch,
+    ];
+    $payload = json_encode($payload);
+    if (false === $payload) {
+        errorOut('Unexpected error (1.1).');
+    }
+
+    $apiCallUrl = getApiBaseUrl() . '/patch/' . $patch['_id'];
+
+    $curl = curl_init($apiCallUrl);
+    if (false === $curl) {
+        errorOut('Unexpected error (2).');
+    }
+    if (!curl_setopt($curl, CURLOPT_RETURNTRANSFER, true)) {
+        errorOut('Unexpected error (3).');
+    }
+    if (!curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT')) {
+        errorOut('Unexpected error (3.1).');
+    }
+    if (!curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($payload)))) {
+        errorOut('Unexpected error (3.3).');
+    }
+    if (!curl_setopt($curl, CURLOPT_POSTFIELDS, $payload)) {
+        errorOut('Unexpected error (3.4).');
+    }
+
+    $data = curl_exec($curl);
+    if (curl_errno($curl)) {
+        errorOut('Unexpected error (4).');
+    }
+    if (false === $data) {
+        errorOut('Unexpected error (5).');
+    }
+    $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    if ($statusCode !== 200) { // FIXME - If we wanted to be really RESTful, any 1xx, 2xx and 3xx should be handled here.
+        errorOut('Unable to update patch ' . $patchId . ' (1, ' . $apiCallUrl . ', ' . $statusCode . ').');
+    }
+
+    $result = json_decode($data, true);
+
+    return $result;
+
+} // function updatePatch
+
+/**
  * Returns information about a source file.
+ *
+ * @todo FIXME This function is duplicated in `patch-builder.php`.
  *
  * @param  string  $url
  *     The file URL.
@@ -148,7 +227,7 @@ function getSourceFileInfo($url)
 
     return $result;
 
-} // function isFileHostedOnOurServers
+} // function getSourceFileInfo
 
 /**
  * Checks that the current WordPress user is authorized to edit the specified
@@ -189,7 +268,7 @@ function checkUserIsAuthorizedToEditPatch($patch)
 function getBaseDirPath()
 {
     $baseDirPath = realpath(dirname(__FILE__) . '/../uploads');
-    if ($_SERVER['HTTP_HOST'] == 'hoxtonowl.localhost:8000') { // FIXME - Remove this if block
+    if ($_SERVER['HTTP_HOST'] == 'hoxtonowl.localhost:8000') { // FIXME - Remove this if block?
         $baseDirPath = '/home/kyuzz/Projects/HoxtonOwl.com/wp-content/uploads';
     }
     $baseDirPath .= '/patch-files';
@@ -260,7 +339,12 @@ function owl_patchFileUpload()
     if (isset($_REQUEST['patchId'])) { // if no patch ID is given, patch is assumed to be new
         $patchDirPath0 = $_REQUEST['patchId'];
     } else {
-        $patchDirPath0 = TMP_DIR_PREFIX . substr($_COOKIE['PHPSESSID'], 0, 10); // one tmp directory per user session
+
+        if (!isset($_REQUEST['fileUploadToken']) || !is_string($_REQUEST['fileUploadToken'])) {
+            errorOut('Missing file upload token.');
+        }
+
+        $patchDirPath0 = TMP_DIR_PREFIX . substr(md5($_REQUEST['fileUploadToken']), 0, 10); // one tmp directory per user session
     }
     $patchDirPath = $baseDirPath . '/' . $patchDirPath0;
 
@@ -410,7 +494,9 @@ function owl_patchFileCleanUp()
     // Check if there are any files that need to be moved from temporary
     // directories
     $baseDirPath = getBaseDirPath();
+    $dstDir = $baseDirPath . '/' . $patchId;
     $sourceFiles = $patch['github'];
+    $movedSourceFiles = [];
     foreach ($sourceFiles as $sourceFile) {
         $sourceFileInfo = getSourceFileInfo($sourceFile);
         if ('url' == $sourceFileInfo['type']) {
@@ -433,7 +519,6 @@ function owl_patchFileCleanUp()
                 }
 
                 // Does destination directory exist on server? (Create it if not)
-                $dstDir = $baseDirPath . '/' . $patchId;
                 if (!file_exists($dstDir)) {
                     if (!mkdir($dstDir, getDirMod(), true)) {
                         errorOut('Unable to create directory "' . $dstDir . '".');
@@ -444,19 +529,36 @@ function owl_patchFileCleanUp()
                 $dstFile = $dstDir . '/' . $sourceFileInfo['name'];
                 if (!rename($srcFile, $dstFile)) {
                     errorOut('Unable to move "' . $srcFile . '" to "' . $dstFile . '".');
+                } else {
+                    $movedSourceFiles[$sourceFile] = str_replace('/' . $sourceFileInfo['dir'] . '/', '/' . $patchId . '/', $sourceFile);
                 }
 
                 // If tmp directory is empty, delete it
-                if (!is_readable($dstDir) || !is_writeable($dstDir)) {
+                if (!is_readable($srcDir) || !is_writeable($srcDir)) {
                     // Destination directory unreadable/unwriteable, won't attempt to delete it
                     continue;
                 }
 
-                if (isDirEmpty($dstDir)) {
-                    @rmdir($dstDir);
+                if (isDirEmpty($srcDir)) {
+                    @rmdir($srcDir);
                 }
             }
         }
+    }
+
+    // Update patch
+    if (count($movedSourceFiles)) {
+
+        foreach ($sourceFiles as &$sourceFile) {
+            if (isset($movedSourceFiles[$sourceFile])) {
+                $sourceFile = $movedSourceFiles[$sourceFile];
+            }
+        }
+        unset($sourceFile);
+
+        $patch['github'] = $sourceFiles;
+        updatePatch($patch);
+
     }
 
     // Delete files that were removed from the database
@@ -481,9 +583,9 @@ function owl_patchFileCleanUp()
 
     $filesToDelete = array_diff($filesOnDisk, $localFilesInDb);
     foreach ($filesToDelete as $fileToDelete) {
-        $fileToDeletePath = $dstDir . $fileToDelete;
-        if (is_file($fileToDeletePath) && is_writeable($fileToDeletePath)) {
-            @unlink($fileToDelete);
+        $fileToDeletePath = $dstDir . '/' . $fileToDelete;
+        if (file_exists($fileToDeletePath) && is_writeable($fileToDeletePath)) {
+            @unlink($fileToDeletePath);
         }
     }
 
@@ -493,7 +595,58 @@ function owl_patchFileCleanUp()
 
 } // function owl_patchFileCleanUp
 
-add_action('wp_ajax_owl-patch-file-cleanup', 'owl_patchFileCleanUp');
+/**
+ * Deletes all the locally hosted files for the specified patch.
+ *
+ * This function is meant to be called just before deleting a patch from the
+ * database.
+ */
+function owl_patchFileDelete()
+{
+
+    // Make sure patch ID is valid
+    if (!isset($_REQUEST['patchId'])) {
+        errorOut('Patch ID not provided.');
+    }
+
+    $patchId = $_REQUEST['patchId'];
+    if (!isPatchIdValid($patchId)) {
+        errorOut('Bad patch ID.');
+    }
+
+    // Get patch
+    $patch = getPatch($patchId);
+
+    // Check user can edit the patch
+    checkUserIsAuthorizedToEditPatch($patch);
+
+    $baseDirPath = getBaseDirPath();
+    $dstDir = $baseDirPath . '/' . $patchId;
+
+    $sourceFiles = $patch['github'];
+    foreach ($sourceFiles as $sourceFile) {
+        $sourceFileInfo = getSourceFileInfo($sourceFile);
+        if ('url' == $sourceFileInfo['type']) {
+            $fileToDeletePath = $dstDir . '/' . $sourceFileInfo['name'];
+            if (file_exists($fileToDeletePath) && is_writeable($fileToDeletePath)) {
+                @unlink($fileToDeletePath);
+            }
+        }
+    }
+
+    // If tmp directory is empty, delete it
+    if (is_readable($dstDir) && is_writeable($dstDir) && isDirEmpty($dstDir)) {
+        @rmdir($dstDir);
+    }
+
+    $result = [ 'error' => false, ];
+    wp_send_json($result);
+    wp_die();
+
+} // function owl_patchFileDelete
+
 add_action('wp_ajax_owl-patch-file-upload', 'owl_patchFileUpload');
+add_action('wp_ajax_owl-patch-file-cleanup', 'owl_patchFileCleanUp');
+add_action('wp_ajax_owl-patch-file-delete', 'owl_patchFileDelete');
 
 // EOF
