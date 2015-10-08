@@ -18,7 +18,8 @@ var summaryFields = {
     'author.url': 1,
     tags: 1,
     seoName: 1,
-    creationTimeUtc: 1
+    creationTimeUtc: 1,
+    published: 1
 };
 
 var regExpEscape = function(str) {
@@ -48,6 +49,7 @@ router.get('/', function(req, res) {
     if ('author.name' in query && query['author.name'] !== '') {
         filter.$match['author.name'] = query['author.name'];
     }
+    // filter.$match['published'] = true;
 
     nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, { $project: summaryFields }, function (err, result) {
         if (err !== null) {

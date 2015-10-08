@@ -299,7 +299,7 @@ HoxtonOwl.patchManager = {
 
             HoxtonOwl.patchManager.sortPatchesByName();
             that.search('myPatches');
-            var author = $('#wordpress-username').text();
+            var author = $('#wordpress-display-name').text();
             //console.log(author);
             that.searchItems.removeAll();
             that.selectedPatch(null);

@@ -318,9 +318,12 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
 global $current_user;
 
 if (is_user_logged_in()): ?>
-<div id="wordpress-username" style="display: none;"><?= $current_user->user_login; ?></div>
-<div id="wordpress-user-id" style="display: none;"><?= $current_user->ID; ?></div>
-<div id="wordpress-user-is-admin" style="display: none;"><?= current_user_can('administrator') ? 1 : 0 ?></div>
+<div style="display: none;">
+    <div id="wordpress-username"><?= $current_user->user_login; ?></div>
+    <div id="wordpress-user-id"><?= $current_user->ID; ?></div>
+    <div id="wordpress-display-name"><?= $current_user->display_name ?></div>
+    <div id="wordpress-user-is-admin"><?= current_user_can('administrator') ? 1 : 0 ?></div>
+</div>
 <?php endif; ?>
 
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/footer','parts/shared/html-footer') ); ?>
