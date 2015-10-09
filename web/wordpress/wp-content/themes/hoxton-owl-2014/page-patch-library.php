@@ -232,10 +232,16 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
         <!-- /ko -->
 
         <div id="patch-counter" data-bind="visible: search() !== 'patch'">
-            <span data-bind="text: filteredPatches().length">0</span> public
-            patch<span data-bind="text: filteredPatches().length == 1 ? '' : 'es'"></span> from
-            <span data-bind="text: filteredPatchAuthorNo()">0</span>
-            author<span data-bind="text: filteredPatchAuthorNo() == 1 ? '' : 's'"></span>.
+            <div data-bind="visible: search() !== 'myPatches'">
+                <span data-bind="text: filteredPatches().length">0</span> public
+                patch<span data-bind="text: filteredPatches().length == 1 ? '' : 'es'"></span> by
+                <span data-bind="text: filteredPatchAuthorNo()">0</span>
+                author<span data-bind="text: filteredPatchAuthorNo() == 1 ? '' : 's'"></span>.
+            </div>
+            <div data-bind="visible: search() === 'myPatches'">
+                <span data-bind="text: filteredPatches().length">0</span>
+                patch<span data-bind="text: filteredPatches().length == 1 ? '' : 'es'"></span>
+            </div>
         </div>
 
         <!-- ko foreach: filteredPatches -->
