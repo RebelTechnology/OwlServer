@@ -92,11 +92,14 @@ HoxtonOwl.patchForm = {
 
             tagData.push({ id: patch.tags[i], text: patch.tags[i] });
         }
-        form.tagMulti.select2({
+        var tagMultiOptions = {
             placeholder: 'Pick one or more tags...',
-            data: tagData,
-            tags: true
-        });
+            data: tagData
+        };
+        if ($('#wordpress-user-is-admin').text() == 1) {
+            tagMultiOptions.tags = true;
+        }
+        form.tagMulti.select2(tagMultiOptions);
 
         // Soundcloud
         if (patch.soundcloud && patch.soundcloud.length) {
