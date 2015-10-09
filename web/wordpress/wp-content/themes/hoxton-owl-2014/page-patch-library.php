@@ -324,6 +324,9 @@ if (is_user_logged_in()): ?>
     <div id="wordpress-display-name"><?= $current_user->display_name ?></div>
     <div id="wordpress-user-is-admin"><?= current_user_can('administrator') ? 1 : 0 ?></div>
 </div>
+<?php /*pre>
+    <?php var_dump($current_user); ?>
+</pre */ ?>
 <?php endif; ?>
 
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/footer','parts/shared/html-footer') ); ?>

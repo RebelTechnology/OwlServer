@@ -95,31 +95,20 @@ function owl_usernameAutocomplete()
     $pattern = $_POST['q'];
 
     $args = array(
-        'search_columns' => array( 'nickname' ),
-        'orderby' => 'nickname',
-        'order' => 'ASC',
-        'meta_query' => array(
-            array(
-                'key'     => 'nickname',
-                'value'   => $pattern,
-                'compare' => 'LIKE',
-            ),
-        ), 'count_total' => true,
+        'search'         => $pattern . '*',
+        'search_columns' => array('display_name'),
+        'orderby'        => 'display_name',
+        'order'          => 'ASC',
+        'count_total' => true,
     );
+
     $userQuery = new WP_User_Query($args);
 
     $result = array(
-        //'total_count' => ?,
         'incomplete_results' => false,
-            'items' => array(
-            //array(
-            //    'id' => 1,
-            //    'text' => 'Samuele',
-            //),
-        )
+        'items' => array()
     );
 
-    //$result['total_count'] = count($users);
     $result['items'] = $userQuery->results;
 
     wp_send_json($result);
