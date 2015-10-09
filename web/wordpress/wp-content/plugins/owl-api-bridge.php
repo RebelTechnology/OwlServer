@@ -96,8 +96,8 @@ function owl_usernameAutocomplete()
 
     $args = array(
         'search'         => $pattern . '*',
-        'search_columns' => array('display_name'),
-        'orderby'        => 'display_name',
+        'search_columns' => array('user_login'),
+        'orderby'        => 'user_login',
         'order'          => 'ASC',
         'count_total' => true,
     );
