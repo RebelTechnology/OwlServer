@@ -203,5 +203,13 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
     <div class="clear"></div>
 
 </div>
+<?php
+global $current_user;
+
+if (is_user_logged_in()): ?>
+<div style="display: none;">
+    <div id="wordpress-user-is-admin"><?= current_user_can('administrator') ? 1 : 0 ?></div>
+</div>
+<?php endif; ?>
 
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/footer','parts/shared/html-footer' ) ); ?>
