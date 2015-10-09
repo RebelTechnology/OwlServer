@@ -90,7 +90,7 @@ HoxtonOwl.patchForm = {
                 return $(this).text() === patch.tags[i];
             }).prop('selected', true);
 
-            tagData.push([{ id: patch.tags[i], text: patch.tags[i] }]);
+            tagData.push({ id: patch.tags[i], text: patch.tags[i] });
         }
         form.tagMulti.select2({
             placeholder: 'Pick one or more tags...',
