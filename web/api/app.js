@@ -30,8 +30,8 @@ var app = express();
 app.use(cors());
 
 app.use(swaggerize({
-    api: './swagger.yaml',
-    handlers: './routes'
+    api: path.join(__dirname, 'swagger.yaml'),
+    handlers: path.join(__dirname, 'routes')
 }));
 
 //// view engine setup
