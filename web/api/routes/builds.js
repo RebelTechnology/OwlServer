@@ -39,15 +39,16 @@ var getBuildFormat = function (format) {
  *
  * The `format` parameter defaults to `sysx`.
  */
-router.get('/:id', function(req, res) {
+router.get('/:id', function (req, res) {
 
-    var id = req.params.id;
-    var buildFormat = 'sysx'; // default
-    var collection = req.db.get('patches');
+    var id = req.params.id,
+        buildFormat = 'sysx', // default
+        collection = req.db.get('patches'),
+        format;
 
     // Determine patch format
     if (req.params.format) {
-        var format = getBuildFormat(req.params.format);
+        format = getBuildFormat(req.params.format);
     }
 
     Q.fcall(function () {
@@ -60,7 +61,8 @@ router.get('/:id', function(req, res) {
 
     }).then(function (patch) {
 
-        var buildFile;
+        var buildFile,
+            filename;
 
         /*
          * Check if SysEx is available
@@ -71,9 +73,9 @@ router.get('/:id', function(req, res) {
         }
 
         if (format === 'sysx') {
-            buildFile = path.join(apiSettings.SYSEX_PATH, patch['seoName'] + '.syx');
-        } else if (format == 'js') {
-            buildFile = path.join(apiSettings.JS_PATH, patch['seoName'] + '.js');
+            buildFile = path.join(apiSettings.SYSEX_PATH, patch.seoName + '.syx');
+        } else if (format === 'js') {
+            buildFile = path.join(apiSettings.JS_PATH, patch.seoName + '.js');
         }
         if (!fs.existsSync(buildFile)) {
             throw { message: 'Build file not available for this patch (in ' + format + ' format).', status: 404 };
@@ -84,12 +86,12 @@ router.get('/:id', function(req, res) {
          */
 
         console.log(buildFile);
-        var filename = path.basename(buildFile);
+        filename = path.basename(buildFile);
         console.log(filename);
         res.setHeader('Content-disposition', 'attachment; filename=' + filename);
         if (format === 'sysx') {
             res.setHeader('Content-type', 'application/octet-stream');
-        } else if () {
+        } else if (format === 'js') {
             res.setHeader('Content-type', 'text/javascript');
         }
         var filestream = fs.createReadStream(buildFile);
@@ -112,7 +114,7 @@ router.get('/:id', function(req, res) {
  *
  * PUT /patch/{patchId}
  */
-router.put('/:id', function(req, res) {
+router.put('/:id', function (req, res) {
 
     var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
     var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
@@ -163,7 +165,7 @@ router.put('/:id', function(req, res) {
 
         return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
 
-    }).then(function() {
+    }).then(function () {
 
         /* ~~~~~~~~~~~~~~~~~~
          *  Get WP user info
