@@ -111,7 +111,7 @@ paths:
       operationId: get_builds
       description: |
         Starts the download of a patch build.
-        
+
         Patch builds may be either of `sysx` or `js` type.
       parameters:
         - name: type
@@ -147,19 +147,41 @@ paths:
       description: |
         Builds a patch. The build is stored on the server and can be fetched
         afterwards with a `GET` request.
-        
+
         Patch builds can either be of `sysx` or `js` type.
       parameters:
-        - name: type
-          in: query
-          description: Patch build type.
-          required: false
-          type: string
-          default: sysx
-          enum:
-            - sysx
-            - sysex
-            - js
+        - name: parameters
+          in: body
+          description: The request parameters.
+          required: true
+          schema:
+            type: object
+            required:
+              - format
+            properties:
+              format:
+                type: string
+                description: The patch format.
+                default: sysx
+                enum:
+                  - sysx
+                  - sysex
+                  - js
+              credentials:
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    type: string
+                    description: The type of credential.
+                    default: api_key
+                    enum:
+                      - api_key
+                      - wordpress
+                  cookie:
+                    type: string
+                    description: WP authentication token.
       tags:
         - builds
       responses:
@@ -234,6 +256,21 @@ definitions:
       wordpressId:
         type: integer
         description: Used internally. The ID of the WordPress user the patch belongs to.
+  Credentials:
+    type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        description: The type of credential.
+        default: api_key
+        enum:
+          - api_key
+          - wordpress
+      cookie:
+        type: string
+        description: WP authentication token.
   GeneralError:
     type: object
     required:
