@@ -20,12 +20,13 @@ paths:
       operationId: get_patches
       description: >
         Returns a summary of all public patches.
-        
-        
+
+
         Private patches are not returned by this API call.
-        
-        
-        To retrieve all the available fields for a certain patch, use `GET /patches/{patchId}`.
+
+
+        To retrieve all the available fields for a certain patch, use `GET
+        /patches/{patchId}`.
       parameters:
         - name: author.name
           in: query
@@ -36,7 +37,7 @@ paths:
         - patches
       responses:
         '200':
-          description: A summary of all public patches, alphabetically sorted by patch name.
+          description: 'A summary of all public patches, alphabetically sorted by patch name.'
           schema:
             type: object
             required:
@@ -51,7 +52,7 @@ paths:
                 items:
                   $ref: '#/definitions/PatchSummary'
         default:
-          description: Unexpected error
+          description: Unexpected error.
           schema:
             $ref: '#/definitions/GeneralError'
   /authors:
@@ -63,7 +64,7 @@ paths:
         - authors
       responses:
         '200':
-          description: A list of all authors, alphabetically sorted.
+          description: 'A list of all authors, alphabetically sorted.'
           schema:
             type: object
             required:
@@ -78,7 +79,7 @@ paths:
                 items:
                   $ref: '#/definitions/PatchAuthor'
         default:
-          description: Unexpected error
+          description: Unexpected error.
           schema:
             $ref: '#/definitions/GeneralError'
   /tags:
@@ -90,20 +91,106 @@ paths:
         - tags
       responses:
         '200':
-          description: A list of all tags, alphabetically sorted.
+          description: 'A list of all tags, alphabetically sorted.'
           schema:
-           type: object
-           required:
-             - count
-             - result
-           properties:
-             count:
-               type: integer
-               description: The total number of tags.
-             result:
-               type: array
-               items:
-                 type: string
+            type: object
+            required:
+              - count
+              - result
+            properties:
+              count:
+                type: integer
+                description: The total number of tags.
+              result:
+                type: array
+                items:
+                  type: string
+  /builds:
+    get:
+      summary: Starts the download of a patch build.
+      operationId: get_builds
+      description: |
+        Starts the download of a patch build.
+        
+        Patch builds may be either of `sysx` or `js` type.
+      parameters:
+        - name: type
+          in: query
+          description: Patch build type.
+          required: false
+          type: string
+          default: sysx
+          enum:
+            - sysx
+            - sysex
+            - js
+      tags:
+        - builds
+      responses:
+        '200':
+          description: The selected build will be streammed in the HTTP response.
+        '401':
+          description: The specified patch could not be found.
+          schema:
+            $ref: '#/definitions/GeneralError'
+        '404':
+          description: The build could not be found.
+          schema:
+            $ref: '#/definitions/GeneralError'
+        default:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/GeneralError'
+    put:
+      summary: Builds a patch.
+      operationId: put_builds
+      description: |
+        Builds a patch. The build is stored on the server and can be fetched
+        afterwards with a `GET` request.
+        
+        Patch builds can either be of `sysx` or `js` type.
+      parameters:
+        - name: type
+          in: query
+          description: Patch build type.
+          required: false
+          type: string
+          default: sysx
+          enum:
+            - sysx
+            - sysex
+            - js
+      tags:
+        - builds
+      responses:
+        '200':
+          description: The patch was built successfully.
+          schema:
+            type: object
+            required:
+              - success
+            properties:
+              success:
+                type: boolean
+                description: Whether the patch build succeeded.
+              stdout:
+                type: string
+                description: All the messages that the compiler sent to `stdout`.
+              stderr:
+                type: string
+                description: All the messages that the compiler sent to `stderr`.
+        '401':
+          description: Access denied.
+          schema:
+            $ref: '#/definitions/GeneralError'
+        '404':
+          description: The specified patch could not be found.
+          schema:
+            $ref: '#/definitions/GeneralError'
+        default:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/GeneralError'
 definitions:
   PatchSummary:
     type: object
@@ -140,7 +227,7 @@ definitions:
       url:
         type: string
         format: uri
-        description: The author's URL.
+        description: "The author's URL."
       type:
         type: string
         description: Used internally. The only possible value for this field is `wordpress` at the moment.
@@ -154,3 +241,7 @@ definitions:
     properties:
       message:
         type: string
+        description: The error message.
+      status:
+        type: integer
+        description: The error code.
