@@ -384,7 +384,7 @@ HoxtonOwl.patchManager = {
 
                 knobify();
                 if (that.selectedPatch().sysExAvailable) {
-                    $('.sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id);
+                    $('.sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=sysx');
                 }
 
                 // Show compile patch button:
