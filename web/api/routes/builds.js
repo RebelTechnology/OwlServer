@@ -14,14 +14,41 @@ var wordpressBridge = require('../lib/wordpress-bridge.js');
 var apiSettings = require('../api-settings.js');
 
 /**
- * Downloads the SysEx file for a specific patch.
+ * Convenience function for determining the build format.
+ */
+var getBuildFormat = function (format) {
+
+    var buildFormat = 'sysx'; // default
+    if (format) {
+        buildFormat = format;
+    }
+    if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'sysex') {
+        throw { message: 'Invalid format.', status: 500 };
+    }
+    if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
+        buildFormat = 'sysx';
+    }
+
+    return buildFormat;
+};
+
+/**
+ * Downloads the build for the specified patch.
  *
- * GET /sysex/{id}
+ * GET /builds/{patchId}[?format={sysex|sysx|js}]
+ *
+ * The `format` parameter defaults to `sysx`.
  */
 router.get('/:id', function(req, res) {
 
     var id = req.params.id;
+    var buildFormat = 'sysx'; // default
     var collection = req.db.get('patches');
+
+    // Determine patch format
+    if (req.params.format) {
+        var format = getBuildFormat(req.params.format);
+    }
 
     Q.fcall(function () {
 
@@ -33,6 +60,8 @@ router.get('/:id', function(req, res) {
 
     }).then(function (patch) {
 
+        var buildFile;
+
         /*
          * Check if SysEx is available
          */
@@ -41,21 +70,29 @@ router.get('/:id', function(req, res) {
             throw { message: 'Patch not found.', status: 401 };
         }
 
-        var sysexFile = path.join(apiSettings.SYSEX_PATH, patch['seoName'] + '.syx');
-        if (!fs.existsSync(sysexFile)) {
-            throw { message: 'SysEx not avilable for this patch.', status: 401 };
+        if (format === 'sysx') {
+            buildFile = path.join(apiSettings.SYSEX_PATH, patch['seoName'] + '.syx');
+        } else if (format == 'js') {
+            buildFile = path.join(apiSettings.JS_PATH, patch['seoName'] + '.js');
+        }
+        if (!fs.existsSync(buildFile)) {
+            throw { message: 'Build file not available for this patch (in ' + format + ' format).', status: 404 };
         }
 
         /*
          * Download file
          */
 
-        console.log(sysexFile);
-        var filename = path.basename(sysexFile);
+        console.log(buildFile);
+        var filename = path.basename(buildFile);
         console.log(filename);
         res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-        res.setHeader('Content-type', 'application/octet-stream');
-        var filestream = fs.createReadStream(sysexFile);
+        if (format === 'sysx') {
+            res.setHeader('Content-type', 'application/octet-stream');
+        } else if () {
+            res.setHeader('Content-type', 'text/javascript');
+        }
+        var filestream = fs.createReadStream(buildFile);
         return filestream.pipe(res);
 
     }).fail(
@@ -71,9 +108,9 @@ router.get('/:id', function(req, res) {
 });
 
 /**
- * Recompiles a patch.
+ * Builds the specified patch.
  *
- * PUT /patch/{id}
+ * PUT /patch/{patchId}
  */
 router.put('/:id', function(req, res) {
 
@@ -96,6 +133,11 @@ router.put('/:id', function(req, res) {
            message: 'Invalid ID.',
            error: { status: 500 }
         });
+    }
+
+    var format = 'sysx'; // default
+    if (req.body.format) {
+        format = getBuildFormat(req.body.format);
     }
 
     Q.fcall(function () {
@@ -159,7 +201,7 @@ router.put('/:id', function(req, res) {
         if (null === patch) {
             throw {
                 message: 'Patch not found.',
-                error: { status: 400 }
+                error: { status: 404 }
             };
         }
 
@@ -180,7 +222,11 @@ router.put('/:id', function(req, res) {
          * Compile patch
          */
 
-        var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH + ' ' + id;
+        var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH;
+        if (format === 'js') {
+            cmd += ' --web';
+        }
+        cmd += ' ' + id;
         console.log('Running command "' + cmd + '"...');
         exec(cmd, function (error, stdout, stderr) {
 

@@ -454,7 +454,7 @@ HoxtonOwl.patchManager = {
             $('#compile-dialog textarea').empty().text('Please wait...');
 
             var apiClient = new HoxtonOwl.ApiClient();
-            apiClient.compilePatch($('#selected-patch-id').text(), function (data) {
+            apiClient.compilePatch($('#selected-patch-id').text(), 'sysx' /* FIXME - TODO */, function (data) {
 
                 if (data.success === true) {
                     $('#compile-dialog textarea').first().text('Patch compiled successfully.');

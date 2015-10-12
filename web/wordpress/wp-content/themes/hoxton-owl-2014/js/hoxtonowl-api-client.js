@@ -273,17 +273,15 @@ HoxtonOwl.ApiClient.prototype.deletePatch = function (patchId, callback) {
  *
  * @param {string} patchId
  *     The patch ID.
+ * @param {string} format
+ *     The desired format (either `sysx` or `js`).
  * @param {Function} callback
  *     A callback that will be invoked once data is loaded. This function will
  *     be passed the freshly loaded patch.
  */
-HoxtonOwl.ApiClient.prototype.compilePatch = function (patchId, callback) {
+HoxtonOwl.ApiClient.prototype.compilePatch = function (patchId, format, callback) {
 
     var client = this;
-
-    //jQuery.when(client._query('/sysex/' + patchId, 'PUT')).done(function (data) {
-    //    callback(data);
-    //});
 
     jQuery.when(client._getWpAuthCookie()).then(
 
@@ -294,7 +292,11 @@ HoxtonOwl.ApiClient.prototype.compilePatch = function (patchId, callback) {
                 cookie: authCookieVal
             };
 
-            jQuery.when(client._query('/sysex/' + patchId, 'PUT', { credentials: credentials })).always(function (result) {
+            var data = {
+                credentials: credentials,
+                format: format
+            };
+            jQuery.when(client._query('/builds/' + patchId, 'PUT', data)).always(function (result) {
                 callback(result);
             });
         },
