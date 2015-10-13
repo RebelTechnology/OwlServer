@@ -14,7 +14,7 @@ var wordpressBridge = require('../lib/wordpress-bridge.js');
 
 var apiSettings     = require('../api-settings.js');
 
-var regExpEscape = function(str) {
+var regExpEscape = function (str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 };
 
@@ -31,9 +31,9 @@ var regExpEscape = function(str) {
  * @param {function} callback
  *     An callback to be called if the specified patch exists.
  */
-var apply = function(id, collection, res, callback) {
+var apply = function (id, collection, res, callback) {
 
-    collection.findOne({ _id: id }, function(err, patch) {
+    collection.findOne({ _id: id }, function (err, patch) {
 
         var response = {};
         if (null !== err) {
@@ -66,6 +66,14 @@ var apply = function(id, collection, res, callback) {
                     patch['sysExLastUpdated'] = fs.statSync(sysexFile).mtime;
                 }
 
+                // get patch js
+                patch['jsAvailable'] = false;
+                var jsFile = path.join(apiSettings.JS_PATH, patch['seoName'] + '.js');
+                if (fs.existsSync(jsFile)) {
+                    patch['jsAvailable'] = true;
+                    patch['jsLastUpdated'] = fs.statSync(jsFile).mtime;
+                }
+
                 callback(patch);
 
             }
@@ -78,11 +86,11 @@ var apply = function(id, collection, res, callback) {
  *
  * GET /patch/{id}
  */
-router.get('/:id', function(req, res) {
+router.get('/:id', function (req, res) {
 
     var id = req.params.id;
     var collection = req.db.get('patches');
-    apply(id, collection, res, function(patch) {
+    apply(id, collection, res, function (patch) {
 
         var response = { result: patch };
         return res.status(200).json(response);
@@ -94,7 +102,7 @@ router.get('/:id', function(req, res) {
  *
  * GET /patch/?field=value&...
  */
-router.get('/', function(req,res) {
+router.get('/', function (req,res) {
 
     var query = {};
     var collection = req.db.get('patches');
@@ -107,7 +115,7 @@ router.get('/', function(req,res) {
         var response = { message: 'You must specify at least 1 search parameter.', error: { status: 400 }};
         return res.status(response.error.status).json(response);
     } else {
-        collection.findOne(query, function(err, patch) {
+        collection.findOne(query, function (err, patch) {
 
             var response = {};
             if (null !== err) {
@@ -143,7 +151,7 @@ router.get('/', function(req,res) {
  *
  * PUT /patch/{id}
  */
-router.put('/:id', function(req, res) {
+router.put('/:id', function (req, res) {
 
     var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
     var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
@@ -184,7 +192,7 @@ router.put('/:id', function(req, res) {
          *  Get WP user info
          * ~~~~~~~~~~~~~~~~~~ */
 
-        function() {
+        function () {
 
             console.log('Getting WP user info...');
             username = wpCookie.split('|')[0];
@@ -245,7 +253,7 @@ router.put('/:id', function(req, res) {
          *  Retrieve patch before updating it
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-        function(doc) {
+        function (doc) {
 
             if (null !== doc) {
                 throw {
@@ -346,7 +354,7 @@ router.put('/:id', function(req, res) {
  *
  * DELETE /patch/{id}
  */
-router.delete('/:id', function(req, res) {
+router.delete('/:id', function (req, res) {
 
     var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
     var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
@@ -385,7 +393,7 @@ router.delete('/:id', function(req, res) {
          *  Check if user is WordPress admin
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-        function() {
+        function () {
 
             console.log('Checking if WP admin...');
             username = wpCookie.split('|')[0];
@@ -400,7 +408,7 @@ router.delete('/:id', function(req, res) {
          *  Find specified patch
          * ~~~~~~~~~~~~~~~~~~~~~~ */
 
-        function(wpUserInfo) {
+        function (wpUserInfo) {
 
             isAdmin = wpUserInfo.admin;
             wpUserId = wpUserInfo.id;

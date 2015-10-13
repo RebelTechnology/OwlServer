@@ -141,14 +141,28 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     <!-- ko if: sysExAvailable -->
                     <tr>
                         <td><span class="parameter-label">SysEx</span></td>
-                        <td><p><a class="sysExDownloadLink" href="#">Download</a>
-                    </tr>
-                    <!-- ko if: sysExLastUpdated -->
-                    <tr>
-                        <td><span class="parameter-label">Last updated on</span></td>
-                        <td><p data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></p></td>
+                        <td>
+                            <p>
+                                <a class="sysExDownloadLink" href="#">Download</a>
+                                <!-- ko if: sysExLastUpdated -->
+                                <span data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></span>
+                                <!-- /ko -->
+                            </p>
+                        </td>
                     </tr>
                     <!-- /ko -->
+                    <!-- ko if: jsAvailable -->
+                    <tr>
+                        <td><span class="parameter-label">JS</span></td>
+                        <td>
+                            <p>
+                                <a class="jsDownloadLink" href="#">Download</a>
+                                <!-- ko if: jsLastUpdated -->
+                                <span data-bind="text: new Date(selectedPatch().jsLastUpdated).toLocaleString()"></span>
+                                <!-- /ko -->
+                            </p>
+                        </td>
+                    </tr>
                     <!-- /ko -->
                     <tr class="compile-patch-container" style="display: none;">
                         <td><span class="parameter-label">Compile</span></td>
