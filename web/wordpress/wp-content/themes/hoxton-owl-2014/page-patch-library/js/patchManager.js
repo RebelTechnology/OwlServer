@@ -442,7 +442,12 @@ HoxtonOwl.patchManager = {
         });
         $(document).on('click', '.compileLink', function(e) {
 
-            if (!confirm('Are you sure you want to compile this patch?')) {
+            var target = 'sysx';
+            if ($(e.target).hasClass('js')) {
+                target = 'js';
+            }
+
+            if (!confirm('Are you sure you want to build this patch (' + target + ' target)?')) {
                 return false;
             }
 
@@ -454,7 +459,7 @@ HoxtonOwl.patchManager = {
             $('#compile-dialog textarea').empty().text('Please wait...');
 
             var apiClient = new HoxtonOwl.ApiClient();
-            apiClient.compilePatch($('#selected-patch-id').text(), 'sysx' /* FIXME - TODO */, function (data) {
+            apiClient.compilePatch($('#selected-patch-id').text(), target, function (data) {
 
                 if (data.success === true) {
                     $('#compile-dialog textarea').first().text('Patch compiled successfully.');

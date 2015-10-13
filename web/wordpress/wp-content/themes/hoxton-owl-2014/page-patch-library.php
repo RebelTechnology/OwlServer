@@ -165,8 +165,8 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </tr>
                     <!-- /ko -->
                     <tr class="compile-patch-container" style="display: none;">
-                        <td><span class="parameter-label">Compile</span></td>
-                        <td><p><a class="compileLink" href="#">Compile</a></p></td>
+                        <td><span class="parameter-label">Build</span></td>
+                        <td><p><a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></p></td>
                     </tr>
                 </table>
             </div>
