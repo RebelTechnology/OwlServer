@@ -383,8 +383,14 @@ HoxtonOwl.patchManager = {
                 }
 
                 knobify();
+
+                // Show build download links
                 if (that.selectedPatch().sysExAvailable) {
                     $('.sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=sysx');
+                }
+
+                if (that.selectedPatch().jsAvailable) {
+                    $('.jsDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=js');
                 }
 
                 // Show compile patch button:
