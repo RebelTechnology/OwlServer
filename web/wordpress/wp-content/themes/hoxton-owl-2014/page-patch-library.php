@@ -145,7 +145,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <p>
                                 <a class="sysExDownloadLink" href="#">Download</a>
                                 <!-- ko if: sysExLastUpdated -->
-                                <span data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></span>
+                                (<span data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></span>)
                                 <!-- /ko -->
                             </p>
                         </td>
@@ -158,7 +158,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <p>
                                 <a class="jsDownloadLink" href="#">Download</a>
                                 <!-- ko if: jsLastUpdated -->
-                                <span data-bind="text: new Date(selectedPatch().jsLastUpdated).toLocaleString()"></span>
+                                (<span data-bind="text: new Date(selectedPatch().jsLastUpdated).toLocaleString()"></span>)
                                 <!-- /ko -->
                             </p>
                         </td>
