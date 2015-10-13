@@ -47,6 +47,8 @@ router.get('/:id', function (req, res) {
         format;
 
     // Determine patch format
+    console.log('test');
+    console.log(req.params.format);
     if (req.params.format) {
         format = getBuildFormat(req.params.format);
     }

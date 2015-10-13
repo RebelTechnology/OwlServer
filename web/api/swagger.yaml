@@ -152,16 +152,14 @@ paths:
       parameters:
         - name: parameters
           in: body
-          description: The request parameters.
+          description: test
           required: true
           schema:
             type: object
-            required:
-              - format
             properties:
               format:
                 type: string
-                description: The patch format.
+                description: Patch format.
                 default: sysx
                 enum:
                   - sysx
@@ -169,19 +167,8 @@ paths:
                   - js
               credentials:
                 type: object
-                required:
-                  - type
-                properties:
-                  type:
-                    type: string
-                    description: The type of credential.
-                    default: api_key
-                    enum:
-                      - api_key
-                      - wordpress
-                  cookie:
-                    type: string
-                    description: WP authentication token.
+                description: User credentials.
+                $ref: '#/definitions/Credentials'
       tags:
         - builds
       responses:
