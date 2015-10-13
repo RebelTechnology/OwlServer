@@ -407,7 +407,7 @@ if ($buildCmd == 'make online') { // This is the old `make online` build process
     $cmd  = 'make ';
     if (MAKE_TARGET_WEB === $makeTarget || MAKE_TARGET_MINIFY === $makeTarget) {
         // Specify where to find Emscripten's config file
-        $cmd .= 'EMCCFLAGS="--em-config /opt/.emscripten -fno-rtti -fno-exceptions" ';
+        $cmd = 'EM_CONFIG="/opt/.emscripten" make ';
     }
     $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
     $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
