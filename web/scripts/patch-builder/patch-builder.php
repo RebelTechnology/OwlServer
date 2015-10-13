@@ -262,7 +262,7 @@ if (isset($options['web']) && false === $options['web']) {
         outputError('The --make-online and --web options cannot be used together.');
         exit(1);
     }
-    $makeTarget = MAKE_TARGET_MINIFY;
+    $makeTarget = MAKE_TARGET_MINIFY; // Same as MAKE_TARGET_WEB, but yields minified JS file
 }
 
 /*
@@ -382,12 +382,9 @@ if ($onlyDloadFiles) {
  * See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-85998573
  */
 
-if ($buildCmd == 'make online') {
+if ($buildCmd == 'make online') { // This is the old `make online` build process, legacy only!
 
-    $cmd  = 'make ';
-    // Specify where to find Emscripten's config file
-    $cmd .= 'EMCCFLAGS="--em-config /opt/.emscripten -fno-rtti -fno-exceptions" ';
-    $cmd .= 'BUILD=' . escapeshellarg($patchBuildDir) . ' ';
+    $cmd  = 'make BUILD=' . escapeshellarg($patchBuildDir) . ' ';
 
     // We hash-include only the first file
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
@@ -407,7 +404,12 @@ if ($buildCmd == 'make online') {
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
-    $cmd  = 'make BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
+    $cmd  = 'make ';
+    if (MAKE_TARGET_WEB === $makeTarget || MAKE_TARGET_MINIFY === $makeTarget) {
+        // Specify where to find Emscripten's config file
+        $cmd .= 'EMCCFLAGS="--em-config /opt/.emscripten -fno-rtti -fno-exceptions" ';
+    }
+    $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
     $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
     $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
     $cmd .= 'PATCHIN=' .     $patch['inputs']  .' ';
