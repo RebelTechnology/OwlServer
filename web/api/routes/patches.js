@@ -4,7 +4,7 @@
 
 var express = require('express');
 var router  = express.Router();
-var url     = require('url'); // FIXME - is this really necessary?
+var url     = require('url');
 var Q       = require('q');
 Q.longStackSupport = true; // To be enabled only when debugging
 

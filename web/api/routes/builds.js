@@ -3,11 +3,12 @@
  */
 
 var express = require('express');
-var router = express.Router();
-var fs = require('fs');
-var path = require('path');
-var exec = require('child_process').exec;
-var Q = require('q');
+var router  = express.Router();
+var url     = require('url');
+var fs      = require('fs');
+var path    = require('path');
+var exec    = require('child_process').exec;
+var Q       = require('q');
 Q.longStackSupport = false; // To be enabled only when debugging
 
 var wordpressBridge = require('../lib/wordpress-bridge.js');
@@ -47,10 +48,9 @@ router.get('/:id', function (req, res) {
         format;
 
     // Determine patch format
-    console.log('test');
-    console.log(req.params.format);
-    if (req.params.format) {
-        format = getBuildFormat(req.params.format);
+    var query = url.parse(req.url, true).query;
+    if (query.format) {
+        format = getBuildFormat(query.format);
     }
 
     Q.fcall(function () {
