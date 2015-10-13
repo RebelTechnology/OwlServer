@@ -77,7 +77,7 @@ router.get('/:id', function (req, res) {
         if (format === 'sysx') {
             buildFile = path.join(apiSettings.SYSEX_PATH, patch.seoName + '.syx');
         } else if (format === 'js') {
-            buildFile = path.join(apiSettings.JS_PATH, patch.seoName + '.js');
+            buildFile = path.join(apiSettings.JS_PATH, patch.seoName + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
         }
         if (!fs.existsSync(buildFile)) {
             throw { message: 'Build file not available for this patch (in ' + format + ' format).', status: 404 };

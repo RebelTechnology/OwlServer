@@ -29,6 +29,9 @@ module.exports.SYSEX_PATH = '/var/www/hoxtonowl.com/subdomains/staging/patch-bui
 // Path to the directory where all patch JS files are kept
 module.exports.JS_PATH = '/var/www/hoxtonowl.com/subdomains/staging/patch-builder/build-js';
 
+module.exports.JS_BUILD_TYPE = 'min'; // If we're building minified JS patches, this should be
+                                      // set to 'min'.
+
 //////////////////////////////
 // Please do not edit below //
 //////////////////////////////

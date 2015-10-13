@@ -68,7 +68,7 @@ var apply = function (id, collection, res, callback) {
 
                 // get patch js
                 patch['jsAvailable'] = false;
-                var jsFile = path.join(apiSettings.JS_PATH, patch['seoName'] + '.js');
+                var jsFile = path.join(apiSettings.JS_PATH, patch['seoName'] + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
                 if (fs.existsSync(jsFile)) {
                     patch['jsAvailable'] = true;
                     patch['jsLastUpdated'] = fs.statSync(jsFile).mtime;
