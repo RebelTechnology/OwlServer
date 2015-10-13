@@ -384,7 +384,10 @@ if ($onlyDloadFiles) {
 
 if ($buildCmd == 'make online') {
 
-    $cmd = 'make BUILD=' . escapeshellarg($patchBuildDir) . ' ';
+    $cmd  = 'make ';
+    // Specify where to find Emscripten's config file
+    $cmd .= 'EMCCFLAGS="--em-config /opt/.emscripten -fno-rtti -fno-exceptions" ';
+    $cmd .= 'BUILD=' . escapeshellarg($patchBuildDir) . ' ';
 
     // We hash-include only the first file
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
