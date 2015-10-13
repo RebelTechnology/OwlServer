@@ -145,7 +145,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <p>
                                 <a class="sysExDownloadLink" href="#">Download</a>
                                 <!-- ko if: sysExLastUpdated -->
-                                (<span data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></span>)
+                                (built on <span data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></span>)
                                 <!-- /ko -->
                             </p>
                         </td>
@@ -158,7 +158,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <p>
                                 <a class="jsDownloadLink" href="#">Download</a>
                                 <!-- ko if: jsLastUpdated -->
-                                (<span data-bind="text: new Date(selectedPatch().jsLastUpdated).toLocaleString()"></span>)
+                                (built on <span data-bind="text: new Date(selectedPatch().jsLastUpdated).toLocaleString()"></span>)
                                 <!-- /ko -->
                             </p>
                         </td>
@@ -199,9 +199,12 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <span class="parameter-value" data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></span>
                 <!-- /ko -->
                 <!-- ko if: sysExAvailable -->
-                <span class="parameter-value"><a class="sysExDownloadLink" href="#">Download</a></span>
+                <span class="parameter-value"><a class="sysExDownloadLink" href="#">Download SysEx</a></span>
                 <!-- /ko -->
-                <span class="parameter-value compile-patch-container" style="display: none;"><a class="compileLink" href="#">Compile</a></span>
+                <!-- ko if: jsAvailable -->
+                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span>
+                <!-- /ko -->
+                <span class="parameter-value compile-patch-container" style="display: none;">Build: <a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></span>
             </div>
             <div class="white-box2" data-bind="with: selectedPatch">
                 <h2 class="bolder">Parameters</h2>
