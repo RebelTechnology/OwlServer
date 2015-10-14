@@ -331,6 +331,16 @@ input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, but
     background: #433540;
 }
 
+input[type=submit]:disabled, input[type=reset]:disabled, input[type=button]:disabled, button:disabled {
+    color: white;
+    background: #E1B48E;
+}
+
+input[type=submit]:disabled:hover, input[type=reset]:disabled:hover, input[type=button]:disabled:hover, button::disabled:hover {
+    color: white;
+    background: #E1B48E;
+}
+
 #subscription-toggle { /* forum visual fix */
   float: right;
 }
@@ -809,4 +819,8 @@ div.file-upload-container input[type=file] {
     cursor: pointer;
     opacity: 0;
     filter: alpha(opacity=0);
+}
+
+div.knob-container {
+    display: none;
 }

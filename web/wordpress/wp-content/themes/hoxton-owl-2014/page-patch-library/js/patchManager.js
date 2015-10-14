@@ -129,6 +129,17 @@ HoxtonOwl.patchManager = {
         });
     },
 
+    updatePatchParameters: function () {
+        var patch = HoxtonOwl.patchManager.testPatch;
+        if (patch) {
+            $('[id^=patch-parameter-]:visible').each(function (i, el) {
+                var p = el.id.substr(-1, 1).charCodeAt(0) - 97; // "a".charCodeAt(0) === 97
+                var $el = $(el);
+                patch.update(p, $el.find('.knob').val() / 100);
+            });
+        }
+    },
+
     /**
      * Contains the code that operates the patches page.
      *
@@ -382,15 +393,75 @@ HoxtonOwl.patchManager = {
                     }
                 }
 
-                knobify();
+                if (patch.parameters) {
+                    for (var key in patch.parameters) {
+                        $('#patch-parameter-' + key).show();
+                    }
+                    knobify();
+                }
 
                 // Show build download links
                 if (that.selectedPatch().sysExAvailable) {
-                    $('.sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=sysx');
+                    $('.sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=sysx&amp;download=1');
                 }
 
                 if (that.selectedPatch().jsAvailable) {
-                    $('.jsDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=js');
+                    $('.jsDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=js&amp;download=1');
+                }
+
+                // Patch test
+                var testOk = true;
+                if (!window.AudioContext) {
+                    $('#patch-test-container').html('Your browser does not support the HTML5 Web Audio API.');
+                    testOk = false;
+                }
+                if (testOk && !that.selectedPatch().jsAvailable) {
+                    $('#patch-test-container').html('JavaScript build not available for this patch.');
+                    testOk = false;
+                }
+                if (testOk) {
+                    $('#patch-test-init').click(function () {
+
+                        $('#patch-test-init').attr('value', 'Loading patch...');
+                        $('#patch-test-init').prop('disabled', true);
+
+                        var deferred1 = $.getScript($('.jsDownloadLink').attr('href'));
+                        var deferred2 = $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js/webaudio.js');
+
+                        $.when(deferred1, deferred2).done(function () {
+
+                            $('#patch-test-init-container').hide();
+                            $('#patch-test-inner-container').show();
+                            $('.knob').val(50).trigger('change');
+
+                            $('#patch-test-source').change(function (e) {
+                                var $target = $(e.target);
+                                var $audio = $('#patch-test-audio');
+                                var val = $(e.target).val();
+                                var audioSampleBasePath = '/wp-content/themes/hoxton-owl-2014/page-patch-library/audio/';
+                                $audio.find('source').remove();
+                                if ('_' !== val.substr(0, 1)) {
+                                    var html = '<source src="' + audioSampleBasePath + val + '.mp3" type="audio/mpeg"><source src="' + audioSampleBasePath + val + '.ogg" type="audio/ogg">';
+                                    $(html).appendTo($audio);
+                                }
+                                $audio[0].load();
+                                if ('_' !== val.substr(0, 1)) {
+                                    $audio[0].play();
+                                    patch.useFileInput();
+                                } else if ('_clear' === val) {
+                                    HoxtonOwl.patchManager.testPatch.clearInput();
+                                } else if ('_mic' === val) {
+                                    HoxtonOwl.patchManager.testPatch.useMicrophoneInput();
+                                }
+                            });
+
+                            HoxtonOwl.patchManager.testPatch = owl.dsp();
+                            var patch = HoxtonOwl.patchManager.testPatch;
+                            HoxtonOwl.patchManager.updatePatchParameters();
+                            patch.useFileInput();
+
+                        });
+                    });
                 }
 
                 // Show compile patch button:

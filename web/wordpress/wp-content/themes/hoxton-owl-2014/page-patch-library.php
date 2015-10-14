@@ -209,25 +209,47 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
             <div class="white-box2" data-bind="with: selectedPatch">
                 <h2 class="bolder">Parameters</h2>
                 <div class="flexbox flex-center">
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-a">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.a"></p>
                     </div>
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-b">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.b"></p>
                     </div>
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-c">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.c"></p>
                     </div>
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-d">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.d"></p>
                     </div>
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-e">
+                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.e"></p>
+                    </div>
+                </div>
+                <h2 class="bolder">Test Patch</h2>
+                <div class="" id="patch-test-container">
+                    <div id="patch-test-init-container" style="display: block; clear: both;">
+                        <input type="button" value="Load patch" id="patch-test-init" />
+                    </div>
+                    <div id="patch-test-inner-container" style="clear: both; display: none;">
+                        <label for="patch-test-source">Select source:</label>
+                        <select id="patch-test-source">
+                            <option value="_clear" selected>No Input</option>
+                            <option value="_mic">Microphone</option>
+                            <option disabled>──────────</option>
+                            <option value="gtr-jazz">Jazz Guitar</option>
+                            <option value="rock-beat">Rock Beat</option>
+                            <option value="synth">Synth</option>
+                            <option value="white-noise">White Noise</option>
+                        </select>
+                        <audio id="patch-test-audio" controls loop preload="auto">
+                            Your browser does not support the <code>&lt;audio&gt;</code> element.
+
+                        </audio>
                     </div>
                 </div>
             </div>

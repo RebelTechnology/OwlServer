@@ -45,12 +45,17 @@ router.get('/:id', function (req, res) {
     var id = req.params.id,
         buildFormat = 'sysx', // default
         collection = req.db.get('patches'),
-        format;
+        format,
+        download = true;
 
     // Determine patch format
     var query = url.parse(req.url, true).query;
     if (query.format) {
         format = getBuildFormat(query.format);
+    }
+
+    if (query.download && query.download == 0 || query.download == 'false' || query.download == '') {
+        download = false;
     }
 
     Q.fcall(function () {
@@ -90,7 +95,10 @@ router.get('/:id', function (req, res) {
         console.log(buildFile);
         filename = path.basename(buildFile);
         console.log(filename);
-        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        if (download) {
+            res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        }
+        res.setHeader('Content-length', fs.statSync(buildFile)['size']);
         if (format === 'sysx') {
             res.setHeader('Content-type', 'application/octet-stream');
         } else if (format === 'js') {
