@@ -133,9 +133,15 @@ HoxtonOwl.patchManager = {
         var patch = HoxtonOwl.patchManager.testPatch;
         if (patch) {
             $('[id^=patch-parameter-]:visible').each(function (i, el) {
-                var p = el.id.substr(-1, 1).charCodeAt(0) - 97; // "a".charCodeAt(0) === 97
-                var $el = $(el);
-                patch.update(p, $el.find('.knob').val() / 100);
+                var paramLetter = el.id.substr(-1, 1),
+                    paramNo = paramLetter.charCodeAt(0) - 97, // "a".charCodeAt(0) === 97
+                    $el = $(el),
+                    paramVal = $el.find('.knob').val() / 100;
+
+                if (paramVal !== HoxtonOwl.patchManager['param_' + paramLetter]) { // Don't call into the patch if not necessary
+                    patch.update(paramNo, paramVal);
+                    HoxtonOwl.patchManager['param_' + paramLetter] = paramVal;
+                }
             });
         }
     },
