@@ -21,8 +21,6 @@ define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
 define('OWL_SRC_DIR',            '/opt/OwlProgram.online/');
 define('COMPILE_TIMEOUT',        30); // time-out in seconds
 define('HEAVY_TOKEN',            'FNPHpsCYj0Jxa8Fwh5cDV1MU1M8OHghK');
-define('SYSX_DST_PATH',          __DIR__ . '/build/');
-define('JS_DST_PATH',            __DIR__ . '/build-js/');
 
 $stdout = fopen('php://stdout', 'w+');
 $stderr = fopen('php://stderr', 'w+');
