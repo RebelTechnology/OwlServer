@@ -97,7 +97,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                         <?php endif; ?>
                     </tr>
                     <tr>
-                        <td style="padding-top: 20px;">
+                        <td class="patch-author">
                             <span class="author-name" data-bind="text: author.name, click: selectOnlyAuthor"></span>
                         </td>
                         <td>&nbsp;</td>
@@ -164,7 +164,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                         </td>
                     </tr>
                     <!-- /ko -->
-                    <tr class="compile-patch-container" style="display: none;">
+                    <tr class="compile-patch-container">
                         <td><span class="parameter-label">Build</span></td>
                         <td><p><a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></p></td>
                     </tr>
@@ -204,38 +204,56 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <!-- ko if: jsAvailable -->
                 <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span>
                 <!-- /ko -->
-                <span class="parameter-value compile-patch-container" style="display: none;">Build: <a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></span>
+                <span class="parameter-value compile-patch-container">Build: <a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></span>
             </div>
             <div class="white-box2" data-bind="with: selectedPatch">
-                <h2 class="bolder">Parameters</h2>
-                <div class="flexbox flex-center">
+                <div id="patch-tab-header-container">
+                    <h2 class="bolder patch-tab-header selected" id="patch-tab-header-info"><a href="#">Info</a></h2>
+                    <h2 class="bolder patch-tab-header" id="patch-tab-header-test"><a href="#">Test</a></h2>
+                </div>
+                <div class="flexbox flex-center patch-tab-container">
                     <div class="knob-container" id="patch-parameter-a">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.a"></p>
                     </div>
                     <div class="knob-container" id="patch-parameter-b">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.b"></p>
                     </div>
                     <div class="knob-container" id="patch-parameter-c">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.c"></p>
                     </div>
                     <div class="knob-container" id="patch-parameter-d">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.d"></p>
                     </div>
                     <div class="knob-container" id="patch-parameter-e">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.e"></p>
                     </div>
                 </div>
-                <h2 class="bolder">Test Patch</h2>
-                <div class="" id="patch-test-container">
-                    <div id="patch-test-init-container" style="display: block; clear: both;">
+                <div class="flexbox flex-center patch-tab-container" id="patch-tab-info">
+
+                </div>
+                <div class="flexbox flex-center patch-tab-container" id="patch-tab-test">
+
+                    <div id="patch-tab-test-err-1" class="patch-tab-test-err">
+                        <strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.<br><br>
+                        Try and upgrade your browser. Here's a <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a> of browsers that do support the Web Audio API.
+                    </div>
+                    <div id="patch-tab-test-err-2" class="patch-tab-test-err">
+                        <strong>Error:</strong> JavaScript build not available for this patch.
+                        <div id="patch-tab-test-err-3" class="patch-tab-test-err">
+                            <br><br>
+                            <a class="compileLink js" href="#">Build this patch now</a>
+                        </div>
+                    </div>
+
+                    <div id="patch-test-init-container">
                         <input type="button" value="Load patch" id="patch-test-init" />
                     </div>
-                    <div id="patch-test-inner-container" style="clear: both; display: none;">
+                    <div id="patch-test-inner-container">
                         <label for="patch-test-source">Select source:</label>
                         <select id="patch-test-source">
                             <option value="_clear" selected>No Input</option>
@@ -302,7 +320,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                         <!-- /ko -->
                     </tr>
                     <tr>
-                        <td style="padding-top: 20px;">
+                        <td class="patch-author">
                             <span class="author-name" data-bind="visible: search() !== 'myPatches', text: author.name, click: selectOnlyAuthor"></span>
                         </td>
                     </tr>
@@ -324,9 +342,6 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <tbody>
                     <tr>
                         <td><span class="patch-title">Add a new patch</span></td>
-                    </tr>
-                    <tr>
-                        <td style="padding-top: 20px;"></td>
                     </tr>
                 </tbody>
             </table>

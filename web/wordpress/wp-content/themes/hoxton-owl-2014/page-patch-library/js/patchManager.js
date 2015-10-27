@@ -147,6 +147,77 @@ HoxtonOwl.patchManager = {
     },
 
     /**
+     * Returns whether the current user is allowed to build a patch.
+     *
+     * @return boolean
+     *     Whether the current user is alloed to build a patch.
+     */
+    userAllowedToBuildPatch: function (patch) {
+
+        var isAdmin = false,
+            $isAdmin = $('#wordpress-user-is-admin'),
+            currentWpUserId = null,
+            $currentWpUserId = $('#wordpress-user-id'),
+            github = patch.github;
+
+        if ($isAdmin) {
+            isAdmin = $isAdmin.text() == 1;
+        }
+
+        if ($currentWpUserId) {
+            currentWpUserId = $currentWpUserId.text();
+        }
+
+        console.log('github = ');
+        console.log(github);
+        console.log('isAdmin = ');
+        console.log(isAdmin);
+        console.log('patch.author.wordpressId =');
+        console.log(patch.author.wordpressId);
+        console.log('currentWpUserId =');
+        console.log(currentWpUserId);
+
+        if (github && github.length && // are there any source files?
+            (isAdmin || (patch.author && patch.author.wordpressId == currentWpUserId))) { // either admin or legitimate owner
+
+            console.log('Returning true');
+            return true;
+        }
+
+        console.log('Returning false');
+        return false;
+    },
+
+    startPatchTest: function () {
+        $('.knob').val(35).trigger('change');
+        $('.knob-container:visible input.knob').css('visibility', 'visible');
+        $('.knob-disabler').remove();
+    },
+
+    stopPatchTest: function () {
+        $('.knob').val(35).trigger('change');
+        $('.knob-container:visible input.knob').css('visibility', 'hidden');
+
+        // This is a workaround to make the knobs unresponsive to mouse/touch events:
+        $('.knob-container canvas:visible').each(function (i, el) {
+            var rect = el.getBoundingClientRect();
+            var css = {
+                // 'background-color': 'red',
+                'position': 'absolute',
+                'top': Math.round(rect.top) + 'px',
+                'left': Math.round(rect.left) + 'px',
+                'width': Math.round(rect.width) + 'px',
+                'height': Math.round(rect.height) + 'px'
+            };
+            var styles = '';
+            for (rule in css) {
+                styles += rule + ': ' + css[rule] + '; ';
+            }
+            $('body').append($('<div class="knob-disabler" style="' + styles + '"></div>'));
+        });
+    },
+
+    /**
      * Contains the code that operates the patches page.
      *
      * @param {Object[]} patches
@@ -335,7 +406,6 @@ HoxtonOwl.patchManager = {
             var pdGraphs = [];
             apiClient.getSinglePatch(patchId, function(patch) {
 
-
                 if (name.name) {
                     name = name.name;
                 }
@@ -400,6 +470,7 @@ HoxtonOwl.patchManager = {
                 }
 
                 if (patch.parameters) {
+                    $('.knob-container').hide();
                     for (var key in patch.parameters) {
                         $('#patch-parameter-' + key).show();
                     }
@@ -415,17 +486,21 @@ HoxtonOwl.patchManager = {
                     $('.jsDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=js&amp;download=1');
                 }
 
+                var isAdmin = HoxtonOwl.isUserAdmin;
+
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                 // Patch test
-                var testOk = true;
                 if (!window.AudioContext) {
-                    $('#patch-test-container').html('Your browser does not support the HTML5 Web Audio API.');
-                    testOk = false;
-                }
-                if (testOk && !that.selectedPatch().jsAvailable) {
-                    $('#patch-test-container').html('JavaScript build not available for this patch.');
-                    testOk = false;
-                }
-                if (testOk) {
+                    $('#patch-tab-test-err-1').show(); // Web Audio API not available
+                } else if (!that.selectedPatch().jsAvailable) {
+
+                    $('#patch-tab-test-err-2').show(); // JS build not available
+                    if (HoxtonOwl.patchManager.userAllowedToBuildPatch(that.selectedPatch())) {
+                        $('#patch-tab-test-err-3').show(); // Would you like to build the patch now?
+                    }
+                } else  {
+                    $('#patch-test-init-container').show();
                     $('#patch-test-init').click(function () {
 
                         $('#patch-test-init').attr('value', 'Loading patch...');
@@ -470,23 +545,32 @@ HoxtonOwl.patchManager = {
                     });
                 }
 
+                HoxtonOwl.patchManager.stopPatchTest();
+                $('.patch-tab-header a').click(function (e) {
+                    var $tab = $(e.target).closest('h2'),
+                        id = $tab.attr('id');
+                    $tab.addClass('selected');
+                    $tab.siblings('h2').removeClass('selected');
+                    if ('patch-tab-header-info' === id) {
+                        //$('#patch-tab-info').show();
+                        $('#patch-tab-test').hide();
+                        HoxtonOwl.patchManager.stopPatchTest();
+                    } else if ('patch-tab-header-test' === id) {
+                        //$('#patch-tab-info').hide();
+                        $('#patch-tab-test').show();
+                        HoxtonOwl.patchManager.startPatchTest();
+                    }
+                    return false;
+                });
+                $('.knob-container:visible input.knob').css('visibility', 'hidden');
+
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                 // Show compile patch button:
                 $('.compile-patch-container').css('display', 'none');
-                var isAdmin = false;
-                var $isAdmin = $('#wordpress-user-is-admin');
-                if ($isAdmin) {
-                    isAdmin = $isAdmin.text() == 1;
-                }
-
-                var authorWpId = null;
-                $wpUserId = $('#wordpress-user-id');
-                if ($wpUserId) {
-                    authorWpId = $wpUserId.text();
-                }
 
                 // Patch compile button
-                var github = that.selectedPatch().github;
-                if (github && github.length && (isAdmin || that.selectedPatch().author.wordpressId == authorWpId)) {
+                if (HoxtonOwl.patchManager.userAllowedToBuildPatch(that.selectedPatch())) {
                     $('tr.compile-patch-container').css('display', 'table-row');
                     $('span.compile-patch-container').css('display', 'inline');
                 } else {

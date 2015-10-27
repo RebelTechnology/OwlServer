@@ -452,6 +452,10 @@ input.knob {
     vertical-align: top;
 }
 
+.patch-author {
+    padding-top: 20px;
+}
+
 .patch-title {
     display: inline;
     background: #231f20;
@@ -809,4 +813,89 @@ div.patch-library h2.bolder {
     .tag-filter-button {
         width: 48.9%;
     }
+}
+
+#patch-tab-header-container {
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.patch-tab-header {
+    padding: 0 !important;
+    position: relative;
+    top: 1px;
+    left: 2px;
+    background-color: #e6e6e6 !important;
+    border: 1px solid #d3d3d3;
+    border-radius: 3px 3px 0 0;
+}
+
+.patch-tab-header a {
+    padding: 5px 10px;
+}
+
+.patch-tab-header.selected {
+    border: 1px solid #aaaaaa;
+    border-bottom: 1px solid white;
+    background-color: #ffffff !important;
+}
+
+.patch-tab-header a {
+    color: #aaaaaa;
+}
+
+.patch-tab-header.selected a {
+    color: #5d5d5d;
+}
+
+.patch-tab-header:hover {
+    border: 1px solid #aaaaaa;
+    border-bottom: none;
+}
+
+.patch-tab-header.selected:hover {
+    border-bottom: 1px solid white;
+}
+
+.patch-tab-header a:hover {
+    color: #5d5d5d;
+}
+
+#patch-tab-test {
+    display: none;
+}
+
+div.patch-tab-container {
+    padding-top: 30px;
+}
+
+div.patch-tab-test-err {
+    display: none;
+    margin-bottom: 20px;
+}
+
+div.patch-tab-test-err strong {
+    font-weight: bold;
+}
+
+div.patch-tab-test-err a {
+    color: #ed7800;
+    text-decoration: underline;
+}
+
+.compile-patch-container {
+    display: none;
+}
+
+#patch-test-init-container {
+    display: none;
+    clear: both;
+}
+
+#patch-test-inner-container {
+    clear: both;
+    display: none;
+}
+
+#patch-tab-info {
+    display: none;
 }
