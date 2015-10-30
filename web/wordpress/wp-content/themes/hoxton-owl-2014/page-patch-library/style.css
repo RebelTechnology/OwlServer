@@ -886,16 +886,16 @@ div.patch-tab-test-err a {
     display: none;
 }
 
-#patch-test-init-container {
-    display: none;
-    clear: both;
-}
-
 #patch-test-inner-container {
     clear: both;
     display: none;
+    text-align: center;
 }
 
 #patch-tab-info {
+    display: none;
+}
+
+#patch-test-audio {
     display: none;
 }

@@ -16,6 +16,7 @@ wp_enqueue_style('owl-patches-page_fonts_googleapis', 'http://fonts.googleapis.c
 wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
 wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
 wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
+//wp_enqueue_style('select2', get_template_directory_uri() . '/js/select2/css/select2.min.css');
 
 // <script> tags to be placed in <head>
 wp_enqueue_script('owl-patches-page_knockout',      $resUri . 'js3rdparty/knockout-2.0.0.js');
@@ -26,6 +27,8 @@ wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
 
 wp_enqueue_script('owl-patches-page_prettify',      'https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js');
 wp_enqueue_script('owl-patches-page_run_prettify',  'https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js');
+
+//wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
 
 // <script> tags to be placed just before </body>
 wp_enqueue_script('owl-api-client',                 get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
@@ -249,12 +252,13 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <a class="compileLink js" href="#">Build this patch now</a>
                         </div>
                     </div>
-
-                    <div id="patch-test-init-container">
-                        <input type="button" value="Load patch" id="patch-test-init" />
+                    <div id="patch-tab-test-err-4">
+                        Loading patch...
                     </div>
+
                     <div id="patch-test-inner-container">
-                        <label for="patch-test-source">Select source:</label>
+
+                        <label for="patch-test-source">Source:</label>
                         <select id="patch-test-source">
                             <option value="_clear" selected>No Input</option>
                             <option value="_mic">Microphone</option>
@@ -264,9 +268,10 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <option value="synth">Synth</option>
                             <option value="white-noise">White Noise</option>
                         </select>
+                        <input type="button" value="Start" id="patch-test-start-stop" />
+
                         <audio id="patch-test-audio" controls loop preload="auto">
                             Your browser does not support the <code>&lt;audio&gt;</code> element.
-
                         </audio>
                     </div>
                 </div>

@@ -54,6 +54,8 @@ HoxtonOwl.patchManager = {
      */
     getGithubFile: function(url, callback, startLineNum, endLineNum) {
 
+        var pm = HoxtonOwl.patchManager;
+
         // hack to see if this file is hosted on GitHub
         var urlParser = document.createElement('a');
         urlParser.href = url;
@@ -67,11 +69,11 @@ HoxtonOwl.patchManager = {
                 url:      url,
                 dataType: "text",
                 success:  function(data) {
-                    HoxtonOwl.patchManager.getGithubFile.count++;
+                    pm.getGithubFile.count++;
                     callback(data, filename, url, false);
                 },
                 error: function(data) {
-                    HoxtonOwl.patchManager.getGithubFile.count++;
+                    pm.getGithubFile.count++;
                     callback('// This file could not be fetched because of an unexpected error.', filename, url, false);
                 }
             });
@@ -104,7 +106,7 @@ HoxtonOwl.patchManager = {
             url:      endpoint,
             dataType: "jsonp",
             success:  function(data) {
-                HoxtonOwl.patchManager.getGithubFile.count++;
+                pm.getGithubFile.count++;
                 if (typeof data.data.content != "undefined") {
                     if (data.data.encoding == "base64") {
 
@@ -123,14 +125,15 @@ HoxtonOwl.patchManager = {
                 callback('// This file could not be fetched. Is it from a public GitHub repository?', filename);
             },
             error: function(data) {
-                HoxtonOwl.patchManager.getGithubFile.count++;
+                pm.getGithubFile.count++;
                 callback('// This file could not be fetched because of an unexpected error.', filename);
             }
         });
     },
 
     updatePatchParameters: function () {
-        var patch = HoxtonOwl.patchManager.testPatch;
+        var pm = HoxtonOwl.patchManager,
+            patch = pm.testPatch;
         if (patch) {
             $('[id^=patch-parameter-]:visible').each(function (i, el) {
                 var paramLetter = el.id.substr(-1, 1),
@@ -138,9 +141,9 @@ HoxtonOwl.patchManager = {
                     $el = $(el),
                     paramVal = $el.find('.knob').val() / 100;
 
-                if (paramVal !== HoxtonOwl.patchManager['param_' + paramLetter]) { // Don't call into the patch if not necessary
+                if (paramVal !== pm['param_' + paramLetter]) { // Don't call into the patch if not necessary
                     patch.update(paramNo, paramVal);
-                    HoxtonOwl.patchManager['param_' + paramLetter] = paramVal;
+                    pm['param_' + paramLetter] = paramVal;
                 }
             });
         }
@@ -168,53 +171,96 @@ HoxtonOwl.patchManager = {
             currentWpUserId = $currentWpUserId.text();
         }
 
-        console.log('github = ');
-        console.log(github);
-        console.log('isAdmin = ');
-        console.log(isAdmin);
-        console.log('patch.author.wordpressId =');
-        console.log(patch.author.wordpressId);
-        console.log('currentWpUserId =');
-        console.log(currentWpUserId);
-
         if (github && github.length && // are there any source files?
             (isAdmin || (patch.author && patch.author.wordpressId == currentWpUserId))) { // either admin or legitimate owner
-
-            console.log('Returning true');
             return true;
         }
 
-        console.log('Returning false');
         return false;
     },
 
+    initPatchTest: function () {
+
+        var pm = HoxtonOwl.patchManager;
+
+        if (pm.patchTestInited || !pm.patchTestOk) {
+            return;
+        }
+
+        var deferred1 = $.getScript($('.jsDownloadLink').attr('href'));
+        var deferred2 = $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js/webaudio.js');
+
+        $.when(deferred1, deferred2).done(function () {
+
+            $('#patch-tab-test-err-4').hide();
+
+            $('#patch-test-inner-container').show();
+            $('.knob').val(50).trigger('change');
+            // $('#patch-test-source').select2({
+            //     placeholder: 'Select a source',
+            //     minimumResultsForSearch: Infinity
+            // });
+
+            $('#patch-test-source').change(function (e) {
+                var $target = $(e.target);
+                var $audio = $('#patch-test-audio');
+                var val = $(e.target).val();
+                var audioSampleBasePath = '/wp-content/themes/hoxton-owl-2014/page-patch-library/audio/';
+                $audio.find('source').remove();
+                if ('_' !== val.substr(0, 1)) {
+                    var html = '<source src="' + audioSampleBasePath + val + '.mp3" type="audio/mpeg"><source src="' + audioSampleBasePath + val + '.ogg" type="audio/ogg">';
+                    $(html).appendTo($audio);
+                }
+                $audio[0].load();
+                if ('_' !== val.substr(0, 1)) {
+                    $audio[0].play();
+                    patch.useFileInput();
+                } else if ('_clear' === val) {
+                    pm.testPatch.clearInput();
+                } else if ('_mic' === val) {
+                    pm.testPatch.useMicrophoneInput();
+                }
+            });
+
+        }).fail(function () {
+            $('#patch-tab-test-err-4').html('Error: Could not load patch.');
+        });
+
+        $('#patch-test-start-stop').click(function () {
+            if (pm.patchPlaying) {
+                pm.stopPatchTest();
+            } else {
+                pm.startPatchTest();
+            }
+        });
+
+        pm.patchTestInited = true;
+    },
+
     startPatchTest: function () {
-        $('.knob').val(35).trigger('change');
-        $('.knob-container:visible input.knob').css('visibility', 'visible');
-        $('.knob-disabler').remove();
+        var pm = HoxtonOwl.patchManager,
+            patch = pm.testPatch;
+
+        if (pm.startPatchTest.inited) {
+            pm.testPatch.scriptProcessor.connect(owl.context.destination);
+        } else {
+            pm.testPatch = owl.dsp();
+            pm.updatePatchParameters();
+            pm.testPatch.useFileInput();
+            pm.startPatchTest.inited = true;
+        }
+        pm.patchPlaying = true;
+        $('#patch-test-start-stop').val('Stop');
     },
 
     stopPatchTest: function () {
-        $('.knob').val(35).trigger('change');
-        $('.knob-container:visible input.knob').css('visibility', 'hidden');
-
-        // This is a workaround to make the knobs unresponsive to mouse/touch events:
-        $('.knob-container canvas:visible').each(function (i, el) {
-            var rect = el.getBoundingClientRect();
-            var css = {
-                // 'background-color': 'red',
-                'position': 'absolute',
-                'top': Math.round(rect.top) + 'px',
-                'left': Math.round(rect.left) + 'px',
-                'width': Math.round(rect.width) + 'px',
-                'height': Math.round(rect.height) + 'px'
-            };
-            var styles = '';
-            for (rule in css) {
-                styles += rule + ': ' + css[rule] + '; ';
-            }
-            $('body').append($('<div class="knob-disabler" style="' + styles + '"></div>'));
-        });
+        var pm = HoxtonOwl.patchManager;
+        if (!pm.patchPlaying) {
+            return;
+        }
+        pm.testPatch.scriptProcessor.disconnect();
+        pm.patchPlaying = false;
+        $('#patch-test-start-stop').val('Start');
     },
 
     /**
@@ -242,12 +288,8 @@ HoxtonOwl.patchManager = {
         that.patchSortOrder = ko.observable('name');
 
         that.filteredPatches = ko.computed(function() {
-            //console.log('filteredPatches');
-            //console.log(that.searchItems());
             return ko.utils.arrayFilter(that.patches(), function(r) {
-                //console.log(that.searchItems);
                 if (that.searchItems.indexOf("All") > -1) {
-                    //return true;
                     return r.published;
                 }
                 if (that.search() === "tag") {
@@ -279,11 +321,8 @@ HoxtonOwl.patchManager = {
 
         that.selectAllPatches = function(dummy, e) {
 
-            //console.log('selectAllPatches');
-
-            //pm.updateBreadcrumbs();
-
-            HoxtonOwl.patchManager['sortPatchesBy' + e.currentTarget.id.split('-')[3]]();
+            pm.stopPatchTest();
+            pm['sortPatchesBy' + e.currentTarget.id.split('-')[3]]();
 
             that.selectedPatch(null);
             that.search('all');
@@ -292,7 +331,7 @@ HoxtonOwl.patchManager = {
         };
 
         that.selectFilter = function(item) {
-            //console.log("select filter "+item+" searching "+that.search());
+            pm.stopPatchTest();
             if(that.search() === "author") {
                 return selectAuthor(item);
             } else {
@@ -301,11 +340,7 @@ HoxtonOwl.patchManager = {
         };
 
         that.selectAuthor = function(author) {
-
-            //console.log(author);
-
-            //pm.updateBreadcrumbs();
-
+            pm.stopPatchTest();
             that.selectedPatch(null);
             if(that.search() != "author") {
                 that.search("author");
@@ -328,11 +363,7 @@ HoxtonOwl.patchManager = {
         };
 
         that.selectTag = function(tag) {
-            //console.log("select tag " + tag);
-
-            // console.log("select tag ");
-            // console.log(tag);
-
+            pm.stopPatchTest();
             that.selectedPatch(null);
             if (that.search() != "tag") {
                 that.search("tag");
@@ -355,40 +386,34 @@ HoxtonOwl.patchManager = {
         };
 
         that.selectOnlyTag = function(tag) {
-            //console.log('selectOnlyTag');
             that.searchItems.removeAll();
             selectTag(tag);
         };
 
         that.selectAllTags = function(tag) {
-
-            //console.log('selectAllTags');
-            //pm.updateBreadcrumbs();
-
-            HoxtonOwl.patchManager.sortPatchesByName();
+            pm.stopPatchTest();
+            pm.sortPatchesByName();
             selectTag('All');
         };
 
         that.selectOnlyAuthor = function(authorsPatch) {
+            pm.stopPatchTest();
             that.searchItems.removeAll();
             selectAuthor(authorsPatch.author.name);
         };
 
         that.selectAllAuthors = function(tag) {
-
-            //console.log('selectAllAuthors');
-            //pm.updateBreadcrumbs();
-
-            HoxtonOwl.patchManager.sortPatchesByName();
+            pm.stopPatchTest();
+            pm.sortPatchesByName();
             selectAuthor('All');
         };
 
         that.selectMyPatches = function() {
 
-            HoxtonOwl.patchManager.sortPatchesByName();
+            pm.stopPatchTest();
+            pm.sortPatchesByName();
             that.search('myPatches');
             var author = $('#wordpress-username').text();
-            //console.log(author);
             that.searchItems.removeAll();
             that.selectedPatch(null);
             that.searchItems.push(author);
@@ -396,11 +421,6 @@ HoxtonOwl.patchManager = {
         },
 
         that.selectPatch = function(patch) {
-
-            //console.log(patch);
-
-            //pm.updateBreadcrumbs(patch);
-
             var patchId = patch._id;
             var apiClient = new HoxtonOwl.ApiClient();
             var pdGraphs = [];
@@ -409,7 +429,6 @@ HoxtonOwl.patchManager = {
                 if (name.name) {
                     name = name.name;
                 }
-                //console.log("select patch "+name);
                 that.search("patch");
                 that.searchItems.removeAll();
                 $("#gitsource").empty();
@@ -448,10 +467,10 @@ HoxtonOwl.patchManager = {
                                 pdGraphs[cnt] = r;
                                 $('body').append('<div id="svg-' + cnt + '"></div>');
                             } else {
-                                $('#github-files pre.prettyprint').eq(HoxtonOwl.patchManager.getGithubFile.count - 1).text(contents);
+                                $('#github-files pre.prettyprint').eq(pm.getGithubFile.count - 1).text(contents);
                             }
 
-                            if (HoxtonOwl.patchManager.getGithubFile.count == max) { // no more files to be loaded
+                            if (pm.getGithubFile.count == max) { // no more files to be loaded
 
                                 // Pretty print source code
                                 prettyPrint();
@@ -488,89 +507,68 @@ HoxtonOwl.patchManager = {
 
                 var isAdmin = HoxtonOwl.isUserAdmin;
 
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
                 // Patch test
                 if (!window.AudioContext) {
                     $('#patch-tab-test-err-1').show(); // Web Audio API not available
                 } else if (!that.selectedPatch().jsAvailable) {
-
                     $('#patch-tab-test-err-2').show(); // JS build not available
-                    if (HoxtonOwl.patchManager.userAllowedToBuildPatch(that.selectedPatch())) {
+                    if (pm.userAllowedToBuildPatch(that.selectedPatch())) {
                         $('#patch-tab-test-err-3').show(); // Would you like to build the patch now?
                     }
                 } else  {
-                    $('#patch-test-init-container').show();
-                    $('#patch-test-init').click(function () {
-
-                        $('#patch-test-init').attr('value', 'Loading patch...');
-                        $('#patch-test-init').prop('disabled', true);
-
-                        var deferred1 = $.getScript($('.jsDownloadLink').attr('href'));
-                        var deferred2 = $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js/webaudio.js');
-
-                        $.when(deferred1, deferred2).done(function () {
-
-                            $('#patch-test-init-container').hide();
-                            $('#patch-test-inner-container').show();
-                            $('.knob').val(50).trigger('change');
-
-                            $('#patch-test-source').change(function (e) {
-                                var $target = $(e.target);
-                                var $audio = $('#patch-test-audio');
-                                var val = $(e.target).val();
-                                var audioSampleBasePath = '/wp-content/themes/hoxton-owl-2014/page-patch-library/audio/';
-                                $audio.find('source').remove();
-                                if ('_' !== val.substr(0, 1)) {
-                                    var html = '<source src="' + audioSampleBasePath + val + '.mp3" type="audio/mpeg"><source src="' + audioSampleBasePath + val + '.ogg" type="audio/ogg">';
-                                    $(html).appendTo($audio);
-                                }
-                                $audio[0].load();
-                                if ('_' !== val.substr(0, 1)) {
-                                    $audio[0].play();
-                                    patch.useFileInput();
-                                } else if ('_clear' === val) {
-                                    HoxtonOwl.patchManager.testPatch.clearInput();
-                                } else if ('_mic' === val) {
-                                    HoxtonOwl.patchManager.testPatch.useMicrophoneInput();
-                                }
-                            });
-
-                            HoxtonOwl.patchManager.testPatch = owl.dsp();
-                            var patch = HoxtonOwl.patchManager.testPatch;
-                            HoxtonOwl.patchManager.updatePatchParameters();
-                            patch.useFileInput();
-
-                        });
-                    });
+                    pm.patchTestOk = true;
                 }
 
-                HoxtonOwl.patchManager.stopPatchTest();
+                var resetPatchParameterView = function () {
+                    $('.knob').val(35).trigger('change');
+                    $('.knob-container:visible input.knob').css('visibility', 'hidden');
+
+                    // This is a workaround to make the knobs unresponsive to mouse/touch events:
+                    $('.knob-container canvas:visible').each(function (i, el) {
+                        var rect = el.getBoundingClientRect();
+                        var css = {
+                            // 'background-color': 'red',
+                            // 'opacity':          0.3,
+                            'position': 'absolute',
+                            'top':      Math.round(rect.top + window.scrollY) + 'px',
+                            'left':     Math.round(rect.left + window.scrollX) + 'px',
+                            'width':    Math.round(rect.width) + 'px',
+                            'height':   Math.round(rect.height) + 'px'
+                        };
+                        var styles = '';
+                        for (rule in css) {
+                            styles += rule + ': ' + css[rule] + '; ';
+                        }
+                        $('body').append($('<div class="knob-disabler" style="' + styles + '"></div>'));
+                    });
+                };
+                resetPatchParameterView();
+
                 $('.patch-tab-header a').click(function (e) {
                     var $tab = $(e.target).closest('h2'),
                         id = $tab.attr('id');
                     $tab.addClass('selected');
                     $tab.siblings('h2').removeClass('selected');
                     if ('patch-tab-header-info' === id) {
-                        //$('#patch-tab-info').show();
                         $('#patch-tab-test').hide();
-                        HoxtonOwl.patchManager.stopPatchTest();
+                        pm.stopPatchTest();
+                        resetPatchParameterView();
                     } else if ('patch-tab-header-test' === id) {
-                        //$('#patch-tab-info').hide();
                         $('#patch-tab-test').show();
-                        HoxtonOwl.patchManager.startPatchTest();
+                        $('.knob').val(35).trigger('change');
+                        $('.knob-container:visible input.knob').css('visibility', 'visible');
+                        $('.knob-disabler').remove();
+                        pm.initPatchTest();
                     }
                     return false;
                 });
                 $('.knob-container:visible input.knob').css('visibility', 'hidden');
 
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
                 // Show compile patch button:
                 $('.compile-patch-container').css('display', 'none');
 
                 // Patch compile button
-                if (HoxtonOwl.patchManager.userAllowedToBuildPatch(that.selectedPatch())) {
+                if (pm.userAllowedToBuildPatch(that.selectedPatch())) {
                     $('tr.compile-patch-container').css('display', 'table-row');
                     $('span.compile-patch-container').css('display', 'inline');
                 } else {
@@ -653,7 +651,7 @@ HoxtonOwl.patchManager = {
         } else {
             selectTag("All");
             that.search("all");
-            HoxtonOwl.patchManager.sortPatchesByCreationTimeUtc();
+            pm.sortPatchesByCreationTimeUtc();
         }
     },
 
