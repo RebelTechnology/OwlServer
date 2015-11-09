@@ -247,12 +247,9 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </div>
                     <div id="patch-tab-test-err-2" class="patch-tab-test-err">
                         <strong>Error:</strong> JavaScript build not available for this patch.
-                        <div id="patch-tab-test-err-3" class="patch-tab-test-err">
-                            <br><br>
-                            <a class="compileLink js" href="#">Build this patch now</a>
-                        </div>
+                        <span id="patch-tab-test-err-3" class="patch-tab-test-err"><a class="compileLink js" href="#">Build this patch now</a></span>
                     </div>
-                    <div id="patch-tab-test-err-4">
+                    <div id="patch-tab-test-err-4" class="patch-tab-test-err">
                         Loading patch...
                     </div>
 
