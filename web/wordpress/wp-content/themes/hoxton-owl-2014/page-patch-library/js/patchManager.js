@@ -172,7 +172,8 @@ HoxtonOwl.patchManager = {
         }
 
         if (github && github.length && // are there any source files?
-            (isAdmin || (patch.author && patch.author.wordpressId == currentWpUserId))) { // either admin or legitimate owner
+            (isAdmin || (patch.author && patch.author.wordpressId && patch.author.wordpressId == currentWpUserId))) { // either admin or legitimate owner
+
             return true;
         }
 

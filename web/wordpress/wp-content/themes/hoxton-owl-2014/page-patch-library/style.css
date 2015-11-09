@@ -868,16 +868,16 @@ div.patch-tab-container {
     padding-top: 30px;
 }
 
-div.patch-tab-test-err {
+.patch-tab-test-err {
     display: none;
     margin-bottom: 20px;
 }
 
-div.patch-tab-test-err strong {
+.patch-tab-test-err strong {
     font-weight: bold;
 }
 
-div.patch-tab-test-err a {
+.patch-tab-test-err a {
     color: #ed7800;
     text-decoration: underline;
 }
