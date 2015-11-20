@@ -19,7 +19,7 @@ require_once __DIR__ . '/common.php';
 define('PATCH_SRC_DIR_PREFIX',   'owl-src-');
 define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
 define('OWL_SRC_DIR',            '/opt/OwlProgram.online/');
-define('COMPILE_TIMEOUT',        30); // time-out in seconds
+define('COMPILE_TIMEOUT',        80); // time-out in seconds
 define('HEAVY_TOKEN',            'FNPHpsCYj0Jxa8Fwh5cDV1MU1M8OHghK');
 
 $stdout = fopen('php://stdout', 'w+');
