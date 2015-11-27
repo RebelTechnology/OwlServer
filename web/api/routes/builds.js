@@ -23,7 +23,9 @@ var getBuildFormat = function (format) {
         buildFormat = format;
     }
     if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'sysex') {
-        throw { message: 'Invalid format.', status: 500 };
+        var e = new Error('Invalid format.');
+        e.status = 500;
+        throw e;
     }
     if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
         buildFormat = 'sysx';
@@ -47,21 +49,21 @@ router.get('/:id', function (req, res) {
         format,
         download = true;
 
-    // Determine patch format
-    var query = url.parse(req.url, true).query;
-    if (query.format) {
-        format = getBuildFormat(query.format);
-    }
-
-    if (query.download && query.download == 0 || query.download == 'false' || query.download == '') {
-        download = false;
-    }
-
     Q.fcall(function () {
 
-        /*
-         * Find patch
-         */
+        // Determine patch format
+        var query = url.parse(req.url, true).query;
+        if (query.format) {
+            format = getBuildFormat(query.format);
+        }
+
+        if (query.download && query.download == 0 || query.download == 'false' || query.download == '') {
+            download = false;
+        }
+
+        /* ~~~~~~~~~~~~
+         *  Find patch
+         * ~~~~~~~~~~~~ */
 
         return collection.findOne({ _id: id });
 
@@ -75,7 +77,9 @@ router.get('/:id', function (req, res) {
          */
 
         if (null === patch) {
-            throw { message: 'Patch not found.', status: 401 };
+            var e = new Error('Patch not found.');
+            e.status = 404;
+            throw e;
         }
 
         if (format === 'sysx') {
@@ -84,12 +88,14 @@ router.get('/:id', function (req, res) {
             buildFile = path.join(apiSettings.JS_PATH, patch.seoName + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
         }
         if (!fs.existsSync(buildFile)) {
-            throw { message: 'Build file not available for this patch (in ' + format + ' format).', status: 404 };
+            var e = new Error('Build file not available for this patch (in ' + format + ' format).');
+            e.status = 404;
+            throw e;
         }
 
-        /*
-         * Download file
-         */
+        /* ~~~~~~~~~~~~~~~
+         *  Download file
+         * ~~~~~~~~~~~~~~~ */
 
         console.log(buildFile);
         filename = path.basename(buildFile);
@@ -106,16 +112,23 @@ router.get('/:id', function (req, res) {
         var filestream = fs.createReadStream(buildFile);
         return filestream.pipe(res);
 
-    }).fail(
+    }).catch(function (error) {
 
-        function (error) {
-            //console.log('Error: ' + error.message);
-            return res.status(error.status || 500).json({
-               message: error.message,
-               error: { status: error.status || 500 }
-            });
+        var status = error.status || 500;
+        return res.status(status).json({
+            message: error.toString(),
+            status: status
+        });
+
+    }).done(function (response) {
+
+        if ('ServerResponse' === response.constructor.name) {
+            return response;
         }
-    );
+
+        return res.status(200).json(response);
+
+    });
 });
 
 /**
@@ -163,11 +176,15 @@ router.put('/:id', function (req, res) {
         console.log(credentials);
 
         if (!credentials) {
-            throw { message: 'Access denied (1).', status: 401 };
+            var e = new Error('Access denied (1).');
+            e.status = 401;
+            throw e;
         }
 
         if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            throw { message: 'Access denied (2).', status: 401 };
+            var e = new Error('Access denied (2).');
+            e.status = 401;
+            throw e;
         }
 
         wpCookie = credentials.cookie;
@@ -201,37 +218,35 @@ router.put('/:id', function (req, res) {
             patchAuthor.wordpressId = wpUserId;
         }
 
-        /*
-         * Retrieve patch from database
-         */
+        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         *  Retrieve patch from database
+         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
         return collection.findById(id);
 
     }).then(function (patch) {
 
         if (null === patch) {
-            throw {
-                message: 'Patch not found.',
-                error: { status: 404 }
-            };
+            var e = new Error('Patch not found.');
+            e.status = 404;
+            throw e;
         }
 
-        /*
-         * Check if user can compile patch
-         */
+        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         *  Check if user can compile patch
+         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
         if (!isAdmin) {
             if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
-                throw {
-                    message: 'You are not authorized to compile this patch.',
-                    error: { status: 401 }
-                };
+                var e = new Error('You are not authorized to compile this patch.');
+                e.status = 401;
+                throw e;
             }
         }
 
-        /*
-         * Compile patch
-         */
+        /* ~~~~~~~~~~~~~~~
+         *  Compile patch
+         * ~~~~~~~~~~~~~~~ */
 
         var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH;
         if (format === 'js') {
@@ -249,21 +264,26 @@ router.put('/:id', function (req, res) {
             if (error !== null) {
                 response.error = { status: 500 };
             }
-            return res.status(error !== null ? 500 : 200).json(response);
+            return response;
 
         });
 
-    }).fail(function (error) {
+    }).catch(function (error) {
 
-        console.log(error);
+        var status = error.status || 500;
+        return res.status(status).json({
+            message: error.toString(),
+            status: status
+        });
 
-        if (!error.error) {
-            error.error = { status: 500 };
+    }).done(function (response) {
+
+        if ('ServerResponse' === response.constructor.name) {
+            return response;
         }
-        if (!error.error.status) {
-            error.error.status = 500;
-        }
-        return res.status(error.error.status).json(error);
+
+        return res.status(response.error.status).json(response);
+
     });
 });
 
