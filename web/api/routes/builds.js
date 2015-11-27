@@ -9,10 +9,9 @@ var fs      = require('fs');
 var path    = require('path');
 var exec    = require('child_process').exec;
 var Q       = require('q');
-Q.longStackSupport = false; // To be enabled only when debugging
 
 var wordpressBridge = require('../lib/wordpress-bridge.js');
-var apiSettings = require('../api-settings.js');
+var apiSettings     = require('../api-settings.js');
 
 /**
  * Convenience function for determining the build format.

@@ -3,7 +3,7 @@
  */
 
 var express = require('express');
-var router = express.Router();
+var router  = express.Router();
 
 /**
  * Retrieves all tags.
@@ -17,9 +17,9 @@ router.get('/', function(req, res) {
     nativeCol.aggregate(
 
         { $project: { tags: 1 }},
-        { $unwind: "$tags" },
-        { $group: { _id: "$tags" }},
-        { $project: { _id: 1, insensitive: { $toLower: "$_id" }}}, // case-insensitive ordering
+        { $unwind: '$tags' },
+        { $group: { _id: '$tags' }},
+        { $project: { _id: 1, insensitive: { $toLower: '$_id' }}}, // case-insensitive ordering
         { $sort: { insensitive: 1 }},
         { $project: { _id: 1 }},
 
@@ -36,8 +36,6 @@ router.get('/', function(req, res) {
             }
         }
     );
-
-
 });
 
 module.exports = router;
