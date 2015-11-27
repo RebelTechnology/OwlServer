@@ -42,10 +42,13 @@ function owl_validateAuthCookie($cookie, $scheme = 'logged_in')
  * @param string $username
  *     The user ID.
  * @return array|boolean
- *     An array whose keys are 'admin' and 'id' and whose values are
- *     respectively a boolean telling whether the user is a WP admin and the
+ *     An array whose keys are 'id', 'display_name' and 'admin', and whose values
+ *     are respectively a boolean telling whether the user is a WP admin and the
  *     user ID of the user. Returns false if the user could not be found or if
  *     an error occurred.
+ *
+ * @todo FIXME - This function must be rewritten to accept the WP user ID as
+ *       a parameter instead of the username.
  */
 function owl_getUserInfo($username)
 {
@@ -59,10 +62,43 @@ function owl_getUserInfo($username)
         return false;
     } else {
         return array(
-            'id'    => $userQuery->results[0]->ID,
-            'admin' => in_array('administrator', $userQuery->results[0]->roles)
+            'id'           => $userQuery->results[0]->ID,
+            'display_name' => $userQuery->results[0]->display_name,
+            'admin'        => in_array('administrator', $userQuery->results[0]->roles),
         );
     }
+}
+
+/**
+ * Returns information about the users identified by the specified user IDs.
+ *
+ * Exposed as an XML-RPC method.
+ *
+ * @param array[int]
+ *     An array of user IDs.
+ * @return array
+ *     An associative array whose keys are WP user IDs and whose values are
+ *     associative arrays containing user meta data. At the moment the only
+ *     piece of metadata returned is the user display name.
+ */
+function owl_getUserInfoBatch($userIds)
+{
+    $result = array();
+
+    foreach ($userIds as $userId) {
+
+        $userInfo = get_userdata($userId);
+
+        if (false === $userInfo) { // user not found
+            continue;
+        }
+
+        $result[intval($userId)] = array(
+            'display_name' => $userInfo->display_name,
+        );
+    }
+
+    return $result;
 }
 
 /**
@@ -76,7 +112,8 @@ function owl_getUserInfo($username)
 function owl_new_xmlrpc_methods($methods)
 {
     $methods['owl.validateAuthCookie'] = 'owl_validateAuthCookie';
-    $methods['owl.getUserInfo'] = 'owl_getUserInfo';
+    $methods['owl.getUserInfo']        = 'owl_getUserInfo';
+    $methods['owl.getUserInfoBatch']   = 'owl_getUserInfoBatch';
 
     return $methods;
 }
