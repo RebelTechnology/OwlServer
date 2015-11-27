@@ -89,10 +89,20 @@ HoxtonOwl.ApiClient.prototype.getAllPatches = function (callback) {
         }
 
         var authors = [];
+        var wpAuthors = {};
         for(var i = 0; i < authorData[0].result.length; i++) {
             authors.push(authorData[0].result[i].name);
+            if ('wordpressId' in authorData[0].result[i]) {
+                wpAuthors[authorData[0].result[i].wordpressId] = authorData[0].result[i].name;
+            }
         }
         authors.unshift("All");
+
+        for (var i = 0; i < patches.length; i++) {
+            if ('wordpressId' in patches[i].author) {
+                patches[i].author.name = wpAuthors[patches[i].author.wordpressId];
+            }
+        }
 
         var tags = tagData[0].result;
         tags.unshift("All");

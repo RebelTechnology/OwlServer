@@ -6,30 +6,31 @@ var express = require('express');
 var router  = express.Router();
 var url     = require('url');
 var Q       = require('q');
-Q.longStackSupport = true; // To be enabled only when debugging
 
-var patchModel = require('../models/patch');
+var patchModel      = require('../models/patch');
 var wordpressBridge = require('../lib/wordpress-bridge.js');
+var apiSettings     = require('../api-settings.js');
 
 var summaryFields = {
     _id: 1,
     name: 1,
     'author.name': 1,
     'author.url': 1,
+    'author.wordpressId': 1,
     tags: 1,
     seoName: 1,
     creationTimeUtc: 1,
     published: 1
 };
 
-var regExpEscape = function(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-};
-
 /**
  * Retrieves all patches.
  *
- * GET /patches?author.name=
+ * GET /patches
+ *
+ * Possible GET parameters:
+ * * author.name
+ * * author.wordpressId
  */
 router.get('/', function(req, res) {
 
@@ -43,12 +44,18 @@ router.get('/', function(req, res) {
     for (field in summaryFields) { // shallow copy
         summaryFields2[field] = summaryFields[field];
     }
-    summaryFields2.lowercase = { $toLower: '$name' };
+    summaryFields2.lowercase = { $toLower: '$name' }; // Used below to sort patches by name
 
     var filter = { $match: {}};
+
     if ('author.name' in query && query['author.name'] !== '') {
         filter.$match['author.name'] = query['author.name'];
     }
+
+    if ('author.wordpressId' in query && query['author.wordpressId'] !== '') {
+        filter.$match['author.wordpressId'] = query['author.wordpressId'];
+    }
+
     // filter.$match['published'] = true;
 
     nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, { $project: summaryFields }, function (err, result) {
@@ -152,6 +159,10 @@ router.post('/', function(req, res) {
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
         function() {
+
+            var regExpEscape = function(str) {
+                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            };
 
             var nameRegexp = new RegExp('^' + regExpEscape(newPatch.name) + '$', 'i');
             var seoNameRegexp = new RegExp('^' + regExpEscape(newPatch.seoName) + '$', 'i');

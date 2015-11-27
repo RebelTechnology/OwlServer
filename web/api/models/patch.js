@@ -69,40 +69,46 @@ var patchModel = {
                     throw err;
                 }
 
-                if (!('name' in val) || typeof val.name !== 'string' ||
-                    val.name.length < 1 || val.name.length > 255) {
-                    err.message = 'Invalid author name.';
+                // Either name or wordpressId, exclusive (i.e. not both)
+                if (!('name' in val) && !('wordpressId' in val)) {
+                    err.message = 'Invalid author schema.';
                     throw err;
                 }
-
-                if ('type' in val && val.type !== 'wordpress') {
-                    err.message = 'Invalid author name.';
-                    throw err;
+                if (('name' in val) && ('wordpressId' in val)) {
+                    err.message = 'Invalid author schema.';
                 }
 
-                if ('type' in val && 'wordpress' === val.type) {
-                    if (!('wordpressId' in val)) {
-                        err.message = 'Wordpress user ID not specified.';
+                // Validate name
+                if ('name' in val) {
+                    if (val.name.length < 1 || val.name.length > 255) {
+                        err.message = 'Invalid author name.';
                         throw err;
                     }
                 }
 
+                // Validate WordPress user ID
                 if ('wordpressId' in val) {
-                    if (!('type' in val) || val.type !== 'wordpress') {
-                        err.message = 'Invalid author object';
+                    if (val.wordpressId <= 0) {
+                        err.message = 'Invalid WordPress user ID.';
                         throw err;
                     }
                 }
+
             },
             sanitize: function (val) {
+
+                // remove illegal keys
                 for (var key in val) {
-                    if ('type' !== key && 'wordpressId' !== key && 'name' !== key) {
+                    if ('wordpressId' !== key && 'name' !== key) {
                         delete val[key];
                     }
                 }
+
+                // sanitize WP user ID
                 if ('wordpressId' in val) {
                     val.wordpressId = parseInt(val.wordpressId);
                 }
+
                 return val;
             }
         },

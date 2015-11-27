@@ -2,98 +2,126 @@
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
-var express         = require('express');
-var router          = express.Router();
-var fs              = require('fs');
-var path            = require('path');
-var Q               = require('q');
-Q.longStackSupport  = false; // To be enabled only when debugging
+var express = require('express');
+var router  = express.Router();
+var fs      = require('fs');
+var path    = require('path');
+var Q       = require('q');
 
 var patchModel      = require('../models/patch');
 var wordpressBridge = require('../lib/wordpress-bridge.js');
-
 var apiSettings     = require('../api-settings.js');
 
-var regExpEscape = function (str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+/**
+ * Adds the WP user "display name" to the patch's author info, if necessary.
+ */
+var getUserWpDisplayName = function (patch) {
+
+    var getUserInfoBatch = Q.denodeify(wordpressBridge.getUserInfoBatch);
+
+    if (null === patch) {
+        var e = new Error('Patch not found.');
+        e.status = 404;
+        throw e;
+    }
+
+    /*
+     * Get WordPress user's "display name"
+     */
+
+    if ('wordpressId' in patch.author) {
+
+        // FIXME - This should not be a batch call
+        // This should call instead 'getUserInfo()'
+
+        return getUserInfoBatch([ parseInt(patch.author.wordpressId) ]).then(function (result) {
+
+            if (patch.author.wordpressId in result) {
+                patch.author.name = result[patch.author.wordpressId].display_name;
+            }
+
+            return patch;
+
+        });
+    }
+
+    return patch;
+
 };
 
 /**
- * Checks whether a patch with the specified ID exists. If it exists,
- * the specified callback will be invoked.
- *
- * @param {string} id
- *     Patch ID.
- * @param {object} collection
- *     Patch collection.
- * @param {object} res
- *     Express's router "response" object.
- * @param {function} callback
- *     An callback to be called if the specified patch exists.
+ * Completes patch info with extra information.
  */
-var apply = function (id, collection, res, callback) {
+var finishPatch = function (patch) {
 
-    collection.findOne({ _id: id }, function (err, patch) {
+    /*
+     * Get patch SysEx
+     */
 
-        var response = {};
-        if (null !== err) {
+    patch['sysExAvailable'] = false;
+    var sysexFile = path.join(apiSettings.SYSEX_PATH, patch['seoName'] + '.syx');
+    if (fs.existsSync(sysexFile)) {
+        patch['sysExAvailable'] = true;
+        patch['sysExLastUpdated'] = fs.statSync(sysexFile).mtime;
+    }
 
-            // database returned an error
-            return res.status(500).json({
-                message: err,
-                error: { status: 500 }
-            });
+    /*
+     * Get patch JS
+     */
 
-        } else {
+    patch['jsAvailable'] = false;
+    var jsFile = path.join(apiSettings.JS_PATH, patch['seoName'] + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
+    if (fs.existsSync(jsFile)) {
+        patch['jsAvailable'] = true;
+        patch['jsLastUpdated'] = fs.statSync(jsFile).mtime;
+    }
 
-            if (null === patch) {
+    /*
+     * Return patch
+     */
 
-                // patch not found
-                return res.status(404).json({
-                    message: 'Patch not found.',
-                    error: { status: 404 }
-                });
+    return response = { result: patch };
 
-            } else {
-
-                // patch found
-
-                // get patch sysex
-                patch['sysExAvailable'] = false;
-                var sysexFile = path.join(apiSettings.SYSEX_PATH, patch['seoName'] + '.syx');
-                if (fs.existsSync(sysexFile)) {
-                    patch['sysExAvailable'] = true;
-                    patch['sysExLastUpdated'] = fs.statSync(sysexFile).mtime;
-                }
-
-                // get patch js
-                patch['jsAvailable'] = false;
-                var jsFile = path.join(apiSettings.JS_PATH, patch['seoName'] + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
-                if (fs.existsSync(jsFile)) {
-                    patch['jsAvailable'] = true;
-                    patch['jsLastUpdated'] = fs.statSync(jsFile).mtime;
-                }
-
-                callback(patch);
-
-            }
-        }
-    });
 };
 
 /**
  * Retrieves a single patch.
  *
  * GET /patch/{id}
+ *
+ * FIXME: Private patches should be returned only to their owners.
  */
 router.get('/:id', function (req, res) {
 
     var id = req.params.id;
     var collection = req.db.get('patches');
-    apply(id, collection, res, function (patch) {
 
-        var response = { result: patch };
+    Q.fcall(function () {
+
+        /*
+         * Get patch by ID
+         */
+
+        return collection.findOne({ _id: id });
+
+    }).then(getUserWpDisplayName)
+    .then(finishPatch)
+    .fail(function (error) {
+
+        var status = error.status || 500;
+        return res.status(status).json({
+            message: error.toString(),
+            status: status
+        });
+
+    }).done(function (response) {
+
+        if ('ServerResponse' === response.constructor.name) {
+            return response;
+        }
+
         return res.status(200).json(response);
+
     });
 });
 
@@ -102,7 +130,7 @@ router.get('/:id', function (req, res) {
  *
  * GET /patch/?field=value&...
  */
-router.get('/', function (req,res) {
+router.get('/', function (req, res) {
 
     var query = {};
     var collection = req.db.get('patches');
@@ -112,38 +140,38 @@ router.get('/', function (req,res) {
     }
 
     if (0 === Object.keys(query).length) {
-        var response = { message: 'You must specify at least 1 search parameter.', error: { status: 400 }};
-        return res.status(response.error.status).json(response);
-    } else {
-        collection.findOne(query, function (err, patch) {
-
-            var response = {};
-            if (null !== err) {
-
-                // database returned an error
-                return res.status(500).json({
-                    message: err,
-                    error: { status: 500 }
-                });
-
-            } else {
-
-                if (null === patch) {
-
-                    // patch not found
-                    return res.status(404).json({
-                        message: 'Patch not found.',
-                        error: { status: 404 }
-                    });
-
-                } else {
-
-                    var response = { result: patch };
-                    return res.status(200).json(response);
-                }
-            }
-        });
+        var e = new Error('You must specify at least 1 search parameter.');
+        e.status = 400;
+        throw e;
     }
+
+    Q.fcall(function () {
+
+        /*
+         * Find patch
+         */
+
+        return collection.findOne(query);
+
+    }).then(getUserWpDisplayName)
+    .then(finishPatch)
+    .fail(function (error) {
+
+        var status = error.status || 500;
+        return res.status(status).json({
+            message: error.toString(),
+            status: status
+        });
+
+    }).done(function (response) {
+
+        if ('ServerResponse' === response.constructor.name) {
+            return response;
+        }
+
+        return res.status(200).json(response);
+
+    });
 });
 
 /**
@@ -235,6 +263,10 @@ router.put('/:id', function (req, res) {
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
         function () {
+
+            var regExpEscape = function (str) {
+                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            };
 
             var nameRegexp = new RegExp('^' + regExpEscape(updatedPatch.name) + '$', 'i');
             var seoNameRegexp = new RegExp('^' + regExpEscape(updatedPatch.seoName) + '$', 'i');

@@ -278,6 +278,7 @@ HoxtonOwl.patchManager = {
 
         var that = this;
         var pm = HoxtonOwl.patchManager;
+        var $currentWpUserId = $('#wordpress-user-id').text();
 
         that.selectedPatch = ko.observable();       // currently selected patch
         that.patches = ko.observableArray(patches); // all patches
@@ -290,19 +291,20 @@ HoxtonOwl.patchManager = {
 
         that.filteredPatches = ko.computed(function() {
             return ko.utils.arrayFilter(that.patches(), function(r) {
-                if (that.searchItems.indexOf("All") > -1) {
+                if (that.searchItems.indexOf('All') > -1) {
                     return r.published;
                 }
-                if (that.search() === "tag") {
+                if (that.search() === 'tag') {
                     for (i=0; i<r.tags.length; ++i) {
                         if(that.searchItems.indexOf(r.tags[i]) > -1) {
                             return true;
                         }
                     }
-                } else if (that.search() === "author") {
+                } else if (that.search() === 'author') {
                     return that.searchItems.indexOf(r.author.name) > -1;
                 } else if (that.search() === 'myPatches') {
-                    return that.searchItems.indexOf(r.author.name) > -1;
+                    // return that.searchItems.indexOf(r.author.name) > -1;
+                    return r.author.wordpressId == $currentWpUserId;
                 }
                 return false;
             });
