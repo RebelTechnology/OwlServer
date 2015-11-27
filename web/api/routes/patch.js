@@ -246,8 +246,8 @@ router.put('/:id', function (req, res) {
         // we blindy trust the authorship information. Not ideal, but
         // at least keeps code leaner.
         if (!isAdmin) {
-            patchAuthor.type = 'wordpress';
-            patchAuthor.name = username;
+            // patchAuthor.type = 'wordpress';
+            // patchAuthor.name = username;
             patchAuthor.wordpressId = wpUserId;
         }
 
@@ -283,8 +283,8 @@ router.put('/:id', function (req, res) {
         if (null !== doc) {
             var e = new Error('This name is already taken.');
             e.status = 400;
-            e.type = 'not_valid',
-            e.field = 'name',
+            e.type = 'not_valid';
+            e.field = 'name';
             throw e;
         }
 
@@ -433,8 +433,7 @@ router.delete('/:id', function (req, res) {
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
         // This code must be here because we need the value of patch.author.name
-        if (!isAdmin && (!patch.author.type || patch.author.type !== 'wordpress' ||
-            patch.author.name !== username)) {
+        if (!isAdmin && (patch.author.wordpressId !== wpUserId)) {
 
             console.log(patch.author);
             var e = new Error('You are not authorized to delete this patch.');

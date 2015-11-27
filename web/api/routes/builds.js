@@ -72,9 +72,9 @@ router.get('/:id', function (req, res) {
         var buildFile,
             filename;
 
-        /*
-         * Check if SysEx is available
-         */
+        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         *  Check if SysEx is available
+         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
         if (null === patch) {
             var e = new Error('Patch not found.');
@@ -213,8 +213,11 @@ router.put('/:id', function (req, res) {
         // we blindy trust the authorship information. Not ideal, but
         // at least keeps code leaner.
         if (!isAdmin) {
-            patchAuthor.type = 'wordpress';
-            patchAuthor.name = username;
+            // patchAuthor.type = 'wordpress';
+            // patchAuthor.name = username;
+            if (patchAuthor.name) {
+                delete patchAuthor.name;
+            }
             patchAuthor.wordpressId = wpUserId;
         }
 

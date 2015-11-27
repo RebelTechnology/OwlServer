@@ -31,6 +31,8 @@ var summaryFields = {
  * Possible GET parameters:
  * * author.name
  * * author.wordpressId
+ *
+ * FIXME - Only WP admins/patch authors should be able to retrieve all/their private patches.
  */
 router.get('/', function(req, res) {
 
@@ -140,8 +142,11 @@ router.post('/', function(req, res) {
         // we blindy trust the authorship information. Not ideal, but
         // at least keeps code leaner.
         if (!isAdmin) {
-            patchAuthor.type = 'wordpress';
-            patchAuthor.name = username;
+            // patchAuthor.type = 'wordpress';
+            // patchAuthor.name = username;
+            if (patchAuthor.name) {
+                delete patchAuthor.name;
+            }
             patchAuthor.wordpressId = wpUserId;
         }
 

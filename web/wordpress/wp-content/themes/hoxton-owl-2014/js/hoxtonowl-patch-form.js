@@ -46,8 +46,8 @@ HoxtonOwl.patchForm = {
         // Author
         var wordPressIdRadio = $('#frm-patch-author-type-wordpress');
         var patchAuthorNameRadio = $('#frm-patch-author-type-other');
-        if (wordPressIdRadio.length && patchAuthorNameRadio.length) {
-            if ('wordpress' === patch.author.type && !!patch.author.wordpressId) {
+        if (wordPressIdRadio.length && patchAuthorNameRadio.length) { // true only for admins
+            if (patch.author.wordpressId) {
                 $('#frm-patch-author-wordpressId').
                     append('<option value="' + patch.author.wordpressId + '">' + patch.author.name + '</option>').
                     trigger('change');
@@ -169,37 +169,39 @@ HoxtonOwl.patchForm = {
             return;
         }
 
-        if ($('#frm-patch-author-type-wordpress').length) {
+        if ($('#frm-patch-author-type-wordpress').length) { // true only for admins
 
             var author = {};
             if ($('#frm-patch-author-type-wordpress').prop('checked')) {
-                author.type = 'wordpress';
+
+                if (!$('#frm-patch-author-wordpressId').val()) {
+                    $('#frm-patch-author-wordpressId').
+                        addClass('invalid').
+                        siblings('div.error-message').
+                        text('Invalid author.').
+                        show();
+                    location = '#form-top';
+                    return;
+                }
+
                 author.wordpressId = $('#frm-patch-author-wordpressId').val();
-                author.name = $.trim($('#frm-patch-author-wordpressId option[value="' + author.wordpressId + '"]').text());
                 $('#frm-patch-author-name').val('');
+
             } else if ($('#frm-patch-author-type-other').prop('checked')) {
+
                 author.name = $.trim($('#frm-patch-author-name').val());
+                if ('' === author.name) {
+                    $('#frm-patch-author-name').
+                        addClass('invalid').
+                        siblings('div.error-message').
+                        text('Invalid author.').
+                        show();
+                    location = '#form-top';
+                    return;
+                }
+
                 $('#frm-patch-author-wordpressId').empty().val(null).trigger('change');
-            }
 
-            if (!('name' in author) || '' === author.name) {
-                $('#frm-patch-author-name').
-                    addClass('invalid').
-                    siblings('div.error-message').
-                    text('Invalid author.').
-                    show();
-                location = '#form-top';
-                return;
-            }
-
-            if (('type' in author) && (author.type !== 'wordpress' || !('wordpressId' in author) || !author.wordpressId)) {
-                $('#frm-patch-author-name').
-                    addClass('invalid').
-                    siblings('div.error-message').
-                    text('Invalid author.').
-                    show();
-                location = '#form-top';
-                return;
             }
         }
 
