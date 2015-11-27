@@ -111,19 +111,23 @@ router.get('/', function(req, res) {
             return 0;
         });
 
-    }).then(function () {
-
-        return res.status(200).json(result);
+        return result;
 
     }).catch(function (error) {
 
-        if (!error.error) {
-            error.error = { status: 500 };
+        var status = error.status || 500;
+        return res.status(status).json({
+            message: error.toString(),
+            status: status
+        });
+
+    }).done(function (response) {
+
+        if ('ServerResponse' === response.constructor.name) {
+            return response;
         }
-        if (!error.error.status) {
-            error.error.status = 500;
-        }
-        return res.status(error.error.status).json(error);
+
+        return res.status(200).json(response);
 
     });
 });
