@@ -496,7 +496,7 @@ function owl_patchFileCleanUp()
     $baseDirPath = getBaseDirPath();
     $dstDir = $baseDirPath . '/' . $patchId;
     if (!isset($patch['github'])) {
-        $patch['gitub'] = [];
+        $patch['github'] = [];
     }
     $sourceFiles = $patch['github'];
     $movedSourceFiles = [];
@@ -627,7 +627,7 @@ function owl_patchFileDelete()
     $dstDir = $baseDirPath . '/' . $patchId;
 
     if (!isset($patch['github'])) {
-        $patch['gitub'] = [];
+        $patch['github'] = [];
     }
     $sourceFiles = $patch['github'];
     foreach ($sourceFiles as $sourceFile) {
