@@ -83,20 +83,18 @@ function owl_getUserInfo($username)
  */
 function owl_getUserInfoBatch($userIds)
 {
-    $result = array();
+    global $wpdb;
 
-    foreach ($userIds as $userId) {
+    $userIds = array_map('intval', $userIds);
+    $sql = 'SELECT ID, display_name FROM ' . $wpdb->prefix . 'users WHERE ID IN(' . implode(', ', $userIds) . ')';
+    $users = $wpdb->get_results($sql);
 
-        $userInfo = get_userdata($userId);
-
-        if (false === $userInfo) { // user not found
-            continue;
-        }
-
-        $result[intval($userId)] = array(
-            'display_name' => $userInfo->display_name,
-        );
+    $result = [];
+    foreach ($users as $user) {
+        $result[$user->ID] = array('display_name' => $user->display_name);
     }
+
+    file_put_contents('/tmp/debug.txt', var_export($result, true));
 
     return $result;
 }
