@@ -95,7 +95,6 @@ function owl_getUserInfoBatch($userIds)
     while ($user = $res->fetch_assoc()) {
         $result[$user['ID']] = array('display_name' => $user['display_name']);
     }
-    file_put_contents('/tmp/debug.txt', var_export($result, true));
 
     return $result;
 }

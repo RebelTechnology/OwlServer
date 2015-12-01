@@ -7,7 +7,7 @@ var router  = express.Router();
 var url     = require('url');
 var fs      = require('fs');
 var path    = require('path');
-var exec    = require('child_process').exec;
+var exec    = require('child-process-promise').exec;
 var Q       = require('q');
 
 var wordpressBridge = require('../lib/wordpress-bridge.js');
@@ -271,6 +271,17 @@ router.put('/:id', function (req, res) {
 
         });
 
+        return exec(cmd).then(function (result) {
+            var stdout = result.stdout;
+            var stderr = result.stderr;
+            var response = {
+                stdout: stdout,
+                stderr: stderr,
+                success: true
+            };
+            return response;
+        });
+
     }).catch(function (error) {
 
         var status = error.status || 500;
@@ -285,7 +296,7 @@ router.put('/:id', function (req, res) {
             return response;
         }
 
-        return res.status(response.error.status).json(response);
+        return res.status(200).json(response);
 
     });
 });
