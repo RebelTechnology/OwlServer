@@ -623,13 +623,15 @@ function owl_patchFileDelete()
     $baseDirPath = getBaseDirPath();
     $dstDir = $baseDirPath . '/' . $patchId;
 
-    $sourceFiles = $patch['github'];
-    foreach ($sourceFiles as $sourceFile) {
-        $sourceFileInfo = getSourceFileInfo($sourceFile);
-        if ('url' == $sourceFileInfo['type']) {
-            $fileToDeletePath = $dstDir . '/' . $sourceFileInfo['name'];
-            if (file_exists($fileToDeletePath) && is_writeable($fileToDeletePath)) {
-                @unlink($fileToDeletePath);
+    if (isset($patch['github'])) {
+        $sourceFiles = $patch['github'];
+        foreach ($sourceFiles as $sourceFile) {
+            $sourceFileInfo = getSourceFileInfo($sourceFile);
+            if ('url' == $sourceFileInfo['type']) {
+                $fileToDeletePath = $dstDir . '/' . $sourceFileInfo['name'];
+                if (file_exists($fileToDeletePath) && is_writeable($fileToDeletePath)) {
+                    @unlink($fileToDeletePath);
+                }
             }
         }
     }
