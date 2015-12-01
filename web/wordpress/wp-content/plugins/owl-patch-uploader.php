@@ -495,6 +495,9 @@ function owl_patchFileCleanUp()
     // directories
     $baseDirPath = getBaseDirPath();
     $dstDir = $baseDirPath . '/' . $patchId;
+    if (!isset($patch['github'])) {
+        $patch['gitub'] = [];
+    }
     $sourceFiles = $patch['github'];
     $movedSourceFiles = [];
     foreach ($sourceFiles as $sourceFile) {
@@ -623,15 +626,16 @@ function owl_patchFileDelete()
     $baseDirPath = getBaseDirPath();
     $dstDir = $baseDirPath . '/' . $patchId;
 
-    if (isset($patch['github'])) {
-        $sourceFiles = $patch['github'];
-        foreach ($sourceFiles as $sourceFile) {
-            $sourceFileInfo = getSourceFileInfo($sourceFile);
-            if ('url' == $sourceFileInfo['type']) {
-                $fileToDeletePath = $dstDir . '/' . $sourceFileInfo['name'];
-                if (file_exists($fileToDeletePath) && is_writeable($fileToDeletePath)) {
-                    @unlink($fileToDeletePath);
-                }
+    if (!isset($patch['github'])) {
+        $patch['gitub'] = [];
+    }
+    $sourceFiles = $patch['github'];
+    foreach ($sourceFiles as $sourceFile) {
+        $sourceFileInfo = getSourceFileInfo($sourceFile);
+        if ('url' == $sourceFileInfo['type']) {
+            $fileToDeletePath = $dstDir . '/' . $sourceFileInfo['name'];
+            if (file_exists($fileToDeletePath) && is_writeable($fileToDeletePath)) {
+                @unlink($fileToDeletePath);
             }
         }
     }
