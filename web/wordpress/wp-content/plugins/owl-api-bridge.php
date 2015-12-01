@@ -83,17 +83,18 @@ function owl_getUserInfo($username)
  */
 function owl_getUserInfoBatch($userIds)
 {
-    global $wpdb;
+    global $table_prefix;
 
     $userIds = array_map('intval', $userIds);
-    $sql = 'SELECT ID, display_name FROM ' . $wpdb->prefix . 'users WHERE ID IN(' . implode(', ', $userIds) . ')';
-    $users = $wpdb->get_results($sql);
 
+    $db = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    $db->set_charset('utf8');
+    $sql = 'SELECT ID, display_name FROM ' . $table_prefix . 'users WHERE ID IN(' . implode(', ', $userIds) . ')';
+    $res = $db->query($sql);
     $result = [];
-    foreach ($users as $user) {
-        $result[$user->ID] = array('display_name' => $user->display_name);
+    while ($user = $res->fetch_assoc()) {
+        $result[$user['ID']] = array('display_name' => $user['display_name']);
     }
-
     file_put_contents('/tmp/debug.txt', var_export($result, true));
 
     return $result;
