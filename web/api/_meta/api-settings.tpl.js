@@ -32,6 +32,10 @@ module.exports.JS_PATH = '/var/www/hoxtonowl.com/subdomains/staging/patch-builde
 module.exports.JS_BUILD_TYPE = 'min'; // If we're building minified JS patches, this should be
                                       // set to 'min'.
 
+if (global.Q) {
+  Q.longStackSupport = true; // dev mode only
+}
+
 //////////////////////////////
 // Please do not edit below //
 //////////////////////////////
