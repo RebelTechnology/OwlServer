@@ -296,12 +296,12 @@ HoxtonOwl.patchManager = {
                 }
                 if (that.search() === 'tag') {
                     for (i=0; i<r.tags.length; ++i) {
-                        if(that.searchItems.indexOf(r.tags[i]) > -1) {
+                        if(that.searchItems.indexOf(r.tags[i]) > -1 && r.published) {
                             return true;
                         }
                     }
                 } else if (that.search() === 'author') {
-                    return that.searchItems.indexOf(r.author.name) > -1;
+                    return that.searchItems.indexOf(r.author.name) > -1 && r.published;
                 } else if (that.search() === 'myPatches') {
                     // return that.searchItems.indexOf(r.author.name) > -1;
                     return r.author.wordpressId == $currentWpUserId;
