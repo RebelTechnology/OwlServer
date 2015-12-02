@@ -130,9 +130,9 @@ function owl_usernameAutocomplete()
     $pattern = $_POST['q'];
 
     $args = array(
-        'search'         => $pattern . '*',
-        'search_columns' => array('user_login'),
-        'orderby'        => 'user_login',
+        'search'         => '*' . $pattern . '*',
+        'search_columns' => array('display_name'),
+        'orderby'        => 'display_name',
         'order'          => 'ASC',
         'count_total' => true,
     );
