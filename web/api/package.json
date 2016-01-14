@@ -19,5 +19,10 @@
     "swaggerize-express": "^4.0.4",
     "wordpress": "^1.0.0",
     "child-process-promise": "~1.1.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.11.3",
+    "grunt-mocha-test": "^0.12.7"
   }
 }
