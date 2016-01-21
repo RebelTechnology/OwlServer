@@ -439,6 +439,8 @@ HoxtonOwl.patchManager = {
 
                 //var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().github;
 
+                hookupButtonEvents();
+
                 $('#github-files').empty();
                 $('#git-code').hide();
                 if (that.selectedPatch().github.length) {
@@ -553,15 +555,23 @@ HoxtonOwl.patchManager = {
                     $tab.addClass('selected');
                     $tab.siblings('h2').removeClass('selected');
                     if ('patch-tab-header-info' === id) {
+                        $('#patch-tab-midi').hide();
                         $('#patch-tab-test').hide();
                         pm.stopPatchTest();
                         resetPatchParameterView();
                     } else if ('patch-tab-header-test' === id) {
+                        $('#patch-tab-midi').hide();
                         $('#patch-tab-test').show();
                         $('.knob').val(35).trigger('change');
                         $('.knob-container:visible input.knob').css('visibility', 'visible');
                         $('.knob-disabler').remove();
                         pm.initPatchTest();
+                    } else if ('patch-tab-header-midi' === id) {
+                        $('#patch-tab-info').hide();
+                        $('#patch-tab-test').hide();
+                        $('#patch-tab-midi').show();
+                        pm.stopPatchTest();
+                        resetPatchParameterView();
                     }
                     return false;
                 });

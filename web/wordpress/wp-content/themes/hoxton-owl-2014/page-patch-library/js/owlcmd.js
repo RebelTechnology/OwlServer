@@ -140,7 +140,7 @@ function updatePermission(name, status) {
     log('update permission for ' + name + ' with ' + status);
 }
 
-window.addEventListener('load', function() {
+function hookupButtonEvents() {
     // Check for Midi/Midi SysEx permissions
 
     // if(navigator && navigator.permissions){
@@ -189,5 +189,4 @@ window.addEventListener('load', function() {
 	$('#log').empty();
 	return false;
     });
-
-} );
+}

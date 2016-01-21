@@ -30,6 +30,11 @@ wp_enqueue_script('owl-patches-page_run_prettify',  'https://google-code-prettif
 
 //wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
 
+
+wp_enqueue_script('midi-client',                    $resUri . 'js/midiclient.js');
+wp_enqueue_script('owl-midi-control',               $resUri . 'js/OpenWareMidiControl.js');
+wp_enqueue_script('owl-cmd',                        $resUri . 'js/owlcmd.js');
+
 // <script> tags to be placed just before </body>
 wp_enqueue_script('owl-api-client',                 get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
 wp_enqueue_script('owl-patch',                      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
@@ -213,6 +218,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <div id="patch-tab-header-container">
                     <h2 class="bolder patch-tab-header selected" id="patch-tab-header-info"><a href="#">Info</a></h2>
                     <h2 class="bolder patch-tab-header" id="patch-tab-header-test"><a href="#">Test</a></h2>
+                    <h2 class="bolder patch-tab-header" id="patch-tab-header-midi"><a href="#">MIDI</a></h2>
                 </div>
                 <div class="flexbox flex-center patch-tab-container">
                     <div class="knob-container" id="patch-parameter-a">
@@ -271,6 +277,21 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             Your browser does not support the <code>&lt;audio&gt;</code> element.
                         </audio>
                     </div>
+                </div>
+                <div class="flexbox flex-center patch-tab-container" id="patch-tab-midi" style="display:none;">
+                  <p>MIDI In
+                      <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
+                        <option>...</option>
+                      </select>
+                  </p>
+
+                  <p>MIDI Out
+                      <select id="midiOutputs" onchange="selectMidiOutput(this.selectedIndex)">
+                        <option>...</option>
+                      </select>
+                      Monitor: <input id="monitor" type="button"/>
+                      Connect: <input id="connect" type="button"/>
+                  </p>
                 </div>
             </div>
             <div class="white-box2" id="git-code">
