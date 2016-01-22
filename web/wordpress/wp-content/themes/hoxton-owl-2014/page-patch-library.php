@@ -12,7 +12,7 @@ $resUri = get_template_directory_uri() . '/page-patch-library/';
 
 // <link rel="stylesheet"> tags to be placed in <head>
 wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), 5);
-wp_enqueue_style('owl-patches-page_fonts_googleapis', 'http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700');
+wp_enqueue_style('owl-patches-page_fonts_googleapis', '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700');
 wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
 wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
 wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
