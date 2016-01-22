@@ -64,6 +64,10 @@ HoxtonOwl.patchManager = {
             var pieces = urlParser.pathname.split('/');
             var filename = pieces[pieces.length - 1];
 
+            // Force same protocol as current HTTP(S) connection
+            urlParser.protocol = window.location.protocol;
+            url = urlParser.href;
+
             $.ajax({
                 type:     "GET",
                 url:      url,
