@@ -19,7 +19,7 @@ HoxtonOwl.ApiClient = function () {
     // Determine API endpoint
     this.apiEndPoint = window.location.protocol + '//' + window.location.host + '/api';
     if ('hoxtonowl.localhost' == window.location.hostname || 'hoxtonowl.local' == window.location.hostname) { // for local debugging
-        this.apiEndPoint = 'http://' + window.location.hostname + ':3000';
+        this.apiEndPoint = 'https://' + window.location.hostname + ':8443';
     }
 };
 

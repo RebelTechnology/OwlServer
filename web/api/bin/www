@@ -9,3 +9,14 @@ var server = app.listen(app.get('port'), function() {
   debug('Express server listening on port ' + server.address().port);
 });
 
+var fs = require('fs');
+var https = require('https');
+
+// to create the following key and cert files, see:
+// http://blog.justin.kelly.org.au/how-to-create-a-self-sign-ssl-cert-with-no-pa/
+var privateKey  = fs.readFileSync('sslcert/hoxtonowl.com.key', 'utf8');
+var certificate = fs.readFileSync('sslcert/hoxtonowl.com.crt', 'utf8');
+
+var credentials = {key: privateKey, cert: certificate};
+var httpsServer = https.createServer(credentials, app);
+httpsServer.listen(8443);
