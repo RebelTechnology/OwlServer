@@ -78,7 +78,8 @@ HoxtonOwl.ApiClient.prototype.getAllPatches = function (callback) {
 
     jQuery.when(
         client._query('/patches/'),
-        client._query('/authors/'),
+        client._query('/tags/'), // request tags instead of authors. not sure why we can't just comment
+        // this out, but the return values of these calls probably get passed to the callback.
         client._query('/tags/')
     ).done(function (patchData, authorData, tagData) {
 
@@ -89,18 +90,20 @@ HoxtonOwl.ApiClient.prototype.getAllPatches = function (callback) {
         }
 
         var authors = [];
-        var wpAuthors = {};
-        for(var i = 0; i < authorData[0].result.length; i++) {
-            authors.push(authorData[0].result[i].name);
-            if ('wordpressId' in authorData[0].result[i]) {
-                wpAuthors[authorData[0].result[i].wordpressId] = authorData[0].result[i].name;
-            }
-        }
-        authors.unshift("All");
+        // // disabling authors during development
+        // var wpAuthors = {};
+        // for(var i = 0; i < authorData[0].result.length; i++) {
+        //     authors.push(authorData[0].result[i].name);
+        //     if ('wordpressId' in authorData[0].result[i]) {
+        //         wpAuthors[authorData[0].result[i].wordpressId] = authorData[0].result[i].name;
+        //     }
+        // }
+        // authors.unshift("All");
 
         for (var i = 0; i < patches.length; i++) {
             if ('wordpressId' in patches[i].author) {
-                patches[i].author.name = wpAuthors[patches[i].author.wordpressId];
+                // // disabling authors during development
+                // patches[i].author.name = wpAuthors[patches[i].author.wordpressId];
             }
         }
 
