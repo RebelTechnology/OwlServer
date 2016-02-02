@@ -443,7 +443,7 @@ HoxtonOwl.patchManager = {
 
                 //var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().github;
 
-                HoxtonOwl.owlCmd.hookupButtonEvents();
+                hookupButtonEvents();
 
                 $('#github-files').empty();
                 $('#git-code').hide();

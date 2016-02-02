@@ -279,57 +279,18 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 </div>
                 <div class="flexbox flex-center patch-tab-container" id="patch-tab-midi" style="display:none;">
                   <p>MIDI In
-                      <select id="midiInputs" onchange="HoxtonOwl.midiClient.selectMidiInput(this.selectedIndex)">
+                      <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
                         <option>...</option>
                       </select>
                   </p>
 
                   <p>MIDI Out
-                      <select id="midiOutputs" onchange="HoxtonOwl.midiClient.selectMidiOutput(this.selectedIndex)">
+                      <select id="midiOutputs" onchange="selectMidiOutput(this.selectedIndex)">
                         <option>...</option>
                       </select>
                       Monitor: <input id="monitor" type="button"/>
                       Connect: <input id="connect" type="button"/>
                   </p>
-
-                  <p>Patches
-                      <select id="patchnames" onchange="selectPatch(this.value)"></select>
-                  </p>
-
-                  <div>
-                    <h3 id="patchname">...</h3>
-                    <form action="">
-                      <div id="p1"></div>
-                      <input type="range" min="0" max="1" step="0.001" onchange="setParameter(0, this.value)"/>
-                      <div id="p2"></div>
-                      <input type="range" min="0" max="1" step="0.001" onchange="setParameter(1, this.value)"/>
-                      <div id="p3"></div>
-                      <input type="range" min="0" max="1" step="0.001" onchange="setParameter(2, this.value)"/>
-                      <div id="p4"></div>
-                      <input type="range" min="0" max="1" step="0.001" onchange="setParameter(3, this.value)"/>
-                    </form>
-                    <p id="patchstatus">...</p>
-                  </div>
-
-                  <div>
-                    <h3>Control</h3>
-                    <form action="">
-                      <p>status <input type="button" onclick="HoxtonOwl.owlCmd.sendStatusRequest(); return false;"/></p>
-                      <p>load <input type="button" onclick="HoxtonOwl.owlCmd.sendLoadRequest(); return false;"/></p>
-                      <p>led <input type="button" onclick="HoxtonOwl.owlCmd.sendRequest(OpenWareMidiControl.LED); return false;"/></p>
-                      <p>message <input type="button" onclick="HoxtonOwl.owlCmd.sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE); return false;"/></p>
-                      <p>device id <input type="button" onclick="HoxtonOwl.owlCmd.sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID); return false;"/></p>
-                      <p>version <input type="button" onclick="HoxtonOwl.owlCmd.sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION); return false;"/></p>
-                      <p>settings <input type="button" onclick="HoxtonOwl.owlCmd.sendRequest(127); return false;"/></p>
-                    </form>
-                  </div>
-
-                  <div>
-                    <h3>Messages</h3>
-                    <button id="clear">Clear</button>
-                    <ul id="log"></ul>
-                  </div>
-
                 </div>
             </div>
             <div class="white-box2" id="git-code">
