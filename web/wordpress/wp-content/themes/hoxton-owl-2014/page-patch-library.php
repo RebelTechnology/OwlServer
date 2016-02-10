@@ -217,7 +217,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <div id="patch-tab-header-container">
                     <h2 class="bolder patch-tab-header selected" id="patch-tab-header-info"><a href="#">Info</a></h2>
                     <h2 class="bolder patch-tab-header" id="patch-tab-header-test"><a href="#">Test</a></h2>
-                    <h2 class="bolder patch-tab-header" id="patch-tab-header-midi"><a href="#">MIDI</a></h2>
+                    <h2 class="bolder patch-tab-header" id="patch-tab-header-midi"><a href="#" onclick="connectToOwl();">MIDI</a></h2>
                 </div>
                 <div class="flexbox flex-center patch-tab-container">
                     <div class="knob-container" id="patch-parameter-a">

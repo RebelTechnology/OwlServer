@@ -134,8 +134,23 @@ function sendLoadRequest(){
 }
 
 function onMidiInitialised(){
-    $("#midiInputs").val(0).change();
-    $("#midiOutputs").val(0).change();
+
+    // auto set the input and output to an OWL
+    
+    $("#midiOutputs option").each(function(){
+        if ($(this).text().match('^OWL-MIDI')) {
+            $("#midiOutputs").val($(this).val()).change();
+        }
+    });
+
+    $("#midiInputs option").each(function(){
+        if ($(this).text().match('^OWL-MIDI')) {
+            $("#midiInputs").val($(this).val()).change();
+        }
+    });
+
+    sendLoadRequest(); // load patches
+
     // selectMidiInput(3);
     // selectMidiOutput(4);
     // selectMidiInput(0);
@@ -146,6 +161,17 @@ function onMidiInitialised(){
 function updatePermission(name, status) {
     console.log('update permission for ' + name + ' with ' + status);
     log('update permission for ' + name + ' with ' + status);
+}
+
+function connectToOwl() {
+    if(navigator && navigator.requestMIDIAccess)
+    {
+        navigator.requestMIDIAccess({sysex:true});
+    }
+    initialiseMidi(onMidiInitialised);
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
+    sendLoadRequest();
+    sendStatusRequest();
 }
 
 function hookupButtonEvents() {
@@ -173,14 +199,7 @@ function hookupButtonEvents() {
     //         navigator.requestMIDIAccess({sysex:false});
     // });
 
-    $("#connect").on('click', function() {
-    	if(navigator && navigator.requestMIDIAccess)
-            navigator.requestMIDIAccess({sysex:true});
-    	initialiseMidi(onMidiInitialised);
-	sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
-	sendLoadRequest();
-	sendStatusRequest();
-    });
+    $("#connect").on('click', connectToOwl);
 
     $("#monitor").on('click', function() {
 	if(monitorTask == undefined){
@@ -198,3 +217,5 @@ function hookupButtonEvents() {
 	return false;
     });
 }
+
+
