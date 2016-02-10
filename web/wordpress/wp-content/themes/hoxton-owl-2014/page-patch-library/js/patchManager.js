@@ -301,10 +301,10 @@ HoxtonOwl.patchManager = {
                         }
                     }
                 } else if (that.search() === 'author') {
-                    return that.searchItems.indexOf(r.author.name) > -1 && r.published;
+                    return r.author && that.searchItems.indexOf(r.author.name) > -1 && r.published;
                 } else if (that.search() === 'myPatches') {
                     // return that.searchItems.indexOf(r.author.name) > -1;
-                    return r.author.wordpressId == $currentWpUserId;
+                    return r.author && r.author.wordpressId == $currentWpUserId;
                 }
                 return false;
             });
