@@ -113,7 +113,7 @@ function setParameter(pid, value){
     sendCc(OpenWareMidiControl.PATCH_PARAMETER_A+pid, value);
 }
 
-function selectPatch(pid){
+function selectOwlPatch(pid){
     console.log("select patch "+pid);
     for(i=0; i<5; ++i)
 	$("#p"+i).text("");
