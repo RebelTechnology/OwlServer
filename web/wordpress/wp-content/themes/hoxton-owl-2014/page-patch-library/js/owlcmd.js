@@ -40,10 +40,12 @@ function systemExclusive(data) {
 	    // log("preset "+idx+": "+name);
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
+        var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
             var name = getStringFromSysex(data, 5, 1);
 	    var pid = data[4]+1;
 	    console.log("parameter "+pid+" :"+name);
-	    $("#p"+pid).text(name);
+	    $("#p"+pid).text(name); // update the prototype slider names
+        $('#patch-parameter-' + parameter_map[pid] + ' p').text(name); // update the styled slider names
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_PROGRAM_STATS:
             var msg = getStringFromSysex(data, 4, 1);
@@ -114,9 +116,15 @@ function setParameter(pid, value){
 }
 
 function selectOwlPatch(pid){
+    var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
+
     console.log("select patch "+pid);
-    for(i=0; i<5; ++i)
-	$("#p"+i).text("");
+
+    for(i=0; i<5; ++i) {
+        $("#p"+i).text(""); // clear the prototype slider names
+        $('#patch-parameter-' + parameter_map[i] + ' p').text(''); // clear the styled slider names    
+    }
+    
     sendPc(pid);
 }
 
