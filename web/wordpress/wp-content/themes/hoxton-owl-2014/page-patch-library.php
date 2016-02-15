@@ -281,7 +281,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                   
                     <p>test loading patch from url<input type="button" onclick="sendProgramFromUrl('/api/builds/' + selectedPatch()._id + '?format=sysx&amp;download=1')"/></p>
                   
-                    <div id="hidden-midi-controls" style="display:none;">
+                    <div id="hidden-midi-controls" style="">
                       <p>MIDI In
                           <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
                             <option>...</option>
