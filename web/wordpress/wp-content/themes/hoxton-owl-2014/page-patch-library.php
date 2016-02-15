@@ -278,38 +278,42 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </div>
                 </div>
                 <div class="flexbox flex-center patch-tab-container" id="patch-tab-midi" style="display:none;">
-                  <p>MIDI In
-                      <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
-                        <option>...</option>
-                      </select>
-                  </p>
+                  
+                    <p>test loading patch from url<input type="button" onclick="sendProgramFromUrl('/HeavyOWL.syx')"/></p>
+                  
+                    <div id="hidden-midi-controls" style="display:none;">
+                      <p>MIDI In
+                          <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
+                            <option>...</option>
+                          </select>
+                      </p>
 
-                  <p>MIDI Out
-                      <select id="midiOutputs" onchange="selectMidiOutput(this.selectedIndex)">
-                        <option>...</option>
-                      </select>
-                      Monitor: <input id="monitor" type="button"/>
-                      Connect: <input id="connect" type="button"/>
-                  </p>
+                      <p>MIDI Out
+                          <select id="midiOutputs" onchange="selectMidiOutput(this.selectedIndex)">
+                            <option>...</option>
+                          </select>
+                          Monitor: <input id="monitor" type="button"/>
+                          Connect: <input id="connect" type="button"/>
+                      </p>
 
-                  <p>Patches
-                      <select id="patchnames" onchange="selectOwlPatch(this.value)"></select>
-                  </p>
+                      <p>Patches
+                          <select id="patchnames" onchange="selectOwlPatch(this.value)"></select>
+                      </p>
 
-                  <div>
-                    <h3 id="patchname">...</h3>
-                    <form action="">
-                      <div id="p1"></div>
-                      <input type="range" min="0" max="1" step="0.001" onchange="setParameter(0, this.value)"/>
-                      <div id="p2"></div>
-                      <input type="range" min="0" max="1" step="0.001" onchange="setParameter(1, this.value)"/>
-                      <div id="p3"></div>
-                      <input type="range" min="0" max="1" step="0.001" onchange="setParameter(2, this.value)"/>
-                      <div id="p4"></div>
-                      <input type="range" min="0" max="1" step="0.001" onchange="setParameter(3, this.value)"/>
-                    </form>
-                    <p id="patchstatus">...</p>
-                  </div>
+                      <div>
+                        <h3 id="patchname">...</h3>
+                        <form action="">
+                          <div id="p1"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(0, this.value)"/>
+                          <div id="p2"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(1, this.value)"/>
+                          <div id="p3"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(2, this.value)"/>
+                          <div id="p4"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(3, this.value)"/>
+                        </form>
+                        <p id="patchstatus">...</p>
+                      </div>
 
                   <div>
                     <h3>Control</h3>
@@ -321,7 +325,6 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                       <p>device id <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID); return false;"/></p>
                       <p>version <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION); return false;"/></p>
                       <p>settings <input type="button" onclick="sendRequest(127); return false;"/></p>
-                      <p>test loading patch from url<input type="button" onclick="sendProgramFromUrl('/HeavyOWL.syx')"/></p>
                     </form>
                   </div>
 
@@ -330,6 +333,8 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     <button id="clear">Clear</button>
                     <ul id="log"></ul>
                   </div>
+
+                </div>
 
                 </div>
             </div>
