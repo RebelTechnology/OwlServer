@@ -40,10 +40,12 @@ function systemExclusive(data) {
 	    // log("preset "+idx+": "+name);
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
+        var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
             var name = getStringFromSysex(data, 5, 1);
 	    var pid = data[4]+1;
 	    console.log("parameter "+pid+" :"+name);
-	    $("#p"+pid).text(name);
+	    $("#p"+pid).text(name); // update the prototype slider names
+        $('#patch-parameter-' + parameter_map[pid] + ' p').text(name); // update the styled slider names
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_PROGRAM_STATS:
             var msg = getStringFromSysex(data, 4, 1);
@@ -113,10 +115,16 @@ function setParameter(pid, value){
     sendCc(OpenWareMidiControl.PATCH_PARAMETER_A+pid, value);
 }
 
-function selectPatch(pid){
+function selectOwlPatch(pid){
+    var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
+
     console.log("select patch "+pid);
-    for(i=0; i<5; ++i)
-	$("#p"+i).text("");
+
+    for(i=0; i<5; ++i) {
+        $("#p"+i).text(""); // clear the prototype slider names
+        $('#patch-parameter-' + parameter_map[i] + ' p').text(''); // clear the styled slider names    
+    }
+    
     sendPc(pid);
 }
 
@@ -126,8 +134,23 @@ function sendLoadRequest(){
 }
 
 function onMidiInitialised(){
-    $("#midiInputs").val(0).change();
-    $("#midiOutputs").val(0).change();
+
+    // auto set the input and output to an OWL
+    
+    $("#midiOutputs option").each(function(){
+        if ($(this).text().match('^OWL-MIDI')) {
+            $("#midiOutputs").val($(this).val()).change();
+        }
+    });
+
+    $("#midiInputs option").each(function(){
+        if ($(this).text().match('^OWL-MIDI')) {
+            $("#midiInputs").val($(this).val()).change();
+        }
+    });
+
+    sendLoadRequest(); // load patches
+
     // selectMidiInput(3);
     // selectMidiOutput(4);
     // selectMidiInput(0);
@@ -138,6 +161,17 @@ function onMidiInitialised(){
 function updatePermission(name, status) {
     console.log('update permission for ' + name + ' with ' + status);
     log('update permission for ' + name + ' with ' + status);
+}
+
+function connectToOwl() {
+    if(navigator && navigator.requestMIDIAccess)
+    {
+        navigator.requestMIDIAccess({sysex:true});
+    }
+    initialiseMidi(onMidiInitialised);
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
+    sendLoadRequest();
+    sendStatusRequest();
 }
 
 function hookupButtonEvents() {
@@ -165,14 +199,7 @@ function hookupButtonEvents() {
     //         navigator.requestMIDIAccess({sysex:false});
     // });
 
-    $("#connect").on('click', function() {
-    	if(navigator && navigator.requestMIDIAccess)
-            navigator.requestMIDIAccess({sysex:true});
-    	initialiseMidi(onMidiInitialised);
-	sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
-	sendLoadRequest();
-	sendStatusRequest();
-    });
+    $("#connect").on('click', connectToOwl);
 
     $("#monitor").on('click', function() {
 	if(monitorTask == undefined){
@@ -190,3 +217,47 @@ function hookupButtonEvents() {
 	return false;
     });
 }
+
+function sendProgramData(data){
+    var from = 0;
+    console.log("sending program data "+data.length+" bytes");  
+    for(var i=0; i<data.length; ++i){
+    if(data[i] == 0xf0){
+        from = i;
+    }else if(data[i] == 0xf7){
+        console.log("sending "+(i-from)+" bytes sysex");
+        msg = data.subarray(from, i+1);
+        logMidiData(msg);
+        if(midiOutput)
+        midiOutput.send(msg, 0);
+    }
+    }
+}
+
+function sendProgramRun(){
+    console.log("sending sysex run command");
+    var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, 
+           OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7 ];
+    logMidiData(msg);
+    if(midiOutput)
+      midiOutput.send(msg, 0);
+}
+
+function sendProgramFromUrl(url){
+    console.log("sending patch from url "+url);
+    var oReq = new XMLHttpRequest();
+    oReq.responseType = "arraybuffer";
+    oReq.onload = function (oEvent) {
+    console.log("here");    
+    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+    if(arrayBuffer) {
+        console.log("there");   
+        var data = new Uint8Array(arrayBuffer);
+        sendProgramData(data);
+        sendProgramRun();
+    }
+    }
+    oReq.open("GET", url, true);
+    oReq.send();
+}
+

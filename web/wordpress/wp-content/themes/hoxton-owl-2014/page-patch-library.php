@@ -216,8 +216,8 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
             <div class="white-box2" data-bind="with: selectedPatch">
                 <div id="patch-tab-header-container">
                     <h2 class="bolder patch-tab-header selected" id="patch-tab-header-info"><a href="#">Info</a></h2>
-                    <h2 class="bolder patch-tab-header" id="patch-tab-header-test"><a href="#">Test</a></h2>
-                    <h2 class="bolder patch-tab-header" id="patch-tab-header-midi"><a href="#">MIDI</a></h2>
+                    <h2 class="bolder patch-tab-header" id="patch-tab-header-test"><a href="#">Audio</a></h2>
+                    <h2 class="bolder patch-tab-header" id="patch-tab-header-midi"><a href="#" onclick="connectToOwl();">MIDI</a></h2>
                 </div>
                 <div class="flexbox flex-center patch-tab-container">
                     <div class="knob-container" id="patch-parameter-a">
@@ -278,19 +278,64 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </div>
                 </div>
                 <div class="flexbox flex-center patch-tab-container" id="patch-tab-midi" style="display:none;">
-                  <p>MIDI In
-                      <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
-                        <option>...</option>
-                      </select>
-                  </p>
+                  
+                    <p>test loading patch from url<input type="button" onclick="sendProgramFromUrl('/api/builds/547db9630548016374e64978?format=sysx&amp;download=1')"/></p>
+                  
+                    <div id="hidden-midi-controls" style="display:none;">
+                      <p>MIDI In
+                          <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
+                            <option>...</option>
+                          </select>
+                      </p>
 
-                  <p>MIDI Out
-                      <select id="midiOutputs" onchange="selectMidiOutput(this.selectedIndex)">
-                        <option>...</option>
-                      </select>
-                      Monitor: <input id="monitor" type="button"/>
-                      Connect: <input id="connect" type="button"/>
-                  </p>
+                      <p>MIDI Out
+                          <select id="midiOutputs" onchange="selectMidiOutput(this.selectedIndex)">
+                            <option>...</option>
+                          </select>
+                          Monitor: <input id="monitor" type="button"/>
+                          Connect: <input id="connect" type="button"/>
+                      </p>
+
+                      <p>Patches
+                          <select id="patchnames" onchange="selectOwlPatch(this.value)"></select>
+                      </p>
+
+                      <div>
+                        <h3 id="patchname">...</h3>
+                        <form action="">
+                          <div id="p1"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(0, this.value)"/>
+                          <div id="p2"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(1, this.value)"/>
+                          <div id="p3"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(2, this.value)"/>
+                          <div id="p4"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(3, this.value)"/>
+                        </form>
+                        <p id="patchstatus">...</p>
+                      </div>
+
+                  <div>
+                    <h3>Control</h3>
+                    <form action="">
+                      <p>status <input type="button" onclick="sendStatusRequest(); return false;"/></p>
+                      <p>load <input type="button" onclick="sendLoadRequest(); return false;"/></p>
+                      <p>led <input type="button" onclick="sendRequest(OpenWareMidiControl.LED); return false;"/></p>
+                      <p>message <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE); return false;"/></p>
+                      <p>device id <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID); return false;"/></p>
+                      <p>version <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION); return false;"/></p>
+                      <p>settings <input type="button" onclick="sendRequest(127); return false;"/></p>
+                    </form>
+                  </div>
+
+                  <div>
+                    <h3>Messages</h3>
+                    <button id="clear">Clear</button>
+                    <ul id="log"></ul>
+                  </div>
+
+                </div>
+
                 </div>
             </div>
             <div class="white-box2" id="git-code">
