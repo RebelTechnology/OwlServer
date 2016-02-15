@@ -47,10 +47,12 @@ router.get('/', function(req, res) {
     }).then(function (docs) {
 
         for (var i = 0, max = docs.length; i < max; i++) {
-            if (docs[i].author.wordpressId) {
-                authorWpIds.push(docs[i].author.wordpressId);
-            } else {
-                authorNames[docs[i].author.name] = true;
+            if (docs[i] && docs[i].author) {
+              if (docs[i].author.wordpressId) {
+                  authorWpIds.push(docs[i].author.wordpressId);
+              } else {
+                  authorNames[docs[i].author.name] = true;
+              }
             }
         }
 
@@ -117,7 +119,7 @@ router.get('/', function(req, res) {
 
         var status = error.status || 500;
         return res.status(status).json({
-            message: error.toString(),
+            message: error.toString()+"yowzer",
             status: status
         });
 
