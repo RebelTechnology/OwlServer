@@ -137,17 +137,17 @@ function onMidiInitialised(){
 
     // auto set the input and output to an OWL
     
-    $("#midiOutputs option").each(function(){
-        if ($(this).text().match('^OWL-MIDI')) {
-            $("#midiOutputs").val($(this).val()).change();
-        }
-    });
+    for (var o = 0; o < midiOutputs.length; o++) {
+        if (midiOutputs[o].name.match('^OWL-MIDI')) {
+            selectMidiOutput(o);
+        }        
+    }
 
-    $("#midiInputs option").each(function(){
-        if ($(this).text().match('^OWL-MIDI')) {
-            $("#midiInputs").val($(this).val()).change();
-        }
-    });
+    for (var i = 0; i < midiInputs.length; i++) {
+        if (midiInputs[i].name.match('^OWL-MIDI')) {
+            selectMidiInput(i);
+        }        
+    }
 
     sendLoadRequest(); // load patches
 
