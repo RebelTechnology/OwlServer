@@ -16,16 +16,21 @@ var monk = require('monk');
 var apiSettings = require('./api-settings');
 var db = monk(apiSettings.mongoConnectionString);
 
-var author  = require('./routes/author');
-var authors = require('./routes/authors');
-var patch   = require('./routes/patch');
+var swaggerize = require('swaggerize-express');
+
 var patches = require('./routes/patches');
-var tag     = require('./routes/tag');
+var patch   = require('./routes/patch');
+var authors = require('./routes/authors');
 var tags    = require('./routes/tags');
-var sysex   = require('./routes/sysex');
+var builds  = require('./routes/builds');
 
 var app = express();
 app.use(cors());
+
+app.use(swaggerize({
+    api: path.join(__dirname, 'swagger.yaml'),
+    handlers: path.join(__dirname, 'routes')
+}));
 
 //// view engine setup
 //app.set('views', path.join(__dirname, 'views'));
@@ -44,13 +49,11 @@ app.use(function(req,res,next) {
     req.db = db; next();
 });
 
-app.use('/author', author);
-app.use('/authors', authors);
-app.use('/patch', patch);
 app.use('/patches', patches);
-app.use('/tag', tag);
+app.use('/patch', patch);
 app.use('/tags', tags);
-app.use('/sysex', sysex);
+app.use('/authors', authors);
+app.use('/builds', builds);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

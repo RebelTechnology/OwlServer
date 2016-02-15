@@ -2,8 +2,6 @@
 
 wp_enqueue_script('owl-api-client', get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array(), false, true);
 wp_enqueue_script('owl-patch',      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
-// wp_enqueue_script('owl-patches-add-edit-form-chosen-js', get_template_directory_uri() . '/js/chosen/chosen.jquery.min.js', array('jquery'));
-// wp_enqueue_style('owl-patches-add-edit-form-chosen-css', get_template_directory_uri() . '/js/chosen/chosen.css');
 wp_enqueue_script('owl-patches-add-edit-form-sheepit', get_template_directory_uri() . '/js/jquery.sheepItPlugin-1.1.1.min.js', array('jquery'));
 wp_enqueue_script('owl-patch-form', get_template_directory_uri() . '/js/hoxtonowl-patch-form.js', array('jquery'), false, true);
 wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
@@ -54,6 +52,16 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         <div class="error-message"></div>
                     </div>
                     <?php endif; ?>
+
+                    <div class="row">
+                        <label for="frm-patch-published" class="required">Published?</label>
+                        <select class="form-control" id="frm-patch-published" name="published" required>
+                            <option value="1">Yes</option>
+                            <option value="0" selected>No</option>
+                        </select>
+                        <div class="error-message"></div>
+                        <div class="info-message">Unpublished patches will be visible only to their authors.</div>
+                    </div>
 
                     <div class="row">
                         <label for="frm-patch-description" class="required">Description</label> <textarea class="form-control" id="frm-patch-description" name="description" required></textarea>
@@ -121,7 +129,8 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         </div>
                     </fieldset>
                     <fieldset id="frm-patch-github">
-                        <legend>GitHub files</legend>
+                        <legend>Source files</legend>
+                        <div class="info-message" style="margin-bottom: 15px;">Paste one or more files from GitHub, or use the upload button.</div>
                         <div id="frm-patch-github_template" class="row repeat">
                             <label for="frm-patch-github_#index#">File</label>
                             <div class="form-control">
@@ -134,6 +143,17 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         <div id="frm-patch-github_controls">
                             <div id="frm-patch-github_add" class="add"><a href="#"><span>Add</span></a></div>
                         </div>
+
+                        <div class="row">
+                            <label>Upload a file</label>
+                            <div class="form-control">
+                                <div class="file-upload-container">
+                                    Choose files...
+                                    <input type="file" id="frm-patch-file" name="files[]" multiple />
+                                </div>
+                            </div>
+                            <div class="error-message" style="margin-top: 10px;"></div>
+                        </div>
                     </fieldset>
                     <div class="row">
                         <label for="frm-patch-cycles">CPU cycles</label> <input class="form-control" type="number" min="0" id="frm-patch-cycles" name="cycles"><label class="percent">%</label>
@@ -145,25 +165,15 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                     </div>
                     <div class="row">
                         <label for="frm-patch-tags">Tags</label>
-                        <!--select data-placeholder="Pick one or more tags..." class="form-control chosen-select" id="frm-patch-tags" name="tags" multiple="multiple"></select-->
                         <select class="form-control" id="frm-patch-tags" name="tags" multiple="multiple"></select>
                         <div class="error-message" style="margin-top: 13px;"></div>
-                    </div>
-                    <div class="row">
-                        <label for="frm-patch-published" class="required">Published?</label>
-                        <select class="form-control" id="frm-patch-published" name="published" required>
-                            <option value="1">Yes</option>
-                            <option value="0" selected>No</option>
-                        </select>
-                        <div class="error-message"></div>
-                        <div class="info-message">Unpublished patches will be visible only to their authors.</div>
                     </div>
                     <?php if ($isAdmin): ?>
                     <div class="row">
                         <label for="frm-patch-creationTimeUtc">Creation time</label>
                         <input type="text" class="form-control" id="frm-patch-creationTimeUtc" name="creationTimeUtc" value="">
                         <div class="error-message"></div>
-                        <div class="info-message">Please use ISO 8601 combined date/time format. If left blank, it will default to the current time.</div>
+                        <div class="info-message">This field is only visible to admins. Please use ISO 8601 combined date/time format. If left blank, it will default to the current time.</div>
                     </div>
                     <?php endif; ?>
                     <div class="row btn-row">
@@ -193,5 +203,13 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
     <div class="clear"></div>
 
 </div>
+<?php
+global $current_user;
+
+if (is_user_logged_in()): ?>
+<div style="display: none;">
+    <div id="wordpress-user-is-admin"><?= current_user_can('administrator') ? 1 : 0 ?></div>
+</div>
+<?php endif; ?>
 
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/footer','parts/shared/html-footer' ) ); ?>

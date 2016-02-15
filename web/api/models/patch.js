@@ -2,6 +2,8 @@
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
+var urlParser = require('url');
+
 var patchModel = {
 
     fields: {
@@ -67,40 +69,46 @@ var patchModel = {
                     throw err;
                 }
 
-                if (!('name' in val) || typeof val.name !== 'string' ||
-                    val.name.length < 1 || val.name.length > 255) {
-                    err.message = 'Invalid author name.';
+                // Either name or wordpressId, exclusive (i.e. not both)
+                if (!('name' in val) && !('wordpressId' in val)) {
+                    err.message = 'Invalid author schema.';
                     throw err;
                 }
-
-                if ('type' in val && val.type !== 'wordpress') {
-                    err.message = 'Invalid author name.';
-                    throw err;
+                if (('name' in val) && ('wordpressId' in val)) {
+                    err.message = 'Invalid author schema.';
                 }
 
-                if ('type' in val && 'wordpress' === val.type) {
-                    if (!('wordpressId' in val)) {
-                        err.message = 'Wordpress user ID not specified.';
+                // Validate name
+                if ('name' in val) {
+                    if (val.name.length < 1 || val.name.length > 255) {
+                        err.message = 'Invalid author name.';
                         throw err;
                     }
                 }
 
+                // Validate WordPress user ID
                 if ('wordpressId' in val) {
-                    if (!('type' in val) || val.type !== 'wordpress') {
-                        err.message = 'Invalid author object';
+                    if (val.wordpressId <= 0) {
+                        err.message = 'Invalid WordPress user ID.';
                         throw err;
                     }
                 }
+
             },
             sanitize: function (val) {
+
+                // remove illegal keys
                 for (var key in val) {
-                    if ('type' !== key && 'wordpressId' !== key && 'name' !== key) {
+                    if ('wordpressId' !== key && 'name' !== key) {
                         delete val[key];
                     }
                 }
+
+                // sanitize WP user ID
                 if ('wordpressId' in val) {
                     val.wordpressId = parseInt(val.wordpressId);
                 }
+
                 return val;
             }
         },
@@ -125,7 +133,7 @@ var patchModel = {
         },
 
         instructions: {
-            required: true,
+            required: false, // ...but required, if published == true
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'instructions', error: { status: 400 }};
@@ -135,8 +143,8 @@ var patchModel = {
                     throw err;
                 }
 
-                if(val.length < 1 || val.length > 1023) {
-                    err.message = 'This field should be at least 1 and at most 1023 characters long.';
+                if(val.length > 1023) {
+                    err.message = 'This field should be at most 1023 characters long.';
                     throw err;
                 }
             },
@@ -218,10 +226,11 @@ var patchModel = {
 
                 var err = { type: 'not_valid', field: 'soundcloud', error: { status: 400 }};
 
-                if ('object' !== typeof val || val.constructor !== Array) {
+                if (Object.prototype.toString.call(val) !== '[object Array]') {
                     err.message = 'Value not valid.';
                     throw err;
                 }
+
                 for (var i = 0, max = val.length; i < max; i++) {
                     if (typeof val[i] !== 'string') {
                         err.message = 'Value not valid.';
@@ -247,18 +256,58 @@ var patchModel = {
 
                 var err = { type: 'not_valid', field: 'github', error: { status: 400 }};
 
-                if ('object' !== typeof val || val.constructor !== Array) {
-                    err.message = 'Value not valid.';
+                if (Object.prototype.toString.call(val) !== '[object Array]') {
+                    err.message = 'Value not valid (1).';
                     throw err;
                 }
+
+                var url;
+                var validHosts = [
+                    'hoxtonowl.localhost:8000',
+                    'staging.hoxtonowl.com',
+                    'hoxtonowl.com',
+                    'www.hoxtonowl.com',
+                    'github.com',
+                    'www.github.com'
+                ];
                 for (var i = 0, max = val.length; i < max; i++) {
+
                     if (typeof val[i] !== 'string') {
-                        err.message = 'Value not valid.';
+                        err.message = 'Invalid URL (1).';
                         throw err;
                     }
-                    // https://github.com/pingdynasty/OwlPatches/blob/master/PhaserPatch.hpp
-                    if (!/^https?:\/\/(?:www\.)?github\.com\/.+\/.+\/blob\/.+\/.+$/i.test(val[i])) {
-                        err.message = 'URL does not seem a valid GitHub blob.';
+
+                    url = urlParser.parse(val[i]);
+
+                    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+                        err.message = 'Invalid URL (2).';
+                        err.index = i;
+                        throw err;
+                    }
+
+                    if (validHosts.indexOf(url.host) === -1) {
+                        err.message = 'Source files can only be hosted on our servers or on GitHub.';
+                        err.index = i;
+                        throw err;
+                    }
+
+                    if (url.host.indexOf('hoxtonowl') !== -1) {
+                        // e.g.: http://hoxtonowl.localhost:8000/wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
+                        // url.path = /wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
+                        if (!/^\/wp-content\/uploads\/patch\-files\/[a-z0-9\-]+\/.+$/i.test(url.path)) {
+                            err.message = 'URL does not seem to belong to a source file hosted on our servers.';
+                            err.index = i;
+                            throw err;
+                        }
+                    } else if (url.host.indexOf('github') !== -1) {
+                        // e.g.: https://github.com/pingdynasty/OwlPatches/blob/master/PhaserPatch.hpp
+                        if (!/^https?:\/\/(?:www\.)?github\.com\/.+\/.+\/blob\/.+\/.+$/i.test(val[i])) {
+                            err.message = 'URL does not seem to be a valid GitHub blob URL.';
+                            err.index = i;
+                            throw err;
+                        }
+                    } else {
+                        err.message = 'Source files can only be hosted on our servers or on GitHub.';
                         err.index = i;
                         throw err;
                     }
@@ -267,7 +316,7 @@ var patchModel = {
         },
 
         cycles: {
-            required: false,
+            required: false, // ...but required, if published == true
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'cycles', error: { status: 400 }};
@@ -283,7 +332,7 @@ var patchModel = {
         },
 
         bytes: {
-            required: false,
+            required: false, // ...but required, if published == true
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'bytes', error: { status: 400 }};
@@ -304,10 +353,11 @@ var patchModel = {
 
                 var err = { type: 'not_valid', field: 'tags', error: { status: 400 }};
 
-                if ('object' !== typeof val || val.constructor !== Array) {
+                if (Object.prototype.toString.call(val) !== '[object Array]') {
                     err.message = 'Value not valid.';
                     throw err;
                 }
+
                 for (var i = 0, max = val.length; i < max; i++) {
                     if (typeof val[i] !== 'string') {
                         err.message = 'Value not valid.';
@@ -368,7 +418,12 @@ var patchModel = {
                 throw err;
             }
 
+            if (patch.published == true && ('instructions' == key || 'cycles' == key || 'bytes' == key)) {
+                patchModel.fields[key].required = true;
+            }
+
             if (typeof patch[key] === 'undefined') {
+
                 // Check for required fields
                 if (patchModel.fields[key].required === true) {
 
@@ -377,6 +432,7 @@ var patchModel = {
                     err.field = key;
                     throw err;
                 }
+
             } else {
                 // Validate single fields
                 patchModel.fields[key].validate(patch[key]);

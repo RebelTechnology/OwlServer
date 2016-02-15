@@ -1,16 +1,15 @@
-function knobify(){
-// $(function($) {
+function knobify () {
+
     $(".knob").knob({
         change : function (value) {
-            //console.log("change : " + value);
+            HoxtonOwl.patchManager.updatePatchParameters();
         },
         release : function (value) {
-            //console.log(this.$.attr('value'));
-            //console.log("release : " + value);
+            HoxtonOwl.patchManager.updatePatchParameters();
         },
-        cancel : function () {
+        /*cancel : function () {
             //console.log("cancel : ", this);
-        },
+        },*/
         /*format : function (value) {
           return value + '%';
           },*/
@@ -43,4 +42,3 @@ function knobify(){
         }
     });
 };
-// });

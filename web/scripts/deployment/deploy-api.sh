@@ -24,7 +24,7 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 # Work out environment
 HOSTNAME=`hostname`
-if [ "$HOSTNAME" = "bella" ]
+if [ "$HOSTNAME" = "ulrike" -o "$HOSTNAME" = "bella" ]
 then
     TARGET_ENV='staging'
     GIT_BRANCH='dev'
@@ -54,17 +54,19 @@ cd - > /dev/null
 # Copy files
 echo "Copying files..."
 mv $DIR/../api/api-settings.js /tmp
+mv $DIR/../api/node_modules /tmp
 rm -rf $DIR/../api
 cp -a $DIR/OwlServer/web/api $DIR/../
 mv /tmp/api-settings.js $DIR/../api/
+mv /tmp/node_modules $DIR/../api/
 
-# Install node modules
-if [ ! -d "$DIR/../api/node_modules" ]; then
-    echo "Installing node.js modules..."
-    cd $DIR/../api
-    npm install
-    cd - > /dev/null
-fi
+## Install node modules
+#if [ ! -d "$DIR/../api/node_modules" ]; then
+#    echo "Installing node.js modules..."
+#    cd $DIR/../api
+#    npm install
+#    cd - > /dev/null
+#fi
 
 # Update deployment script
 echo "Updating deployment script..."

@@ -42,16 +42,19 @@ function owl_validateAuthCookie($cookie, $scheme = 'logged_in')
  * @param string $username
  *     The user ID.
  * @return array|boolean
- *     An array whose keys are 'admin' and 'id' and whose values are
- *     respectively a boolean telling whether the user is a WP admin and the
+ *     An array whose keys are 'id', 'display_name' and 'admin', and whose values
+ *     are respectively a boolean telling whether the user is a WP admin and the
  *     user ID of the user. Returns false if the user could not be found or if
  *     an error occurred.
+ *
+ * @todo FIXME - This function must be rewritten to accept the WP user ID as
+ *       a parameter instead of the username.
  */
 function owl_getUserInfo($username)
 {
     $args = array(
         'search'         => $username,
-        'search_columns' => 'user_login'
+        'search_columns' => [ 'user_login' ]
     );
     $userQuery = new WP_User_Query($args);
 
@@ -59,10 +62,41 @@ function owl_getUserInfo($username)
         return false;
     } else {
         return array(
-            'id'    => $userQuery->results[0]->ID,
-            'admin' => in_array('administrator', $userQuery->results[0]->roles)
+            'id'           => $userQuery->results[0]->ID,
+            'display_name' => $userQuery->results[0]->display_name,
+            'admin'        => in_array('administrator', $userQuery->results[0]->roles),
         );
     }
+}
+
+/**
+ * Returns information about the users identified by the specified user IDs.
+ *
+ * Exposed as an XML-RPC method.
+ *
+ * @param array[int]
+ *     An array of user IDs.
+ * @return array
+ *     An associative array whose keys are WP user IDs and whose values are
+ *     associative arrays containing user meta data. At the moment the only
+ *     piece of metadata returned is the user display name.
+ */
+function owl_getUserInfoBatch($userIds)
+{
+    global $table_prefix;
+
+    $userIds = array_map('intval', $userIds);
+
+    $db = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    $db->set_charset('utf8');
+    $sql = 'SELECT ID, display_name FROM ' . $table_prefix . 'users WHERE ID IN(' . implode(', ', $userIds) . ')';
+    $res = $db->query($sql);
+    $result = [];
+    while ($user = $res->fetch_assoc()) {
+        $result[$user['ID']] = array('display_name' => $user['display_name']);
+    }
+
+    return $result;
 }
 
 /**
@@ -76,7 +110,8 @@ function owl_getUserInfo($username)
 function owl_new_xmlrpc_methods($methods)
 {
     $methods['owl.validateAuthCookie'] = 'owl_validateAuthCookie';
-    $methods['owl.getUserInfo'] = 'owl_getUserInfo';
+    $methods['owl.getUserInfo']        = 'owl_getUserInfo';
+    $methods['owl.getUserInfoBatch']   = 'owl_getUserInfoBatch';
 
     return $methods;
 }
@@ -95,31 +130,20 @@ function owl_usernameAutocomplete()
     $pattern = $_POST['q'];
 
     $args = array(
-        'search_columns' => array( 'nickname' ),
-        'orderby' => 'nickname',
-        'order' => 'ASC',
-        'meta_query' => array(
-            array(
-                'key'     => 'nickname',
-                'value'   => $pattern,
-                'compare' => 'LIKE',
-            ),
-        ), 'count_total' => true,
+        'search'         => '*' . $pattern . '*',
+        'search_columns' => array('display_name'),
+        'orderby'        => 'display_name',
+        'order'          => 'ASC',
+        'count_total' => true,
     );
+
     $userQuery = new WP_User_Query($args);
 
     $result = array(
-        //'total_count' => ?,
         'incomplete_results' => false,
-            'items' => array(
-            //array(
-            //    'id' => 1,
-            //    'text' => 'Samuele',
-            //),
-        )
+        'items' => array()
     );
 
-    //$result['total_count'] = count($users);
     $result['items'] = $userQuery->results;
 
     wp_send_json($result);
@@ -131,8 +155,12 @@ add_action('wp_ajax_nopriv_owl-username-autocomplete', 'owl_usernameAutocomplete
 
 /**
  * Provides an AJAX endpoint for retrieving WordPress's authentication cookie.
+ *
+ * @param bool $return
+ *     This function can also called internally. In this case, set this param
+ *     to `true`.
  */
-function owl_getAuthCookie()
+function owl_getAuthCookie($return = false)
 {
     $cookies = $_COOKIE;
     $result = null;
@@ -142,6 +170,10 @@ function owl_getAuthCookie()
             $result = $value;
             break;
         }
+    }
+
+    if ($return) {
+        return $result;
     }
 
     wp_send_json($result);

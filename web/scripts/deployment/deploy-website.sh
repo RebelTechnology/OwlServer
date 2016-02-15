@@ -24,7 +24,7 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 # Work out environment
 HOSTNAME=`hostname`
-if [ "$HOSTNAME" = "bella" ]
+if [ "$HOSTNAME" = "ulrike" -o "$HOSTNAME" = "bella" ]
 then
     TARGET_ENV='staging'
     GIT_BRANCH='dev'
@@ -59,6 +59,8 @@ rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
 mv $DIR/$CLONE_DIR/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
 cp -a $DIR/$CLONE_DIR/web/wordpress/robots.txt $DIR/../httpdocs/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../httpdocs/wp-content/plugins/
+cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-patch-uploader.php $DIR/../httpdocs/wp-content/plugins/
+cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/README.owl.md $DIR/../httpdocs/wp-content/plugins/
 
 # Update Mediawiki
 echo "Updating Mediawiki files..."
@@ -68,6 +70,7 @@ rsync --quiet -avz $DIR/$CLONE_DIR/web/mediawiki/skins/HoxtonOWL2014 $DIR/../htt
 echo "Updating patch builder script..."
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/patch-builder.php $DIR/../patch-builder/
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/build-all.php $DIR/../patch-builder/
+cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/common.php $DIR/../patch-builder/
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/composer.json $DIR/../patch-builder/
 cp -a $DIR/$CLONE_DIR/web/scripts/patch-builder/composer.lock $DIR/../patch-builder/
 cd $DIR/../patch-builder/
@@ -91,6 +94,10 @@ chown -R www-data $DIR/../httpdocs/mediawiki/images
 chown -R www-data:www-data $DIR/../patch-builder
 chmod -R a+r $DIR/../patch-builder
 chmod a+x $DIR/../patch-builder
+if [ "$TARGET_ENV" = "production" ]
+then
+    chmod -R o+w $DIR/../httpdocs/piwik/tmp
+fi
 
 chown -R root:root $DIR/../deployment
 chmod 755 $DIR/../deployment
@@ -102,9 +109,3 @@ chmod 664 $DIR/../logs/*
 # Delete temp repo clone
 echo "Deleting temp repo clone..."
 rm -rf $DIR/$CLONE_DIR
-
-echo "Done."
-echo
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo " REMEMBER TO CLEAR APC CACHE @ $SITE_URL/apc.php !!!                    "
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"

@@ -13,24 +13,28 @@ $resUri = get_template_directory_uri() . '/page-patch-library/';
 // <link rel="stylesheet"> tags to be placed in <head>
 wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), 5);
 wp_enqueue_style('owl-patches-page_fonts_googleapis', 'http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700');
-wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.min.css');
-wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.structure.min.css');
-wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.theme.min.css');
+wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
+wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
+wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
+//wp_enqueue_style('select2', get_template_directory_uri() . '/js/select2/css/select2.min.css');
 
 // <script> tags to be placed in <head>
 wp_enqueue_script('owl-patches-page_knockout',      $resUri . 'js3rdparty/knockout-2.0.0.js');
 wp_enqueue_script('jquery',                         $resUri . 'js3rdparty/jquery-1.7.1.min.js');
-wp_enqueue_script('jquery-ui',                      get_template_directory_uri() . '/js/jquery-ui-1.11.2.custom/jquery-ui.min.js', array('jquery'));
+wp_enqueue_script('jquery-ui',                      get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_jquery_knob',   $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
 
 wp_enqueue_script('owl-patches-page_prettify',      'https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js');
 wp_enqueue_script('owl-patches-page_run_prettify',  'https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js');
 
+//wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
+
 // <script> tags to be placed just before </body>
 wp_enqueue_script('owl-api-client',                 get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
 wp_enqueue_script('owl-patch',                      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
 wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'jquery-ui', 'owl-patch', 'owl-api-client'), false, true);
+wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fileutils-latest.min.js', ['owl-patches-page_patch_manager'], false, true);
 
 ?>
 
@@ -39,10 +43,6 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
 
 <div id="secondary-nav-bar">
     <div id="secondary-nav-bar-content">
-        <div class="secondary-nav-item" id="sort-patches-by-Name" data-bind="css: { active: (search() === 'all' && patchSortOrder() === 'name') }, click: selectAllPatches">
-            <img src="<?= $resUri ?>images/browse-all-icon.png" width="40" height="40" alt="icon">
-            <p>Browse all</p>
-        </div>
         <div class="secondary-nav-item" id="sort-patches-by-CreationTimeUtc" data-bind="css: { active: (search() === 'all' && patchSortOrder() === 'creationTimeUtc') }, click: selectAllPatches">
           <img src="<?= $resUri ?>images/latest-icon.png" width="40" height="40" alt="icon">
           <p>Latest</p>
@@ -58,6 +58,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
         <div class="secondary-nav-item" data-bind="css: { active: search() === 'author' }, click: selectAllAuthors">
             <img src="<?= $resUri ?>images/authors-icon.png" width="40" height="40" alt="icon">
             <p>Authors</p>
+        </div>
+        <div class="secondary-nav-item" id="sort-patches-by-Name" data-bind="css: { active: (search() === 'all' && patchSortOrder() === 'name') }, click: selectAllPatches">
+            <img src="<?= $resUri ?>images/browse-all-icon.png" width="40" height="40" alt="icon">
+            <p>All</p>
         </div>
         <?php if (is_user_logged_in()): ?>
         <div class="secondary-nav-item" data-bind="css: { active: search() === 'myPatches' }, click: selectMyPatches">
@@ -96,7 +100,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         <?php endif; ?>
                     </tr>
                     <tr>
-                        <td style="padding-top: 20px;">
+                        <td class="patch-author">
                             <span class="author-name" data-bind="text: author.name, click: selectOnlyAuthor"></span>
                         </td>
                         <td>&nbsp;</td>
@@ -113,6 +117,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                 <p data-bind="text: instructions"></p>
             </div>
             <!-- /ko -->
+            <div id="selected-patch-id" data-bind="visible: false, text: _id"></div>
             <!-- <div class="video-wrapper1">
                 <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe>
             </div> -->
@@ -131,21 +136,41 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <!-- ko if: bytes -->
                     <tr>
                         <td><span class="parameter-label">Memory</span></td>
-                        <td><p data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></p></td>
+                        <td>
+                            <p data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></p>
+                        </td>
                     </tr>
                     <!-- /ko -->
                     <!-- ko if: sysExAvailable -->
                     <tr>
                         <td><span class="parameter-label">SysEx</span></td>
-                        <td><p><a id="sysExDownloadLink" href="#">Download</a></p></td>
+                        <td>
+                            <p>
+                                <a class="sysExDownloadLink" href="#">Download</a>
+                                <!-- ko if: sysExLastUpdated -->
+                                (built on <span data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></span>)
+                                <!-- /ko -->
+                            </p>
+                        </td>
                     </tr>
-                        <!-- ko if: sysExLastUpdated -->
-                        <tr>
-                            <td><span class="parameter-label">Last updated on</span></td>
-                            <td><p data-bind="text: new Date(selectedPatch().sysExLastUpdated).toLocaleString()"></p></td>
-                        </tr>
-                        <!-- /ko -->
                     <!-- /ko -->
+                    <!-- ko if: jsAvailable -->
+                    <tr>
+                        <td><span class="parameter-label">JS</span></td>
+                        <td>
+                            <p>
+                                <a class="jsDownloadLink" href="#">Download</a>
+                                <!-- ko if: jsLastUpdated -->
+                                (built on <span data-bind="text: new Date(selectedPatch().jsLastUpdated).toLocaleString()"></span>)
+                                <!-- /ko -->
+                            </p>
+                        </td>
+                    </tr>
+                    <!-- /ko -->
+                    <tr class="compile-patch-container">
+                        <td><span class="parameter-label">Build</span></td>
+                        <td><p><a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></p></td>
+                    </tr>
                 </table>
             </div>
             <!-- ko foreach: tags -->
@@ -156,8 +181,10 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
 
         <!-- #two-thirds -->
         <div id="two-thirds" class="patch-library">
-            <div data-bind="foreach: soundcloud">
-                <iframe width="100%" height="250" scrolling="no" frameborder="no" data-bind="attr: { src: $data }"></iframe>
+            <div data-bind="visible: location.hostname != 'hoxtonowl.localhost' && selectedPatch().soundcloud.length > 0">
+                <div class="patch-soundcloud" data-bind="foreach: soundcloud">
+                    <iframe width="100%" height="250" scrolling="no" frameborder="no" data-bind="attr: { src: $data }"></iframe>
+                </div>
             </div>
             <!-- <div class="video-wrapper2"> -->
             <!--     <iframe src="//www.youtube.com/embed/HAfODHJFkjE" frameborder="0" allowfullscreen></iframe> -->
@@ -170,37 +197,79 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                 <span class="parameter-label">CPU</span>
                 <span class="parameter-value" data-bind="text: cycles + '%'"></span>
                 <!-- /ko -->
-                <!-- ko if: cycles -->
+                <!-- ko if: bytes -->
                 <span class="parameter-label">Memory</span>
                 <span class="parameter-value" data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></span>
                 <!-- /ko -->
-                <!-- <span class="parameter-label">Version</span> -->
-                <!-- <span class="parameter-value">v.1.1.0 - 21/04/2014</span> -->
-                <!-- <span class="parameter-label">Used in</span> -->
-                <!-- <span class="parameter-value">123 rigs</span> -->
+                <!-- ko if: sysExAvailable -->
+                <span class="parameter-value"><a class="sysExDownloadLink" href="#">Download SysEx</a></span>
+                <!-- /ko -->
+                <!-- ko if: jsAvailable -->
+                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span>
+                <!-- /ko -->
+                <span class="parameter-value compile-patch-container">Build: <a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></span>
             </div>
             <div class="white-box2" data-bind="with: selectedPatch">
-                <h2 class="bolder">Parameters</h2>
-                <div class="flexbox flex-center">
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                <div id="patch-tab-header-container">
+                    <h2 class="bolder patch-tab-header selected" id="patch-tab-header-info"><a href="#">Info</a></h2>
+                    <h2 class="bolder patch-tab-header" id="patch-tab-header-test"><a href="#">Test</a></h2>
+                </div>
+                <div class="flexbox flex-center patch-tab-container">
+                    <div class="knob-container" id="patch-parameter-a">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.a"></p>
                     </div>
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-b">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.b"></p>
                     </div>
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-c">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.c"></p>
                     </div>
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-d">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.d"></p>
                     </div>
-                    <div class="knob-container">
-                        <input class="knob" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" data-readOnly="true" value="35">
+                    <div class="knob-container" id="patch-parameter-e">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.e"></p>
+                    </div>
+                </div>
+                <div class="flexbox flex-center patch-tab-container" id="patch-tab-info">
+
+                </div>
+                <div class="flexbox flex-center patch-tab-container" id="patch-tab-test">
+
+                    <div id="patch-tab-test-err-1" class="patch-tab-test-err">
+                        <strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.<br><br>
+                        Try and upgrade your browser. Here's a <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a> of browsers that do support the Web Audio API.
+                    </div>
+                    <div id="patch-tab-test-err-2" class="patch-tab-test-err">
+                        <strong>Error:</strong> JavaScript build not available for this patch.
+                        <span id="patch-tab-test-err-3" class="patch-tab-test-err"><a class="compileLink js" href="#">Build this patch now</a></span>
+                    </div>
+                    <div id="patch-tab-test-err-4" class="patch-tab-test-err">
+                        Loading patch...
+                    </div>
+
+                    <div id="patch-test-inner-container">
+
+                        <label for="patch-test-source">Source:</label>
+                        <select id="patch-test-source">
+                            <option value="_clear" selected>No Input</option>
+                            <option value="_mic">Microphone</option>
+                            <option disabled>──────────</option>
+                            <option value="gtr-jazz">Jazz Guitar</option>
+                            <option value="rock-beat">Rock Beat</option>
+                            <option value="synth">Synth</option>
+                            <option value="white-noise">White Noise</option>
+                        </select>
+                        <input type="button" value="Start" id="patch-test-start-stop" />
+
+                        <audio id="patch-test-audio" controls loop preload="auto">
+                            Your browser does not support the <code>&lt;audio&gt;</code> element.
+                        </audio>
                     </div>
                 </div>
             </div>
@@ -221,6 +290,19 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
         <!-- /#two-thirds -->
         <!-- /ko -->
 
+        <div id="patch-counter" data-bind="visible: search() !== 'patch'">
+            <div data-bind="visible: search() !== 'myPatches'">
+                <span data-bind="text: filteredPatches().length">0</span> public
+                patch<span data-bind="text: filteredPatches().length == 1 ? '' : 'es'"></span> by
+                <span data-bind="text: filteredPatchAuthorNo()">0</span>
+                author<span data-bind="text: filteredPatchAuthorNo() == 1 ? '' : 's'"></span>.
+            </div>
+            <div data-bind="visible: search() === 'myPatches'">
+                <span data-bind="text: filteredPatches().length">0</span>
+                patch<span data-bind="text: filteredPatches().length == 1 ? '' : 'es'"></span>
+            </div>
+        </div>
+
         <!-- ko foreach: filteredPatches -->
         <!-- div.patch-tile -->
         <div class="patch-tile">
@@ -240,7 +322,7 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                         <!-- /ko -->
                     </tr>
                     <tr>
-                        <td style="padding-top: 20px;">
+                        <td class="patch-author">
                             <span class="author-name" data-bind="visible: search() !== 'myPatches', text: author.name, click: selectOnlyAuthor"></span>
                         </td>
                     </tr>
@@ -263,9 +345,6 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
                     <tr>
                         <td><span class="patch-title">Add a new patch</span></td>
                     </tr>
-                    <tr>
-                        <td style="padding-top: 20px;"></td>
-                    </tr>
                 </tbody>
             </table>
             <div class="patch-baseline"></div>
@@ -275,11 +354,38 @@ wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.j
     </div> <!-- /div.content-container -->
 </div> <!-- /div.wrapper.flexbox -->
 
+<div id="compile-dialog" title="Compile patch">
+    <div id="compile-tabs">
+        <ul>
+            <li><a href="#tabs-msg">Result</a></li>
+            <li><a href="#tabs-stdout">stdout</a></li>
+            <li><a href="#tabs-stderr">stderr</a></li>
+        </ul>
+        <div id="tabs-msg">
+            <textarea readonly></textarea>
+        </div>
+        <div id="tabs-stdout">
+            <textarea readonly></textarea>
+        </div>
+        <div id="tabs-stderr">
+            <textarea readonly></textarea>
+        </div>
+    </div>
+    <div id="compile-dialog-button-container">
+        <button id="compile-dialog-btn-done">Done</button>
+    </div>
+</div>
+
 <?php
 global $current_user;
 
-if (is_user_logged_in()):
-?><div id="wordpress-username" style="display: none;"><?= $current_user->user_login; ?></div>
+if (is_user_logged_in()): ?>
+<div style="display: none;">
+    <div id="wordpress-username"><?= $current_user->user_login; ?></div>
+    <div id="wordpress-user-id"><?= $current_user->ID; ?></div>
+    <div id="wordpress-display-name"><?= $current_user->display_name ?></div>
+    <div id="wordpress-user-is-admin"><?= current_user_can('administrator') ? 1 : 0 ?></div>
+</div>
 <?php endif; ?>
 
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/footer','parts/shared/html-footer') ); ?>

@@ -23,7 +23,7 @@ HoxtonOwl.patchForm = {
      * @param {string} seoName
      *     The SEO name of the patch to load.
      */
-    load: function(seoName) {
+    load: function (seoName) {
 
         var apiClient = new HoxtonOwl.ApiClient();
         apiClient.getSinglePatchBySeoName(seoName, HoxtonOwl.patchForm.populate);
@@ -36,7 +36,9 @@ HoxtonOwl.patchForm = {
      * @param {HoxtonOwl.Patch} patch
      *     An object that represents a patch.
      */
-    populate: function(patch) {
+    populate: function (patch) {
+
+        var form = HoxtonOwl.patchForm;
 
         $('#frm-patch-id').val(patch._id);
         if (patch.name) $('#frm-patch-name').val(patch.name);
@@ -44,8 +46,8 @@ HoxtonOwl.patchForm = {
         // Author
         var wordPressIdRadio = $('#frm-patch-author-type-wordpress');
         var patchAuthorNameRadio = $('#frm-patch-author-type-other');
-        if (wordPressIdRadio.length && patchAuthorNameRadio.length) {
-            if ('wordpress' === patch.author.type && !!patch.author.wordpressId) {
+        if (wordPressIdRadio.length && patchAuthorNameRadio.length) { // true only for admins
+            if (patch.author.wordpressId) {
                 $('#frm-patch-author-wordpressId').
                     append('<option value="' + patch.author.wordpressId + '">' + patch.author.name + '</option>').
                     trigger('change');
@@ -55,6 +57,12 @@ HoxtonOwl.patchForm = {
                 patchAuthorNameRadio.prop('checked', true);
             }
         }
+
+        // Published field
+        if ('published' in patch) {
+            $('#frm-patch-published').val(patch.published).trigger('change');
+        }
+        form.updateMandatoryFields();
 
         // Description & instructions
         if (patch.description) $('#frm-patch-description').val(patch.description);
@@ -78,19 +86,25 @@ HoxtonOwl.patchForm = {
         var tagData = [];
         for (var i = 0, max = patch.tags.length; i < max; i++) {
 
-            $('#frm-patch-tags option').filter(function() {
+            $('#frm-patch-tags option').filter(function () {
                 return $(this).text() === patch.tags[i];
             }).prop('selected', true);
 
-            tagData.push([{ id: patch.tags[i], text: patch.tags[i] }]);
+            tagData.push({ id: patch.tags[i], text: patch.tags[i] });
         }
-        //HoxtonOwl.patchForm.tagMulti.trigger("chosen:updated");
-        HoxtonOwl.patchForm.tagMulti.select2({ data: tagData });
+        var tagMultiOptions = {
+            placeholder: 'Pick one or more tags...',
+            data: tagData
+        };
+        if ($('#wordpress-user-is-admin').text() == 1) {
+            tagMultiOptions.tags = true;
+        }
+        form.tagMulti.select2(tagMultiOptions);
 
         // Soundcloud
         if (patch.soundcloud && patch.soundcloud.length) {
             if (patch.soundcloud.length !== 1) {
-                HoxtonOwl.patchForm.sampleCtrl.addNForms(patch.soundcloud.length - 1);
+                form.sampleCtrl.addNForms(patch.soundcloud.length - 1);
             }
             for (var i = 0, max = patch.soundcloud.length; i < max; i++) {
                 $('#frm-patch-samples_' + i).val(patch.soundcloud[i]);
@@ -100,16 +114,11 @@ HoxtonOwl.patchForm = {
         // GitHub
         if (patch.github && patch.github.length) {
             if (patch.github.length !== 1) {
-                HoxtonOwl.patchForm.gitHubCtrl.addNForms(patch.github.length - 1);
+                form.gitHubCtrl.addNForms(patch.github.length - 1);
             }
             for (var i = 0, max = patch.github.length; i < max; i++) {
                 $('#frm-patch-github_' + i).val(patch.github[i]);
             }
-        }
-
-        // Published field
-        if ('published' in patch) {
-            $('#frm-patch-published').val(patch.published).trigger('change');
         }
 
         // Creation time
@@ -125,17 +134,17 @@ HoxtonOwl.patchForm = {
      * @return {HoxtonOwl.Patch}
      *     An object that represents a patch.
      */
-    make: function() {
+    make: function () {
 
         $('#patch-add-edit-form input').
           add('#patch-add-edit-form textarea').
-          add('#patch-add-edit-form select').focus(function(e) {
+          add('#patch-add-edit-form select').focus(function (e) {
             var $target = $(e.target);
             $target.removeClass('invalid');
         });
-        $('#patch-add-edit-form input').next('div.error-message').hide();
-        $('#patch-add-edit-form textarea').next('div.error-message').hide();
-        $('#patch-add-edit-form select').next('div.error-message').hide();
+        $('#patch-add-edit-form input').siblings('div.error-message').hide();
+        $('#patch-add-edit-form textarea').siblings('div.error-message').hide();
+        $('#patch-add-edit-form select').siblings('div.error-message').hide();
 
         $('[id^=frm-patch-samples_]').
             removeClass('invalid').
@@ -146,68 +155,74 @@ HoxtonOwl.patchForm = {
             nextAll('div.error-message').
             hide();
 
-        var name = $.trim($('#frm-patch-name').val());var description = $.trim($('#frm-patch-description').val());
+        var name = $.trim($('#frm-patch-name').val());
+        var description = $.trim($('#frm-patch-description').val());
         var instructions = $.trim($('#frm-patch-instructions').val());
 
         if ('' === name) {
             $('#frm-patch-name').
                 addClass('invalid').
-                next('div.error-message').
+                siblings('div.error-message').
                 text('This field is required.').
                 show();
             location = '#form-top';
             return;
         }
 
-        if ($('#frm-patch-author-type-wordpress').length) {
+        if ($('#frm-patch-author-type-wordpress').length) { // true only for admins
 
             var author = {};
             if ($('#frm-patch-author-type-wordpress').prop('checked')) {
-                author.type = 'wordpress';
+
+                if (!$('#frm-patch-author-wordpressId').val()) {
+                    $('#frm-patch-author-wordpressId').
+                        addClass('invalid').
+                        siblings('div.error-message').
+                        text('Invalid author.').
+                        show();
+                    location = '#form-top';
+                    return;
+                }
+
                 author.wordpressId = $('#frm-patch-author-wordpressId').val();
-                author.name = $.trim($('#frm-patch-author-wordpressId option[value="' + author.wordpressId + '"]').text());
                 $('#frm-patch-author-name').val('');
+
             } else if ($('#frm-patch-author-type-other').prop('checked')) {
+
                 author.name = $.trim($('#frm-patch-author-name').val());
+                if ('' === author.name) {
+                    $('#frm-patch-author-name').
+                        addClass('invalid').
+                        siblings('div.error-message').
+                        text('Invalid author.').
+                        show();
+                    location = '#form-top';
+                    return;
+                }
+
                 $('#frm-patch-author-wordpressId').empty().val(null).trigger('change');
-            }
 
-            if (!('name' in author) || '' === author.name) {
-                $('#frm-patch-author-name').
-                    addClass('invalid').
-                    next('div.error-message').
-                    text('Invalid author.').
-                    show();
-                location = '#form-top';
-                return;
-            }
-
-            if (('type' in author) && (author.type !== 'wordpress' || !('wordpressId' in author) || !author.wordpressId)) {
-                $('#frm-patch-author-name').
-                    addClass('invalid').
-                    next('div.error-message').
-                    text('Invalid author.').
-                    show();
-                location = '#form-top';
-                return;
             }
         }
+
+        // published
+        var published = $('#frm-patch-published').val() == 0 ? '' : true;
 
         if ('' === description) {
             $('#frm-patch-description').
                 addClass('invalid').
-                next('div.error-message').
+                siblings('div.error-message').
                 text('This field is required.').
                 show();
             location = '#form-top';
             return;
         }
 
-        if ('' === instructions) {
+        if (published && '' === instructions) {
             $('#frm-patch-instructions').
                 addClass('invalid').
-                next('div.error-message').
-                text('This field is required.').
+                siblings('div.error-message').
+                text('This field is required for published patches.').
                 show();
             location = '#form-top';
             return;
@@ -218,7 +233,8 @@ HoxtonOwl.patchForm = {
             description: description,
             instructions: instructions,
             inputs: parseInt($('#frm-patch-inputs').val()),
-            outputs: parseInt($('#frm-patch-outputs').val())
+            outputs: parseInt($('#frm-patch-outputs').val()),
+            published: published ? 1 : 0
         };
 
         if (author) {
@@ -226,11 +242,29 @@ HoxtonOwl.patchForm = {
         }
 
         var percent = $.trim($('#frm-patch-cycles').val());
+        if (published && '' === percent) {
+            $('#frm-patch-cycles').
+                addClass('invalid').
+                siblings('div.error-message').
+                text('This field is required for published patches.').
+                show();
+            location = '#form-top';
+            return;
+        }
         if ('' !== percent) {
             patch.cycles = HoxtonOwl.Patch.prototype.percentToCycles(percent); // FIXME - what precision is required here?
         }
 
         var bytes = $('#frm-patch-bytes').val();
+        if (published && '' === bytes) {
+            $('#frm-patch-bytes').
+                addClass('invalid').
+                siblings('div.error-message').
+                text('This field is required for published patches.').
+                show();
+            location = '#form-top';
+            return;
+        }
         if ('' !== bytes) {
             patch.bytes = Math.round(bytes);
         }
@@ -265,7 +299,7 @@ HoxtonOwl.patchForm = {
 
         // soundcloud
         patch.soundcloud = [];
-        $('input[type=url][id^=frm-patch-samples_]').each(function(i, el) {
+        $('input[type=url][id^=frm-patch-samples_]').each(function (i, el) {
             var val = $.trim($(el).val());
             if ('' != val) {
                 patch.soundcloud.push(val);
@@ -274,15 +308,12 @@ HoxtonOwl.patchForm = {
 
         // github
         patch.github = [];
-        $('input[type=url][id^=frm-patch-github_]').each(function(i, el) {
+        $('input[type=url][id^=frm-patch-github_]').each(function (i, el) {
             var val = $.trim($(el).val());
             if ('' != val) {
                 patch.github.push(val);
             }
         });
-
-        // published
-        patch.published = $('#frm-patch-published').val();
 
         // creation time
         var $creationTimeUtc = $('#frm-patch-creationTimeUtc');
@@ -291,7 +322,7 @@ HoxtonOwl.patchForm = {
             if (isNaN(creationTimeUtc)) {
                 $creationTimeUtc.
                     addClass('invalid').
-                    next('div.error-message').
+                    siblings('div.error-message').
                     text('Invalid date/time.').
                     show();
                 location = '#form-top';
@@ -310,13 +341,27 @@ HoxtonOwl.patchForm = {
      * @return {HoxtonOwl.Patch}
      *     An object that represents a patch.
      */
-    save: function(patch) {
+    save: function (patch) {
 
         var apiClient = new HoxtonOwl.ApiClient;
-        apiClient.savePatch(patch, function(data) {
-            if (data._id) {
-                // patch saved
-                location = '/patch-library/patch/' + data.seoName;
+        apiClient.savePatch(patch, function (data) {
+            if (data._id) { // patch saved
+                // clean up locally hosted source files:
+                $.ajax({
+                    url: '/wp-admin/admin-ajax.php',
+                    dataType: 'json',
+                    data: {
+                        action: 'owl-patch-file-cleanup',
+                        patchId: data._id
+                    },
+                    cache: false,
+                    error: function (jqXHR, textStatus, errorThrown ) {},
+                    complete: function (jqXHR, textStatus) { // Executed regardless of whethere the clean-up succeeded or not
+                        // Final redirect
+                        location = '/patch-library/patch/' + data.seoName;
+                    },
+                    success: function (data, textStatus, jqXHR) {}
+                });
             } else if (data.responseJSON) {
 
                 var response = data.responseJSON;
@@ -331,13 +376,13 @@ HoxtonOwl.patchForm = {
                     } else if (response.field == 'author') {
                         $('#frm-patch-author-name').
                             addClass('invalid').
-                            next('div.error-message').
+                            siblings('div.error-message').
                             text('Invalid author.').
                             show();
                     } else {
                         $('#frm-patch-' + response.field).
                             addClass('invalid').
-                            next('div.error-message').
+                            siblings('div.error-message').
                             text(response.message).
                             show();
                     }
@@ -352,13 +397,52 @@ HoxtonOwl.patchForm = {
     },
 
     /**
+     * Updates mandatory fields.
+     *
+     * Some fields are mandatory based on whether the patch is published or not.
+     */
+    updateMandatoryFields: function () {
+
+        if (0 == $('#frm-patch-published.form-control').val()) { // not published
+
+            // Instructions
+            $('label[for=frm-patch-instructions]').removeClass('required');
+            $('#frm-patch-instructions').removeAttr('required');
+
+            // CPU
+            $('label[for=frm-patch-cycles]').removeClass('required');
+            $('#frm-patch-cycles').removeAttr('required');
+
+            // Memory
+            $('label[for=frm-patch-bytes]').removeClass('required');
+            $('#frm-patch-bytes').removeAttr('required');
+
+        } else { // published
+
+            // Instructions
+            $('label[for=frm-patch-instructions]').addClass('required');
+            $('#frm-patch-instructions').attr('required', '');
+
+            // CPU
+            $('label[for=frm-patch-cycles]').addClass('required');
+            $('#frm-patch-cycles').attr('required', '');
+
+            // Memory
+            $('label[for=frm-patch-bytes]').addClass('required');
+            $('#frm-patch-bytes').attr('required', '');
+
+        }
+    },
+
+    /**
      * Initializes the form.
      */
-    init: function() {
+    init: function () {
 
-        jQuery(function() {
+        jQuery(function () {
 
             var $ = jQuery;
+            var form = HoxtonOwl.patchForm;
 
             // Selects
             $('#frm-patch-inputs').select2({
@@ -370,6 +454,11 @@ HoxtonOwl.patchForm = {
             $('#frm-patch-published').select2({
                 minimumResultsForSearch: Infinity
             });
+
+            $('#frm-patch-published').change(function () {
+                form.updateMandatoryFields();
+            });
+            form.updateMandatoryFields();
 
             var wordPressIdRadio = $('#frm-patch-author-wordpressId');
             if (wordPressIdRadio.length) {
@@ -419,13 +508,10 @@ HoxtonOwl.patchForm = {
                 });
             }
 
-            // tag multi select
-            //HoxtonOwl.patchForm.tagMulti = $(".chosen-select").chosen({
-            //    no_results_text: "Oops, nothing found!"
-            //});
-            HoxtonOwl.patchForm.tagMulti = $('#frm-patch-tags');
-            HoxtonOwl.patchForm.tagMulti.select2({
-                placeholder: 'Pick one or more tags...'
+            form.tagMulti = $('#frm-patch-tags');
+            form.tagMulti.select2({
+                placeholder: 'Pick one or more tags...',
+                tags: true
             });
 
             var options = {
@@ -439,38 +525,130 @@ HoxtonOwl.patchForm = {
                 minFormsCount: 1,
                 iniFormsCount: 1
             };
-            HoxtonOwl.patchForm.sampleCtrl = $('#frm-patch-samples').sheepIt(options);
-            HoxtonOwl.patchForm.gitHubCtrl = $('#frm-patch-github').sheepIt(options);
+            form.sampleCtrl = $('#frm-patch-samples').sheepIt(options);
+            form.gitHubCtrl = $('#frm-patch-github').sheepIt(options);
 
             var client = new HoxtonOwl.ApiClient();
-            client.getAllTags(function(tags) {
+            client.getAllTags(function (tags) {
                 for (var i = 0, max = tags.length; i < max; i++) {
                     $('#frm-patch-tags').append('<option>' + tags[i] + '</option>');
                 }
-                //HoxtonOwl.patchForm.tagMulti.trigger("chosen:updated");
             });
 
-            $('#frm-patch-btn-submit').click(function(e) {
-                var patch = HoxtonOwl.patchForm.make();
+            $('#frm-patch-btn-submit').click(function (e) {
+                var patch = form.make();
                 if (patch) {
-                    HoxtonOwl.patchForm.save(patch);
+                    form.save(patch);
                 }
             });
 
-            $('#frm-patch-btn-cancel').click(function(e) {
+            $('#frm-patch-btn-cancel').click(function (e) {
                 location = '/patch-library/';
             });
 
             // Trigger the "formInited" event
             $(document).trigger('formInited');
 
+            // Source file upload
+            var fileUpload = $('#frm-patch-file');
+
+            HoxtonOwl.patchForm.fileUploadToken = '';
+            var bag = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            for (var i = 0; i < 7; i++) {
+                HoxtonOwl.patchForm.fileUploadToken += bag.charAt(Math.floor(Math.random() * bag.length));
+            }
+
+            fileUpload.change(function (e) {
+
+                fileUpload.prop('disabled', true);
+                $('#frm-patch-file').closest('.form-control').next('.error-message').html('').hide();
+
+                var data = new FormData();
+                var files = fileUpload[0].files;
+                for (var i = 0; i < files.length; i++) {
+                    data.append('files[]', files[i]);
+                }
+
+                var patchId = $('#frm-patch-id').val();
+                if (patchId) {
+                    data.append('patchId', patchId);
+                } else {
+                    data.append('fileUploadToken', HoxtonOwl.patchForm.fileUploadToken);
+                }
+
+                data.append('action', 'owl-patch-file-upload'); // WordPress action
+
+                $.ajax({
+                    url: '/wp-admin/admin-ajax.php',
+                    type: 'POST',
+                    contentType: false,
+                    data: data,
+                    processData: false,
+                    cache: false
+                }).done(HoxtonOwl.patchForm.handleUploads);
+
+            });
         });
+    },
+
+    handleUploads: function (data) {
+
+        var errorDiv = $('#frm-patch-file').closest('.form-control').next('.error-message');
+        var fileUpload = $('#frm-patch-file');
+
+        fileUpload.prop('disabled', false);
+
+        // reset file input (see http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery#13351234)
+        fileUpload.wrap('<form>').closest('form').get(0).reset();
+        fileUpload.unwrap();
+
+        if (data.err) {
+            errorDiv.html('Unexpected error during file upload.').show();
+        } else {
+
+            var files = [];
+            var errorMsg = '';
+            for (var i = 0, max = data.files.length; i < max; i++) {
+                if (data.files[i].err) {
+                    var errorMsg = errorDiv.html();
+                    errorDiv.html(errorMsg + data.files[i].name + ': ' + data.files[i].msg + '<br />');
+                    errorDiv.show();
+                } else {
+                    //console.log(location.protocol + '//' + location.host + '/wp-content/uploads/patch-files/' + data.files[i].path);
+                    files.push(location.protocol + '//' + location.host + '/wp-content/uploads/patch-files/' + data.files[i].path);
+                }
+            }
+
+            var fileFields = $('input[type=url][id^=frm-patch-github_]');
+            var currentFiles = Array.prototype.map.call(fileFields, function (e) { return e.value; });
+            currentFiles = currentFiles.filter(function (e) { return e != ''; });
+            files = files.filter(function (e) { return currentFiles.indexOf(e) == -1 });
+
+            // Populate any empty fields
+            var file;
+            for (var i = 0, max = fileFields.length; i < max; i++) {
+                if (!fileFields[i].value) {
+                    file = files.pop();
+                    if (file) {
+                        fileFields[i].value = file;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            // Create new fields for remaining elements
+            while (file = files.pop()) {
+                HoxtonOwl.patchForm.gitHubCtrl.addForm();
+                $('input[type=url][id^=frm-patch-github_]').last().val(file);
+            }
+        }
     }
 };
 
-(function() {
+(function () {
 
-    $(document).on('formInited', function(e) {
+    $(document).on('formInited', function (e) {
         var url = location.pathname;
         var matches = url.match(/^\/edit-patch\/.+\/?$/g);
         if (matches) {
@@ -480,6 +658,5 @@ HoxtonOwl.patchForm = {
     });
 
     HoxtonOwl.patchForm.init();
-
 
 })();

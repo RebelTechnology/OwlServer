@@ -89,10 +89,20 @@ HoxtonOwl.ApiClient.prototype.getAllPatches = function (callback) {
         }
 
         var authors = [];
+        var wpAuthors = {};
         for(var i = 0; i < authorData[0].result.length; i++) {
             authors.push(authorData[0].result[i].name);
+            if ('wordpressId' in authorData[0].result[i]) {
+                wpAuthors[authorData[0].result[i].wordpressId] = authorData[0].result[i].name;
+            }
         }
         authors.unshift("All");
+
+        for (var i = 0; i < patches.length; i++) {
+            if (patches[i].author && 'wordpressId' in patches[i].author) {
+                patches[i].author.name = wpAuthors[patches[i].author.wordpressId];
+            }
+        }
 
         var tags = tagData[0].result;
         tags.unshift("All");
@@ -223,21 +233,39 @@ HoxtonOwl.ApiClient.prototype.deletePatch = function (patchId, callback) {
 
         function (authCookieVal) {
 
-            var credentials = {
-                type: 'wordpress',
-                cookie: authCookieVal
+            var ajaxConfig = {
+                url: '/wp-admin/admin-ajax.php',
+                data: {
+                    action: 'owl-patch-file-delete',
+                    cache: false,
+                    patchId: patchId
+                }
             };
-
-            jQuery.when(client._query('/patch/' + patchId, 'DELETE', credentials)).then(
+            jQuery.when(jQuery.ajax(ajaxConfig)).then(
 
                 function (result) {
-                    callback(true);
+
+                    var credentials = {
+                        type: 'wordpress',
+                        cookie: authCookieVal
+                    };
+
+                    jQuery.when(client._query('/patch/' + patchId, 'DELETE', credentials)).then(
+
+                        function (result) {
+                            callback(true);
+                        },
+
+                        function (reason) {
+                            // deletion failed
+                            //console.log(reason);
+                            callback(false);
+                        }
+                    );
                 },
 
                 function (reason) {
-                    // deletion failed
-                    //console.log(reason);
-                    callback(false);
+                    calback(false);
                 }
             );
         },
@@ -248,4 +276,46 @@ HoxtonOwl.ApiClient.prototype.deletePatch = function (patchId, callback) {
             callback(false);
         }
     );
+};
+
+/**
+ * Compiles a patch and returns the output of make.
+ *
+ * @param {string} patchId
+ *     The patch ID.
+ * @param {string} format
+ *     The desired format (either `sysx` or `js`).
+ * @param {Function} callback
+ *     A callback that will be invoked once data is loaded. This function will
+ *     be passed the freshly loaded patch.
+ */
+HoxtonOwl.ApiClient.prototype.compilePatch = function (patchId, format, callback) {
+
+    var client = this;
+
+    jQuery.when(client._getWpAuthCookie()).then(
+
+        function (authCookieVal) {
+
+            var credentials = {
+                type: 'wordpress',
+                cookie: authCookieVal
+            };
+
+            var data = {
+                credentials: credentials,
+                format: format
+            };
+            jQuery.when(client._query('/builds/' + patchId, 'PUT', data)).always(function (result) {
+                callback(result);
+            });
+        },
+
+        function (reason) {
+            // Unable to retrieve authentication cookie
+            //console.log(reason);
+            callback(false);
+        }
+    );
+
 };

@@ -1,4 +1,3 @@
-
 /*
 Theme Name:     Hoxton Owl 2014
 Theme URI:      http://hoxtonowl.com/about/contact/
@@ -330,6 +329,16 @@ input[type=submit], input[type=reset], input[type=button], button {
 input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, button:hover {
     color: white;
     background: #433540;
+}
+
+input[type=submit]:disabled, input[type=reset]:disabled, input[type=button]:disabled, button:disabled {
+    color: white;
+    background: #E1B48E;
+}
+
+input[type=submit]:disabled:hover, input[type=reset]:disabled:hover, input[type=button]:disabled:hover, button::disabled:hover {
+    color: white;
+    background: #E1B48E;
 }
 
 #subscription-toggle { /* forum visual fix */
@@ -679,4 +688,135 @@ div.patch-visibility img {
 
 body.login {
   padding: 0 !important;
+}
+
+.ui-widget-overlay {
+  opacity: .70 !important; /* Make sure to change both of these, as IE only sees the second one */
+  filter: Alpha(Opacity=70) !important;
+}
+
+#compile-dialog {
+  display: none;
+  width: 60%;
+}
+
+#compile-tabs {
+  height: 200px;
+}
+
+#compile-dialog-button-container {
+  text-align: right;
+  margin-top: 10px;
+}
+
+#compile-tabs textarea {
+  height: 130px;
+  font-family: 'Droid Sans Mono', monospace;
+  font-size: 12px;
+  border: none;
+  width: 99%;
+  padding: 3px;
+}
+
+#tabs-result, #tabs-stdout, #tabs-stderr {
+  padding: 0;
+}
+
+a.github-link {
+    display: block;
+    position: absolute;
+    top: 40px;
+    right: 30px;
+    text-decoration: underline;
+    color: #ed7800;
+    background: white;
+}
+
+/* Fix for login, register and reset pass pages */
+
+body.login .wp-social-login-provider-list a,
+body.register-2 .wp-social-login-provider-list a {
+    display: block;
+    float: left;
+    margin-right: 10px;
+}
+
+body.login p.forgetmenot {
+    clear: both;
+    padding-top: 20px;
+}
+
+body.login div.sharedaddy,
+body.lostpassword div.sharedaddy,
+body.resetpass div.sharedaddy,
+body.register-2 div.sharedaddy {
+    display: none;
+}
+
+body.login ul.tml-action-links {
+    margin-top: 40px;
+}
+
+body.resetpass #pass1-text {
+    display: none;
+}
+
+body.login #user_login,
+body.register-2 #user_login,
+body.login #user_pass,
+body.register-2 #user_email {
+    display: block;
+}
+
+#theme-my-login p.message {
+    background-color: #fcf8e3;
+    padding: 10px;
+}
+
+#theme-my-login p.error {
+    background-color: #f2dede;
+    padding: 10px;
+}
+
+div.file-upload-container { /* simulate a button */
+    overflow: hidden;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background: #e19758 none repeat scroll 0 0;
+    border-color: -moz-use-text-color -moz-use-text-color #ed7800;
+    border-image: none;
+    border-style: none none solid;
+    border-width: medium medium 2px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline;
+    font-family: "montserrat",sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    height: 24px;
+    list-style-type: none;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    top: 3px;
+    padding: 3px 10px;
+}
+
+div.file-upload-container:hover {
+    color: white;
+    background: #433540;
+}
+
+div.file-upload-container input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
 }

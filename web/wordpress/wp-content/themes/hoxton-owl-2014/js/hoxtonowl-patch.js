@@ -71,9 +71,17 @@ HoxtonOwl.Patch = function(p) {
     this.sysExAvailable = false;
     if (p.sysExAvailable) {
         this.sysExAvailable = p.sysExAvailable;
+        if (p.sysExLastUpdated) {
+            this.sysExLastUpdated = p.sysExLastUpdated;
+        }
     }
-    if (p.sysExLastUpdated) {
-        this.sysExLastUpdated = p.sysExLastUpdated;
+
+    this.jsAvailable = false;
+    if (p.jsAvailable) {
+        this.jsAvailable = p.jsAvailable;
+        if (p.jsLastUpdated) {
+            this.jsLastUpdated = p.jsLastUpdated;;
+        }
     }
 };
 

@@ -4,32 +4,35 @@
 
 var express = require('express');
 var router  = express.Router();
-var url     = require('url'); // FIXME - is this really necessary?
+var url     = require('url');
 var Q       = require('q');
-Q.longStackSupport = true; // To be enabled only when debugging
 
-var patchModel = require('../models/patch');
+var patchModel      = require('../models/patch');
 var wordpressBridge = require('../lib/wordpress-bridge.js');
+var apiSettings     = require('../api-settings.js');
 
 var summaryFields = {
     _id: 1,
     name: 1,
     'author.name': 1,
     'author.url': 1,
+    'author.wordpressId': 1,
     tags: 1,
     seoName: 1,
     creationTimeUtc: 1,
     published: 1
 };
 
-var regExpEscape = function(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-};
-
 /**
  * Retrieves all patches.
  *
- * GET /patches?author.name=
+ * GET /patches
+ *
+ * Possible GET parameters:
+ * * author.name
+ * * author.wordpressId
+ *
+ * FIXME - Only WP admins/patch authors should be able to retrieve all/their private patches.
  */
 router.get('/', function(req, res) {
 
@@ -39,17 +42,27 @@ router.get('/', function(req, res) {
     var collection = req.db.get('patches');
     var nativeCol = collection.col;
 
-    var summaryFields2 = summaryFields;
-    summaryFields2.lowercase = { $toLower: '$name' };
+    var summaryFields2 = {};
+    for (field in summaryFields) { // shallow copy
+        summaryFields2[field] = summaryFields[field];
+    }
+    summaryFields2.lowercase = { $toLower: '$name' }; // Used below to sort patches by name
 
     var filter = { $match: {}};
-    if ('author.name' in query) {
+
+    if ('author.name' in query && query['author.name'] !== '') {
         filter.$match['author.name'] = query['author.name'];
     }
 
-    nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, function (err, result) {
+    if ('author.wordpressId' in query && query['author.wordpressId'] !== '') {
+        filter.$match['author.wordpressId'] = query['author.wordpressId'];
+    }
+
+    // filter.$match['published'] = true;
+
+    nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, { $project: summaryFields }, function (err, result) {
         if (err !== null) {
-            return res.status(500).json({error: err});
+            return res.status(500).json({ message: err, status: 500 });
         } else {
             var response = {};
             response.count = result.length;
@@ -88,141 +101,136 @@ router.post('/', function(req, res) {
         console.log('Checking credentials...');
 
         if (!credentials) {
-            throw { message: 'Access denied (1).', status: 401 };
+            var e = new Error('Access denied (1).');
+            e.status = 401;
+            throw e;
         }
 
         if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            throw { message: 'Access denied (2).', status: 401 };
+            var e = new Error('Access denied (2).');
+            e.status = 401;
+            throw e;
         }
 
         wpCookie = credentials.cookie;
 
         return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
 
-    }).then(
+    }).then(function() {
 
         /* ~~~~~~~~~~~~~~~~~~
          *  Get WP user info
          * ~~~~~~~~~~~~~~~~~~ */
 
-        function() {
+        console.log('Getting WP user info...');
+        username = wpCookie.split('|')[0];
+        return getUserInfo(username);
 
-            console.log('Getting WP user info...');
-            username = wpCookie.split('|')[0];
-            return getUserInfo(username);
-        }
-
-    ).then(
+    }).then(function (wpUserInfo) {
 
         /* ~~~~~~~~~~~~~~~~
          *  Validate patch
          * ~~~~~~~~~~~~~~~~ */
 
-        function (wpUserInfo) {
+        isAdmin = wpUserInfo.admin;
+        wpUserId = wpUserInfo.id;
+        console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
+        console.log('WP user ID is ' + wpUserId + '');
 
-            isAdmin = wpUserInfo.admin;
-            wpUserId = wpUserInfo.id;
-            console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
-            console.log('WP user ID is ' + wpUserId + '');
-
-            // If not an admin, we set the current WP user as patch author,
-            // disregarding any authorship info s/he sent. If an admin,
-            // we blindy trust the authorship information. Not ideal, but
-            // at least keeps code leaner.
-            if (!isAdmin) {
-                patchAuthor.type = 'wordpress';
-                patchAuthor.name = username;
-                patchAuthor.wordpressId = wpUserId;
+        // If not an admin, we set the current WP user as patch author,
+        // disregarding any authorship info s/he sent. If an admin,
+        // we blindy trust the authorship information. Not ideal, but
+        // at least keeps code leaner.
+        if (!isAdmin) {
+            // patchAuthor.type = 'wordpress';
+            // patchAuthor.name = username;
+            if (patchAuthor.name) {
+                delete patchAuthor.name;
             }
-
-            newPatch.seoName = patchModel.generateSeoName(newPatch);
-            return patchModel.validate(newPatch); // will throw an error if patch is not valid
-
+            patchAuthor.wordpressId = wpUserId;
         }
 
-    ).then(
+        newPatch.seoName = patchModel.generateSeoName(newPatch);
+        return patchModel.validate(newPatch); // will throw an error if patch is not valid
+
+    }).then(function() {
 
         /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          *  Make sure that no other patches are named the same
          *  (in a case insensitive fashion)
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-        function() {
+        var regExpEscape = function(str) {
+            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        };
 
-            var nameRegexp = new RegExp('^' + regExpEscape(newPatch.name) + '$', 'i');
-            var seoNameRegexp = new RegExp('^' + regExpEscape(newPatch.seoName) + '$', 'i');
-            return collection.findOne({ $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] });
+        var nameRegexp = new RegExp('^' + regExpEscape(newPatch.name) + '$', 'i');
+        var seoNameRegexp = new RegExp('^' + regExpEscape(newPatch.seoName) + '$', 'i');
+        return collection.findOne({ $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] });
 
-        }
-
-    ).then(
+    }).then(function(doc) {
 
         /* ~~~~~~~~~~~~
          *  Save patch
          * ~~~~~~~~~~~~ */
 
-        function(doc) {
-
-            if (null !== doc) {
-                throw {
-                    message: 'This name is already taken.',
-                    type: 'not_valid',
-                    field: 'name',
-                    error: {
-                        status: 400
-                    }
-                };
-            }
-
-            newPatch = patchModel.sanitize(newPatch);
-            if (!isAdmin) {
-                newPatch.author = patchAuthor;
-            }
-
-            delete newPatch._id;
-            console.log('Patch to be inserted: \n' + JSON.stringify(newPatch, null, 4));
-
-            var now = new Date().getTime();
-            if (!isAdmin) {
-                newPatch.creationTimeUtc = now; // set creation date
-            } else {
-                if (!newPatch.creationTimeUtc) {
-                    newPatch.creationTimeUtc = now; // set creation date
-                }
-            }
-
-            return collection.insert(newPatch);
-
+        if (null !== doc) {
+            var e = new Error('This name is already taken.');
+            e.type = 'not_valid';
+            e.field = 'name';
+            e.status = 400;
+            throw e;
         }
 
-    ).then(
+        newPatch = patchModel.sanitize(newPatch);
+        if (!isAdmin) {
+            newPatch.author = patchAuthor;
+        }
+
+        delete newPatch._id;
+        console.log('Patch to be inserted: \n' + JSON.stringify(newPatch, null, 4));
+
+        var now = new Date().getTime();
+        if (!isAdmin) {
+            newPatch.creationTimeUtc = now; // set creation date
+        } else {
+            if (!newPatch.creationTimeUtc) {
+                newPatch.creationTimeUtc = now; // set creation date
+            }
+        }
+
+        return collection.insert(newPatch);
+
+    }).then(function (patch) {
 
         /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          *  Check that the new patch was actually inserted
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-        function (patch) {
 
-            console.log('New patch saved, id = ' + patch._id);
-            return res.status(200).json({
-                message: 'New patch saved.',
-                _id: patch._id,
-                seoName: patch.seoName
-            });
+        console.log('New patch saved, id = ' + patch._id);
+        return {
+            message: 'New patch saved.',
+            _id: patch._id,
+            seoName: patch.seoName
+        };
 
+    }).catch(function (error) {
+
+        var status = error.status || 500;
+        return res.status(status).json({
+            message: error.toString(),
+            status: status
+        });
+
+    }).done(function (response) {
+
+        if ('ServerResponse' === response.constructor.name) {
+            return response;
         }
 
-    ).fail(
+        return res.status(200).json(response);
 
-        function (error) {
-            if (!error.error) {
-                error.error = { status: 500 };
-            }
-            if (!error.error.status) {
-                error.error.status = 500;
-            }
-            return res.status(error.error.status).json(error);
-        }
-    );
+    });
 });
 
 module.exports = router;
