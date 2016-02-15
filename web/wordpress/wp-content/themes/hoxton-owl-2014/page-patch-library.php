@@ -279,7 +279,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 </div>
                 <div class="flexbox flex-center patch-tab-container" id="patch-tab-midi" style="display:none;">
                   
-                    <p>test loading patch from url<input type="button" onclick="sendProgramFromUrl('/api/builds/547db9630548016374e64978?format=sysx&amp;download=1')"/></p>
+                    <p>test loading patch from url<input type="button" onclick="sendProgramFromUrl('/api/builds/" + selectedPatch()._id + "?format=sysx&amp;download=1')"/></p>
                   
                     <div id="hidden-midi-controls" style="display:none;">
                       <p>MIDI In
