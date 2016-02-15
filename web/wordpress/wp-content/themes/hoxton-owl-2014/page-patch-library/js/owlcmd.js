@@ -218,4 +218,46 @@ function hookupButtonEvents() {
     });
 }
 
+function sendProgramData(data){
+    var from = 0;
+    console.log("sending program data "+data.length+" bytes");  
+    for(var i=0; i<data.length; ++i){
+    if(data[i] == 0xf0){
+        from = i;
+    }else if(data[i] == 0xf7){
+        console.log("sending "+(i-from)+" bytes sysex");
+        msg = data.subarray(from, i+1);
+        logMidiData(msg);
+        if(midiOutput)
+        midiOutput.send(msg, 0);
+    }
+    }
+}
+
+function sendProgramRun(){
+    console.log("sending sysex run command");
+    var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, 
+           OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7 ];
+    logMidiData(msg);
+    if(midiOutput)
+      midiOutput.send(msg, 0);
+}
+
+function sendProgramFromUrl(url){
+    console.log("sending patch from url "+url);
+    var oReq = new XMLHttpRequest();
+    oReq.responseType = "arraybuffer";
+    oReq.onload = function (oEvent) {
+    console.log("here");    
+    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+    if(arrayBuffer) {
+        console.log("there");   
+        var data = new Uint8Array(arrayBuffer);
+        sendProgramData(data);
+        sendProgramRun();
+    }
+    }
+    oReq.open("GET", url, true);
+    oReq.send();
+}
 

@@ -321,6 +321,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                       <p>device id <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID); return false;"/></p>
                       <p>version <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION); return false;"/></p>
                       <p>settings <input type="button" onclick="sendRequest(127); return false;"/></p>
+                      <p>test loading patch from url<input type="button" onclick="sendProgramFromUrl('/HeavyOWL.syx')"/></p>
                     </form>
                   </div>
 
