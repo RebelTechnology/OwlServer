@@ -166,7 +166,7 @@ function onMidiInitialised(){
     if (inConnected && outConnected) {
         console.log('connected to an OWL');
         $('#ourstatus').text('connected to an OWL')
-
+        $('#load-owl-button').show();
     } else {
         console.log('failed to connect to an OWL');
         $('#ourstatus').text('failed to connect to an OWL')

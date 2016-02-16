@@ -288,7 +288,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                         <p id="patchstatus">...</p>
                     </div>
 
-                    <div style="width:100%; text-align:center;">
+                    <div id="load-owl-button" style="display:none; width:100%; text-align:center;">
                         <button style="display:block; padding:10px 10px 40px; margin:0 auto;" onclick="sendProgramFromUrl('/api/builds/' + selectedPatch()._id + '?format=sysx&amp;download=1')"/>Load patch onto OWL device<img style="vertical-align:middle;display:inline;margin:0;" src="<?php echo get_stylesheet_directory_uri(); ?>/page-patch-library/images/sendfile.png" /></button>
                     </div>       
 
