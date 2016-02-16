@@ -4,9 +4,6 @@
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
-// `make online` example:
-// make BUILD=/tmp/owl-patch-xxx ONLINE_INCLUDES='#include \"OverdrivePatch.hpp\"' ONLINE_REGISTER='REGISTER_PATCH(OverdrivePatch, \"Overdrive\", 2, 2);' online
-//
 // `make sysx` example:
 // make BUILD='/tmp/owl-patch-xxx' PATCHSOURCE='/tmp/owl-patch-xxx' PATCHFILE='OverdrivePatch.hpp' PATCHNAME='Overdrive' PATCHCLASS='OverdrivePatch' PATCHIN=2 PATCHOUT=2 sysex
 
@@ -35,13 +32,13 @@ function usage() {
     echo 'Options:' . PHP_EOL;
     echo '  -h, --help          Show this help and exit.' . PHP_EOL;
     echo '  --name=<patch-name> Finds patch by name.' . PHP_EOL;
-    echo '  --web               Builds a JavaScript file instead of a .syx file.' . PHP_EOL;
+    echo '  --sysex             Build only the sysex target.' . PHP_EOL;
+    echo '  --web               Build only the JavaScript target.' . PHP_EOL;
     echo PHP_EOL;
     echo 'Debug options:' . PHP_EOL;
     echo '  --only-show-files   Only show files that would be downloaded from GitHub.' . PHP_EOL;
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
-    echo '  --make-online       Use the old `make online` command instead of the newer `make sysx`.' . PHP_EOL;
     echo '  --keep-tmp-files    Do not delete temporary source and build directories once the build has finished.' . PHP_EOL;
 }
 
@@ -204,11 +201,11 @@ $longopts  = [
     'only-show-files',
     'only-dload-files',
     'show-build-cmd',
-    'make-online',
     'patch-files:',
     'keep-tmp-files',
     'name:',
     'web',
+    'sysex',
 ];
 $options = getopt($shortopts, $longopts);
 
@@ -234,9 +231,6 @@ if (isset($options['show-build-cmd']) && false === $options['show-build-cmd']) {
 }
 
 $buildCmd = 'make sysx';
-if (isset($options['make-online']) && false === $options['make-online']) {
-    $buildCmd = 'make online';
-}
 
 $keepTmpFiles = false;
 if (isset($options['keep-tmp-files']) && false === $options['keep-tmp-files']) {
@@ -256,10 +250,6 @@ if (isset($options['name'])) {
 
 $makeTarget = MAKE_TARGET_SYSX;
 if (isset($options['web']) && false === $options['web']) {
-    if (isset($options['make-online']) && false === $options['make-online']) {
-        outputError('The --make-online and --web options cannot be used together.');
-        exit(1);
-    }
     $makeTarget = MAKE_TARGET_MINIFY; // Same as MAKE_TARGET_WEB, but yields minified JS file
 }
 
@@ -374,32 +364,14 @@ if ($onlyDloadFiles) {
 /*
  * Work out crazy command needed to compile patch
  *
- * make BUILD=/tmp/foo ONLINE_INCLUDES='#include \"PhaserPatch.hpp\"' \
- * ONLINE_REGISTER='REGISTER_PATCH(PhaserPatch, \"Phaser\", 2, 2);' online
- *
- * See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-85998573
  */
 
-if ($buildCmd == 'make online') { // This is the old `make online` build process, legacy only!
-
-    $cmd  = 'make BUILD=' . escapeshellarg($patchBuildDir) . ' ';
-
-    // We hash-include only the first file
-    // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
-    $sourceFile = $sourceFiles[0];
-    $cmd .= 'ONLINE_INCLUDES=' . escapeshellarg('#include \\"' . $sourceFile . '\\"') . ' ';
-    // The filename must be ClassName.hpp
-    // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86669862
-    $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
-    $cmd .= 'ONLINE_REGISTER=' . escapeshellarg('REGISTER_PATCH(' . $className . ', \\"' . $patch['name'] . '\\", 2, 2);') . ' online';
-
-} elseif ($buildCmd = 'make sysx') {
+if($buildCmd = 'make sysx') {
 
     // First source file only
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
     $sourceFile = $sourceFiles[0];
-
-    $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
+    $className = substr($sourceFile, 0, strrpos($sourceFile, '.    '));
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
     $cmd  = 'make ';
@@ -425,7 +397,6 @@ if ($buildCmd == 'make online') { // This is the old `make online` build process
     case 'pd': // PureData
         $cmd .= 'HEAVY=' . escapeshellarg($className) . ' ';
         $cmd .= 'HEAVYTOKEN=' . escapeshellarg(HEAVY_TOKEN) . ' ';
-        $cmd .= 'heavy ';
         break;
 
     default: // C/C++ patch
@@ -433,6 +404,11 @@ if ($buildCmd == 'make online') { // This is the old `make online` build process
         $cmd .= 'PATCHCLASS=' . escapeshellarg($className) . ' ';
     }
     $cmd .= $makeTarget;
+
+    if (!(isset($options['sysex']) && false === $options['sysex'])
+         && MAKE_TARGET_WEB != $makeTarget) {
+      $cmd .= MAKE_TARGET_WEB; // build both web and sysex
+    }
 
 } else {
     echo 'Unexpected error!' . PHP_EOL;
@@ -451,9 +427,9 @@ if ($showBuildCmd) {
 // If we're compiling a PureData patch, we need to build the patch twice.
 // The first build will fail, and the second one will (hopefully) succeed.
 // See: https://github.com/pingdynasty/OwlServer/issues/80#issuecomment-128419020
-if ($patchSourceFileExt == 'pd') {
-    system('cd ' . escapeshellarg(OWL_SRC_DIR) . ' ; ' . $cmd); // we just ignore the result of this command, whatever it is
-}
+// if ($patchSourceFileExt == 'pd') {
+//     system('cd ' . escapeshellarg(OWL_SRC_DIR) . ' ; ' . $cmd); // we just ignore the result of this command, whatever it is
+// }
 
 $process = new Process($cmd, OWL_SRC_DIR, null, null, COMPILE_TIMEOUT);
 try {
@@ -485,11 +461,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
      * Move .syx file to download location
      */
 
-    if ($buildCmd == 'make sysx') {
-        $syxFilePath = $patchBuildDir . '/patch.syx';
-    } else {
-        $syxFilePath = $patchBuildDir . '/online.syx';
-    }
+    $syxFilePath = $patchBuildDir . '/patch.syx';
     if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
         outputError('Unable to access ' . $syxFilePath . '.');
         exit(1);
@@ -501,6 +473,14 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
         outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
         exit(1);
     }
+
+    $ext = MAKE_TARGET_WEB == $makeTarget ? '.js' : '.min.js';
+    $jsFilePath = $patchBuildDir . '/web/patch' . $ext;
+    if (file_exists($jsFilePath) && is_file($jsFilePath) && is_readable($jsFilePath)) {
+      $dstDir = __DIR__ . '/build-js/';
+      $r = rename($jsFilePath, $dstDir . $patch['seoName'] . $ext);
+    }
+
 
 } elseif (MAKE_TARGET_WEB == $makeTarget || MAKE_TARGET_MINIFY == $makeTarget) {
 
