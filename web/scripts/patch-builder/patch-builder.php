@@ -375,10 +375,8 @@ if($buildCmd = 'make sysx') {
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
     $cmd  = 'make ';
-    if (MAKE_TARGET_WEB === $makeTarget || MAKE_TARGET_MINIFY === $makeTarget) {
         // Specify where to find Emscripten's config file
         $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
-    }
     $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
     $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
     $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
@@ -403,7 +401,7 @@ if($buildCmd = 'make sysx') {
     $cmd .= $makeTarget;
 
     if (!(isset($options['sysex']) && false === $options['sysex'])
-         && MAKE_TARGET_SYSEX == $makeTarget) {
+         && MAKE_TARGET_SYSX == $makeTarget) {
       $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
     }
 
@@ -474,7 +472,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     $jsFilePath = $patchBuildDir . '/web/patch.min.js';
     if (file_exists($jsFilePath) && is_file($jsFilePath) && is_readable($jsFilePath)) {
       $dstDir = __DIR__ . '/build-js/';
-      $r = rename($jsFilePath, $dstDir . $patch['seoName'] . $ext);
+      $r = rename($jsFilePath, $dstDir . $patch['seoName'] . 'min.js');
     }
 
 
