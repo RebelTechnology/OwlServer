@@ -371,7 +371,7 @@ if($buildCmd = 'make sysx') {
     // First source file only
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
     $sourceFile = $sourceFiles[0];
-    $className = substr($sourceFile, 0, strrpos($sourceFile, '.    '));
+    $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
     $cmd  = 'make ';
@@ -389,9 +389,6 @@ if($buildCmd = 'make sysx') {
 
     case 'dsp': // Faust
         $cmd .= 'FAUST=' . escapeshellarg($className) . ' ';
-        $className .= 'Patch';
-        $cmd .= 'PATCHFILE=' .  escapeshellarg($className . '.hpp') . ' ';
-        $cmd .= 'PATCHCLASS=' . escapeshellarg($className) . ' ';
         break;
 
     case 'pd': // PureData
@@ -406,8 +403,8 @@ if($buildCmd = 'make sysx') {
     $cmd .= $makeTarget;
 
     if (!(isset($options['sysex']) && false === $options['sysex'])
-         && MAKE_TARGET_WEB != $makeTarget) {
-      $cmd .= MAKE_TARGET_WEB; // build both web and sysex
+         && MAKE_TARGET_SYSEX == $makeTarget) {
+      $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
     }
 
 } else {
@@ -474,8 +471,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
         exit(1);
     }
 
-    $ext = MAKE_TARGET_WEB == $makeTarget ? '.js' : '.min.js';
-    $jsFilePath = $patchBuildDir . '/web/patch' . $ext;
+    $jsFilePath = $patchBuildDir . '/web/patch.min.js';
     if (file_exists($jsFilePath) && is_file($jsFilePath) && is_readable($jsFilePath)) {
       $dstDir = __DIR__ . '/build-js/';
       $r = rename($jsFilePath, $dstDir . $patch['seoName'] . $ext);
