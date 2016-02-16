@@ -118,6 +118,11 @@ function sendStatusRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_STATS);
 }
 
+function statusRequestLoop() {
+    sendStatusRequest();
+    setTimeout(statusRequestLoop, 10000);
+}
+
 function setParameter(pid, value){
     console.log("parameter "+pid+": "+value);
     sendCc(OpenWareMidiControl.PATCH_PARAMETER_A+pid, value);
