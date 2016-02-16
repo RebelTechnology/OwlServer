@@ -54,7 +54,6 @@ function systemExclusive(data) {
 	    var pid = data[4]+1;
 	    console.log("parameter "+pid+" :"+name);
 	    $("#p"+pid).text(name); // update the prototype slider names
-        $('#patch-parameter-' + parameter_map[pid] + ' p').text(name); // update the styled slider names
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_PROGRAM_STATS:
             var msg = getStringFromSysex(data, 4, 1);
@@ -131,7 +130,6 @@ function selectOwlPatch(pid){
 
     for(i=0; i<5; ++i) {
         $("#p"+i).text(""); // clear the prototype slider names
-        $('#patch-parameter-' + parameter_map[i] + ' p').text(''); // clear the styled slider names    
     }
     
     sendPc(pid);
