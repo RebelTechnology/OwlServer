@@ -103,7 +103,7 @@ HoxtonOwl.ApiClient.prototype.getAllPatches = function (callback) {
         for (var i = 0; i < patches.length; i++) {
 
             if (patches[i].author && 'wordpressId' in patches[i].author) {
-                patches[i].author.name = wpAuthors[patches[i].author.wordpressId];
+                patches[i].author.name = 'dummy author name'; //wpAuthors[patches[i].author.wordpressId];
             }
         }
 
