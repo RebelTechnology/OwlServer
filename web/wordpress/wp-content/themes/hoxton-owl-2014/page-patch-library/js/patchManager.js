@@ -629,10 +629,6 @@ HoxtonOwl.patchManager = {
                 target = 'js';
             }
 
-            if (!confirm('Are you sure you want to build this patch (' + target + ' target)?')) {
-                return false;
-            }
-
             $('#compile-dialog').dialog({
                 width: 600,
                 modal: true,
