@@ -1,5 +1,14 @@
 var monitorTask = undefined;
 
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
 function noteOn(note, velocity) {
   console.log("received noteOn "+note+"/"+velocity);
 }
@@ -137,16 +146,32 @@ function onMidiInitialised(){
 
     // auto set the input and output to an OWL
     
+    var outConnected = false,
+        inConnected = false;
+
     for (var o = 0; o < midiOutputs.length; o++) {
         if (midiOutputs[o].name.match('^OWL-MIDI')) {
             selectMidiOutput(o);
+            outConnected = true;
+            break;
         }        
     }
 
     for (var i = 0; i < midiInputs.length; i++) {
         if (midiInputs[i].name.match('^OWL-MIDI')) {
             selectMidiInput(i);
+            inConnected = true;
+            break;
         }        
+    }
+
+    if (inConnected && outConnected) {
+        console.log('connected to an OWL');
+        $('#ourstatus').text('connected to an OWL')
+
+    } else {
+        console.log('failed to connect to an OWL');
+        $('#ourstatus').text('failed to connect to an OWL')
     }
 
     sendLoadRequest(); // load patches
@@ -230,6 +255,7 @@ function sendProgramData(data){
         logMidiData(msg);
         if(midiOutput)
         midiOutput.send(msg, 0);
+        sleep(1);
     }
     }
 }
