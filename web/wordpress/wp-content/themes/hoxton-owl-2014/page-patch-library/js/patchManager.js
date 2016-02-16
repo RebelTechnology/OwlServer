@@ -561,9 +561,11 @@ HoxtonOwl.patchManager = {
                     if ('patch-tab-header-info' === id) {
                         $('#patch-tab-midi').hide();
                         $('#patch-tab-test').hide();
+                        $('#patch-tab-info').show();
                         pm.stopPatchTest();
                         resetPatchParameterView();
                     } else if ('patch-tab-header-test' === id) {
+                        $('#patch-tab-info').hide();
                         $('#patch-tab-midi').hide();
                         $('#patch-tab-test').show();
                         $('.knob').val(35).trigger('change');
