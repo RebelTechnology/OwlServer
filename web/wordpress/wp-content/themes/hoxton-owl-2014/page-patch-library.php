@@ -278,10 +278,20 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </div>
                 </div>
                 <div class="flexbox flex-center patch-tab-container" id="patch-tab-midi" style="display:none;">
+
+                    <div style="width:100%; text-align:center;">
+                        <p id="ourstatus">...</p>
+                    </div>
                   
-                    <p>test loading patch from url<input type="button" onclick="sendProgramFromUrl('/api/builds/' + selectedPatch()._id + '?format=sysx&amp;download=1')"/></p>
-                  
-                    <div id="hidden-midi-controls" style="">
+                    <div style="width:100%; text-align:center;">
+                        <p id="patchstatus">...</p>
+                    </div>
+
+                    <div style="width:100%; text-align:center;">
+                        <button style="display:block; padding:10px 10px 40px; margin:0 auto;" onclick="sendProgramFromUrl('/api/builds/' + selectedPatch()._id + '?format=sysx&amp;download=1')"/>Load patch onto OWL device<img style="vertical-align:middle;display:inline;margin:0;" src="<?php echo get_stylesheet_directory_uri(); ?>/page-patch-library/images/sendfile.png" /></button>
+                    </div>       
+
+                    <div id="hidden-midi-controls" style="display:none; ">
                       <p>MIDI In
                           <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
                             <option>...</option>
@@ -312,7 +322,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                           <div id="p4"></div>
                           <input type="range" min="0" max="1" step="0.001" onchange="setParameter(3, this.value)"/>
                         </form>
-                        <p id="patchstatus">...</p>
+                        
                       </div>
 
                   <div>
