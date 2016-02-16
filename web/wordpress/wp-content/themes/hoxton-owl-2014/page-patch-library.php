@@ -159,6 +159,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </tr>
                     <!-- /ko -->
                     <!-- ko if: jsAvailable -->
+                    <!--
                     <tr>
                         <td><span class="parameter-label">JS</span></td>
                         <td>
@@ -170,10 +171,11 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             </p>
                         </td>
                     </tr>
+                    -->
                     <!-- /ko -->
                     <tr class="compile-patch-container">
-                        <td><span class="parameter-label">Build</span></td>
-                        <td><p><a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></p></td>
+                       <td><span class="parameter-label">Build</span></td>
+                       <td><p><a class="compileLink sysex" href="#">Compile Patch</a></p></td>
                     </tr>
                 </table>
             </div>
@@ -209,9 +211,10 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <span class="parameter-value"><a class="sysExDownloadLink" href="#">Download SysEx</a></span>
                 <!-- /ko -->
                 <!-- ko if: jsAvailable -->
-                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span>
+<!--                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span> -->
                 <!-- /ko -->
-                <span class="parameter-value compile-patch-container">Build: <a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></span>
+
+                <span class="parameter-value compile-patch-container"><a class="compileLink sysex" href="#">Compile Patch</a></span>
             </div>
             <div class="white-box2" data-bind="with: selectedPatch">
                 <div id="patch-tab-header-container">
@@ -252,7 +255,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </div>
                     <div id="patch-tab-test-err-2" class="patch-tab-test-err">
                         <strong>Error:</strong> JavaScript build not available for this patch.
-                        <span id="patch-tab-test-err-3" class="patch-tab-test-err"><a class="compileLink js" href="#">Build this patch now</a></span>
+                        <span id="patch-tab-test-err-3" class="patch-tab-test-err"><a class="compileLink sysex" href="#">Build this patch now</a></span>
                     </div>
                     <div id="patch-tab-test-err-4" class="patch-tab-test-err">
                         Loading patch...
