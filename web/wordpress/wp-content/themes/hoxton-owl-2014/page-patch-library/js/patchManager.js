@@ -647,15 +647,14 @@ HoxtonOwl.patchManager = {
                     $('#tabs-stderr textarea').text(data.stderr);
                 } else {
                     $('#compile-dialog textarea').first().text('Patch compilation failed. Please check the logs for errors.');
-		    console.log(JSON.stringify(data);
 		    if(data.stdout)
 			$('#tabs-stdout textarea').text(data.stdout);
 		    else
-			$('#tabs-stdout textarea').text(data);
+			$('#tabs-stdout textarea').text(data.responseText);
 		    if(data.stderr)
 			$('#tabs-stderr textarea').text(data.stderr);
 		    else
-			$('#tabs-stderr textarea').text(data);
+			$('#tabs-stderr textarea').text(JSON.stringify(data));
                 }
             });
 
