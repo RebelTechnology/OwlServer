@@ -192,7 +192,7 @@ HoxtonOwl.patchManager = {
             return;
         }
 
-        var deferred1 = $.getScript($(apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=js&amp;download=1');
+        var deferred1 = $.getScript($('.jsDownloadLink').attr('href'));
         var deferred2 = $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js/webaudio.js');
 
         $.when(deferred1, deferred2).done(function () {
@@ -647,8 +647,15 @@ HoxtonOwl.patchManager = {
                     $('#tabs-stderr textarea').text(data.stderr);
                 } else {
                     $('#compile-dialog textarea').first().text('Patch compilation failed. Please check the logs for errors.');
-                    $('#tabs-stdout textarea').text(data.stdout);
-                    $('#tabs-stderr textarea').text(data.stderr);
+		    console.log(JSON.stringify(data);
+		    if(data.stdout)
+			$('#tabs-stdout textarea').text(data.stdout);
+		    else
+			$('#tabs-stdout textarea').text(data);
+		    if(data.stderr)
+			$('#tabs-stderr textarea').text(data.stderr);
+		    else
+			$('#tabs-stderr textarea').text(data);
                 }
             });
 

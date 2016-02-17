@@ -277,7 +277,7 @@ router.put('/:id', function (req, res) {
                 stdout:  result.stdout,
                 stderr:  result.stderr,
                 success: false,
-                status:  500
+                status:  200
             };
             
             console.log('Command failed.');
