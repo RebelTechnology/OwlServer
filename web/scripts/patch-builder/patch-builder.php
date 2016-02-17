@@ -407,7 +407,7 @@ if($buildCmd = 'make sysx') {
 
 } else {
     echo 'Unexpected error!' . PHP_EOL;
-    exit;
+    exit(1);
 }
 
 if ($showBuildCmd) {
@@ -446,7 +446,7 @@ $exitCode = $process->getExitCode();
 outputMessage('make exit code is ' . $exitCode . '.');
 if (0 !== $exitCode) {
     outputError('Patch build failed.');
-    exit(255);
+    exit(0); // exit with zero status so that build.js will recover stderr and stdout
 }
 outputMessage('Build successful!');
 
