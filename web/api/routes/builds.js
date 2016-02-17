@@ -257,19 +257,6 @@ router.put('/:id', function (req, res) {
         }
         cmd += ' ' + id;
         console.log('Running command "' + cmd + '"...');
-//        exec(cmd, function (error, stdout, stderr) {
-//
-//            var response = {
-//                stdout: stdout,
-//                stderr: stderr,
-//                success: error === null
-//            };
-//            if (error !== null) {
-//                response.error = { status: 500 };
-//            }
-//            return response;
-//
-//        });
 
         return exec(cmd).then(function (result) {
 
@@ -284,12 +271,11 @@ router.put('/:id', function (req, res) {
             
             return response;
 
-        }).fail(function (err) {
+        }).fail(function (result) {
 
-            var response = {}
-            response.responseJSON = { // FIXME: remove this stupid `responseJSON` thing - requires changes to the frontend too
-                stdout:  err.stdout,
-                stderr:  err.stderr,
+            var response = {
+                stdout:  result.stdout,
+                stderr:  result.stderr,
                 success: false,
                 status:  500
             };
@@ -305,6 +291,9 @@ router.put('/:id', function (req, res) {
         var status = error.status || 500;
         return res.status(status).json({
             message: error.toString(),
+            stdout: error.toString(),
+            stderr: error.toString(),
+            success: false,
             status: status
         });
 
