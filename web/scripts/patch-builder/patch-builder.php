@@ -446,7 +446,7 @@ $exitCode = $process->getExitCode();
 outputMessage('make exit code is ' . $exitCode . '.');
 if (0 !== $exitCode) {
     outputError('Patch build failed.');
-    exit(0); // exit with zero status so that build.js will recover stderr and stdout
+    exit($exitCode);
 }
 outputMessage('Build successful!');
 
