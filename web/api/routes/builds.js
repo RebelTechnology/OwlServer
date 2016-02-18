@@ -287,12 +287,11 @@ router.put('/:id', function (req, res) {
         });
 
     }).catch(function (error) {
-
         var status = error.status || 500;
         return res.status(status).json({
             message: error.toString(),
-            stdout: error.toString(),
-            stderr: error.toString(),
+            stdout: error.stdout,
+            stderr: error.stderr,
             success: false,
             status: status
         });
