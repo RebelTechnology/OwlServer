@@ -12,7 +12,6 @@ $resUri = get_template_directory_uri() . '/page-patch-library/';
 
 // <link rel="stylesheet"> tags to be placed in <head>
 wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), 5);
-wp_enqueue_style('owl-patches-page_fonts_googleapis', 'http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700|Montserrat:400,700');
 wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
 wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
 wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
@@ -29,6 +28,11 @@ wp_enqueue_script('owl-patches-page_prettify',      'https://google-code-prettif
 wp_enqueue_script('owl-patches-page_run_prettify',  'https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js');
 
 //wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
+
+
+wp_enqueue_script('midi-client',                    $resUri . 'js/midiclient.js');
+wp_enqueue_script('owl-midi-control',               $resUri . 'js/OpenWareMidiControl.js');
+wp_enqueue_script('owl-cmd',                        $resUri . 'js/owlcmd.js');
 
 // <script> tags to be placed just before </body>
 wp_enqueue_script('owl-api-client',                 get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
@@ -168,8 +172,8 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </tr>
                     <!-- /ko -->
                     <tr class="compile-patch-container">
-                        <td><span class="parameter-label">Build</span></td>
-                        <td><p><a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></p></td>
+                       <td><span class="parameter-label">Build</span></td>
+                       <td><p><a class="compileLink sysex" href="#">Compile Patch</a></p></td>
                     </tr>
                 </table>
             </div>
@@ -205,14 +209,16 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <span class="parameter-value"><a class="sysExDownloadLink" href="#">Download SysEx</a></span>
                 <!-- /ko -->
                 <!-- ko if: jsAvailable -->
-                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span>
+<!--                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span> -->
                 <!-- /ko -->
-                <span class="parameter-value compile-patch-container">Build: <a class="compileLink sysex" href="#">SysEx</a> - <a class="compileLink js" href="#">JS</a></span>
+
+                <span class="parameter-value compile-patch-container"><a class="compileLink sysex" href="#">Compile Patch</a></span>
             </div>
             <div class="white-box2" data-bind="with: selectedPatch">
                 <div id="patch-tab-header-container">
                     <h2 class="bolder patch-tab-header selected" id="patch-tab-header-info"><a href="#">Info</a></h2>
-                    <h2 class="bolder patch-tab-header" id="patch-tab-header-test"><a href="#">Test</a></h2>
+                    <h2 class="bolder patch-tab-header" id="patch-tab-header-test"><a href="#">Audio</a></h2>
+                    <h2 class="bolder patch-tab-header" id="patch-tab-header-midi"><a href="#" onclick="connectToOwl();">MIDI</a></h2>
                 </div>
                 <div class="flexbox flex-center patch-tab-container">
                     <div class="knob-container" id="patch-parameter-a">
@@ -247,7 +253,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </div>
                     <div id="patch-tab-test-err-2" class="patch-tab-test-err">
                         <strong>Error:</strong> JavaScript build not available for this patch.
-                        <span id="patch-tab-test-err-3" class="patch-tab-test-err"><a class="compileLink js" href="#">Build this patch now</a></span>
+                        <span id="patch-tab-test-err-3" class="patch-tab-test-err"><a class="compileLink sysex" href="#">Build this patch now</a></span>
                     </div>
                     <div id="patch-tab-test-err-4" class="patch-tab-test-err">
                         Loading patch...
@@ -271,6 +277,76 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             Your browser does not support the <code>&lt;audio&gt;</code> element.
                         </audio>
                     </div>
+                </div>
+                <div class="flexbox flex-center patch-tab-container" id="patch-tab-midi" style="display:none;">
+
+                    <div style="width:100%; text-align:center;">
+                        <p id="ourstatus">...</p>
+                    </div>
+                  
+                    <div style="width:100%; text-align:center;">
+                        <p id="patchstatus">...</p>
+                    </div>
+
+                    <div id="load-owl-button" style="display:none; width:100%; text-align:center;">
+                        <button style="display:block; padding:10px 10px 40px; margin:0 auto;" onclick="sendProgramFromUrl('/api/builds/' + selectedPatch()._id + '?format=sysx&amp;download=1');statusRequestLoop();"/>Load patch onto OWL device<img style="vertical-align:middle;display:inline;margin:0;" src="<?php echo get_stylesheet_directory_uri(); ?>/page-patch-library/images/sendfile.png" /></button>
+                    </div>       
+
+                    <div id="hidden-midi-controls" style="display:none; ">
+                      <p>MIDI In
+                          <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
+                            <option>...</option>
+                          </select>
+                      </p>
+
+                      <p>MIDI Out
+                          <select id="midiOutputs" onchange="selectMidiOutput(this.selectedIndex)">
+                            <option>...</option>
+                          </select>
+                          Monitor: <input id="monitor" type="button"/>
+                          Connect: <input id="connect" type="button"/>
+                      </p>
+
+                      <p>Patches
+                          <select id="patchnames" onchange="selectOwlPatch(this.value)"></select>
+                      </p>
+
+                      <div>
+                        <h3 id="patchname">...</h3>
+                        <form action="">
+                          <div id="p1"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(0, this.value)"/>
+                          <div id="p2"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(1, this.value)"/>
+                          <div id="p3"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(2, this.value)"/>
+                          <div id="p4"></div>
+                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(3, this.value)"/>
+                        </form>
+                        
+                      </div>
+
+                  <div>
+                    <h3>Control</h3>
+                    <form action="">
+                      <p>status <input type="button" onclick="sendStatusRequest(); return false;"/></p>
+                      <p>load <input type="button" onclick="sendLoadRequest(); return false;"/></p>
+                      <p>led <input type="button" onclick="sendRequest(OpenWareMidiControl.LED); return false;"/></p>
+                      <p>message <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE); return false;"/></p>
+                      <p>device id <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID); return false;"/></p>
+                      <p>version <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION); return false;"/></p>
+                      <p>settings <input type="button" onclick="sendRequest(127); return false;"/></p>
+                    </form>
+                  </div>
+
+                  <div>
+                    <h3>Messages</h3>
+                    <button id="clear">Clear</button>
+                    <ul id="log"></ul>
+                  </div>
+
+                </div>
+
                 </div>
             </div>
             <div class="white-box2" id="git-code">

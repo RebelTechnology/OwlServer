@@ -64,6 +64,10 @@ HoxtonOwl.patchManager = {
             var pieces = urlParser.pathname.split('/');
             var filename = pieces[pieces.length - 1];
 
+            // Force same protocol as current HTTP(S) connection
+            urlParser.protocol = window.location.protocol;
+            url = urlParser.href;
+
             $.ajax({
                 type:     "GET",
                 url:      url,
@@ -439,6 +443,8 @@ HoxtonOwl.patchManager = {
 
                 //var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().github;
 
+                hookupButtonEvents();
+
                 $('#github-files').empty();
                 $('#git-code').hide();
                 if (that.selectedPatch().github.length) {
@@ -553,15 +559,25 @@ HoxtonOwl.patchManager = {
                     $tab.addClass('selected');
                     $tab.siblings('h2').removeClass('selected');
                     if ('patch-tab-header-info' === id) {
+                        $('#patch-tab-midi').hide();
                         $('#patch-tab-test').hide();
+                        $('#patch-tab-info').show();
                         pm.stopPatchTest();
                         resetPatchParameterView();
                     } else if ('patch-tab-header-test' === id) {
+                        $('#patch-tab-info').hide();
+                        $('#patch-tab-midi').hide();
                         $('#patch-tab-test').show();
                         $('.knob').val(35).trigger('change');
                         $('.knob-container:visible input.knob').css('visibility', 'visible');
                         $('.knob-disabler').remove();
                         pm.initPatchTest();
+                    } else if ('patch-tab-header-midi' === id) {
+                        $('#patch-tab-info').hide();
+                        $('#patch-tab-test').hide();
+                        $('#patch-tab-midi').show();
+                        pm.stopPatchTest();
+                        resetPatchParameterView();
                     }
                     return false;
                 });
@@ -615,10 +631,6 @@ HoxtonOwl.patchManager = {
                 target = 'js';
             }
 
-            if (!confirm('Are you sure you want to build this patch (' + target + ' target)?')) {
-                return false;
-            }
-
             $('#compile-dialog').dialog({
                 width: 600,
                 modal: true,
@@ -635,8 +647,14 @@ HoxtonOwl.patchManager = {
                     $('#tabs-stderr textarea').text(data.stderr);
                 } else {
                     $('#compile-dialog textarea').first().text('Patch compilation failed. Please check the logs for errors.');
-                    $('#tabs-stdout textarea').text(data.responseJSON.stdout);
-                    $('#tabs-stderr textarea').text(data.responseJSON.stderr);
+		    if(data.stdout)
+			$('#tabs-stdout textarea').text(data.stdout);
+		    else
+			$('#tabs-stdout textarea').text(data.responseText);
+		    if(data.stderr)
+			$('#tabs-stderr textarea').text(data.stderr);
+		    else
+			$('#tabs-stderr textarea').text(JSON.stringify(data));
                 }
             });
 
