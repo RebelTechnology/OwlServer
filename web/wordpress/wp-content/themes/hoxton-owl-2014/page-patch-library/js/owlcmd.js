@@ -63,9 +63,12 @@ function systemExclusive(data) {
             var msg = getStringFromSysex(data, 4, 1);
 	    $("#firmwareversion").text(msg);	    
 	    break;
-	case OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS:
 	case OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE:
-	    // deliberate fall-through
+            var msg = getStringFromSysex(data, 4, 1);
+	    $("#patchmessage").text(msg);
+	    log(msg);
+	    break;
+	case OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS:
 	default:
             var msg = getStringFromSysex(data, 4, 1);
 	    log(msg);

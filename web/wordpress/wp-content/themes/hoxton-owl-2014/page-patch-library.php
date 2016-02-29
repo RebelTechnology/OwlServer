@@ -285,7 +285,9 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </div>
                   
                     <div style="width:100%; text-align:center;">
-                        <p id="patchstatus">...</p>
+                        <p id="patchstatus">Waiting for OWL</p>
+                        <p id="patchmessage"></p>
+                        <p id="firmwareversion"></p>
                     </div>
 
                     <div id="load-owl-button" style="display:none; width:100%; text-align:center;">
