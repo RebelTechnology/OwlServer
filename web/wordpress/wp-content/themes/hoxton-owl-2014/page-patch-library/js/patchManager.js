@@ -239,6 +239,19 @@ HoxtonOwl.patchManager = {
             }
         });
 
+        $('#patch-test-pushbutton').click(function () {
+            if(pm.patchPlaying) {
+		patch.toggleButton();
+		var state = patch.getButtons();
+		if(state & 0x04) // GREEN_BUTTON
+  		    $(this).css('background', 'lightgreen');
+		else if(state & 0x08) // RED_BUTTON
+  		    $(this).css('background', 'red');
+		else
+  		    $(this).css('background', 'lightgray');
+            }
+        });
+
         pm.patchTestInited = true;
     },
 

@@ -271,6 +271,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <option value="synth">Synth</option>
                             <option value="white-noise">White Noise</option>
                         </select>
+                        <input type="button" value="Pushbutton" id="patch-test-pushbutton" />
                         <input type="button" value="Start" id="patch-test-start-stop" />
 
                         <audio id="patch-test-audio" controls loop preload="auto">

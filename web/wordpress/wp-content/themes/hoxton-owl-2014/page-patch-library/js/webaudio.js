@@ -17,23 +17,24 @@ navigator.getUserMedia = navigator.getUserMedia ||
 	navigator.mozGetUserMedia ||
 	navigator.msGetUserMedia;
 
+var WEB_setup = Module.cwrap('WEB_setup', 'number', ['number', 'number']);
+var WEB_processBlock = Module.cwrap('WEB_processBlock', 'number', ['number', 'number']);
+var WEB_setParameter = Module.cwrap('WEB_setParameter', 'number', ['number', 'number']);
+var WEB_getPatchName = Module.cwrap('WEB_getPatchName', 'string', []);
+var WEB_getParameterName = Module.cwrap('WEB_getParameterName', 'string', ['number']);
+var WEB_getMessage = Module.cwrap('WEB_getMessage', 'string', []);
+var WEB_getStatus = Module.cwrap('WEB_getStatus', 'string', []);
+var WEB_setButtons = Module.cwrap('WEB_setButtons', 'number', ['number']);
+var WEB_getButtons = Module.cwrap('WEB_getButtons', 'number', []);
+
 owl.dsp = function () {
-
-	var WEB_setup = Module.cwrap('WEB_setup', 'number', ['number', 'number']);
-	var WEB_processBlock = Module.cwrap('WEB_processBlock', 'number', ['number', 'number']);
-	var WEB_setParameter = Module.cwrap('WEB_setParameter', 'number', ['number', 'number']);
-	var WEB_getPatchName = Module.cwrap('WEB_getPatchName', 'string', []);
-	var WEB_getParameterName = Module.cwrap('WEB_getParameterName', 'string', ['number']);
-	var WEB_getMessage = Module.cwrap('WEB_getMessage', 'string', []);
-	var WEB_getStatus = Module.cwrap('WEB_getStatus', 'string', []);
-
 	var that = {};
 	that.model = {
 		inputNode: null,
-		fileNode: owl.context.createMediaElementSource(document.getElementById('patch-test-audio')),
+		fileNode: owl.context.createMediaElementSource(document.getElementById('file-input-audio')),
 		micNode: null
 	};
-	that.vectorsize = 2048;
+	that.vectorsize = 2048;      
 	console.log("setup[fs "+owl.context.sampleRate+"][bs "+that.vectorsize+"]");
 	WEB_setup(owl.context.sampleRate, that.vectorsize);
 	for (i = 0; i < 5; i++)
@@ -115,7 +116,7 @@ owl.dsp = function () {
 
 	that.onFileSelect = function (files) {
 		var fileUrl = files[0] ? URL.createObjectURL(files[0]) : '';
-		var audioElement = document.getElementById('patch-test-audio');
+		var audioElement = document.getElementById('file-input-audio');
 		audioElement.src = fileUrl;
 	}
 
@@ -130,9 +131,26 @@ owl.dsp = function () {
 
 	that.update = function (key, val) {
 		WEB_setParameter(key, val);
-		console.log("set parameter "+key+": "+val);
 		return that;
 	};
+    
+        that.setButtons = function(values) {
+		WEB_setButtons(values);
+		return that;
+        };
+
+        that.getButtons = function() {
+    	        return WEB_getButtons();
+        };
+
+        that.toggleButton = function() {
+	        var values = WEB_getButtons();
+	        values ^= 0x02; // PUSHBUTTON;
+	        values ^= 0x04; // GREEN_BUTTON;
+	        values ^= 0x08; // RED_BUTTON;
+        	WEB_setButtons(values);
+		return that;
+        };
 
 	that.init = function () {
 		var i;
@@ -148,27 +166,26 @@ owl.dsp = function () {
 		that.scriptProcessor = owl.context.createScriptProcessor(that.vectorsize, that.numIn, that.numOut);
 		that.scriptProcessor.onaudioprocess = that.compute;
 
-		// // Connect output of OWL processor to audio out
-	    // that.scope = new WavyJones(owl.context, "oscilloscope");
-   	    // that.scope.connect(owl.context.destination);
+		// Connect output of OWL processor to audio out
+	        // that.scope = new WavyJones(owl.context, "oscilloscope");
+   	        // that.scope.connect(owl.context.destination);
 		// that.scriptProcessor.connect(that.scope);
-		that.scriptProcessor.connect(owl.context.destination);
 
 		// TODO the below calls to malloc are not yet being freed, potential memory leak
 		// allocate memory for input / output arrays
 		that.ins = Module._malloc(that.ptrsize * that.numIn);
 
 		// assign to our array of pointer elements an array of 32bit floats, one for each channel. currently we assume pointers are 32bits
-		for (i = 0; i < that.numIn; i++) {
+		for (i = 0; i < that.numIn; i++) { 
 			// assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
-			HEAP32[(that.ins >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize);
+			HEAP32[(that.ins >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize); 
 		}
 
 		//ptrsize, change to eight or use Runtime.QUANTUM? or what?
-		that.outs = Module._malloc(that.ptrsize * that.numOut);
+		that.outs = Module._malloc(that.ptrsize * that.numOut); 
 
 		// assign to our array of pointer elements an array of 64bit floats, one for each channel. currently we assume pointers are 32bits
-		for (i = 0; i < that.numOut; i++) {
+		for (i = 0; i < that.numOut; i++) { 
 			// assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
 			HEAP32[(that.outs >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize);
 		}
