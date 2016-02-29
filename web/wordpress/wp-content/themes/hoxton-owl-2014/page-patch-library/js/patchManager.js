@@ -136,7 +136,7 @@ HoxtonOwl.patchManager = {
     },
 
     updatePushbutton: function () {
-        if(pm.testPatch.) {
+        if(pm.testPatch) {
 	    var state = pm.testPatch.getButtons();
 	    if(state & 0x04) // GREEN_BUTTON
   		$('#patch-test-pushbutton').css('background', 'lightgreen');
