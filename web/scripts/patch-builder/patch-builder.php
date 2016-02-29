@@ -472,7 +472,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     $jsFilePath = $patchBuildDir . '/web/patch.min.js';
     if (file_exists($jsFilePath) && is_file($jsFilePath) && is_readable($jsFilePath)) {
       $dstDir = __DIR__ . '/build-js/';
-      $r = rename($jsFilePath, $dstDir . $patch['seoName'] . 'min.js');
+      $r = rename($jsFilePath, $dstDir . $patch['seoName'] . '.min.js');
     }
 
 
