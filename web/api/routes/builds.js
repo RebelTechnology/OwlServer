@@ -122,7 +122,7 @@ router.get('/:id', function (req, res) {
 
     }).done(function (response) {
 
-        if ('ServerResponse' === response.constructor.name) {
+        if (response.constructor && 'ServerResponse' === response.constructor.name) {
             return response;
         }
 
@@ -298,7 +298,7 @@ router.put('/:id', function (req, res) {
 
     }).done(function (response) {
 
-        if ('ServerResponse' === response.constructor.name) {
+        if (response.constructor && 'ServerResponse' === response.constructor.name) {
             return response;
         }
 
