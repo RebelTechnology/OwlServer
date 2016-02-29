@@ -135,6 +135,18 @@ HoxtonOwl.patchManager = {
         });
     },
 
+    updatePushbutton: function () {
+        if(pm.testPatch.) {
+	    var state = pm.testPatch.getButtons();
+	    if(state & 0x04) // GREEN_BUTTON
+  		$('#patch-test-pushbutton').css('background', 'lightgreen');
+	    else if(state & 0x08) // RED_BUTTON
+  		$('#patch-test-pushbutton').css('background', 'lightred');
+	    else
+  		$('#patch-test-pushbutton').css('background', 'lightgray');    
+	}
+    },
+
     updatePatchParameters: function () {
         var pm = HoxtonOwl.patchManager,
             patch = pm.testPatch;
@@ -197,6 +209,8 @@ HoxtonOwl.patchManager = {
 
         $.when(deferred1, deferred2).done(function () {
 
+            pm.startPatchTest();
+
             $('#patch-tab-test-err-4').hide();
 
             $('#patch-test-inner-container').show();
@@ -217,9 +231,11 @@ HoxtonOwl.patchManager = {
                     $(html).appendTo($audio);
                 }
                 $audio[0].load();
+		if(!pm.patchPlaying)
+		    pm.startPatchTest();
                 if ('_' !== val.substr(0, 1)) {
                     $audio[0].play();
-                    patch.useFileInput();
+                    pm.testPatch.useFileInput();
                 } else if ('_clear' === val) {
                     pm.testPatch.clearInput();
                 } else if ('_mic' === val) {
@@ -241,14 +257,8 @@ HoxtonOwl.patchManager = {
 
         $('#patch-test-pushbutton').click(function () {
             if(pm.patchPlaying) {
-		patch.toggleButton();
-		var state = patch.getButtons();
-		if(state & 0x04) // GREEN_BUTTON
-  		    $(this).css('background', 'lightgreen');
-		else if(state & 0x08) // RED_BUTTON
-  		    $(this).css('background', 'red');
-		else
-  		    $(this).css('background', 'lightgray');
+		pm.testPatch.toggleButton();
+		pm.updatePushbutton();
             }
         });
 
@@ -256,15 +266,16 @@ HoxtonOwl.patchManager = {
     },
 
     startPatchTest: function () {
-        var pm = HoxtonOwl.patchManager,
-            patch = pm.testPatch;
+        var pm = HoxtonOwl.patchManager;
+        var patch = pm.testPatch;
 
         if (pm.startPatchTest.inited) {
             pm.testPatch.scriptProcessor.connect(owl.context.destination);
         } else {
             pm.testPatch = owl.dsp();
+            pm.testPatch.scriptProcessor.connect(owl.context.destination);
             pm.updatePatchParameters();
-            pm.testPatch.useFileInput();
+	    pm.updatePushbutton();
             pm.startPatchTest.inited = true;
         }
         pm.patchPlaying = true;
