@@ -136,6 +136,7 @@ HoxtonOwl.patchManager = {
     },
 
     updatePushbutton: function () {
+        var pm = HoxtonOwl.patchManager;
         if(pm.testPatch) {
 	    var state = pm.testPatch.getButtons();
 	    if(state & 0x04) // GREEN_BUTTON
@@ -148,8 +149,8 @@ HoxtonOwl.patchManager = {
     },
 
     updatePatchParameters: function () {
-        var pm = HoxtonOwl.patchManager,
-            patch = pm.testPatch;
+        var pm = HoxtonOwl.patchManager;
+        var patch = pm.testPatch;
         if (patch) {
             $('[id^=patch-parameter-]:visible').each(function (i, el) {
                 var paramLetter = el.id.substr(-1, 1),
