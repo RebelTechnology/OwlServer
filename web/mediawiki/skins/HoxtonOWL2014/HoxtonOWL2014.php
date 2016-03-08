@@ -24,6 +24,7 @@ $wgAutoloadClasses['SkinHoxtonOWL2014'] = __DIR__ . '/HoxtonOWL2014.skin.php';
 $wgMessagesDirs['HoxtonOWL2014'] = __DIR__ . '/i18n';
 
 $wgResourceModules['skins.hoxtonowl2014'] = array(
+    'position' => 'top',
     'styles' => array(
         'HoxtonOWL2014/resources/wordpress-fix.css'                       => array( 'media' => 'screen' ),
         '../../wp-content/themes/hoxton-owl-2014/css/reset.css'     => array('media' => 'screen'),
