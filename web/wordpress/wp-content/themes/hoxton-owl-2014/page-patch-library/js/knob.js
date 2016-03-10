@@ -1,7 +1,5 @@
 function knobify () {
 
-    console.log('this is knobify');
-
     function knobChange(val) {
         HoxtonOwl.patchManager.updatePatchParameters();
     }

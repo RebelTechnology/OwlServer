@@ -537,11 +537,9 @@ HoxtonOwl.patchManager = {
 
                 $('.knob').addClass('disabled');
                 if (patch.parameters) {
-                    // $('.knob-container').hide();
                     for (var key in patch.parameters) {
                         $('#patch-parameter-' + key + ' .knob').removeClass('disabled').addClass('enabled');
                     }
-                    // console.log('knobifying');
                 }
                 knobify();
 
