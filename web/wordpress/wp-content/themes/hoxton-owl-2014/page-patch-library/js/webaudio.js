@@ -26,8 +26,12 @@ owl.dsp = function () {
     var WEB_getParameterName = Module.cwrap('WEB_getParameterName', 'string', ['number']);
     var WEB_getMessage = Module.cwrap('WEB_getMessage', 'string', []);
     var WEB_getStatus = Module.cwrap('WEB_getStatus', 'string', []);
-    var WEB_setButtons = Module.cwrap('WEB_setButtons', 'number', ['number']);
-    var WEB_getButtons = Module.cwrap('WEB_getButtons', 'number', []);
+    var WEB_setButtons;
+    var WEB_getButtons;
+	try {
+	    WEB_setButtons = Module.cwrap('WEB_setButtons', 'number', ['number']);
+	    WEB_getButtons = Module.cwrap('WEB_getButtons', 'number', []);
+	}catch(x){}
 
 	var that = {};
 	that.model = {
@@ -136,21 +140,27 @@ owl.dsp = function () {
 	};
     
         that.setButtons = function(values) {
-		WEB_setButtons(values);
+                if(WEB_setButtons)
+   		    WEB_setButtons(values);
 		return that;
         };
 
         that.getButtons = function() {
+	    if(WEB_getButtons)
     	        return WEB_getButtons();
+	    else
+		return 0;
         };
 
         that.toggleButton = function() {
+            if(WEB_getButtons){
 	        var values = WEB_getButtons();
 	        values ^= 0x02; // PUSHBUTTON;
 	        values ^= 0x04; // GREEN_BUTTON;
 	        values ^= 0x08; // RED_BUTTON;
         	WEB_setButtons(values);
-		return that;
+	    }
+	    return that;
         };
 
 	that.init = function () {
