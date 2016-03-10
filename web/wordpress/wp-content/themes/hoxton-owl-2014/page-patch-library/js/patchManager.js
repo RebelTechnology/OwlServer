@@ -535,13 +535,15 @@ HoxtonOwl.patchManager = {
                     }
                 }
 
+                $('.knob').addClass('disabled');
                 if (patch.parameters) {
-                    $('.knob-container').hide();
+                    // $('.knob-container').hide();
                     for (var key in patch.parameters) {
-                        $('#patch-parameter-' + key).show();
+                        $('#patch-parameter-' + key + ' .knob').removeClass('disabled').addClass('enabled');
                     }
-                    knobify();
+                    // console.log('knobifying');
                 }
+                knobify();
 
                 // Show build download links
                 if (that.selectedPatch().sysExAvailable) {
