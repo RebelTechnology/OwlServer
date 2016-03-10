@@ -303,13 +303,13 @@ function owl_patchFileUpload()
     if (!file_exists($baseDirPath)) {
 
         if (!is_dir($baseDirPath)) {
-            errorOut('Unexpected error (1).');
+        
+            $r = mkdir($baseDirPath, getDirMod(), true);
+            if (!$r) {
+                errorOut('Unable to create target dir.');
+            }
         }
 
-        $r = mkdir($baseDirPath, getDirMod(), true);
-        if (!$r) {
-            errorOut('Unable to create target dir.');
-        }
     }
 
     if (!is_readable($baseDirPath) || !is_writable($baseDirPath)) {
