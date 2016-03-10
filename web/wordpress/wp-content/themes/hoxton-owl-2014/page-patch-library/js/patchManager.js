@@ -489,7 +489,15 @@ HoxtonOwl.patchManager = {
                             cnt = $('#github-files > ul > li').length;
 
                             cnt++;
-                            $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a></li>');
+
+                            var downloadLink = url;
+                            if (actuallyFromGitHub) {
+                                downloadLink = downloadLink.replace('github.com', 'raw.githubusercontent.com');
+                                downloadLink = downloadLink.replace('/blob', '');
+                            }
+
+                            $('#github-files > ul').append('<li><a href="#tabs-' + cnt + '">' + filename + '</a>' + 
+                                '<a target="_blank" href="' + downloadLink + '"><img src="/wp-content/themes/hoxton-owl-2014/page-patch-library/images/download.png"/></a></li>');
                             $('#github-files').append('<div id="tabs-' + cnt + '"><pre class="prettyprint"></pre></div>');
                             if (actuallyFromGitHub) {
                                 $('#github-files #tabs-' + cnt).prepend('<a href="' + url + '" target="_new" class="github-link">Open this file in GitHub</a>');

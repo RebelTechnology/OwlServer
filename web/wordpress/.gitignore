@@ -1,0 +1,17 @@
+# We only want to track specific items in the wordpress dir.
+
+# We begin by ignoring everything:
+*
+
+# ...except this gitignore file.
+# Use the '!' flag to negate the rule above:
+!.gitignore
+
+# Then we add dirs and files back into the repo one by one.
+
+!/robots.txt
+!/wp-content/plugins/owl-api-bridge.php
+!/wp-content/plugins/owl-patch-uploader.php
+!/wp-content/themes/hoxton-owl-2014/
+
+# Add to the bottom of this list any files you wish to track.
