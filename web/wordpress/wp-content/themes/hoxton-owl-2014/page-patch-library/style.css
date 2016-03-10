@@ -254,6 +254,11 @@ span.parameter-label {
 /*    overflow-y: auto;*/
 }
 
+#github-files .ui-tabs-nav img {
+    display: inline;
+    margin: 5px 10px 0 0;
+}
+
 .knob-container {
     width: 100px;
     float: left;
