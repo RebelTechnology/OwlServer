@@ -299,6 +299,8 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                     </div>
                     <!-- /ko -->
                     <div id="hidden-midi-controls" style="display:none; ">
+		      <!-- todo: get rid of this:
+			   currently we depend on midiInputs and midiOutputs in owlcmd.js  -->
                       <p>MIDI In
                           <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
                             <option>...</option>
@@ -312,47 +314,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                           Monitor: <input id="monitor" type="button"/>
                           Connect: <input id="connect" type="button"/>
                       </p>
-
-                      <p>Patches
-                          <select id="patchnames" onchange="selectOwlPatch(this.value)"></select>
-                      </p>
-
-                      <div>
-                        <h3 id="patchname">...</h3>
-                        <form action="">
-                          <div id="p1"></div>
-                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(0, this.value)"/>
-                          <div id="p2"></div>
-                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(1, this.value)"/>
-                          <div id="p3"></div>
-                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(2, this.value)"/>
-                          <div id="p4"></div>
-                          <input type="range" min="0" max="1" step="0.001" onchange="setParameter(3, this.value)"/>
-                        </form>
-                        
-                      </div>
-
-                  <div>
-                    <h3>Control</h3>
-                    <form action="">
-                      <p>status <input type="button" onclick="sendStatusRequest(); return false;"/></p>
-                      <p>load <input type="button" onclick="sendLoadRequest(); return false;"/></p>
-                      <p>led <input type="button" onclick="sendRequest(OpenWareMidiControl.LED); return false;"/></p>
-                      <p>message <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE); return false;"/></p>
-                      <p>device id <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID); return false;"/></p>
-                      <p>version <input type="button" onclick="sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION); return false;"/></p>
-                      <p>settings <input type="button" onclick="sendRequest(127); return false;"/></p>
-                    </form>
-                  </div>
-
-                  <div>
-                    <h3>Messages</h3>
-                    <button id="clear">Clear</button>
-                    <ul id="log"></ul>
-                  </div>
-
-                </div>
-
+		    </div>
                 </div>
             </div>
             <div class="white-box2" id="git-code">
