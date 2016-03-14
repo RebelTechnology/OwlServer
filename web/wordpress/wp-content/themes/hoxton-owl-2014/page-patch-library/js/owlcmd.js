@@ -49,7 +49,7 @@ function systemExclusive(data) {
 	    // log("preset "+idx+": "+name);
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
-        var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
+            var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
             var name = getStringFromSysex(data, 5, 1);
 	    var pid = data[4]+1;
 	    console.log("parameter "+pid+" :"+name);
@@ -61,17 +61,17 @@ function systemExclusive(data) {
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION:
             var msg = getStringFromSysex(data, 4, 1);
-	    $("#firmwareversion").text(msg);	    
+	    $("#ourstatus").text("Connected to "+msg);	    
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE:
             var msg = getStringFromSysex(data, 4, 1);
 	    $("#patchmessage").text(msg);
-	    log(msg);
+	    // log(msg);
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS:
 	default:
             var msg = getStringFromSysex(data, 4, 1);
-	    log(msg);
+	    log("Unhandled message: "+msg);
 	    break;
 	}
     }
@@ -173,20 +173,16 @@ function onMidiInitialised(){
 
     if (inConnected && outConnected) {
         console.log('connected to an OWL');
-        $('#ourstatus').text('connected to an OWL')
+        $('#ourstatus').text('Connected to an OWL')
         $('#load-owl-button').show();
     } else {
         console.log('failed to connect to an OWL');
-        $('#ourstatus').text('failed to connect to an OWL')
+        $('#ourstatus').text('Failed to connect to an OWL')
     }
 
-    sendLoadRequest(); // load patches
-
-    // selectMidiInput(3);
-    // selectMidiOutput(4);
-    // selectMidiInput(0);
-    // selectMidiOutput(0);
-    log("showtime");
+    // sendLoadRequest(); // load patches
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
+    sendStatusRequest();
 }
 
 function updatePermission(name, status) {
@@ -200,9 +196,6 @@ function connectToOwl() {
         navigator.requestMIDIAccess({sysex:true});
     }
     initialiseMidi(onMidiInitialised);
-    sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
-    sendLoadRequest();
-    sendStatusRequest();
 }
 
 function hookupButtonEvents() {
