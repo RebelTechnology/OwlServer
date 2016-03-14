@@ -41,7 +41,7 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                     <?php if ($isAdmin): ?>
                     <div class="row">
                         <label class="required">Author</label>
-                        <label class="frm-patch-author-radio"><input type="radio" id="frm-patch-author-type-wordpress" name="author-type"> WordPress user:</label>
+                        <label class="frm-patch-author-radio"><input type="radio" id="frm-patch-author-type-wordpress" name="author-type" checked> WordPress user:</label>
                         <select id="frm-patch-author-wordpressId" name="author-wordpressId"></select>
                         <div class="error-message"></div>
                     </div>
