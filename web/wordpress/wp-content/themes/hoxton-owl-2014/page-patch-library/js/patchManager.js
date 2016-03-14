@@ -140,9 +140,9 @@ HoxtonOwl.patchManager = {
         if(pm.testPatch) {
 	    var state = pm.testPatch.getButtons();
 	    if(state & 0x04) // GREEN_BUTTON
-  		$('#patch-test-pushbutton').css('background', 'lightgreen');
+  		$('#patch-test-pushbutton').css('background', 'green');
 	    else if(state & 0x08) // RED_BUTTON
-  		$('#patch-test-pushbutton').css('background', 'lightred');
+  		$('#patch-test-pushbutton').css('background', 'red');
 	    else
   		$('#patch-test-pushbutton').css('background', 'lightgray');    
 	}
