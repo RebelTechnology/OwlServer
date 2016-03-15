@@ -216,7 +216,7 @@ HoxtonOwl.patchManager = {
             $('#patch-tab-test-err-4').hide();
 
             $('#patch-test-inner-container').show();
-            $('.knob').val(50).trigger('change');
+            $('.knob').val(35).trigger('change');
             // $('#patch-test-source').select2({
             //     placeholder: 'Select a source',
             //     minimumResultsForSearch: Infinity
