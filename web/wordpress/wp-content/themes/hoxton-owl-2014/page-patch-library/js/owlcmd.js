@@ -170,6 +170,7 @@ function onMidiInitialised(){
     } else {
         console.log('failed to connect to an OWL');
         $('#ourstatus').text('Failed to connect to an OWL')
+        $('#load-owl-button').hide();
     }
 
     // sendLoadRequest(); // load patches
