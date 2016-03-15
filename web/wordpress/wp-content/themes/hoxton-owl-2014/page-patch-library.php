@@ -290,7 +290,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
 
                     <!-- ko if: sysExAvailable -->
                     <div>
-                        <button id="load-owl-button"/>Load patch onto OWL device<img style="vertical-align:middle;display:inline;margin:0;" src="<?php echo get_stylesheet_directory_uri(); ?>/page-patch-library/images/sendfile.png" /></button>
+                        <button id="load-owl-button"/>Load patch onto OWL device<img src="<?php echo get_stylesheet_directory_uri(); ?>/page-patch-library/images/sendfile.png" /></button>
                     </div>
                     <!-- /ko -->
                     <!-- ko ifnot: sysExAvailable -->

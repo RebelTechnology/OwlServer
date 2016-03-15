@@ -688,6 +688,12 @@ h2, .secondary-nav-item p {
     margin:0 auto;
 }
 
+#load-owl-button img {
+    vertical-align:middle;
+    display:inline;
+    margin:0;
+}
+
 .tag span {
     font-weight: 100;
     font-size: 11px;
