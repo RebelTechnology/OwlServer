@@ -65,8 +65,7 @@ function systemExclusive(data) {
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE:
             var msg = getStringFromSysex(data, 4, 1);
-	    $("#patchmessage").text(msg);
-	    // log(msg);
+	    $("#patchmessage").text("["+msg+"]");
 	    break;
 	case OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS:
 	default:
@@ -119,11 +118,14 @@ function sendRequest(type){
 
 function sendStatusRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_STATS);
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE);
 }
 
+var doStatusRequestLoop = true;
 function statusRequestLoop() {
     sendStatusRequest();
-    setTimeout(statusRequestLoop, 10000);
+    if(doStatusRequestLoop)
+	setTimeout(statusRequestLoop, 2000);
 }
 
 function setParameter(pid, value){
@@ -182,7 +184,7 @@ function onMidiInitialised(){
 
     // sendLoadRequest(); // load patches
     sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
-    sendStatusRequest();
+    statusRequestLoop();
 }
 
 function updatePermission(name, status) {
@@ -198,7 +200,7 @@ function connectToOwl() {
     HoxtonOwl.midiClient.initialiseMidi(onMidiInitialised);
 }
 
-function hookupButtonEvents() {
+// function hookupButtonEvents() {
     // Check for Midi/Midi SysEx permissions
 
     // if(navigator && navigator.permissions){
@@ -223,24 +225,24 @@ function hookupButtonEvents() {
     //         navigator.requestMIDIAccess({sysex:false});
     // });
 
-    $("#connect").on('click', connectToOwl);
+    // $("#connect").on('click', connectToOwl);
 
-    $("#monitor").on('click', function() {
-	if(monitorTask == undefined){
-	    monitorTask = window.setInterval(sendStatusRequest, 1000);
-	}else{
-	    clearInterval(monitorTask);
-	    monitorTask = undefined;
-	}
-    });
+    // $("#monitor").on('click', function() {
+    // 	if(monitorTask == undefined){
+    // 	    monitorTask = window.setInterval(sendStatusRequest, 1000);
+    // 	}else{
+    // 	    clearInterval(monitorTask);
+    // 	    monitorTask = undefined;
+    // 	}
+    // });
 
     // initialiseMidi(onMidiInitialised);
     
-    $('#clear').on('click', function() {
-	$('#log').empty();
-	return false;
-    });
-}
+    // $('#clear').on('click', function() {
+    // 	$('#log').empty();
+    // 	return false;
+    // });
+// }
 
 function sendProgramData(data){
     var from = 0;

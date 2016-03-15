@@ -136,6 +136,7 @@ HoxtonOwl.patchManager = {
     },
 
     updatePushbutton: function () {
+	// todo: update button state (and message) regularly
         var pm = HoxtonOwl.patchManager;
         if(pm.testPatch) {
 	    var state = pm.testPatch.getButtons();
@@ -465,10 +466,6 @@ HoxtonOwl.patchManager = {
                 that.searchItems.removeAll();
                 $("#gitsource").empty();
                 that.selectedPatch(patch);
-
-                //var url = "https://api.github.com/repos/" + that.selectedPatch().repo + "/contents/" + that.selectedPatch().github;
-
-                hookupButtonEvents();
 
                 $('#github-files').empty();
                 $('#git-code').hide();
