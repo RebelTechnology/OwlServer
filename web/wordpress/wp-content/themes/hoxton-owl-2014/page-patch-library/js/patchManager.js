@@ -566,6 +566,7 @@ HoxtonOwl.patchManager = {
 
                 var resetPatchParameterView = function () {
                     $('.knob').val(35).trigger('change');
+                    $('.knob-container:visible input.knob').css('visibility', 'hidden');
                 };
                 resetPatchParameterView();
 
@@ -595,6 +596,7 @@ HoxtonOwl.patchManager = {
                         $('#patch-tab-midi').hide();
                         $('#patch-tab-test').show();
                         $('.knob').val(35).trigger('change');
+                        $('.knob-container:visible input.knob').css('visibility', 'visible');
                         pm.initPatchTest();
                         changeKnobReadOnlyState(false);
                     } else if ('patch-tab-header-midi' === id) {
