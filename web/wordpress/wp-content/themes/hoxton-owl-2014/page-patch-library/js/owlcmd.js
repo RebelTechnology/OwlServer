@@ -76,16 +76,6 @@ function systemExclusive(data) {
     }
 }
 
-function registerMidiInput(index, name){
-  var select = document.getElementById("midiInputs");
-  select.options[index] = new Option(name, index);
-}
-
-function registerMidiOutput(index, name){
-  var select = document.getElementById("midiOutputs");
-  select.options[index] = new Option(name, index);
-}
-
 function controlChange(cc, value){
     console.log("received CC "+cc+": "+value);
     switch(cc){

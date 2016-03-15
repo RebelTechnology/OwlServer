@@ -35,7 +35,6 @@ HoxtonOwl.midiClient = {
         var inputs = midiAccess.inputs.values();
         for(var input = inputs.next(); input && !input.done; input = inputs.next()) {
             HoxtonOwl.midiClient.midiInputs.push(input.value);
-        	registerMidiInput(i++, input.value.name+" ("+input.value.manufacturer+") "+input.value.id);
         	console.log("added MIDI input "+input.value.name+" ("+input.value.manufacturer+") "+input.value.id);
         }
         if(inputs.size === 0)
@@ -45,7 +44,6 @@ HoxtonOwl.midiClient = {
         var outputs = midiAccess.outputs.values();
         for(var output = outputs.next(); output && !output.done; output = outputs.next()) {
             HoxtonOwl.midiClient.midiOutputs.push(output.value);
-        	registerMidiOutput(i++, output.value.name+" ("+output.value.manufacturer+") "+output.value.id);
         	console.log("added MIDI output "+output.value.name+" ("+output.value.manufacturer+") "+output.value.id);
         }
         if(outputs.size === 0)

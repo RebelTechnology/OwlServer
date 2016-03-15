@@ -298,23 +298,7 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                         <strong>Error:</strong> SysEx build not available for this patch.
                     </div>
                     <!-- /ko -->
-                    <div id="hidden-midi-controls" style="display:none; ">
-		      <!-- todo: get rid of this:
-			   currently we depend on midiInputs and midiOutputs in owlcmd.js  -->
-                      <p>MIDI In
-                          <select id="midiInputs" onchange="selectMidiInput(this.selectedIndex)">
-                            <option>...</option>
-                          </select>
-                      </p>
-
-                      <p>MIDI Out
-                          <select id="midiOutputs" onchange="selectMidiOutput(this.selectedIndex)">
-                            <option>...</option>
-                          </select>
-                          Monitor: <input id="monitor" type="button"/>
-                          Connect: <input id="connect" type="button"/>
-                      </p>
-		    </div>
+                    
                 </div>
             </div>
             <div class="white-box2" id="git-code">
