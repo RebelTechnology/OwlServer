@@ -21,7 +21,7 @@ wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jq
 wp_enqueue_script('owl-patches-page_knockout',      $resUri . 'js3rdparty/knockout-2.0.0.js');
 wp_enqueue_script('jquery',                         $resUri . 'js3rdparty/jquery-1.7.1.min.js');
 wp_enqueue_script('jquery-ui',                      get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.js', array('jquery'));
-wp_enqueue_script('owl-patches-page_jquery_knob',   $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
+wp_enqueue_script('owl-patches-page_jquery_knob',   get_template_directory_uri() . '/node_modules/jquery-knob/js/jquery.knob.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
 
 wp_enqueue_script('owl-patches-page_prettify',      'https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js');
@@ -222,23 +222,23 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 </div>
                 <div class="flexbox flex-center patch-tab-container">
                     <div class="knob-container" id="patch-parameter-a">
-                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="true" data-fgColor="#aaa" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.a"></p>
                     </div>
                     <div class="knob-container" id="patch-parameter-b">
-                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="true" data-fgColor="#aaa" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.b"></p>
                     </div>
                     <div class="knob-container" id="patch-parameter-c">
-                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="true" data-fgColor="#aaa" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.c"></p>
                     </div>
                     <div class="knob-container" id="patch-parameter-d">
-                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="true" data-fgColor="#aaa" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.d"></p>
                     </div>
                     <div class="knob-container" id="patch-parameter-e">
-                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="false" data-fgColor="#ed7800" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
+                        <input class="knob" data-displayPreviousValue="true" data-angleOffset="-125" data-angleArc="250" data-displayInput="true" data-readOnly="true" data-fgColor="#aaa" data-linecap="round" data-width="100%" data-rotation="clockwise" value="35">
                         <p class="parameter-label" data-bind="text: parameters.e"></p>
                     </div>
                 </div>

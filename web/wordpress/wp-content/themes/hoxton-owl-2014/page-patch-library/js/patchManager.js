@@ -216,7 +216,7 @@ HoxtonOwl.patchManager = {
             $('#patch-tab-test-err-4').hide();
 
             $('#patch-test-inner-container').show();
-            $('.knob').val(50).trigger('change');
+            $('.knob').val(35).trigger('change');
             // $('#patch-test-source').select2({
             //     placeholder: 'Select a source',
             //     minimumResultsForSearch: Infinity
@@ -531,14 +531,15 @@ HoxtonOwl.patchManager = {
                         });
                     }
                 }
-
-                $('.knob').addClass('disabled');
+                
+                // add colour to knobs for which parameters exist in this patch
                 if (patch.parameters) {
                     for (var key in patch.parameters) {
-                        $('#patch-parameter-' + key + ' .knob').removeClass('disabled').addClass('enabled');
+                        console.log(key);
+                        $('#patch-parameter-' + key + ' .knob').attr('data-fgColor', '#ed7800');
                     }
                 }
-                knobify();
+                knobify();                
 
                 // Show build download links
                 if (that.selectedPatch().sysExAvailable) {
@@ -566,27 +567,17 @@ HoxtonOwl.patchManager = {
                 var resetPatchParameterView = function () {
                     $('.knob').val(35).trigger('change');
                     $('.knob-container:visible input.knob').css('visibility', 'hidden');
-
-                    // This is a workaround to make the knobs unresponsive to mouse/touch events:
-                    $('.knob-container canvas:visible').each(function (i, el) {
-                        var rect = el.getBoundingClientRect();
-                        var css = {
-                            // 'background-color': 'red',
-                            // 'opacity':          0.3,
-                            'position': 'absolute',
-                            'top':      Math.round(rect.top + window.scrollY) + 'px',
-                            'left':     Math.round(rect.left + window.scrollX) + 'px',
-                            'width':    Math.round(rect.width) + 'px',
-                            'height':   Math.round(rect.height) + 'px'
-                        };
-                        var styles = '';
-                        for (rule in css) {
-                            styles += rule + ': ' + css[rule] + '; ';
-                        }
-                        $('body').append($('<div class="knob-disabler" style="' + styles + '"></div>'));
-                    });
                 };
                 resetPatchParameterView();
+
+                function changeKnobReadOnlyState(readonly) {
+                    if (patch.parameters) {
+                        for (var key in patch.parameters) {
+                            console.log(key);
+                            $('#patch-parameter-' + key + ' .knob').trigger('configure', {"readOnly":readonly});
+                        }
+                    }
+                }
 
                 $('.patch-tab-header a').click(function (e) {
                     var $tab = $(e.target).closest('h2'),
@@ -599,20 +590,22 @@ HoxtonOwl.patchManager = {
                         $('#patch-tab-info').show();
                         pm.stopPatchTest();
                         resetPatchParameterView();
+                        changeKnobReadOnlyState(true);
                     } else if ('patch-tab-header-test' === id) {
                         $('#patch-tab-info').hide();
                         $('#patch-tab-midi').hide();
                         $('#patch-tab-test').show();
                         $('.knob').val(35).trigger('change');
                         $('.knob-container:visible input.knob').css('visibility', 'visible');
-                        $('.knob-disabler').remove();
                         pm.initPatchTest();
+                        changeKnobReadOnlyState(false);
                     } else if ('patch-tab-header-midi' === id) {
                         $('#patch-tab-info').hide();
                         $('#patch-tab-test').hide();
                         $('#patch-tab-midi').show();
                         pm.stopPatchTest();
                         resetPatchParameterView();
+                        changeKnobReadOnlyState(true);
                     }
                     return false;
                 });

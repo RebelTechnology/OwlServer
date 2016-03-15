@@ -4,14 +4,7 @@ function knobify () {
         HoxtonOwl.patchManager.updatePatchParameters();
     }
 
-    $(".knob.enabled").knob({
-        change : knobChange,
-        release : knobChange,
-    });
-
-    $(".knob.disabled").knob({
-        'readOnly': true,
-        'fgColor': '#aaa',
+    $(".knob").knob({
         change : knobChange,
         release : knobChange,
     });
