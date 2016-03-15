@@ -76,16 +76,6 @@ function systemExclusive(data) {
     }
 }
 
-function registerMidiInput(index, name){
-  var select = document.getElementById("midiInputs");
-  select.options[index] = new Option(name, index);
-}
-
-function registerMidiOutput(index, name){
-  var select = document.getElementById("midiOutputs");
-  select.options[index] = new Option(name, index);
-}
-
 function controlChange(cc, value){
     console.log("received CC "+cc+": "+value);
     switch(cc){
@@ -113,7 +103,7 @@ function programChange(pc){
 
 
 function sendRequest(type){
-    sendCc(OpenWareMidiControl.REQUEST_SETTINGS, type);
+    HoxtonOwl.midiClient.sendCc(OpenWareMidiControl.REQUEST_SETTINGS, type);
 }
 
 function sendStatusRequest(){
@@ -157,17 +147,17 @@ function onMidiInitialised(){
     var outConnected = false,
         inConnected = false;
 
-    for (var o = 0; o < midiOutputs.length; o++) {
-        if (midiOutputs[o].name.match('^OWL-MIDI')) {
-            selectMidiOutput(o);
+    for (var o = 0; o < HoxtonOwl.midiClient.midiOutputs.length; o++) {
+        if (HoxtonOwl.midiClient.midiOutputs[o].name.match('^OWL-MIDI')) {
+            HoxtonOwl.midiClient.selectMidiOutput(o);
             outConnected = true;
             break;
         }        
     }
 
-    for (var i = 0; i < midiInputs.length; i++) {
-        if (midiInputs[i].name.match('^OWL-MIDI')) {
-            selectMidiInput(i);
+    for (var i = 0; i < HoxtonOwl.midiClient.midiInputs.length; i++) {
+        if (HoxtonOwl.midiClient.midiInputs[i].name.match('^OWL-MIDI')) {
+            HoxtonOwl.midiClient.selectMidiInput(i);
             inConnected = true;
             break;
         }        
@@ -180,6 +170,7 @@ function onMidiInitialised(){
     } else {
         console.log('failed to connect to an OWL');
         $('#ourstatus').text('Failed to connect to an OWL')
+        $('#load-owl-button').hide();
     }
 
     // sendLoadRequest(); // load patches
@@ -197,7 +188,7 @@ function connectToOwl() {
     {
         navigator.requestMIDIAccess({sysex:true});
     }
-    initialiseMidi(onMidiInitialised);
+    HoxtonOwl.midiClient.initialiseMidi(onMidiInitialised);
 }
 
 // function hookupButtonEvents() {
@@ -253,9 +244,11 @@ function sendProgramData(data){
     }else if(data[i] == 0xf7){
         console.log("sending "+(i-from)+" bytes sysex");
         msg = data.subarray(from, i+1);
-        logMidiData(msg);
-        if(midiOutput)
-        midiOutput.send(msg, 0);
+        HoxtonOwl.midiClient.logMidiData(msg);
+        if(HoxtonOwl.midiClient.midiOutput)
+        {
+            HoxtonOwl.midiClient.midiOutput.send(msg, 0);            
+        }
         sleep(1);
     }
     }
@@ -265,9 +258,12 @@ function sendProgramRun(){
     console.log("sending sysex run command");
     var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, 
            OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7 ];
-    logMidiData(msg);
-    if(midiOutput)
-      midiOutput.send(msg, 0);
+    HoxtonOwl.midiClient.logMidiData(msg);
+    if(HoxtonOwl.midiClient.midiOutput)
+    {
+        HoxtonOwl.midiClient.midiOutput.send(msg, 0);
+    }
+      
 }
 
 function sendProgramFromUrl(url){
