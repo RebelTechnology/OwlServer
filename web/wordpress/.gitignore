@@ -23,5 +23,6 @@
 # Unfortunately, the above method reintroduces other 
 # undesirable files, so we re-ignore them:
 .DS_Store
+/wp-content/themes/hoxton-owl-2014/node_modules/
 
 # Add to the bottom of this list any files you wish to track.

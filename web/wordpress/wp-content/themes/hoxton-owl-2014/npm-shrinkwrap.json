@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "jquery-knob": {
+      "version": "1.2.11",
+      "from": "git+https://github.com/valichek/jQuery-Knob.git",
+      "resolved": "git+https://github.com/valichek/jQuery-Knob.git#5c8cd1e74c38bcfd09b1d96e9e39bdabda5a3db5"
+    }
+  }
+}
