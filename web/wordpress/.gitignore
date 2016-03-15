@@ -12,6 +12,16 @@
 !/robots.txt
 !/wp-content/plugins/owl-api-bridge.php
 !/wp-content/plugins/owl-patch-uploader.php
+
+# To add dirs back in, you need to specify a dir at a time,
+# Then specify "everything inside this dir" (**):
+!/wp-content/
+!/wp-content/themes/
 !/wp-content/themes/hoxton-owl-2014/
+!/wp-content/themes/hoxton-owl-2014/**
+
+# Unfortunately, the above method reintroduces other 
+# undesirable files, so we re-ignore them:
+.DS_Store
 
 # Add to the bottom of this list any files you wish to track.

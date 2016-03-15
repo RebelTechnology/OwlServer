@@ -119,7 +119,7 @@ router.get('/', function(req, res) {
 
         var status = error.status || 500;
         return res.status(status).json({
-            message: error.toString()+"yowzer",
+            message: error.toString(),
             status: status
         });
 

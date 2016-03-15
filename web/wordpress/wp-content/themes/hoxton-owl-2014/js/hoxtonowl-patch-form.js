@@ -365,7 +365,7 @@ HoxtonOwl.patchForm = {
             } else if (data.responseJSON) {
 
                 var response = data.responseJSON;
-                if (response.error && response.field && response.message) {
+                if (response.field && response.message) {
 
                     if (response.field == 'soundcloud' || response.field == 'github') {
                         $('#frm-patch-' + (response.field == 'soundcloud' ? 'samples' : 'github') + '_' + response.index).
@@ -387,11 +387,13 @@ HoxtonOwl.patchForm = {
                             show();
                     }
                     location = '#form-top';
+                }else if (response.message) {
+		    alert(response.message);
                 } else {
-                    alert('Internal error.');
+                    alert('Unexpected error saving patch (1)');
                 }
             } else {
-                alert('Internal error.');
+                alert('Unexpected error saving patch (2)');
             }
         });
     },
@@ -500,6 +502,7 @@ HoxtonOwl.patchForm = {
                 $eventSelect.on("select2:select", function (e) { checkWordPressIdRadio(); });
                 $eventSelect.on("select2:unselect", function (e) { checkWordPressIdRadio(); });
             }
+            // todo: pre-populate wordPressIdRadio with current user
 
             var patchAuthorNameRadio = $('#frm-patch-author-name');
             if (patchAuthorNameRadio.length) {

@@ -101,15 +101,17 @@ router.post('/', function(req, res) {
         console.log('Checking credentials...');
 
         if (!credentials) {
-            var e = new Error('Access denied (1).');
-            e.status = 401;
-            throw e;
+	    throw {
+		message: "Access denied (1).",
+		status: 401
+	    }
         }
 
         if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            var e = new Error('Access denied (2).');
-            e.status = 401;
-            throw e;
+	    throw {
+		message: "Access denied (2).",
+		status: 401
+	    }
         }
 
         wpCookie = credentials.cookie;
@@ -175,11 +177,12 @@ router.post('/', function(req, res) {
          * ~~~~~~~~~~~~ */
 
         if (null !== doc) {
-            var e = new Error('This name is already taken.');
-            e.type = 'not_valid';
-            e.field = 'name';
-            e.status = 400;
-            throw e;
+	    throw {
+		type: 'not_valid',
+		field: 'name',
+		message: 'Patch name is already taken.',
+		status: 400
+	    }
         }
 
         newPatch = patchModel.sanitize(newPatch);
@@ -215,13 +218,17 @@ router.post('/', function(req, res) {
         };
 
     }).catch(function (error) {
-
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            status: status
-        });
-
+	if(error.status){
+	    return res.status(error.status).json(error);
+	}else if(error.error){
+            var status = error.error.status || 500;
+	    return res.status(status).json(error);
+	}else{
+            return res.status(500).json({
+		message: error.toString(),
+		status: 500
+            });
+	}
     }).done(function (response) {
 
         if ('ServerResponse' === response.constructor.name) {
