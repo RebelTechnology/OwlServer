@@ -629,6 +629,12 @@ HoxtonOwl.patchManager = {
                     $('span.compile-patch-container').remove();
                 }
 
+                // hook up owl-load-button
+                $('#load-owl-button').click(function(){
+                    sendProgramFromUrl('/api/builds/' + selectedPatch()._id + '?format=sysx&amp;download=1');
+                    statusRequestLoop();
+                });
+
             });
         };
 
