@@ -107,9 +107,11 @@ HoxtonOwl.midiClient = {
     },
 
     selectMidiOutput: function(index) {
-        midiOutput = midiOutputs[index];
+        var midiOutput = HoxtonOwl.midiClient.midiOutput = HoxtonOwl.midiClient.midiOutputs[index];
         if(midiOutput)
-          console.log("selecting MIDI output "+index+": "+midiOutput.name+" ("+midiOutput.manufacturer+")");
+        {
+          console.log("selecting MIDI output "+index+": "+midiOutput.name+" ("+midiOutput.manufacturer+")");        
+        }
     },
 
     sendPc: function(value) {
