@@ -24,8 +24,8 @@ wp_enqueue_script('jquery-ui',                      get_template_directory_uri()
 wp_enqueue_script('owl-patches-page_jquery_knob',   $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
 
-wp_enqueue_script('owl-patches-page_prettify',      'https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js');
-wp_enqueue_script('owl-patches-page_run_prettify',  'https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js');
+wp_enqueue_script('owl-patches-page_prettify',      'https://cdn.rawgit.com/google/code-prettify/master/loader/prettify.js');
+wp_enqueue_script('owl-patches-page_run_prettify',  'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js');
 
 //wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
 
