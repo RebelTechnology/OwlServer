@@ -101,6 +101,13 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
                             <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.deletePatch"><img src="<?= $resUri ?>images/bin.png" alt="Delete patch" /></div>
                         </td>
+                        <?php else: ?>
+                        <!-- ko if: userAllowedToEditPatch(selectedPatch()) -->
+                        <td width="80">
+                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
+                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.deletePatch"><img src="<?= $resUri ?>images/bin.png" alt="Delete patch" /></div>
+                        </td>
+                        <!-- /ko -->
                         <?php endif; ?>
                     </tr>
                     <tr>
@@ -210,6 +217,9 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <!-- /ko -->
                 <!-- ko if: jsAvailable -->
 <!--                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span> -->
+                <!-- /ko -->
+                <!-- ko foreach: tags -->
+                <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
                 <!-- /ko -->
 
                 <span class="parameter-value compile-patch-container"><a class="compileLink sysex" href="#">Compile Patch</a></span>
