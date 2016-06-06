@@ -451,7 +451,7 @@ HoxtonOwl.patchManager = {
             that.selectedPatch(null);
             that.searchItems.push(author);
 
-        },
+        };
 
         that.userAllowedToEditPatch = function(patch){
             var currentWpUserId = parseInt($('#wordpress-user-id').text());
@@ -459,7 +459,7 @@ HoxtonOwl.patchManager = {
                 return true
             }
             return false;
-        },
+        };
 
         that.selectPatch = function(patch) {
             var patchId = patch._id;
