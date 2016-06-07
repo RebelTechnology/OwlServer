@@ -158,8 +158,8 @@ HoxtonOwl.patchManager = {
                     paramNo = paramLetter.charCodeAt(0) - 97, // "a".charCodeAt(0) === 97
                     $el = $(el),
                     paramVal = $el.find('.knob').val() / 100;
-
                 if (paramVal !== pm['param_' + paramLetter]) { // Don't call into the patch if not necessary
+		    // console.log("set "+paramNo+":"+paramVal);
                     patch.update(paramNo, paramVal);
                     pm['param_' + paramLetter] = paramVal;
                 }
@@ -543,7 +543,6 @@ HoxtonOwl.patchManager = {
                 // add colour to knobs for which parameters exist in this patch
                 if (patch.parameters) {
                     for (var key in patch.parameters) {
-                        console.log(key);
                         $('#patch-parameter-' + key + ' .knob').attr('data-fgColor', '#ed7800');
                     }
                 }
@@ -579,9 +578,9 @@ HoxtonOwl.patchManager = {
                 resetPatchParameterView();
 
                 function changeKnobReadOnlyState(readonly) {
+		    // this won't work because the readOnly attribute is only read on creation
                     if (patch.parameters) {
                         for (var key in patch.parameters) {
-                            console.log(key);
                             $('#patch-parameter-' + key + ' .knob').trigger('configure', {"readOnly":readonly});
                         }
                     }

@@ -7,5 +7,6 @@ function knobify () {
     $(".knob").knob({
         change : knobChange,
         release : knobChange,
+	readOnly : false
     });
 };

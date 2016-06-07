@@ -40,10 +40,10 @@ owl.dsp = function () {
 		micNode: null
 	};
 	that.vectorsize = 2048;      
-	console.log("setup[fs "+owl.context.sampleRate+"][bs "+that.vectorsize+"]");
+	console.log("audio[fs "+owl.context.sampleRate+"][bs "+that.vectorsize+"]");
 	WEB_setup(owl.context.sampleRate, that.vectorsize);
-	for (i = 0; i < 5; i++)
-		console.log("parameter "+i+": "+WEB_getParameterName(i));
+	// for (i = 0; i < 5; i++)
+	// 	console.log("parameter "+i+": "+WEB_getParameterName(i));
 
 	// Bind to C++ Member Functions
 	that.getNumInputs = function () {
