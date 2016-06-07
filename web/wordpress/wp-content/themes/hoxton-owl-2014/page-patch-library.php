@@ -21,7 +21,7 @@ wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jq
 wp_enqueue_script('owl-patches-page_knockout',      $resUri . 'js3rdparty/knockout-2.0.0.js');
 wp_enqueue_script('jquery',                         $resUri . 'js3rdparty/jquery-1.7.1.min.js');
 wp_enqueue_script('jquery-ui',                      get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.js', array('jquery'));
-wp_enqueue_script('owl-patches-page_jquery_knob',   get_template_directory_uri() . '/node_modules/jquery-knob/js/jquery.knob.js', array('jquery'));
+wp_enqueue_script('owl-patches-page_jquery_knob',   $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
 
 wp_enqueue_script('owl-patches-page_prettify',      'https://cdn.rawgit.com/google/code-prettify/master/loader/prettify.js');
