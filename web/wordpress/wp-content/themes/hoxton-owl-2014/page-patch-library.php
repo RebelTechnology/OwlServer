@@ -24,8 +24,8 @@ wp_enqueue_script('jquery-ui',                      get_template_directory_uri()
 wp_enqueue_script('owl-patches-page_jquery_knob',   get_template_directory_uri() . '/node_modules/jquery-knob/js/jquery.knob.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
 
-wp_enqueue_script('owl-patches-page_prettify',      'https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js');
-wp_enqueue_script('owl-patches-page_run_prettify',  'https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js');
+wp_enqueue_script('owl-patches-page_prettify',      'https://cdn.rawgit.com/google/code-prettify/master/loader/prettify.js');
+wp_enqueue_script('owl-patches-page_run_prettify',  'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js');
 
 //wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
 
@@ -101,6 +101,13 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
                             <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.deletePatch"><img src="<?= $resUri ?>images/bin.png" alt="Delete patch" /></div>
                         </td>
+                        <?php else: ?>
+                        <!-- ko if: userAllowedToEditPatch(selectedPatch()) -->
+                        <td width="80">
+                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
+                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.deletePatch"><img src="<?= $resUri ?>images/bin.png" alt="Delete patch" /></div>
+                        </td>
+                        <!-- /ko -->
                         <?php endif; ?>
                     </tr>
                     <tr>
@@ -210,6 +217,9 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <!-- /ko -->
                 <!-- ko if: jsAvailable -->
 <!--                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span> -->
+                <!-- /ko -->
+                <!-- ko foreach: tags -->
+                <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>
                 <!-- /ko -->
 
                 <span class="parameter-value compile-patch-container"><a class="compileLink sysex" href="#">Compile Patch</a></span>

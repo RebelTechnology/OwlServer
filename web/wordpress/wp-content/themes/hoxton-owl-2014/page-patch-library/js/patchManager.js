@@ -451,7 +451,15 @@ HoxtonOwl.patchManager = {
             that.selectedPatch(null);
             that.searchItems.push(author);
 
-        },
+        };
+
+        that.userAllowedToEditPatch = function(patch){
+            var currentWpUserId = parseInt($('#wordpress-user-id').text());
+            if(patch.author && patch.author.wordpressId && (patch.author.wordpressId === currentWpUserId)){
+                return true
+            }
+            return false;
+        };
 
         that.selectPatch = function(patch) {
             var patchId = patch._id;
