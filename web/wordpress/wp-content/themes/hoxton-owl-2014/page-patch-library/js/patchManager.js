@@ -306,41 +306,49 @@ HoxtonOwl.patchManager = {
      */
     main: function(patches, authors, tags) {
 
-        var that = this;
+        var self = this;
         var pm = HoxtonOwl.patchManager;
         var $currentWpUserId = $('#wordpress-user-id').text();
 
-        that.selectedPatch = ko.observable();       // currently selected patch
-        that.patches = ko.observableArray(patches); // all patches
-        that.authors = ko.observableArray(authors); // all authors
-        that.tags = ko.observableArray(tags);       // all tags
+        self.selectedPatch = ko.observable();       // currently selected patch
+        self.patches = ko.observableArray(patches); // all patches
+        self.authors = ko.observableArray(authors); // all authors
+        self.tags = ko.observableArray(tags);       // all tags
 
-        that.search = ko.observable();              // one of 'all', 'author', 'tag', 'patch' or 'myPatches'
-        that.searchItems = ko.observableArray();
-        that.patchSortOrder = ko.observable('name');
+        self.search = ko.observable();              // one of 'all', 'author', 'tag', 'patch' or 'myPatches'
+        self.searchItems = ko.observableArray();
+        self.patchSortOrder = ko.observable('name');
 
-        that.filteredPatches = ko.computed(function() {
-            return ko.utils.arrayFilter(that.patches(), function(r) {
-                if (that.searchItems.indexOf('All') > -1) {
-                    return r.published;
+        self.truncateDescriptions = function(patch){
+            if(patch.description && patch.description.length > 215){
+                patch.description = patch.description.substr(0,215) + ' ...';
+            }
+            return patch;
+        };
+
+        self.filteredPatches = ko.computed(function() {
+            return self.patches().filter(function(patch) {
+                
+                if (self.searchItems.indexOf('All') > -1) {
+                    return patch.published;
                 }
-                if (that.search() === 'tag') {
-                    for (i=0; i<r.tags.length; ++i) {
-                        if(that.searchItems.indexOf(r.tags[i]) > -1 && r.published) {
+                if (self.search() === 'tag') {
+                    for (i=0; i<patch.tags.length; ++i) {
+                        if(self.searchItems.indexOf(patch.tags[i]) > -1 && patch.published) {
                             return true;
                         }
                     }
-                } else if (that.search() === 'author') {
-                    return r.author && that.searchItems.indexOf(r.author.name) > -1 && r.published;
-                } else if (that.search() === 'myPatches') {
-                    // return that.searchItems.indexOf(r.author.name) > -1;
-                    return r.author && r.author.wordpressId == $currentWpUserId;
+                } else if (self.search() === 'author') {
+                    return patch.author && self.searchItems.indexOf(patch.author.name) > -1 && patch.published;
+                } else if (self.search() === 'myPatches') {
+                    // return self.searchItems.indexOf(patch.author.name) > -1;
+                    return patch.author && patch.author.wordpressId == $currentWpUserId;
                 }
                 return false;
-            });
+            }).map(self.truncateDescriptions);
         });
 
-        that.filteredPatchAuthorNo = ko.computed(function () {
+        self.filteredPatchAuthorNo = ko.computed(function () {
             var stringified;
             var distinctAuthors = [];
             for (var i = 0, max = filteredPatches().length; i < max; i++) {
@@ -352,108 +360,108 @@ HoxtonOwl.patchManager = {
             return distinctAuthors.length;
         });
 
-        that.selectAllPatches = function(dummy, e) {
+        self.selectAllPatches = function(dummy, e) {
 
             pm.stopPatchTest();
             pm['sortPatchesBy' + e.currentTarget.id.split('-')[3]]();
 
-            that.selectedPatch(null);
-            that.search('all');
-            that.searchItems.removeAll();
-            that.searchItems.push('All');
+            self.selectedPatch(null);
+            self.search('all');
+            self.searchItems.removeAll();
+            self.searchItems.push('All');
         };
 
-        that.selectFilter = function(item) {
+        self.selectFilter = function(item) {
             pm.stopPatchTest();
-            if(that.search() === "author") {
+            if(self.search() === "author") {
                 return selectAuthor(item);
             } else {
                 return selectTag(item);
             }
         };
 
-        that.selectAuthor = function(author) {
+        self.selectAuthor = function(author) {
             pm.stopPatchTest();
-            that.selectedPatch(null);
-            if(that.search() != "author") {
-                that.search("author");
-                that.searchItems.removeAll();
-                that.searchItems.push(author);
-            } else if (that.searchItems.indexOf(author) > -1) {
-                that.searchItems.remove(author);
-                if(that.searchItems().length === 0) {
-                    that.searchItems.push("All");
+            self.selectedPatch(null);
+            if(self.search() != "author") {
+                self.search("author");
+                self.searchItems.removeAll();
+                self.searchItems.push(author);
+            } else if (self.searchItems.indexOf(author) > -1) {
+                self.searchItems.remove(author);
+                if(self.searchItems().length === 0) {
+                    self.searchItems.push("All");
                 }
             } else {
                 if (author === "All") {
-                    that.searchItems.removeAll();
-                    that.searchItems.push('All'); // added by Sam
+                    self.searchItems.removeAll();
+                    self.searchItems.push('All'); // added by Sam
                 } else {
-                    that.searchItems.remove("All");
-                    that.searchItems.push(author);
+                    self.searchItems.remove("All");
+                    self.searchItems.push(author);
                 }
             }
         };
 
-        that.selectTag = function(tag) {
+        self.selectTag = function(tag) {
             pm.stopPatchTest();
-            that.selectedPatch(null);
-            if (that.search() != "tag") {
-                that.search("tag");
-                that.searchItems.removeAll();
-                that.searchItems.push(tag);
-            } else if (that.searchItems.indexOf(tag) > -1) {
-                that.searchItems.remove(tag);
-                if(that.searchItems().length == 0) {
-                    that.searchItems.push("All");
+            self.selectedPatch(null);
+            if (self.search() != "tag") {
+                self.search("tag");
+                self.searchItems.removeAll();
+                self.searchItems.push(tag);
+            } else if (self.searchItems.indexOf(tag) > -1) {
+                self.searchItems.remove(tag);
+                if(self.searchItems().length == 0) {
+                    self.searchItems.push("All");
                 }
             } else {
                 if (tag === "All") {
-                    that.searchItems.removeAll();
-                    that.searchItems.push('All'); // added by Sam
+                    self.searchItems.removeAll();
+                    self.searchItems.push('All'); // added by Sam
                 } else {
-                    that.searchItems.remove("All");
-                    that.searchItems.push(tag);
+                    self.searchItems.remove("All");
+                    self.searchItems.push(tag);
                 }
             }
         };
 
-        that.selectOnlyTag = function(tag) {
-            that.searchItems.removeAll();
+        self.selectOnlyTag = function(tag) {
+            self.searchItems.removeAll();
             selectTag(tag);
         };
 
-        that.selectAllTags = function(tag) {
+        self.selectAllTags = function(tag) {
             pm.stopPatchTest();
             pm.sortPatchesByName();
             selectTag('All');
         };
 
-        that.selectOnlyAuthor = function(authorsPatch) {
+        self.selectOnlyAuthor = function(authorsPatch) {
             pm.stopPatchTest();
-            that.searchItems.removeAll();
+            self.searchItems.removeAll();
             selectAuthor(authorsPatch.author.name);
         };
 
-        that.selectAllAuthors = function(tag) {
+        self.selectAllAuthors = function(tag) {
             pm.stopPatchTest();
             pm.sortPatchesByName();
             selectAuthor('All');
         };
 
-        that.selectMyPatches = function() {
+        self.selectMyPatches = function() {
 
             pm.stopPatchTest();
             pm.sortPatchesByName();
-            that.search('myPatches');
+            self.search('myPatches');
             var author = $('#wordpress-username').text();
-            that.searchItems.removeAll();
-            that.selectedPatch(null);
-            that.searchItems.push(author);
+            self.searchItems.removeAll();
+            self.selectedPatch(null);
+            self.searchItems.push(author);
 
         };
 
-        that.userAllowedToEditPatch = function(patch){
+        self.userAllowedToEditPatch = function(patch){
             var currentWpUserId = parseInt($('#wordpress-user-id').text());
             if(patch.author && patch.author.wordpressId && (patch.author.wordpressId === currentWpUserId)){
                 return true
@@ -461,7 +469,7 @@ HoxtonOwl.patchManager = {
             return false;
         };
 
-        that.selectPatch = function(patch) {
+        self.selectPatch = function(patch) {
             var patchId = patch._id;
             var apiClient = new HoxtonOwl.ApiClient();
             var pdGraphs = [];
@@ -470,17 +478,17 @@ HoxtonOwl.patchManager = {
                 if (name.name) {
                     name = name.name;
                 }
-                that.search("patch");
-                that.searchItems.removeAll();
+                self.search("patch");
+                self.searchItems.removeAll();
                 $("#gitsource").empty();
-                that.selectedPatch(patch);
+                self.selectedPatch(patch);
 
                 $('#github-files').empty();
                 $('#git-code').hide();
-                if (that.selectedPatch().github.length) {
-                    for (var i = 0, max = that.selectedPatch().github.length; i < max; i++) {
+                if (self.selectedPatch().github.length) {
+                    for (var i = 0, max = self.selectedPatch().github.length; i < max; i++) {
 
-                        pm.getGithubFile(that.selectedPatch().github[i], function(contents, filename, url, actuallyFromGitHub) {
+                        pm.getGithubFile(self.selectedPatch().github[i], function(contents, filename, url, actuallyFromGitHub) {
 
                             var cnt;
 
@@ -549,12 +557,14 @@ HoxtonOwl.patchManager = {
                 knobify();                
 
                 // Show build download links
-                if (that.selectedPatch().sysExAvailable) {
-                    $('.sysExDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=sysx&amp;download=1');
+                if (self.selectedPatch().sysExAvailable) {
+                    $('.sysExDownloadLink').on('click', function(){
+                        window.location = apiClient.apiEndPoint + '/builds/' + self.selectedPatch()._id + '?format=sysx&amp;download=1';
+                    });
                 }
 
-                if (that.selectedPatch().jsAvailable) {
-                    $('.jsDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + that.selectedPatch()._id + '?format=js&amp;download=1');
+                if (self.selectedPatch().jsAvailable) {
+                    $('.jsDownloadLink').attr('href', apiClient.apiEndPoint + '/builds/' + self.selectedPatch()._id + '?format=js&amp;download=1');
                 }
 
                 var isAdmin = HoxtonOwl.isUserAdmin;
@@ -562,9 +572,9 @@ HoxtonOwl.patchManager = {
                 // Patch test
                 if (!window.AudioContext) {
                     $('#patch-tab-test-err-1').show(); // Web Audio API not available
-                } else if (!that.selectedPatch().jsAvailable) {
+                } else if (!self.selectedPatch().jsAvailable) {
                     $('#patch-tab-test-err-2').show(); // JS build not available
-                    if (pm.userAllowedToBuildPatch(that.selectedPatch())) {
+                    if (pm.userAllowedToBuildPatch(self.selectedPatch())) {
                         $('#patch-tab-test-err-3').show(); // Would you like to build the patch now?
                     }
                 } else  {
@@ -622,7 +632,7 @@ HoxtonOwl.patchManager = {
                 $('.compile-patch-container').css('display', 'none');
 
                 // Patch compile button
-                if (pm.userAllowedToBuildPatch(that.selectedPatch())) {
+                if (pm.userAllowedToBuildPatch(self.selectedPatch())) {
                     $('tr.compile-patch-container').css('display', 'table-row');
                     $('span.compile-patch-container').css('display', 'inline');
                 } else {
@@ -638,14 +648,14 @@ HoxtonOwl.patchManager = {
             });
         };
 
-        that.soundcloud = ko.computed(function() {
-            if(that.selectedPatch() && that.selectedPatch().soundcloud && that.selectedPatch().soundcloud.length) {
+        self.soundcloud = ko.computed(function() {
+            if(self.selectedPatch() && self.selectedPatch().soundcloud && self.selectedPatch().soundcloud.length) {
 
                 var iframeSrcs = [];
-                for (var i = 0, max = that.selectedPatch().soundcloud.length; i < max; i++) {
+                for (var i = 0, max = self.selectedPatch().soundcloud.length; i < max; i++) {
                     iframeSrcs.push(
                         "https://w.soundcloud.com/player/?url=" +
-                        encodeURIComponent(that.selectedPatch().soundcloud[i]) +
+                        encodeURIComponent(self.selectedPatch().soundcloud[i]) +
                         "&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"
                     );
                 }
@@ -656,7 +666,7 @@ HoxtonOwl.patchManager = {
             }
         });
 
-        ko.applyBindings(that);
+        ko.applyBindings(self);
 
         /* patch compilation section */
 
@@ -712,7 +722,7 @@ HoxtonOwl.patchManager = {
             apiClient.getSinglePatchBySeoName(seoName, selectPatch);
         } else {
             selectTag("All");
-            that.search("all");
+            self.search("all");
             pm.sortPatchesByCreationTimeUtc();
         }
     },

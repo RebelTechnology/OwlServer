@@ -103,6 +103,13 @@ router.get('/:id', function (req, res) {
         if (download) {
             res.setHeader('Content-disposition', 'attachment; filename=' + filename);
         }
+        if(download && format === 'sysx') {
+            // increment download count for sysx files
+            console.log('incrementing patch download count');
+            patch.downloadCount = patch.downloadCount || 0;
+            patch.downloadCount++;
+            collection.updateById(patch._id, patch);
+        }
         res.setHeader('Content-length', fs.statSync(buildFile)['size']);
         if (format === 'sysx') {
             res.setHeader('Content-type', 'application/octet-stream');

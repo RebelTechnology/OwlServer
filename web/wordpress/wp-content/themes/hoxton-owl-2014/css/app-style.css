@@ -706,6 +706,15 @@ h2, .secondary-nav-item p {
     font-size: 14px;
     padding-bottom: 10px;
 }
+.patch-description-list-view {
+    display: inline-block;
+    max-height: 9.5em;
+    width: 343px;
+    overflow: hidden;
+    padding-top: 2em;
+    line-height: 1.5em;
+    color: #fff;
+}
 
 /* Media queries */
 
@@ -713,6 +722,13 @@ h2, .secondary-nav-item p {
     .patch-tile {
         width: 48%;
         height: 180px;
+    }
+    .patch-description-list-view {
+        width: 95%;
+        max-height: 3.5em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     #one-third {
         width: 100%;
