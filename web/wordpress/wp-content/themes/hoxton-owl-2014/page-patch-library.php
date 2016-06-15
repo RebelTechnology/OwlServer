@@ -177,6 +177,12 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                             </p>
                         </td>
                     </tr>
+                    <!-- ko if: downloadCount -->
+                    <tr>
+                        <td><span class="parameter-label">Downloads</span></td>
+                        <td><p data-bind="text: downloadCount"></p></td>
+                    </tr>
+                    <!-- /ko -->
                     <!-- /ko -->
                     <tr class="compile-patch-container">
                        <td><span class="parameter-label">Build</span></td>
@@ -212,8 +218,12 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 <span class="parameter-label">Memory</span>
                 <span class="parameter-value" data-bind="text: (selectedPatch().bytesToHuman(bytes) + ' / 1Mb')"></span>
                 <!-- /ko -->
+                <!-- ko if: downloadCount -->
+                <span class="parameter-label">Downloads</span>
+                <span class="parameter-value" data-bind="text: downloadCount"></span>
+                <!-- /ko -->
                 <!-- ko if: sysExAvailable -->
-                <span class="parameter-value"><a class="sysExDownloadLink" href="#">Download SysEx</a></span>
+                <span class="parameter-value"><button class="sysExDownloadLink" href="#">Download SysEx</button></span>
                 <!-- /ko -->
                 <!-- ko if: jsAvailable -->
 <!--                <span class="parameter-value"><a class="jsDownloadLink" href="#">Download JS</a></span> -->
@@ -344,28 +354,24 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
         <!-- ko foreach: filteredPatches -->
         <!-- div.patch-tile -->
         <div class="patch-tile">
-            <table class="patch-title-controls">
-                <tbody>
-                    <tr>
-                        <td>
-                            <span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': _id }"></span>
-                            <div class="patch-visibility" data-bind="visible: !published"><img src="<?= $resUri ?>images/lock.png"> PRIVATE</div>
-                        </td>
+            <div class="patch-title-controls">
+                <div>
+                    <span class="patch-title" data-bind="text: name, click: HoxtonOwl.patchManager.openPatch, attr: { 'data-patch-id': _id }"></span>
+                    <div class="patch-visibility" data-bind="visible: !published"><img src="<?= $resUri ?>images/lock.png"> PRIVATE</div>
+                </div>
 
-                        <!-- ko if: search() === 'myPatches' -->
-                        <td width="80">
-                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
-                            <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.deletePatch"><img src="<?= $resUri ?>images/bin.png" alt="Delete patch" /></div>
-                        </td>
-                        <!-- /ko -->
-                    </tr>
-                    <tr>
-                        <td class="patch-author">
-                            <span class="author-name" data-bind="visible: search() !== 'myPatches', text: author.name, click: selectOnlyAuthor"></span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                <!-- ko if: search() === 'myPatches' -->
+                <div>
+                    <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.editPatch"><img src="<?= $resUri ?>images/pencil.png" alt="Edit patch" /></div>
+                    <div class="patch-button" data-bind="click: HoxtonOwl.patchManager.deletePatch"><img src="<?= $resUri ?>images/bin.png" alt="Delete patch" /></div>
+                </div>
+                <!-- /ko -->
+       
+                <div class="patch-author">
+                    <span class="author-name" data-bind="visible: search() !== 'myPatches', text: author.name, click: selectOnlyAuthor"></span>
+                </div>
+                <span class="patch-description-list-view" data-bind="text: description"></span>     
+            </div>
             <div class="patch-baseline">
                 <!-- ko foreach: tags -->
                 <div class="tag"><span data-bind="text: $data, click: selectOnlyTag"></span></div>

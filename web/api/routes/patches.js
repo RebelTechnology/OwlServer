@@ -20,7 +20,8 @@ var summaryFields = {
     tags: 1,
     seoName: 1,
     creationTimeUtc: 1,
-    published: 1
+    published: 1,
+    description: 1
 };
 
 /**
@@ -185,6 +186,7 @@ router.post('/', function(req, res) {
 	    }
         }
 
+        newPatch.downloadCount = 0; // set download count
         newPatch = patchModel.sanitize(newPatch);
         if (!isAdmin) {
             newPatch.author = patchAuthor;

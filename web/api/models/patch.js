@@ -403,6 +403,22 @@ var patchModel = {
                 // val will usually be '0', '1' (string), 0 or 1 (integer)
                 return val == '0' ? false : true;
             }
+        },
+
+        downloadCount: {
+            require: false,
+            validate: function (val) {
+                
+                var err = { type: 'not_valid', field: 'downloadCount', error: { status: 400 }};
+
+                if (!/^\d+$/.test(val)) {
+                    err.message = 'Value not valid.';
+                    throw err;
+                }
+            },
+            sanitize: function (val) {
+                return parseInt(val);
+            }
         }
     },
 
