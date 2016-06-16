@@ -11,7 +11,7 @@
 $resUri = get_template_directory_uri() . '/page-patch-library/';
 
 // <link rel="stylesheet"> tags to be placed in <head>
-wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), 5);
+wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), '5.0.1');
 wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
 wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
 wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
@@ -32,7 +32,7 @@ wp_enqueue_script('owl-cmd',                        $resUri . 'js/owlcmd.js');
 // <script> tags to be placed just before </body>
 wp_enqueue_script('owl-api-client',                 get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
 wp_enqueue_script('owl-patch',                      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
-wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'jquery-ui', 'owl-patch', 'owl-api-client'), false, true);
+wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'jquery-ui', 'owl-patch', 'owl-api-client'), '5.0.1', true);
 wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fileutils-latest.min.js', ['owl-patches-page_patch_manager'], false, true);
 
 ?>

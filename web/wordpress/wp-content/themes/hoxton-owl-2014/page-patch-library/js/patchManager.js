@@ -203,7 +203,7 @@ HoxtonOwl.patchManager = {
         }
 
         var deferred1 = $.getScript($('.jsDownloadLink').attr('href'));
-        var deferred2 = $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js/webaudio.js');
+        var deferred2 = $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js/webaudio.js?ver=5.0.1');
 
         $.when(deferred1, deferred2).done(function () {
 
