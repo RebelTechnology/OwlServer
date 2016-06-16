@@ -873,16 +873,16 @@ div.patch-tab-container {
     padding-top: 30px;
 }
 
-.patch-tab-test-err {
+.patch-tab-test-message {
     display: none;
     margin-bottom: 20px;
 }
 
-.patch-tab-test-err strong {
+.patch-tab-test-message strong {
     font-weight: bold;
 }
 
-.patch-tab-test-err a {
+.patch-tab-test-message a {
     color: #ed7800;
     text-decoration: underline;
 }
