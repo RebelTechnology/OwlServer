@@ -6,10 +6,7 @@
 /**
  * @namespace
  */
-var HoxtonOwl;
-if (!HoxtonOwl) {
-    HoxtonOwl = {};
-}
+var HoxtonOwl = HoxtonOwl || {};
 
 /**
  * Conveniently groups some utility functions to handle patches.
@@ -136,31 +133,30 @@ HoxtonOwl.patchManager = {
     },
 
     updatePushbutton: function () {
-	// todo: update button state (and message) regularly
+        // todo: update button state (and message) regularly
         var pm = HoxtonOwl.patchManager;
         if(pm.testPatch) {
-	    var state = pm.testPatch.getButtons();
-	    if(state & 0x04) // GREEN_BUTTON
-  		$('#patch-test-pushbutton').css('background', 'green');
-	    else if(state & 0x08) // RED_BUTTON
-  		$('#patch-test-pushbutton').css('background', 'red');
-	    else
-  		$('#patch-test-pushbutton').css('background', 'lightgray');    
-	}
+            var state = pm.testPatch.getButtons();
+            if(state & 0x04){ // GREEN_BUTTON
+                $('#patch-test-pushbutton').css('background', 'green');
+            } else if(state & 0x08){ // RED_BUTTON
+                $('#patch-test-pushbutton').css('background', 'red');
+            } else {
+                $('#patch-test-pushbutton').css('background', 'lightgray');    
+            }
+        }
     },
 
-    updatePatchParameters: function () {
+    updatePatchParameters: function (val) {
         var pm = HoxtonOwl.patchManager;
-        var patch = pm.testPatch;
-        if (patch) {
+        if (pm.testPatch) {
             $('[id^=patch-parameter-]:visible').each(function (i, el) {
                 var paramLetter = el.id.substr(-1, 1),
                     paramNo = paramLetter.charCodeAt(0) - 97, // "a".charCodeAt(0) === 97
                     $el = $(el),
                     paramVal = $el.find('.knob').val() / 100;
                 if (paramVal !== pm['param_' + paramLetter]) { // Don't call into the patch if not necessary
-		    // console.log("set "+paramNo+":"+paramVal);
-                    patch.update(paramNo, paramVal);
+                    pm.testPatch.update(paramNo, paramVal);
                     pm['param_' + paramLetter] = paramVal;
                 }
             });
@@ -207,13 +203,13 @@ HoxtonOwl.patchManager = {
         }
 
         var deferred1 = $.getScript($('.jsDownloadLink').attr('href'));
-        var deferred2 = $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js/webaudio.js');
+        var deferred2 = $.getScript('/wp-content/themes/hoxton-owl-2014/page-patch-library/js/webaudio.js?ver=5.0.1');
 
         $.when(deferred1, deferred2).done(function () {
 
             pm.startPatchTest();
 
-            $('#patch-tab-test-err-4').hide();
+            $('#patch-tab-test-loading').hide();
 
             $('#patch-test-inner-container').show();
             $('.knob').val(35).trigger('change');
@@ -233,8 +229,8 @@ HoxtonOwl.patchManager = {
                     $(html).appendTo($audio);
                 }
                 $audio[0].load();
-		if(!pm.patchPlaying)
-		    pm.startPatchTest();
+        if(!pm.patchPlaying)
+            pm.startPatchTest();
                 if ('_' !== val.substr(0, 1)) {
                     $audio[0].play();
                     pm.testPatch.useFileInput();
@@ -246,7 +242,7 @@ HoxtonOwl.patchManager = {
             });
 
         }).fail(function () {
-            $('#patch-tab-test-err-4').html('Error: Could not load patch.');
+            $('#patch-tab-test-loading').html('Error: Could not load patch.');
         });
 
         $('#patch-test-start-stop').click(function () {
@@ -259,8 +255,8 @@ HoxtonOwl.patchManager = {
 
         $('#patch-test-pushbutton').click(function () {
             if(pm.patchPlaying) {
-		pm.testPatch.toggleButton();
-		pm.updatePushbutton();
+                pm.testPatch.toggleButton();
+                pm.updatePushbutton();
             }
         });
 
@@ -270,14 +266,15 @@ HoxtonOwl.patchManager = {
     startPatchTest: function () {
         var pm = HoxtonOwl.patchManager;
         var patch = pm.testPatch;
+        var patchNumOutputs = self.selectedPatch().outputs;
 
         if (pm.startPatchTest.inited) {
-            pm.testPatch.scriptProcessor.connect(owl.context.destination);
+            pm.testPatch.connectToOutput({outputs: patchNumOutputs});
         } else {
-            pm.testPatch = owl.dsp();
-            pm.testPatch.scriptProcessor.connect(owl.context.destination);
+            pm.testPatch = owl.initPatchAudio();
+            pm.testPatch.connectToOutput({outputs: patchNumOutputs});
             pm.updatePatchParameters();
-	    pm.updatePushbutton();
+            pm.updatePushbutton();
             pm.startPatchTest.inited = true;
         }
         pm.patchPlaying = true;
@@ -289,7 +286,7 @@ HoxtonOwl.patchManager = {
         if (!pm.patchPlaying) {
             return;
         }
-        pm.testPatch.scriptProcessor.disconnect();
+        pm.testPatch.disconnectFromOutput();
         pm.patchPlaying = false;
         $('#patch-test-start-stop').val('Start');
     },
@@ -469,6 +466,21 @@ HoxtonOwl.patchManager = {
             return false;
         };
 
+        self.initPatchKnobs = function(patch){
+            // add colour to knobs for which parameters exist in this patch
+            if (patch.parameters) {
+                for (var key in patch.parameters) {
+                    $('#patch-parameter-' + key + ' .knob').attr('data-fgColor', '#ed7800');
+                }
+            }
+
+            $(".knob").knob({
+                change : pm.updatePatchParameters,
+                release : pm.updatePatchParameters,
+                readOnly : false
+            });  
+        };
+
         self.selectPatch = function(patch) {
             var patchId = patch._id;
             var apiClient = new HoxtonOwl.ApiClient();
@@ -548,13 +560,7 @@ HoxtonOwl.patchManager = {
                     }
                 }
                 
-                // add colour to knobs for which parameters exist in this patch
-                if (patch.parameters) {
-                    for (var key in patch.parameters) {
-                        $('#patch-parameter-' + key + ' .knob').attr('data-fgColor', '#ed7800');
-                    }
-                }
-                knobify();                
+                self.initPatchKnobs(patch);             
 
                 // Show build download links
                 if (self.selectedPatch().sysExAvailable) {
@@ -570,15 +576,19 @@ HoxtonOwl.patchManager = {
                 var isAdmin = HoxtonOwl.isUserAdmin;
 
                 // Patch test
-                if (!window.AudioContext) {
-                    $('#patch-tab-test-err-1').show(); // Web Audio API not available
+                if (webAudioApiIsNotAvailable()) {
+                    $('#patch-tab-test-message-1').show(); // Web Audio API not available
                 } else if (!self.selectedPatch().jsAvailable) {
-                    $('#patch-tab-test-err-2').show(); // JS build not available
+                    $('#patch-tab-test-message-2').show(); // JS build not available
                     if (pm.userAllowedToBuildPatch(self.selectedPatch())) {
-                        $('#patch-tab-test-err-3').show(); // Would you like to build the patch now?
+                        $('#patch-tab-test-message-3').show(); // Would you like to build the patch now?
                     }
                 } else  {
                     pm.patchTestOk = true;
+                }
+
+                function webAudioApiIsNotAvailable(){
+                    return (!window.AudioContext && !window.webkitAudioContext);
                 }
 
                 var resetPatchParameterView = function () {
@@ -588,7 +598,7 @@ HoxtonOwl.patchManager = {
                 resetPatchParameterView();
 
                 function changeKnobReadOnlyState(readonly) {
-		    // this won't work because the readOnly attribute is only read on creation
+            // this won't work because the readOnly attribute is only read on creation
                     if (patch.parameters) {
                         for (var key in patch.parameters) {
                             $('#patch-parameter-' + key + ' .knob').trigger('configure', {"readOnly":readonly});
@@ -597,6 +607,7 @@ HoxtonOwl.patchManager = {
                 }
 
                 $('.patch-tab-header a').click(function (e) {
+                    e.preventDefault();
                     var $tab = $(e.target).closest('h2'),
                         id = $tab.attr('id');
                     $tab.addClass('selected');
@@ -624,7 +635,6 @@ HoxtonOwl.patchManager = {
                         resetPatchParameterView();
                         changeKnobReadOnlyState(true);
                     }
-                    return false;
                 });
                 $('.knob-container:visible input.knob').css('visibility', 'hidden');
 
@@ -698,14 +708,14 @@ HoxtonOwl.patchManager = {
                     $('#tabs-stderr textarea').text(data.stderr);
                 } else {
                     $('#compile-dialog textarea').first().text('Patch compilation failed. Please check the logs for errors.');
-		    if(data.stdout)
-			$('#tabs-stdout textarea').text(data.stdout);
-		    else
-			$('#tabs-stdout textarea').text(data.responseText);
-		    if(data.stderr)
-			$('#tabs-stderr textarea').text(data.stderr);
-		    else
-			$('#tabs-stderr textarea').text(JSON.stringify(data));
+            if(data.stdout)
+            $('#tabs-stdout textarea').text(data.stdout);
+            else
+            $('#tabs-stdout textarea').text(data.responseText);
+            if(data.stderr)
+            $('#tabs-stderr textarea').text(data.stderr);
+            else
+            $('#tabs-stderr textarea').text(JSON.stringify(data));
                 }
             });
 

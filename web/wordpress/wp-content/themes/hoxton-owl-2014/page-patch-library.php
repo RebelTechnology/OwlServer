@@ -11,24 +11,19 @@
 $resUri = get_template_directory_uri() . '/page-patch-library/';
 
 // <link rel="stylesheet"> tags to be placed in <head>
-wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), 5);
+wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), '5.0.1');
 wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
 wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
 wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
-//wp_enqueue_style('select2', get_template_directory_uri() . '/js/select2/css/select2.min.css');
 
 // <script> tags to be placed in <head>
 wp_enqueue_script('owl-patches-page_knockout',      $resUri . 'js3rdparty/knockout-2.0.0.js');
 wp_enqueue_script('jquery',                         $resUri . 'js3rdparty/jquery-1.7.1.min.js');
 wp_enqueue_script('jquery-ui',                      get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.js', array('jquery'));
 wp_enqueue_script('owl-patches-page_jquery_knob',   $resUri . 'js3rdparty/jquery.knob.min.js', array('jquery'));
-wp_enqueue_script('owl-patches-page_knob',          $resUri . 'js/knob.js');
 
 wp_enqueue_script('owl-patches-page_prettify',      'https://cdn.rawgit.com/google/code-prettify/master/loader/prettify.js');
 wp_enqueue_script('owl-patches-page_run_prettify',  'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js');
-
-//wp_enqueue_script('select2', get_template_directory_uri() . '/js/select2/js/select2.min.js', array('jquery'));
-
 
 wp_enqueue_script('midi-client',                    $resUri . 'js/midiclient.js');
 wp_enqueue_script('owl-midi-control',               $resUri . 'js/OpenWareMidiControl.js');
@@ -37,7 +32,7 @@ wp_enqueue_script('owl-cmd',                        $resUri . 'js/owlcmd.js');
 // <script> tags to be placed just before </body>
 wp_enqueue_script('owl-api-client',                 get_template_directory_uri() . '/js/hoxtonowl-api-client.js', array('jquery'), false, true);
 wp_enqueue_script('owl-patch',                      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
-wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'jquery-ui', 'owl-patch', 'owl-api-client'), false, true);
+wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'jquery-ui', 'owl-patch', 'owl-api-client'), '5.0.1', true);
 wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fileutils-latest.min.js', ['owl-patches-page_patch_manager'], false, true);
 
 ?>
@@ -267,22 +262,22 @@ wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fil
                 </div>
                 <div class="flexbox flex-center patch-tab-container" id="patch-tab-test">
 
-                    <div id="patch-tab-test-err-1" class="patch-tab-test-err">
+                    <div id="patch-tab-test-message-1" class="patch-tab-test-message">
                         <strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.<br><br>
                         Try and upgrade your browser. Here's a <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a> of browsers that do support the Web Audio API.
                     </div>
-                    <div id="patch-tab-test-err-2" class="patch-tab-test-err">
+                    <div id="patch-tab-test-message-2" class="patch-tab-test-message">
                         <strong>Error:</strong> JavaScript build not available for this patch.
-                        <span id="patch-tab-test-err-3" class="patch-tab-test-err"><a class="compileLink sysex" href="#">Build this patch now</a></span>
+                        <span id="patch-tab-test-message-3" class="patch-tab-test-message"><a class="compileLink sysex" href="#">Build this patch now</a></span>
                     </div>
-                    <div id="patch-tab-test-err-4" class="patch-tab-test-err">
+                    <div id="patch-tab-test-loading" class="patch-tab-test-message">
                         Loading patch...
                     </div>
 
                     <div id="patch-test-inner-container">
 
                         <input type="button" value="Pushbutton" id="patch-test-pushbutton" />
-			<br/>
+                        <br/>
                         <label for="patch-test-source">Source:</label>
                         <select id="patch-test-source">
                             <option value="_clear" selected>No Input</option>
