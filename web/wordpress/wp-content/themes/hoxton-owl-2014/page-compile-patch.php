@@ -39,9 +39,146 @@ wp_enqueue_script('owl-api-client',                 get_template_directory_uri()
 wp_enqueue_script('owl-patch',                      get_template_directory_uri() . '/js/hoxtonowl-patch.js', array(), false, true);
 wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/patchManager.js', array('jquery', 'jquery-ui', 'owl-patch', 'owl-api-client'), false, true);
 wp_enqueue_script('pd-fileutils',                   $resUri . 'js3rdparty/pd-fileutils-latest.min.js', ['owl-patches-page_patch_manager'], false, true);
+wp_enqueue_script('ace',                 			get_template_directory_uri() . '/js/ace/ace.js', array(), false, true);
+wp_enqueue_script('ace-autocompleter',             get_template_directory_uri() . '/js/ace/ext-language_tools.js', array('ace'), false, true);
 
 ?>
 
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'parts/shared/header' ) ); ?>
 
+<h1>Owl Patch Editor</h1>
+
+<div id="compile-buttons" style="text-align:center;margin:10px auto">
+	<button id="load-patch-button">load</button>
+	<button id="upload-patch-button">upload</button>
+	<button id="compile-patch-button">compile</button>
+	<form id="test-form">
+		<input id="file-input" type="file"></input>
+		<button type="submit"></button>
+	</form>
+</div>
+
+<div id="ace-editor-wrapper" style="position:relative;width:100%;height:100%;">
+	<div id="ace-editor" style="position:absolute;width:100%;height:100%;"></div>
+</div>
+
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/footer','parts/shared/html-footer') ); ?>
+
+<script>
+	$(function(){
+	
+		var editor;
+		
+		editor = ace.edit('ace-editor');
+		
+		ace.require("ace/ext/language_tools");
+		
+		// set syntax mode
+		editor.session.setMode('ace/mode/c_cpp');
+		editor.$blockScrolling = Infinity;
+		
+		// set theme
+		editor.setTheme("ace/theme/chrome");
+		editor.setShowPrintMargin(false);
+		
+		// autocomplete settings
+		editor.setOptions({
+			enableBasicAutocompletion: true,
+			enableLiveAutocompletion: true,
+			enableSnippets: true
+		});
+		
+		// this function is called when the user modifies the editor
+		editor.session.on('change', (e) => {
+			console.log('editor changed');
+		});
+		
+		$('#test-form').on('submit', function(e){
+			console.log($('#file-input')[0].files[0]);
+			e.preventDefault();
+		});
+		
+		// compile-buttons events
+		$('#load-patch-button').on('click', function(e){
+		
+			var fileUrl = '/wp-content/uploads/patch-files/tmp-470b6dc4c3/test.cpp';
+			
+			console.log('requesting from', fileUrl);
+			
+			$.get( fileUrl, function( data ) {
+				editor.setValue(data);
+			});
+		
+		});
+		$('#upload-patch-button').on('click', function(e){
+		
+			// get the content from the editor as a string
+			var string = editor.getValue();
+			
+			//upload it here
+			upload(string);
+			
+			
+			
+			
+		});
+		
+		$('#compile-patch-button').on('click', function(e){
+		
+			// get the content from the editor as a string
+			var file = editor.getValue();
+			
+			//upload it here
+			
+			
+		});
+		
+	});
+	
+	function upload(string){
+	
+		
+	
+		var fileUploadToken = '';
+		var bag = 'abcdefghijklmnopqrstuvwxyz0123456789';
+		for (var i = 0; i < 7; i++) {
+			fileUploadToken += bag.charAt(Math.floor(Math.random() * bag.length));
+		}
+		
+		var blob = new Blob([string]);
+		var file = new File([blob], 'test.cpp');
+	
+		var data = new FormData();
+		//var files = fileUpload[0].files;
+		//for (var i = 0; i < files.length; i++) {
+		   data.append('files[]', file);
+		//}
+		
+
+		var patchId = '5767ef6884522c960779e73b';//$('#frm-patch-id').val();
+		if (patchId) {
+		   data.append('patchId', patchId);
+		} else {
+		   data.append('fileUploadToken', fileUploadToken);
+		}
+
+		data.append('action', 'owl-patch-file-upload'); // WordPress action
+
+		$.ajax({
+		   url: '/wp-admin/admin-ajax.php',
+		   type: 'POST',
+		   contentType: false,
+		   data: data,
+		   processData: false,
+		   cache: false
+		}).done(function(){
+			console.log('done');
+		});
+		
+	
+	}
+	
+	
+	
+	
+</script>
