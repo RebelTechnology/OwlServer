@@ -1,0 +1,19 @@
+{
+  "name": "owl-spa",
+  "version": "0.0.1",
+  "private": true,
+  "description": "single page application for the owl",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pingdynasty/OwlServer.git"
+  },
+  "author": "gus",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/pingdynasty/OwlServer/issues"
+  },
+  "homepage": "https://github.com/pingdynasty/OwlServer/web/owlspa/#readme"
+}
