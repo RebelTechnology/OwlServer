@@ -1,9 +1,11 @@
+var path = require("path");
+
 module.exports = {
   entry: [
-    './src/app.js'
+    './src/index.js'
   ],
   output: {
-    path: __dirname + '/dist',
+    path: path.join(__dirname, '../wordpress/wp-content/themes/hoxton-owl-2014/page-patch-library/js'),
     publicPath: '/',
     filename: 'bundle.js'
   },
