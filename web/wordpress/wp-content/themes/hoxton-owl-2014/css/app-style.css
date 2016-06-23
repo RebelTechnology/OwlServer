@@ -286,23 +286,39 @@ body { background: #f4f4f4; }
 
 .secondary-nav-item {
     display: inline-block;
+    box-sizing: border-box;
     text-align: center;
+    padding-top: 50px;
     width: 80px;
+    height: 80px;
     margin: 0 15px 15px 0;
+    background: no-repeat center 0 none;
+    color:#fff;
+    opacity: 0.5;
 }
 
-.secondary-nav-item img {
-    display: block;
-    margin: 0 auto;
-    margin-bottom: 5px;
-    opacity: .3;
+.secondary-nav-item.nav-item-latest {
+    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/latest-icon.png");
 }
 
-.secondary-nav-item.active p, .secondary-nav-item:hover p {
-    color: #fff;
+.secondary-nav-item.nav-item-tags {
+    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/tags-icon.png");
 }
 
-.secondary-nav-item.active img, .secondary-nav-item:hover img {
+.secondary-nav-item.nav-item-authors {
+    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/authors-icon.png");
+}
+
+.secondary-nav-item.nav-item-all {
+    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/browse-all-icon.png");
+}
+
+.secondary-nav-item.nav-item-my-patches {
+    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/my-patches-icon.png");
+}
+
+
+.secondary-nav-item.active, .secondary-nav-item:hover {
     opacity: 1;
 }
 
@@ -636,13 +652,13 @@ h2, .parameter-label {
     text-transform: uppercase;
 }
 
-.secondary-nav-item p, .tag-filter-button {
+.secondary-nav-item, .tag-filter-button {
     font-family: 'Ubuntu', sans-serif;
     font-weight: 100;
     font-size: 14px;
 }
 
-h2, .secondary-nav-item p {
+h2 {
     color: #cccccc;
 }
 
@@ -765,13 +781,9 @@ h2, .secondary-nav-item p {
     }
     .secondary-nav-item {
         width: 65px;
-    }
-    .secondary-nav-item p {
+        background-size: 50%;
+        padding-top: 38px;
         font-size: 12px;
-    }
-    .secondary-nav-item img {
-        width: 30px;
-        height: 30px;
     }
     .patch-tile {
         width: 48%;
@@ -809,9 +821,9 @@ h2, .secondary-nav-item p {
     }
     .secondary-nav-item {
         width: 50px;
-    }
-    .secondary-nav-item img {
-        display: none;
+        padding-top: 32px;
+        white-space: nowrap;
+        background-image: none;
     }
 }
 
@@ -821,44 +833,3 @@ h2, .secondary-nav-item p {
     }
 }
 
-/* pre.prettyprint {
-    overflow: scroll;
-    font-family: "Droid Sans Mono", "Lucida Console", "Monaco", "Courier New", monospace;
-    font-size: 13px;
-} */
-
-/* This style conflicts with an earlier style - PLEASE CHECK STYLE SHEETS before adding styles */
-/*.patch-tile {
-    width: 48%;
-    height: 180px;
-}
-
-#one-third {
-    width: 100%;
-    display: flex;
-}
-
-#two-thirds {
-    width: 100%;
-    clear: both;
-    margin-left: 0px;
-}
-.patch-tile-small, .patch-description, .patch-stats {
-    width: 33%;
-    height: auto;
-    margin-top: 0px;
-    margin-bottom: 0px;
-}
-
-.patch-description, .patch-stats {
-    margin-left: 20px;
-}
-
-#one-third .tag {
-    display: none;
-}
-
-span.patch-title, span.author-name, div.tag,
-.tag-filter-button, .secondary-nav-item {
-    cursor: pointer;
-} */

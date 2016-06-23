@@ -1,14 +1,13 @@
 import React, { PropTypes, Component }  from 'react';
 import ReactDom from 'react-dom';
-import NavBar from './NavBar';
+import NavBar from '../NavBar/NavBar';
 
 class App extends Component {
   render(){ 
-    const navLinks = ['Latest', 'Tags', 'Authors', 'All', 'My Patches'];
 
     return (
       <div>
-        <NavBar navLinks={navLinks} />
+        <NavBar />
         {this.props.children}
       </div>
     );

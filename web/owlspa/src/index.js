@@ -1,14 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { Router, useRouterHistory } from 'react-router';
-import { createHistory, useBasename } from 'history';
+import { createHistory } from 'history';
 import routes from './routes';
+import rootReducer from './reducers';
 
-const history = useRouterHistory(useBasename(createHistory))({
-  basename: "/patch-library-spa"
-});
+const browserHistory = useRouterHistory(createHistory)({ basename: '/patch-library-spa' });
+const store = createStore(rootReducer);
 
 ReactDOM.render((
-  <Router history={history} routes={routes} />
+  <Provider store={store}>
+    <Router history={browserHistory} routes={routes} />
+  </Provider>
 ), document.getElementById('owl-spa'));

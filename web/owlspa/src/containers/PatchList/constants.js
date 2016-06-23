@@ -1,0 +1,1 @@
+export const LIST_ALL_PATCHES = 'owlspa/patchList/LIST_ALL_PATCHES';

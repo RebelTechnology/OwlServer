@@ -1,15 +1,15 @@
 import React from 'react';
-import { Route , IndexRoute } from 'react-router';
-import App from './containers/App';
-import PatchList from './containers/PatchList';
+import { Route , IndexRedirect } from 'react-router';
+import App from './containers/App/App';
+import PatchListPage from './containers/PatchListPage/PatchListPage';
 
 export default (
   <Route path="/" component={App}>
-    <IndexRoute component={PatchList} />
-    <Route path="latest" component={PatchList} />
-    <Route path="tags" component={PatchList} />
-    <Route path="authors" component={PatchList} />
-    <Route path="all" component={PatchList} />
-    <Route path="my-patches" component={PatchList} />
+    <IndexRedirect to="latest" />
+    <Route path="latest" component={PatchListPage} />
+    <Route path="tags" component={PatchListPage} />
+    <Route path="authors" component={PatchListPage} />
+    <Route path="all" component={PatchListPage} />
+    <Route path="my-patches" component={PatchListPage} />
   </Route>
 );
