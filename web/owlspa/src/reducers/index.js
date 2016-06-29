@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
-import patches from './containers/PatchList/reducer';
+import thunk from 'redux-thunk';
+import patches from './patches';
 
 const rootReducer = combineReducers({
     patches

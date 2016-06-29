@@ -1,19 +1,33 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDom from 'react-dom';
 import { connect } from 'react-redux';
+import { fetchPatches } from 'actions';
 import { Patch , PatchCounter } from 'containers';
 
 class PatchList extends Component {
   componentWillMount(){
-    console.log('fetch me dat shit');
+    this.props.fetchPatches();
   }
   render(){
-    const patches = this.props.patches.items.map(patch => <Patch />);
+    const { patches } = this.props;
     return (
       <div className="wrapper flexbox">
         <div className="content-container">
           <PatchCounter />
-          {patches}
+            { patches.items.map(
+              patch => {
+                return (
+                  <Patch 
+                    key={patch._id}
+                    id={patch._id}
+                    name={patch.name}
+                    published={patch.published}
+                    authorName={patch.author.name}
+                    description={patch.description}
+                    tags={patch.tags}
+                  />
+                );
+              })}
         </div>
       </div>
     );
@@ -30,4 +44,4 @@ function mapStateToProps({ patches }){
   }
 }
 
-export default connect(mapStateToProps)(PatchList);
+export default connect(mapStateToProps, {fetchPatches})(PatchList);
