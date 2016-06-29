@@ -1,7 +1,6 @@
 import React from 'react';
 import { Route , IndexRedirect } from 'react-router';
-import App from './containers/App/App';
-import PatchListPage from './containers/PatchListPage/PatchListPage';
+import { App, PatchListPage }from 'containers';
 
 export default (
   <Route path="/" component={App}>

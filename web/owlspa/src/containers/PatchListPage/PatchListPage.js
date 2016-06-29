@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDom from 'react-dom';
-import Filters from '../Filters/Filters';
-import PatchList from '../PatchList/PatchList';
+import { Filters , PatchList } from 'containers';
 
 class PatchListPage extends Component {
   render(){

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDom from 'react-dom';
-import NavLink from '../../components/NavLink/NavLink';
+import { NavLink } from 'components';
 
 class NavBar extends Component {
   render(){

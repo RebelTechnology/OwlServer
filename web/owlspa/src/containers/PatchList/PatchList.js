@@ -1,12 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDom from 'react-dom';
 import { connect } from 'react-redux';
-import Patch from '../Patch/Patch';
-import PatchCounter from '../PatchCounter/PatchCounter';
+import { Patch , PatchCounter } from 'containers';
 
 class PatchList extends Component {
+  componentWillMount(){
+    console.log('fetch me dat shit');
+  }
   render(){
-    let patches = this.props.patches.map(patch => <Patch />);
+    const patches = this.props.patches.items.map(patch => <Patch />);
     return (
       <div className="wrapper flexbox">
         <div className="content-container">
