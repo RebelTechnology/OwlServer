@@ -340,14 +340,11 @@ body { background: #f4f4f4; }
 
 .tag-filter-button:hover {
     border: 1px solid #ed7800;
+    background: #f4f4f4;
 }
 
 .tag-filter-button.active {
     border: 1px solid #ed7800;
-    background: #f4f4f4;
-}
-
-.tag-filter-button.active:hover {
     background: #d4d4d4;
 }
 
@@ -457,7 +454,7 @@ body { background: #f4f4f4; }
 }
 
 .author-name {
-    display: inline;
+    display: inline-block;
     background: #5d5d5d;
     padding: 10px;
     transition: .3s;

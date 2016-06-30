@@ -1,25 +1,25 @@
-import { REQUEST_PATCHES } from 'constants';
-import { RECEIVE_PATCHES } from 'constants';
+import { REQUEST_TAGS } from 'constants';
+import { RECEIVE_TAGS } from 'constants';
 
 const initialState = {
   isFetching: false,
   items: []
 };
 
-const patches = (state = initialState, action) => {
+const tags = (state = initialState, action) => {
   switch (action.type) {
-    case REQUEST_PATCHES:
+    case REQUEST_TAGS:
       return Object.assign({}, state, {
         isFetching: true
       })
-    case RECEIVE_PATCHES:
+    case RECEIVE_TAGS:
       return Object.assign({}, state, {
         isFetching: false,
-        items: action.patches
+        items: action.tags
       })
     default:
       return state
   }
 }
 
-export default patches;
+export default tags;

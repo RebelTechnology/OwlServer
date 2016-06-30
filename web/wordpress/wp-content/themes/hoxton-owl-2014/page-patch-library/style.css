@@ -458,7 +458,7 @@ input.knob {
 }
 
 .patch-author {
-    padding-top: 20px;
+    margin-top: 10px;
 }
 
 .patch-title {
@@ -466,24 +466,24 @@ input.knob {
     background: #231f20;
     padding: 10px;
     line-height: 30px;
-    transition: .3s;
+    transition: .2s;
 }
 
 .author-name {
-    display: inline;
+    display: inline-block;
     background: #5d5d5d;
     padding: 10px;
-    transition: .3s;
+    transition: .2s;
 }
 
 .author-name:hover {
     background: #fff;
-    transition: .3s;
+    transition: .2s;
 }
 
 .author-name:hover {
     color: #000;
-    transition: .3s;
+    transition: .2s;
 }
 
 .play-button {
