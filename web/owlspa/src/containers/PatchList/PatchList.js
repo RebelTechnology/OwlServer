@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import { fetchPatches,
   setPatchListTopFilter,
   fetchAuthors,
-  fetchTags,
-  resetPatchListSubFilter
+  fetchTags
 } from 'actions';
 import { Patch , PatchCounter, SubFilter } from 'containers';
 
@@ -13,13 +12,11 @@ class PatchList extends Component {
     this.props.fetchPatches();
     this.props.fetchAuthors();
     this.props.fetchTags();
-    this.props.setPatchListTopFilter(this.props.route.path);
+    this.props.setPatchListTopFilter(this.props.routeParams.topFilter);
   }
   componentWillReceiveProps(nextProps){
-    const nextFilter = nextProps.route.path
-    if(nextFilter !== this.props.route.path){
-      this.props.resetPatchListSubFilter();
-      this.props.setPatchListTopFilter(nextFilter);
+    if(nextProps.routeParams.topFilter !== this.props.routeParams.topFilter){
+      this.props.setPatchListTopFilter(nextProps.routeParams.topFilter);
     }
   }
   getFilteredSortedPatches(patches, patchListFilter){
@@ -39,11 +36,11 @@ class PatchList extends Component {
     }
   }
   render(){
-    const { patches, patchListFilter, patchListFilter:{topFilter} } = this.props;
+    const { patches, patchListFilter, patchListFilter:{topFilter}, routeParams } = this.props;
     const filteredPatches = this.getFilteredSortedPatches(patches.items, patchListFilter);
     return (
       <div>
-        {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter parentFilter={topFilter} /> : null}
+        {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter topFilter={topFilter} subFilter={routeParams.subFilter} /> : null}
         <div className="wrapper flexbox">
           <div className="content-container">
             <PatchCounter />
@@ -84,6 +81,5 @@ export default connect(mapStateToProps, {
   fetchPatches, 
   setPatchListTopFilter,
   fetchAuthors, 
-  fetchTags,
-  resetPatchListSubFilter
+  fetchTags
 })(PatchList);

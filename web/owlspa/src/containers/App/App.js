@@ -4,10 +4,9 @@ import { NavBar } from 'containers';
 
 class App extends Component {
   render(){ 
-
     return (
       <div>
-        <NavBar />
+        <NavBar location={this.props.location} routeParams={this.props.routeParams} />
         {this.props.children}
       </div>
     );

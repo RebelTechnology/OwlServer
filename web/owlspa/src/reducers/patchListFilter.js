@@ -1,7 +1,8 @@
 import { 
   SET_PATCHLIST_TOP_FILTER,
   TOGGLE_FILTER_IN_SUB_FILTER,
-  RESET_PATCHLIST_SUB_FILTER } from 'constants';
+  RESET_PATCHLIST_SUB_FILTER
+} from 'constants';
 
 const initialState = {
   topFilter: 'all',
