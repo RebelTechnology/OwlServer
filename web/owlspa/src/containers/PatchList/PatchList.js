@@ -43,7 +43,7 @@ class PatchList extends Component {
         {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter topFilter={topFilter} subFilter={routeParams.subFilter} /> : null}
         <div className="wrapper flexbox">
           <div className="content-container">
-            <PatchCounter />
+            <PatchCounter patches={filteredPatches} />
               { filteredPatches.map(
                 patch => {
                   return (
