@@ -31,6 +31,9 @@ class SubFilter extends Component {
     }
   }
   componentWillReceiveProps(nextProps){
+    if(!nextProps.subFilter && this.props.subFilter){
+      this.props.togglePatchListSubFilter(this.props.subFilter);
+    }
     if(this.props.topFilter !== nextProps.topFilter){
       this.props.resetPatchListSubFilter();
     }
