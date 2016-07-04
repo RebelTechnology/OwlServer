@@ -19,6 +19,28 @@ class PatchList extends Component {
       this.props.setPatchListTopFilter(nextProps.routeParams.topFilter);
     }
   }
+  filterPatchesByAuthor(patches, subFilter){
+    return patches.filter(patch => patch.published && patch.author).filter(patch =>{
+      let authorId = patch.author.name || patch.author.wordpressId;
+      if(!authorId){
+        return false;
+      }
+      if(subFilter.length === 0){
+        return true;
+      }
+      return subFilter.indexOf(authorId) > -1;
+    })
+  }
+  filterPatchesByTag(patches, subFilter){
+    return patches.filter(patch => patch.published && patch.tags).filter(patch => {
+      if (subFilter.length === 0){
+        return true;
+      }
+      return patch.tags.some(tag => {
+        return subFilter.indexOf(tag) > -1;
+      })
+    });
+  }
   getFilteredSortedPatches(patches, patchListFilter){
     switch(patchListFilter.topFilter){
       case 'latest':
@@ -26,9 +48,9 @@ class PatchList extends Component {
       case 'all':
         return patches.filter(patch => patch.published).sort((a,b) => (a.name).localeCompare(b.name));
       case 'authors':
-        return patches.filter(patch => patch.published);
+        return this.filterPatchesByAuthor(patches, patchListFilter.subFilter);
       case 'tags':
-        return patches.filter(patch => patch.published);
+        return this.filterPatchesByTag(patches, patchListFilter.subFilter);
       case 'my-patches':
         return patches.filter(patch => patch.published);
       default:
@@ -40,7 +62,7 @@ class PatchList extends Component {
     const filteredPatches = this.getFilteredSortedPatches(patches.items, patchListFilter);
     return (
       <div>
-        {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter topFilter={topFilter} subFilter={routeParams.subFilter} /> : null}
+        {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter routeParams={routeParams} /> : null}
         <div className="wrapper flexbox">
           <div className="content-container">
             <PatchCounter patches={filteredPatches} />

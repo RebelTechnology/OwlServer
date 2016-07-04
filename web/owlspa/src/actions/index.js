@@ -9,7 +9,9 @@ import {
   RECEIVE_TAGS,
   SET_PATCHLIST_TOP_FILTER,
   TOGGLE_FILTER_IN_SUB_FILTER,
-  RESET_PATCHLIST_SUB_FILTER
+  RESET_PATCHLIST_SUB_FILTER,
+  REQUEST_CURRENT_USER,
+  RECEIVE_CURRENT_USER
 } from 'constants';
 
 export const fetchPatches = () => {
@@ -97,6 +99,35 @@ export const fetchTags = () => {
   }
 }
 
+export const fetchCurrentUser = () => {
+  return (dispatch) => {
+
+    dispatch({
+      type: REQUEST_CURRENT_USER,
+      isFetching: true
+    });
+
+    return fetch('/wp-admin/admin-ajax.php?action=owl-get-current-user-info', {credentials: 'same-origin'})
+      .then(response => {
+        return response.json();
+      })
+      .then( response => {
+          if (response.status >= 400) {
+            console.error('bad status:', response.status);
+          } else {
+            dispatch({
+              type: RECEIVE_CURRENT_USER,
+              user: response.result
+            });
+          }
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+  }
+}
+
 export const setPatchListTopFilter = (filter) => {
   return {
     type: SET_PATCHLIST_TOP_FILTER,
@@ -111,9 +142,10 @@ export const togglePatchListSubFilter = (subFilter) => {
   };
 }
 
-export const resetPatchListSubFilter = () => {
+export const resetPatchListSubFilter = (subFilter) => {
   return {
-    type: RESET_PATCHLIST_SUB_FILTER
+    type: RESET_PATCHLIST_SUB_FILTER,
+    subFilter: subFilter
   };
 }
 

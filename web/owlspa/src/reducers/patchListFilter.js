@@ -31,7 +31,7 @@ const patchListFilter = (state = initialState, action) => {
       });
     case RESET_PATCHLIST_SUB_FILTER:
       return Object.assign({}, state, {
-        subFilter: initialState.subFilter
+        subFilter: action.subFilter ? [action.subFilter] : initialState.subFilter
       });
     default:
       return state

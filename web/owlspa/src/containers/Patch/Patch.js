@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import { Tag } from 'components';
-import ReactDom from 'react-dom';
 
 class Patch extends Component {
   
@@ -11,14 +10,12 @@ class Patch extends Component {
 
   handleAuthorNameClick(e, authorName){
     e.stopPropagation();
-    //TODO filter to show only patches by this author
-    console.log('author clicked', authorName);
+    this.context.router.push('/patches/authors/'+ authorName);
   }
 
   handleTagClick(e, tagText){
     e.stopPropagation();
-    //TODO filter to show only  patches of tag
-    console.log('tag clicked', tagText);
+    this.context.router.push('/patches/tags/'+ tagText);
   }
 
   render(){
@@ -62,6 +59,10 @@ Patch.propTypes = {
   authorName: PropTypes.string,
   description: PropTypes.string,
   tags: PropTypes.array
+}
+
+Patch.contextTypes = {
+  router: PropTypes.object.isRequired
 }
 
 export default Patch;

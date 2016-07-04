@@ -20,8 +20,8 @@ class PatchCounter extends Component {
     return (
       <div id="patch-counter">
         <div>
-          <span>{numPatches}</span> public { numPatches > 1 ? 'patches' : 'patch' }
-          <span> by {numAuthors}</span> { numAuthors > 1 ? 'authors' : 'author' }.
+          <span>{numPatches}</span> public { numPatches === 1 ? 'patch' : 'patches' }
+          <span> by {numAuthors}</span> { numAuthors === 1 ? 'author' : 'authors' }.
         </div>
       </div>
     );

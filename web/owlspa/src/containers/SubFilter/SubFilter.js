@@ -26,25 +26,26 @@ class SubFilter extends Component {
     });
   }
   componentWillMount(){
-    if(this.props.subFilter){
-      this.props.togglePatchListSubFilter(this.props.subFilter);
+    const { routeParams } = this.props; 
+    if(routeParams && routeParams.subFilter){
+      this.props.togglePatchListSubFilter(routeParams.subFilter);
     }
   }
   componentWillReceiveProps(nextProps){
-    if(!nextProps.subFilter && this.props.subFilter){
-      this.props.togglePatchListSubFilter(this.props.subFilter);
-    }
-    if(this.props.topFilter !== nextProps.topFilter){
+    const { routeParams } = this.props; 
+    if(this.props.patchListFilter.topFilter !== nextProps.patchListFilter.topFilter){
       this.props.resetPatchListSubFilter();
+    }
+    if(routeParams && (routeParams.subFilter !== nextProps.routeParams.subFilter)){
+      this.props.resetPatchListSubFilter(nextProps.routeParams.subFilter);
     }
   }
 
   render(){
-    const { authors, tags, patchListFilter: { subFilter }, topFilter } = this.props;
+    const { authors, tags, patchListFilter: { subFilter, topFilter } } = this.props;
     const tagFilters = this.buildFilters(tags, subFilter);
     const authorFilters = this.buildFilters(authors, subFilter);
 
-    console.log(subFilter);
     return (
       <div id="filter-bar">
         <div id="filter-wrapper" className="wrapper">
@@ -72,8 +73,7 @@ function mapStateToProps({ patchListFilter, authors, tags }){
 }
 
 SubFilter.propTypes = {
-  topFilter : PropTypes.string.isRequired,
-  filter : PropTypes.string
+  routeParams : PropTypes.object
 }
 
 export default connect(mapStateToProps, { 
