@@ -77,6 +77,7 @@ class PatchList extends Component {
                       authorName={patch.author.name}
                       description={patch.description}
                       tags={patch.tags}
+                      seoName={patch.seoName}
                     />
                   );
                 })}

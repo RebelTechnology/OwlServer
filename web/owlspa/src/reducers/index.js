@@ -5,11 +5,13 @@ import tags from './tags';
 import authors from './authors';
 import patchListFilter from './patchListFilter';
 import currentUser from './currentUser';
+import patchDetails from './patchDetails';
 
 const rootReducer = combineReducers({
   authors,
   patches,
   patchListFilter,
+  patchDetails,
   tags,
   currentUser
 });

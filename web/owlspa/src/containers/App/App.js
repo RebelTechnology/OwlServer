@@ -1,5 +1,4 @@
 import React, { PropTypes, Component }  from 'react';
-import ReactDom from 'react-dom';
 import { NavBar } from 'containers';
 import { fetchCurrentUser } from 'actions';
 import { connect } from 'react-redux';

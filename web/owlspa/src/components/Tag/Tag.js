@@ -1,19 +1,22 @@
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 
 class Tag extends Component {
+  onClick(e){
+    e.stopPropagation();
+  }
   render(){
-    const { onClick } = this.props;
+    const { tag } = this.props;
     return (
-      <div className="tag" onClick={onClick}>
-        <span>{ this.props.children }</span>
+      <div className="tag" onClick={(e) => this.onClick(e)}>
+        <Link to={`/patches/tags/${tag}`}>{tag}</Link>
       </div>
     );
   }
 }
 
 Tag.propTypes = {
-  children: PropTypes.node.isRequired,
-  onClick: PropTypes.func
+  tag: PropTypes.string
 }
 
 export default Tag;

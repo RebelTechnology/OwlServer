@@ -158,7 +158,7 @@ body { background: #f4f4f4; }
     background: #5d5d5d;
 }
 
-.patch-stats table tr td {
+.patch-stats table tr td, .patch-stats .patch-stats-row {
     border-top: 1px dotted #b7b7b7;
     padding: 5px;
 }
@@ -351,6 +351,7 @@ body { background: #f4f4f4; }
 /* Patch tile */
 
 .patch-tile-small {
+    position: relative;
     height: 120px;
     width: 100%;
     padding: 20px;
@@ -514,6 +515,12 @@ body { background: #f4f4f4; }
     transition: .3s;
 }
 
+.patch-buttons {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
 .patch-button {
     height: 30px;
     width: 30px;
@@ -531,7 +538,7 @@ body { background: #f4f4f4; }
     background: -ms-linear-gradient(top, #ffffff 43%,#d4d4d4 100%); /* IE10+ */
     background: linear-gradient(to bottom, #ffffff 43%,#d4d4d4 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#d4d4d4',GradientType=0 ); /* IE6-9 */
-    transition: .3s;
+    transition: .2s;
     position: relative;
     top: 3px;
     float: left;
@@ -548,13 +555,25 @@ body { background: #f4f4f4; }
     outline: 0;
 }
 
-.patch-button img {
+.patch-button{
     margin: 3px;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
-.patch-button:hover img {
+.patch-button:hover{
     opacity: 1;
+}
+
+.patch-button-edit {
+    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/pencil.png"), linear-gradient(to bottom, #ffffff 43%,#d4d4d4 100%);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.patch-button-delete {
+    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/bin.png"), linear-gradient(to bottom, #ffffff 43%,#d4d4d4 100%);
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tag {
@@ -584,9 +603,10 @@ body { background: #f4f4f4; }
     width: 0;
 }
 
-.tag span {
+.tag span, .tag a {
     font-family: 'ubuntu', sans-serif;
     font-size: 12px;
+    text-decoration: none;
 }
 
 .tag:hover {

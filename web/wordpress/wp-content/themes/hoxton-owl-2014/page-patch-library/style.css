@@ -197,6 +197,18 @@ span.parameter-label {
     color: #909090;
 }
 
+.patch-stats .parameter-label {
+    width: 100px;
+    display: inline-block;
+    text-align: left;
+}
+
+.patch-stats .parameter-value {
+    padding: 0;
+    font-size: 11px;
+    color: #231f20;
+}
+
 .patch-stats2 span.parameter-value {
     font-size: 12px;
     color: #333;

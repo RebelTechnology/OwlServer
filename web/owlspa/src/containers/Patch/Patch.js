@@ -1,11 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import { Tag } from 'components';
+import { Tag, AuthorLink } from 'components';
 
 class Patch extends Component {
   
-  handlePatchClick(e, id){
-    //TODO go to patch page for this patch
-    console.log('patch clicked', id);
+  handlePatchClick(e, seoName){
+    this.context.router.push('/patch/'+ seoName);
   }
 
   handleAuthorNameClick(e, authorName){
@@ -13,15 +12,10 @@ class Patch extends Component {
     this.context.router.push('/patches/authors/'+ authorName);
   }
 
-  handleTagClick(e, tagText){
-    e.stopPropagation();
-    this.context.router.push('/patches/tags/'+ tagText);
-  }
-
   render(){
-    const { id, name, published, authorName, description, tags } = this.props;
+    const { id, name, published, authorName, description, tags, seoName } = this.props;
     return (
-      <div className="patch-tile" onClick={ (e) => this.handlePatchClick(e, id) } >
+      <div className="patch-tile" onClick={ (e) => this.handlePatchClick(e, seoName) } >
         <div className="patch-title-controls">
           <div>
             <span className="patch-title">{ name }</span>
@@ -31,19 +25,13 @@ class Patch extends Component {
                 </div>): null
               }
           </div> 
-          { authorName ?
-            (
-              <div className="patch-author" onClick={ (e) => this.handleAuthorNameClick(e, authorName) } >
-                <span className="author-name">{ authorName }</span>
-              </div>
-            ): null
-          }
+          <AuthorLink author={authorName} />
           <span className="patch-description-list-view">{ description }</span>     
         </div>
         <div className="patch-baseline">
           { tags ?
             tags.map( tagText => {
-              return <Tag key={tagText} onClick={ (e) => this.handleTagClick(e, tagText) } >{ tagText }</Tag>
+              return <Tag key={tagText} tag={tagText}/>
             }): null
           }
         </div>

@@ -4,3 +4,4 @@ export NavBar from './NavBar/NavBar';
 export Patch from './Patch/Patch';
 export PatchCounter from './PatchCounter/PatchCounter';
 export PatchList from './PatchList/PatchList';
+export PatchDetailsPage from './PatchDetailsPage/PatchDetailsPage';
