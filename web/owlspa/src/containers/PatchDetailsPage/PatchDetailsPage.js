@@ -1,14 +1,19 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import { fetchPatchDetails } from 'actions';
-import { Tag, PatchStats, PatchTileSmall } from 'components';
+import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, GitCode } from 'components';
+import { PatchPreview } from 'containers';
 
 class PatchDetailsPage extends Component {
   componentWillMount(){
     const { fetchPatchDetails , patchDetails, routeParams:{patchSeoName} } = this.props;
-    if(patchSeoName && !patchDetails.patchSeoName){
+    if(patchSeoName && !this.patchIsCached(patchSeoName)){
       this.props.fetchPatchDetails(patchSeoName);
     }
+  }
+
+  patchIsCached(patchSeoName){
+    return !!this.props.patchDetails.patches[patchSeoName];
   }
 
   currentUserCanEdit(patch){
@@ -50,6 +55,16 @@ class PatchDetailsPage extends Component {
               </div>): null 
             } 
             <PatchStats patch={patch} />
+          </div>
+
+          <div id="two-thirds" className="patch-library">
+
+            <PatchSoundcloud soundcloud={patch.soundcloud} />
+
+            <PatchPreview patch={patch} />
+
+            <GitCode github={patch.github} />
+
           </div>
 
         </div>

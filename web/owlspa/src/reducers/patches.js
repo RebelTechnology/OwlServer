@@ -1,22 +1,47 @@
 import { REQUEST_PATCHES } from 'constants';
 import { RECEIVE_PATCHES } from 'constants';
+import { RECEIVE_PATCHES_AUTHORS_TAGS } from 'constants';
+
 
 const initialState = {
   isFetching: false,
   items: []
 };
 
+// patches should be fixed in the db on the server to avoid this.
+const addMissingAuthorNamesToPatches = ({patches, authors}) => {
+  return patches.items.map(patch => {
+    if(patch.author && patch.author.wordpressId && !patch.author.name){
+      authors.items.some(author => {
+        if(author.wordpressId === patch.author.wordpressId){
+          patch.author.name = author.name;
+          return true;
+        }
+        return false;
+      });
+    }
+    return patch;
+  })
+}
+
 const patches = (state = initialState, action) => {
   switch (action.type) {
     case REQUEST_PATCHES:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: true
-      })
+      }
     case RECEIVE_PATCHES:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: false,
         items: action.patches
-      })
+      }
+    case RECEIVE_PATCHES_AUTHORS_TAGS:
+      return {
+        ...state,
+        items: addMissingAuthorNamesToPatches(action.state)
+      }
     default:
       return state
   }

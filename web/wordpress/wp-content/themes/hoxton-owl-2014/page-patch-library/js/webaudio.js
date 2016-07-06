@@ -175,7 +175,7 @@ owl.initPatchAudio = function (options) {
         } else {
             that.outputNode = that.scriptNode;
         }
-            that.outputNode.connect(owl.context.destination);
+        that.outputNode.connect(owl.context.destination);
     };
 
     that.disconnectFromOutput = function(){

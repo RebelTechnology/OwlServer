@@ -14,14 +14,14 @@ class PatchCounter extends Component {
     }, []);
   }
   render(){
-    const { patches } = this.props;
+    const { patches, myPatches } = this.props;
     const numAuthors = this.getUniqueAuthors(patches).length;
     const numPatches = patches.length;
     return (
       <div id="patch-counter">
         <div>
-          <span>{numPatches}</span> public { numPatches === 1 ? 'patch' : 'patches' }
-          <span> by {numAuthors}</span> { numAuthors === 1 ? 'author' : 'authors' }.
+          <span>{numPatches} {myPatches ? null : 'public'} { numPatches === 1 ? 'patch' : 'patches' }</span>
+          { myPatches ? null : (<span> by {numAuthors} { numAuthors === 1 ? 'author.' : 'authors.' } </span>) }
         </div>
       </div>
     );
@@ -29,7 +29,8 @@ class PatchCounter extends Component {
 }
 
 PatchCounter.proptypes = {
-  patches: PropTypes.array
+  patches: PropTypes.array,
+  myPatches : PropTypes.bool
 }
 
 export default PatchCounter;

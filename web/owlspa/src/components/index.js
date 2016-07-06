@@ -3,5 +3,8 @@ export Tag from './Tag/Tag';
 export SubFilterButton from './SubFilterButton/SubFilterButton';
 export PatchStats from './PatchStats/PatchStats';
 export PatchTileSmall from './PatchTileSmall/PatchTileSmall';
+export PatchCounter from './PatchCounter/PatchCounter';
 export AuthorLink from './AuthorLink/AuthorLink';
-
+export PatchSoundcloud from './PatchSoundcloud/PatchSoundcloud';
+export GitCode from './GitCode/GitCode';
+export PatchParameters from './PatchParameters/PatchParameters';

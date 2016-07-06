@@ -13,12 +13,12 @@ import {
   TOGGLE_FILTER_IN_SUB_FILTER,
   RESET_PATCHLIST_SUB_FILTER,
   REQUEST_CURRENT_USER,
-  RECEIVE_CURRENT_USER
+  RECEIVE_CURRENT_USER,
+  RECEIVE_PATCHES_AUTHORS_TAGS
 } from 'constants';
 
 export const fetchPatches = () => {
   return (dispatch) => {
-
     dispatch({
       type: REQUEST_PATCHES,
       isFetching: true
@@ -98,6 +98,24 @@ export const fetchTags = () => {
           console.error(err);
         }
       );
+  }
+}
+
+export const fetchPatchesAuthorsTags = () => {
+  return (dispatch, getState) => {
+    return Promise.all([
+      dispatch(fetchPatches()),
+      dispatch(fetchAuthors()),
+      dispatch(fetchTags())
+    ]).then(() => {
+      dispatch({
+        type: RECEIVE_PATCHES_AUTHORS_TAGS,
+        state: getState()
+      });
+    },
+    (err) => {
+      console.error(err);
+    })
   }
 }
 

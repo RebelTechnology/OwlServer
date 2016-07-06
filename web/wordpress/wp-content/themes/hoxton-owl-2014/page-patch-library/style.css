@@ -470,6 +470,7 @@ input.knob {
 }
 
 .patch-author {
+    display: inline-block;
     margin-top: 10px;
 }
 

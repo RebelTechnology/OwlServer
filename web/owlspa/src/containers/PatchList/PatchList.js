@@ -1,17 +1,15 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { fetchPatches,
+import {
   setPatchListTopFilter,
-  fetchAuthors,
-  fetchTags
+  fetchPatchesAuthorsTags
 } from 'actions';
-import { Patch , PatchCounter, SubFilter } from 'containers';
+import { Patch , SubFilter } from 'containers';
+import { PatchCounter } from 'components';
 
 class PatchList extends Component {
   componentWillMount(){
-    this.props.fetchPatches();
-    this.props.fetchAuthors();
-    this.props.fetchTags();
+    this.props.fetchPatchesAuthorsTags();
     this.props.setPatchListTopFilter(this.props.routeParams.topFilter);
   }
   componentWillReceiveProps(nextProps){
@@ -20,16 +18,16 @@ class PatchList extends Component {
     }
   }
   filterPatchesByAuthor(patches, subFilter){
-    return patches.filter(patch => patch.published && patch.author).filter(patch =>{
-      let authorId = patch.author.name || patch.author.wordpressId;
-      if(!authorId){
-        return false;
-      }
-      if(subFilter.length === 0){
-        return true;
-      }
-      return subFilter.indexOf(authorId) > -1;
-    })
+    return patches.filter(patch => patch.published)
+      .filter(patch => {
+        if(subFilter.length === 0){
+          return true;
+        }
+        if(!patch.author || !patch.author.name){
+          return false;
+        }
+        return subFilter.indexOf(patch.author.name) > -1
+      });
   }
   filterPatchesByTag(patches, subFilter){
     return patches.filter(patch => patch.published && patch.tags).filter(patch => {
@@ -41,7 +39,15 @@ class PatchList extends Component {
       })
     });
   }
-  getFilteredSortedPatches(patches, patchListFilter){
+  filterPatchesByCurrentUser(patches, currentUser){
+    return patches.filter(patch => {
+      if(!patch.author){
+        return false;
+      }
+      return patch.author.name === currentUser.display_name || patch.author.wordpressId === currentUser.ID;
+    });
+  }
+  getFilteredSortedPatches(patches, patchListFilter, currentUser){
     switch(patchListFilter.topFilter){
       case 'latest':
         return patches.filter(patch => patch.published).sort((a,b) => b.creationTimeUtc - a.creationTimeUtc);
@@ -52,20 +58,20 @@ class PatchList extends Component {
       case 'tags':
         return this.filterPatchesByTag(patches, patchListFilter.subFilter);
       case 'my-patches':
-        return patches.filter(patch => patch.published);
+        return this.filterPatchesByCurrentUser(patches, currentUser);
       default:
         return patches.filter(patch => patch.published);
     }
   }
   render(){
-    const { patches, patchListFilter, patchListFilter:{topFilter}, routeParams } = this.props;
-    const filteredPatches = this.getFilteredSortedPatches(patches.items, patchListFilter);
+    const { patches, patchListFilter, patchListFilter:{topFilter}, routeParams, currentUser } = this.props;
+    const filteredPatches = this.getFilteredSortedPatches(patches.items, patchListFilter, currentUser);
     return (
       <div>
         {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter routeParams={routeParams} /> : null}
         <div className="wrapper flexbox">
           <div className="content-container">
-            <PatchCounter patches={filteredPatches} />
+            <PatchCounter patches={filteredPatches} myPatches={topFilter === 'my-patches'} />
               { filteredPatches.map(
                 patch => {
                   return (
@@ -93,16 +99,15 @@ PatchList.PropTypes = {
   filter: PropTypes.string
 };
 
-function mapStateToProps({ patches, patchListFilter }){
+function mapStateToProps({ patches, patchListFilter, currentUser }){
   return {
     patches,
-    patchListFilter
+    patchListFilter,
+    currentUser
   }
 }
 
 export default connect(mapStateToProps, {
-  fetchPatches, 
   setPatchListTopFilter,
-  fetchAuthors, 
-  fetchTags
+  fetchPatchesAuthorsTags
 })(PatchList);
