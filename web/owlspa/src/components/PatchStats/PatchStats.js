@@ -49,7 +49,7 @@ class PatchStats extends Component {
             <div className="patch-stats-row">
                 <span className="parameter-label">SysEx</span>
                 <span className="parameter-value">
-                  <a className="sysExDownloadLink" href="#">Download</a>
+                  <a className="sysExDownloadLink" href={'/api/builds/'+ patch._id +'?format=sysx&amp;download=1'}>Download</a>
                   {patch.sysExLastUpdated ? ' (built on ' + this.isoDateToLocaleString(patch.sysExLastUpdated) + ' )' : null}
                 </span>
             </div>
@@ -59,7 +59,7 @@ class PatchStats extends Component {
             <div className="patch-stats-row">
               <span className="parameter-label">JS</span>
               <span className="parameter-value">
-                <a className="jsDownloadLink" href="#">Download</a>
+                <a className="jsDownloadLink" href={'/api/builds/'+ patch._id +'?format=js&amp;download=1'}>Download</a>
                 { patch.jsLastUpdated ? ' (built on ' + this.isoDateToLocaleString(patch.jsLastUpdated) + ' )': null}
               </span>
             </div>

@@ -1,0 +1,1 @@
+export getScript from './getScript';

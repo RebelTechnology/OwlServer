@@ -55,6 +55,7 @@ class PatchDetailsPage extends Component {
               </div>): null 
             } 
             <PatchStats patch={patch} />
+            
           </div>
 
           <div id="two-thirds" className="patch-library">

@@ -204,22 +204,6 @@ body { background: #f4f4f4; }
     margin-bottom: 20px;
 }
 
-/*
-.knob-container {
-    width: 20%;
-    height: auto;
-    float: left;
-    display: inline;
-    position: relative;
-    margin-top: 10px;
-    margin-left: 20px;
-}
-
-.knob-container:first-of-type {
-    margin-left: 0px;
-}
-*/
-
 /* Navigation items */
 
 #reg-signin-items {
@@ -346,6 +330,57 @@ body { background: #f4f4f4; }
 .tag-filter-button.active {
     border: 1px solid #ed7800;
     background: #d4d4d4;
+}
+
+/* Patch knobs */
+
+.patch-knob {
+    color:#eee;
+    position: relative;
+    margin-right: 30px;
+}
+
+.patch-knob.active {
+    color:#ed7800;
+}
+
+.patch-knob .parameter-name {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.patch-knob .parameter-value {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 20px;
+    margin-left: -25px;
+    margin-top: -10px;
+    text-align: center;
+}
+
+/* Patch Preview Controls */
+
+.patch-preview-buttons {
+    margin: 30px auto 10px;
+    width: 470px;
+}
+
+.patch-preview-buttons button {
+    margin-right:30px;
+    line-height: 0px;
+    padding: 20px;
+}
+
+.patch-preview-buttons button:disabled {
+    background-color: #ccc;
+    border-bottom: 2px solid #999;
 }
 
 /* Patch tile */

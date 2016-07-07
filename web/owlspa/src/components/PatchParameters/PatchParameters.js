@@ -4,14 +4,14 @@ import { Parameter } from 'containers';
 class PatchParameters extends Component {
 
   render(){
-    const { patch } = this.props;
+    const { patch, patchIsActive } = this.props;
     if(!patch){
       return null;
     }
     return (
       <div className="flexbox flex-center">
       { Object.keys(patch.parameters).map(key => {
-         return <Parameter key={key} id={key} name={patch.parameters[key]} />
+         return <Parameter active={patchIsActive} key={key} id={key} name={patch.parameters[key]} />
         })
       }
       </div>
@@ -21,7 +21,8 @@ class PatchParameters extends Component {
 }
 
 PatchParameters.propTypes = {
-  patch: PropTypes.object
+  patch: PropTypes.object,
+  patchIsActive: PropTypes.bool
 }
 
 

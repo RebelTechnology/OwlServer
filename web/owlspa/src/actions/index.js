@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import { getScript } from 'utils';
 import { 
   API_END_POINT,
   REQUEST_PATCHES,
@@ -14,14 +15,15 @@ import {
   RESET_PATCHLIST_SUB_FILTER,
   REQUEST_CURRENT_USER,
   RECEIVE_CURRENT_USER,
-  RECEIVE_PATCHES_AUTHORS_TAGS
+  RECEIVE_PATCHES_AUTHORS_TAGS,
+  REQUEST_PATCH_JAVASCRIPT,
+  LOADED_PATCH_JAVASCRIPT
 } from 'constants';
 
 export const fetchPatches = () => {
   return (dispatch) => {
     dispatch({
-      type: REQUEST_PATCHES,
-      isFetching: true
+      type: REQUEST_PATCHES
     });
 
     return fetch( API_END_POINT + '/patches/')
@@ -48,8 +50,7 @@ export const fetchPatches = () => {
 export const fetchAuthors = () => {
   return (dispatch) => {
     dispatch({
-      type: REQUEST_AUTHORS,
-      isFetching: true
+      type: REQUEST_AUTHORS
     });
 
     return fetch( API_END_POINT + '/authors/')
@@ -76,8 +77,7 @@ export const fetchAuthors = () => {
 export const fetchTags = () => {
   return (dispatch) => {
     dispatch({
-      type: REQUEST_TAGS,
-      isFetching: true
+      type: REQUEST_TAGS
     });
 
     return fetch( API_END_POINT + '/tags/')
@@ -123,8 +123,7 @@ export const fetchCurrentUser = () => {
   return (dispatch) => {
 
     dispatch({
-      type: REQUEST_CURRENT_USER,
-      isFetching: true
+      type: REQUEST_CURRENT_USER
     });
 
     return fetch('/wp-admin/admin-ajax.php?action=owl-get-current-user-info', {credentials: 'same-origin'})
@@ -152,8 +151,7 @@ export const fetchPatchDetails = (patchSeoName) => {
   return (dispatch) => {
 
     dispatch({
-      type: REQUEST_PATCH_DETAILS,
-      isFetching: true
+      type: REQUEST_PATCH_DETAILS
     });
 
     return fetch(API_END_POINT + '/patch/?seoName='+ patchSeoName)
@@ -174,6 +172,25 @@ export const fetchPatchDetails = (patchSeoName) => {
           console.error(err);
         }
       );
+  }
+}
+
+export const fetchPatchJavaScriptFile = (patch) => {
+  return (dispatch) => {
+    dispatch({
+      type: REQUEST_PATCH_JAVASCRIPT
+    });
+    getScript(API_END_POINT + '/builds/'+ patch._id +'?format=js&download=0', (err) => {
+      if(err){
+        console.error(err);
+      } else {
+        dispatch({
+          type: LOADED_PATCH_JAVASCRIPT,
+          isFetching: false,
+          patchId: patch._id
+        });
+      }
+    });
   }
 }
 

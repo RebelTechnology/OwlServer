@@ -6,6 +6,7 @@ import authors from './authors';
 import patchListFilter from './patchListFilter';
 import currentUser from './currentUser';
 import patchDetails from './patchDetails';
+import patchJavaScript from './patchJavaScript';
 
 const rootReducer = combineReducers({
   authors,
@@ -13,7 +14,8 @@ const rootReducer = combineReducers({
   patchListFilter,
   patchDetails,
   tags,
-  currentUser
+  currentUser,
+  patchJavaScript
 });
 
 export default rootReducer;
