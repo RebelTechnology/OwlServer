@@ -4,7 +4,7 @@ import { LOADED_PATCH_JAVASCRIPT } from 'constants';
 
 const initialState = {
   isFetching: false,
-  loadedPatches: []
+  loadedPatch: null
 };
 
 const patchJavaScript = (state = initialState, action) => {
@@ -12,16 +12,14 @@ const patchJavaScript = (state = initialState, action) => {
     case REQUEST_PATCH_JAVASCRIPT:
       return {
         ...state,
-        isFetching: true
+        isFetching: true,
+        loadedPatch: null
       }
     case LOADED_PATCH_JAVASCRIPT:
       return {
         ...state,
         isFetching: false,
-        loadedPatches: [
-          ...state.loadedPatches,
-          action.patchId
-        ]
+        loadedPatch: action.patchId
       }
     default:
       return state

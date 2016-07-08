@@ -338,6 +338,7 @@ body { background: #f4f4f4; }
     color:#eee;
     position: relative;
     margin-right: 30px;
+    cursor: ns-resize;
 }
 
 .patch-knob.active {

@@ -6,7 +6,7 @@ const initialState = {
   patches: {}
 };
 
-const authors = (state = initialState, action) => {
+const patchDetails = (state = initialState, action) => {
   switch (action.type) {
     case REQUEST_PATCH_DETAILS:
       return Object.assign({}, state, {
@@ -24,4 +24,4 @@ const authors = (state = initialState, action) => {
   }
 }
 
-export default authors;
+export default patchDetails;

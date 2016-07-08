@@ -700,6 +700,7 @@ div.white-box2 {
     border: 1px solid #d3d3d3;
     border-radius: 5px;
     height: auto;
+    margin-top: 20px;
     margin-bottom: 20px;
 /*    overflow: hidden; */
     padding: 20px;
@@ -906,7 +907,6 @@ div.patch-tab-container {
 
 #patch-test-inner-container {
     clear: both;
-    display: none;
     text-align: center;
 }
 

@@ -17,7 +17,8 @@ import {
   RECEIVE_CURRENT_USER,
   RECEIVE_PATCHES_AUTHORS_TAGS,
   REQUEST_PATCH_JAVASCRIPT,
-  LOADED_PATCH_JAVASCRIPT
+  LOADED_PATCH_JAVASCRIPT,
+  SET_WEB_AUDIO_PATCH_PARAMETER
 } from 'constants';
 
 export const fetchPatches = () => {
@@ -194,24 +195,31 @@ export const fetchPatchJavaScriptFile = (patch) => {
   }
 }
 
+export const setWebAudioPatchParameter = (parameter) => {
+  return {
+    type: SET_WEB_AUDIO_PATCH_PARAMETER,
+    parameter
+  }; 
+}
+
 export const setPatchListTopFilter = (filter) => {
   return {
     type: SET_PATCHLIST_TOP_FILTER,
-    topFilter: filter
+    topFilter
   };
 }
 
 export const togglePatchListSubFilter = (subFilter) => {
   return {
     type: TOGGLE_FILTER_IN_SUB_FILTER,
-    subFilter: subFilter
+    subFilter
   };
 }
 
 export const resetPatchListSubFilter = (subFilter) => {
   return {
     type: RESET_PATCHLIST_SUB_FILTER,
-    subFilter: subFilter
+    subFilter
   };
 }
 
