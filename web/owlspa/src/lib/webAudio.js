@@ -1,19 +1,16 @@
 /*
  * http://thealphanerd.io/blog/from-faust-to-webaudio/
+ *
+ * This legacy file has been imported more or less as is and should be re-written for react
  */
 
 var owl = {};
 
+owl.audioContext = null;
+
 owl.webAudioApiIsAvailable = function(){
     return (!!window.AudioContext || !!window.webkitAudioContext);
 };
-
-owl.initWebAudioApi = function(){
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-    return new AudioContext();
-}
-
-owl.context = owl.context || owl.initWebAudioApi();
 
 // Cross-browser compatibility for getUserMedia
 navigator.getUserMedia = navigator.getUserMedia ||
@@ -22,6 +19,12 @@ navigator.getUserMedia = navigator.getUserMedia ||
     navigator.msGetUserMedia;
 
 owl.initPatchAudio = function () {
+    if(owl.webAudioApiIsAvailable()){
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        owl.audioContext = owl.audioContext || new AudioContext(); // makes sure there's only one audioContext 
+    } else {
+        throw new Error('no web audio api');
+    }
     
     var WEB_setup = Module.cwrap('WEB_setup', 'number', ['number', 'number']);
     var WEB_processBlock = Module.cwrap('WEB_processBlock', 'number', ['number', 'number']);
@@ -40,12 +43,12 @@ owl.initPatchAudio = function () {
     var that = {};
     that.model = {
         inputNode: null,
-        fileNode: owl.context.createMediaElementSource(document.getElementById('patch-test-audio')),
+        fileNode: owl.audioContext.createMediaElementSource(document.getElementById('patch-test-audio')),
         micNode: null
     };
     that.vectorsize = 2048;      
-    console.log("audio[fs "+owl.context.sampleRate+"][bs "+that.vectorsize+"]");
-    WEB_setup(owl.context.sampleRate, that.vectorsize);
+    console.log("audio[fs "+owl.audioContext.sampleRate+"][bs "+that.vectorsize+"]");
+    WEB_setup(owl.audioContext.sampleRate, that.vectorsize);
     // for (i = 0; i < 5; i++)
     //  console.log("parameter "+i+": "+WEB_getParameterName(i));
 
@@ -111,7 +114,7 @@ owl.initPatchAudio = function () {
             that.connectInput(that.model.micNode);
         } else {
             navigator.getUserMedia.call(navigator, {audio: true}, function (stream) {
-                that.model.micNode = owl.context.createMediaStreamSource(stream);
+                that.model.micNode = owl.audioContext.createMediaStreamSource(stream);
                 that.connectInput(that.model.micNode);
             }, function (err) {
                 console.error(err);
@@ -172,13 +175,13 @@ owl.initPatchAudio = function () {
     that.connectToOutput = function(options){
         options = options || {};
         if(options.outputs === 1){
-            var splitter = owl.context.createChannelSplitter(2);
+            var splitter = owl.audioContext.createChannelSplitter(2);
             that.scriptNode.connect(splitter);
             that.outputNode = splitter;
         } else {
             that.outputNode = that.scriptNode;
         }
-        that.outputNode.connect(owl.context.destination);
+        that.outputNode.connect(owl.audioContext.destination);
     };
 
     that.disconnectFromOutput = function(){
@@ -196,12 +199,12 @@ owl.initPatchAudio = function () {
         that.numOut = that.getNumOutputs();
 
         // Create OWL patch web audio node
-        that.scriptNode = owl.context.createScriptProcessor(that.vectorsize, that.numIn, that.numOut);
+        that.scriptNode = owl.audioContext.createScriptProcessor(that.vectorsize, that.numIn, that.numOut);
         that.scriptNode.onaudioprocess = that.compute;
 
         // Connect output of OWL processor to audio out
-            // that.scope = new WavyJones(owl.context, "oscilloscope");
-            // that.scope.connect(owl.context.destination);
+            // that.scope = new WavyJones(owl.audioContext, "oscilloscope");
+            // that.scope.connect(owl.audioContext.destination);
         // that.scriptNode.connect(that.scope);
 
         // TODO the below calls to malloc are not yet being freed, potential memory leak
@@ -222,7 +225,6 @@ owl.initPatchAudio = function () {
             // assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
             HEAP32[(that.outs >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize);
         }
-        return that;
     };
 
     init();

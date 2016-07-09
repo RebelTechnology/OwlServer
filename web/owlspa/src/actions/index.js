@@ -18,7 +18,8 @@ import {
   RECEIVE_PATCHES_AUTHORS_TAGS,
   REQUEST_PATCH_JAVASCRIPT,
   LOADED_PATCH_JAVASCRIPT,
-  SET_WEB_AUDIO_PATCH_PARAMETER
+  SET_WEB_AUDIO_PATCH_PARAMETER,
+  SET_WEB_AUDIO_PATCH_INSTANCE
 } from 'constants';
 
 export const fetchPatches = () => {
@@ -181,18 +182,24 @@ export const fetchPatchJavaScriptFile = (patch) => {
     dispatch({
       type: REQUEST_PATCH_JAVASCRIPT
     });
-    getScript(API_END_POINT + '/builds/'+ patch._id +'?format=js&download=0', (err) => {
-      if(err){
-        console.error(err);
-      } else {
+    return getScript(API_END_POINT + '/builds/'+ patch._id +'?format=js&download=0')
+      .then(()=>{
         dispatch({
           type: LOADED_PATCH_JAVASCRIPT,
           isFetching: false,
           patchId: patch._id
         });
-      }
-    });
+      }).catch(err => {
+        console.error(err);
+      })
   }
+}
+
+export const setWebAudioPatchInstance = (patchInstance) => {
+  return {
+    type: SET_WEB_AUDIO_PATCH_INSTANCE,
+    patchInstance
+  };
 }
 
 export const setWebAudioPatchParameter = (parameter) => {
@@ -202,7 +209,7 @@ export const setWebAudioPatchParameter = (parameter) => {
   }; 
 }
 
-export const setPatchListTopFilter = (filter) => {
+export const setPatchListTopFilter = (topFilter) => {
   return {
     type: SET_PATCHLIST_TOP_FILTER,
     topFilter

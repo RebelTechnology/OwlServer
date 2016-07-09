@@ -2,19 +2,17 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { PatchParameters, WebAudioButton } from 'components';
 import { webAudio } from 'lib';
-import { fetchPatchJavaScriptFile } from 'actions';
+import { fetchPatchJavaScriptFile, setWebAudioPatchInstance } from 'actions';
 
 class PatchPreview extends Component {
   constructor(props){
     super(props);
     this.state = {
-      audioSelectValue : 'none',
-      patchInstance: null,
-      webAudioInitialised: false
+      audioSelectValue : 'none'
     };
   }
   
-  webAudioTestPatch(){
+  handleTestPatchButtonClick(){
     const { patch, patch:{jsAvailable}, fetchPatchJavaScriptFile } = this.props;
     if(webAudio.webAudioApiIsAvailable() && jsAvailable){
       fetchPatchJavaScriptFile(patch);
@@ -22,20 +20,14 @@ class PatchPreview extends Component {
   }
 
   startPatchAudio(){
-    if(this.state.webAudioInitialised){
-      return;
-    }
-    console.log('trying to start audio!');
     const patchInstance = webAudio.initPatchAudio();
     patchInstance.connectToOutput({outputs: this.props.patch.outputs});
-    this.setState({
-      patchInstance:patchInstance,
-      webAudioInitialised: true
+    
+    this.props.webAudioPatchParameters.forEach((param,i)=>{
+      patchInstance.update(i, param.value/100);
     });
-    //let tempArr = [0.35,0.35,0.35,0.35];
-    // tempArr.forEach((paramVal,i)=>{
-    //   patchInstance.update(i, paramVal);
-    // });
+
+    this.props.setWebAudioPatchInstance(patchInstance);
   }
 
   handleChangeAudioSource(e){
@@ -60,28 +52,50 @@ class PatchPreview extends Component {
   compilePatch(){
     console.log('compile');
   }
+
+  updateWebAudioPatchParameters(nextParams){
+    const { webAudioPatchParameters:currentParams, webAudioPatchInstance:{patchInstance} } = this.props;
+    nextParams.forEach((nextParam, i) => {
+      if(nextParam.value !== currentParams[i].value){
+        if(patchInstance){
+          patchInstance.update(i, nextParam.value/100);
+        }
+      }
+    });
+  }
+
+  patchJavaScriptWillLoad(nextProps){
+    const { patchJavaScript:{loadedPatch:nextLoadedPatch} } = nextProps;
+    const { patchJavaScript:{ loadedPatch }, patch } = this.props;
+    return loadedPatch !== nextLoadedPatch && nextLoadedPatch === patch._id;
+  }
+
+  patchParametersWillChange(nextProps){
+    const { webAudioPatchParameters:nextParameters } = nextProps;
+    const { webAudioPatchParameters:currentParameters } = this.props;
+    if(!nextParameters.length || !currentParameters.length){
+      return false;
+    }
+    return nextParameters.some((nextParam, i) => {
+      return currentParameters[i].value !== nextParam.value
+    });
+  }
   
-  componentWillReceiveProps({ patchJavaScript, webAudioPatchParameters:nextWebAudioPatchParameters }){
-    const { webAudioPatchParameters } = this.props;
-    if(patchJavaScript.loadedPatch && patchJavaScript.loadedPatch === this.props.patch._id){
+  componentWillReceiveProps(nextProps){
+    if(this.patchJavaScriptWillLoad(nextProps)){
       this.startPatchAudio();
     }
-    //TODO take this out to another func
-    if(nextWebAudioPatchParameters.length && webAudioPatchParameters.length){
-      nextWebAudioPatchParameters.forEach((nextParam, i)=>{
-        if(this.state.patchInstance && nextParam && nextParam.value !== webAudioPatchParameters[i].value){
-          console.log(i, nextParam.value);
-          this.state.patchInstance.update(i, nextParam.value);
-        }
-      });
+
+    if(this.patchParametersWillChange(nextProps)){
+      this.updateWebAudioPatchParameters(nextProps.webAudioPatchParameters);
     }
   }
   
   render(){
-    const { patch, patchJavaScript } = this.props;
+    const { patch, patchJavaScript, webAudioPatchInstance:{patchInstance} } = this.props;
     const owlIsConnected = false;
     const firmWareVerison = 'OWL Modular v12';
-    const patchIsActive = true;
+    const patchIsActive = !!patchInstance;
     const audioSampleBasePath = '/wp-content/themes/hoxton-owl-2014/page-patch-library/audio/';
 
     return (
@@ -94,8 +108,8 @@ class PatchPreview extends Component {
         <div className="patch-preview-buttons">
           <button onClick={() => this.compilePatch()} >Compile Patch</button>
           <button 
-            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable()} 
-            onClick={() => this.webAudioTestPatch()} >Test Patch in Browser
+            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
+            onClick={() => this.handleTestPatchButtonClick()} >Test Patch in Browser
           </button>
           <button 
             disabled={!owlIsConnected} 
@@ -151,17 +165,21 @@ class PatchPreview extends Component {
       </div>
     );
   }
+  componentWillUnMount(){
+    this.props.setWebAudioPatchInstance(null);
+  }
 }
 
 PatchPreview.propTypes = {
   patch: PropTypes.object
 }
 
-const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters }) => {
+const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatchInstance }) => {
   return { 
     patchJavaScript,
-    webAudioPatchParameters
+    webAudioPatchParameters,
+    webAudioPatchInstance
   }
 }
 
-export default connect(mapStateToProps, { fetchPatchJavaScriptFile })(PatchPreview);
+export default connect(mapStateToProps, { fetchPatchJavaScriptFile, setWebAudioPatchInstance })(PatchPreview);

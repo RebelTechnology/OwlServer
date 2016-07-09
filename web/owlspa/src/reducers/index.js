@@ -8,6 +8,7 @@ import currentUser from './currentUser';
 import patchDetails from './patchDetails';
 import patchJavaScript from './patchJavaScript';
 import webAudioPatchParameters from './webAudioPatchParameters';
+import webAudioPatchInstance from './webAudioPatchInstance';
 
 const rootReducer = combineReducers({
   authors,
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
   tags,
   currentUser,
   patchJavaScript,
-  webAudioPatchParameters
+  webAudioPatchParameters,
+  webAudioPatchInstance
 });
 
 export default rootReducer;

@@ -7,11 +7,11 @@ class Parameter extends Component {
     super(props);
     this.state = {
       previousY: null,
-      parameterValue: this.props.initialValue
+      parameterValue: 0
     }
   }
   componentWillMount(){
-    this.handleParameterChange(this.state.parameterValue);
+    this.setParameterValue(this.props.initialValue)
   }
 
   updateParamValue(e){
@@ -78,7 +78,8 @@ class Parameter extends Component {
   }
 
   shouldComponentUpdate(nextProps,nextState){
-    return nextState.parameterValue !== this.state.parameterValue;
+    const { parameterValue, active } = this.state;
+    return nextState.parameterValue !== parameterValue || nextProps.active !== active;
   }
 
   getParameterValueAsRotationDegrees(val){
