@@ -2,7 +2,12 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { PatchParameters, WebAudioButton } from 'components';
 import { webAudio } from 'lib';
-import { fetchPatchJavaScriptFile, setWebAudioPatchInstance } from 'actions';
+import { 
+  fetchPatchJavaScriptFile,
+  setWebAudioPatch,
+  setPatchPlaying,
+  resetPatchJavaScriptFile,
+  resetWebAudioPatchParameters } from 'actions';
 
 class PatchPreview extends Component {
   constructor(props){
@@ -19,30 +24,36 @@ class PatchPreview extends Component {
     }
   }
 
-  startPatchAudio(){
+  createPatchInstance(){
     const patchInstance = webAudio.initPatchAudio();
-    patchInstance.connectToOutput({outputs: this.props.patch.outputs});
-    
-    this.props.webAudioPatchParameters.forEach((param,i)=>{
-      patchInstance.update(i, param.value/100);
-    });
 
-    this.props.setWebAudioPatchInstance(patchInstance);
+    this.props.setWebAudioPatch({
+      instance : patchInstance,
+      isReady: true
+    });
+  }
+
+  initAudioDomNode(audioNode){
+    this.audioNode = audioNode;
   }
 
   handleChangeAudioSource(e){
-    this.setState({audioSelectValue: e.target.value});
-    console.log('audio source changed!', e.target.value);
-    // var $target = $(e.target);
-    // var $audio = $('#patch-test-audio');
-    // var val = $(e.target).val();
-    // var audioSampleBasePath = '/wp-content/themes/hoxton-owl-2014/page-patch-library/audio/';
-    // $audio.find('source').remove();
-    // if ('_' !== val.substr(0, 1)) {
-    //     var html = '<source src="' + audioSampleBasePath + val + '.mp3" type="audio/mpeg"><source src="' + audioSampleBasePath + val + '.ogg" type="audio/ogg">';
-    //     $(html).appendTo($audio);
-    // }
-    // $audio[0].load();
+    const audioSelectValue = e.target.value;
+    this.setState({audioSelectValue});    
+
+    if(audioSelectValue === 'none'){
+      this.props.webAudioPatch.instance.clearInput();
+      return;
+    }
+
+    if(audioSelectValue === 'mic'){
+      this.props.webAudioPatch.instance.useMicrophoneInput();
+      return;
+    }
+
+    this.audioNode.load();
+    this.audioNode.play();
+    this.props.webAudioPatch.instance.useFileInput(this.audioNode);
   }
 
   loadPatchOntoOwl(){
@@ -53,12 +64,43 @@ class PatchPreview extends Component {
     console.log('compile');
   }
 
+  startPatchAudio(instance){
+    const { webAudioPatch, webAudioPatchParameters, patch } = this.props;
+    instance = instance || webAudioPatch.instance;
+    if(instance){
+      instance.connectToOutput({outputs: patch.outputs});
+      
+      webAudioPatchParameters.forEach((param,i)=>{
+        instance.update(i, param.value/100);
+      });
+
+      this.props.setPatchPlaying(true);
+    }
+  }
+
+  stopPatchAudio(){
+    const { instance } = this.props.webAudioPatch;
+    if(instance){
+      instance.disconnectFromOutput();
+      this.props.setPatchPlaying(false);
+    }
+  }
+
+  togglePatchAudio(){
+    const { isPlaying } = this.props.webAudioPatch;
+    if(isPlaying){
+      this.stopPatchAudio();
+    } else {
+      this.startPatchAudio();
+    }
+  }
+
   updateWebAudioPatchParameters(nextParams){
-    const { webAudioPatchParameters:currentParams, webAudioPatchInstance:{patchInstance} } = this.props;
+    const { webAudioPatchParameters:currentParams, webAudioPatch:{instance} } = this.props;
     nextParams.forEach((nextParam, i) => {
       if(nextParam.value !== currentParams[i].value){
-        if(patchInstance){
-          patchInstance.update(i, nextParam.value/100);
+        if(instance){
+          instance.update(i, nextParam.value/100);
         }
       }
     });
@@ -80,73 +122,94 @@ class PatchPreview extends Component {
       return currentParameters[i].value !== nextParam.value
     });
   }
+
+  patchInstanceWillBeReady(nextProps){
+    const { webAudioPatch:{isReady} } = this.props;
+    const { webAudioPatch:{isReady:willBeReady} } = nextProps;
+    return !isReady && willBeReady;
+  }
   
   componentWillReceiveProps(nextProps){
     if(this.patchJavaScriptWillLoad(nextProps)){
-      this.startPatchAudio();
+      this.createPatchInstance();
+    }
+
+    if(this.patchInstanceWillBeReady(nextProps)){
+      this.startPatchAudio(nextProps.webAudioPatch.instance);
     }
 
     if(this.patchParametersWillChange(nextProps)){
       this.updateWebAudioPatchParameters(nextProps.webAudioPatchParameters);
     }
   }
-  
+
   render(){
-    const { patch, patchJavaScript, webAudioPatchInstance:{patchInstance} } = this.props;
-    const owlIsConnected = false;
-    const firmWareVerison = 'OWL Modular v12';
-    const patchIsActive = !!patchInstance;
+    const { patch, patchJavaScript, webAudioPatch } = this.props;
+    const { audioSelectValue } = this.state;
+    const owlIsConnected = false; //TODO get from device
+    const firmWareVerison = 'OWL Modular v12'; //TODO getfrom device
     const audioSampleBasePath = '/wp-content/themes/hoxton-owl-2014/page-patch-library/audio/';
+    const playAudioFile = audioSelectValue !== 'none' && audioSelectValue !== 'mic';
 
     return (
       <div className="white-box2">
-        { patch.name }
         <PatchParameters 
-          patchIsActive={patchIsActive} 
+          patchIsActive={webAudioPatch.isPlaying} 
           patch={patch} 
         />
         <div className="patch-preview-buttons">
           <button onClick={() => this.compilePatch()} >Compile Patch</button>
-          <button 
-            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
-            onClick={() => this.handleTestPatchButtonClick()} >Test Patch in Browser
-          </button>
+          { webAudioPatch.isReady ? (
+              <button
+                onClick={() => this.togglePatchAudio()} >
+                { webAudioPatch.isPlaying ? 'stop audio':'start audio' }
+              </button>
+            ) : (
+              <button 
+                disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
+                onClick={() => this.handleTestPatchButtonClick()} >Test Patch in Browser
+              </button>
+            )
+          }
           <button 
             disabled={!owlIsConnected} 
             onClick={() => this.loadPatchOntoOwl()} >Load Patch to Owl Device
           </button>
 
+          { webAudioPatch.isPlaying ? (
+            <div id="patch-test-inner-container">
 
-          <div id="patch-test-inner-container">
+              <input type="button" value="Pushbutton" id="patch-test-pushbutton" />
+              
+              <label for="patch-test-source">Audio Input:</label>
+              <select 
+                id="patch-test-source" 
+                onChange={e => this.handleChangeAudioSource(e)}
+                value={this.state.audioSelectValue} >
+                <option value="none">No Input</option>
+                <option value="mic">Microphone</option>
+                <option disabled>──────────</option>
+                <option value="gtr-jazz">Jazz Guitar</option>
+                <option value="rock-beat">Rock Beat</option>
+                <option value="synth">Synth</option>
+                <option value="white-noise">White Noise</option>
+              </select>
 
-            <input type="button" value="Pushbutton" id="patch-test-pushbutton" />
-            <br/>
-            <label for="patch-test-source">Source:</label>
-
-            <select 
-              id="patch-test-source" 
-              onChange={e => this.handleChangeAudioSource(e)}
-              value={this.state.audioSelectValue} >
-              <option value="none">No Input</option>
-              <option value="_mic">Microphone</option>
-              <option disabled>──────────</option>
-              <option value="gtr-jazz">Jazz Guitar</option>
-              <option value="rock-beat">Rock Beat</option>
-              <option value="synth">Synth</option>
-              <option value="white-noise">White Noise</option>
-            </select>
-
-            <input type="button" value="Start" id="patch-test-start-stop" />
-
-            <audio id="patch-test-audio" controls loop preload="auto">
-              {this.state.audioSelectValue !== 'none' ? (
-                <source src={audioSampleBasePath + this.state.audioSelectValue + '.mp3'} type="audio/mpeg" />
-              ):null }
-              {this.state.audioSelectValue !== 'none' ? (
-                <source src={audioSampleBasePath + this.state.audioSelectValue + '.ogg'} type="audio/ogg" />
-              ):null }
-            </audio>
-          </div>
+              <audio 
+                id="patch-test-audio" 
+                controls 
+                loop 
+                preload="auto"
+                ref={(node) => this.initAudioDomNode(node)}>
+                {playAudioFile ? (
+                  <source src={audioSampleBasePath + this.state.audioSelectValue + '.mp3'} type="audio/mpeg" />
+                ):null }
+                {playAudioFile ? (
+                  <source src={audioSampleBasePath + this.state.audioSelectValue + '.ogg'} type="audio/ogg" />
+                ):null }
+              </audio>
+            </div>
+          ) : null }
           
           <div className="error-msg">
             {!webAudio.webAudioApiIsAvailable() ? (
@@ -165,8 +228,15 @@ class PatchPreview extends Component {
       </div>
     );
   }
-  componentWillUnMount(){
-    this.props.setWebAudioPatchInstance(null);
+
+  componentWillUnmount(){
+    this.stopPatchAudio();
+    this.props.setWebAudioPatch({
+      instance : null,
+      isReady: false
+    });
+    this.props.resetPatchJavaScriptFile();
+    this.props.resetWebAudioPatchParameters();
   }
 }
 
@@ -174,12 +244,18 @@ PatchPreview.propTypes = {
   patch: PropTypes.object
 }
 
-const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatchInstance }) => {
+const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatch }) => {
   return { 
     patchJavaScript,
     webAudioPatchParameters,
-    webAudioPatchInstance
+    webAudioPatch
   }
 }
 
-export default connect(mapStateToProps, { fetchPatchJavaScriptFile, setWebAudioPatchInstance })(PatchPreview);
+export default connect(mapStateToProps, { 
+  fetchPatchJavaScriptFile, 
+  setWebAudioPatch,
+  setPatchPlaying,
+  resetPatchJavaScriptFile,
+  resetWebAudioPatchParameters
+})(PatchPreview);

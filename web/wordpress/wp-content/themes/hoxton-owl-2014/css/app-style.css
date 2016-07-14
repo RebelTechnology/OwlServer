@@ -348,7 +348,7 @@ body { background: #f4f4f4; }
 .patch-knob .parameter-name {
     display: block;
     position: absolute;
-    bottom: 0;
+    top: 95px;
     width: 100%;
     text-align: center;
     text-transform: uppercase;

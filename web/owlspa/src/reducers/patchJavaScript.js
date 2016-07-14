@@ -1,5 +1,7 @@
-import { REQUEST_PATCH_JAVASCRIPT } from 'constants';
-import { LOADED_PATCH_JAVASCRIPT } from 'constants';
+import { 
+  REQUEST_PATCH_JAVASCRIPT,
+  LOADED_PATCH_JAVASCRIPT,
+  RESET_PATCH_JAVASCRIPT } from 'constants'
 
 
 const initialState = {
@@ -21,6 +23,8 @@ const patchJavaScript = (state = initialState, action) => {
         isFetching: false,
         loadedPatch: action.patchId
       }
+    case RESET_PATCH_JAVASCRIPT:
+      return initialState;
     default:
       return state
   }
