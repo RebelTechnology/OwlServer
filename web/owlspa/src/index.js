@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
-import customHistory from './history';
+import customHistory from './customHistory';
 import routes from './routes';
 import rootReducer from 'reducers';
 

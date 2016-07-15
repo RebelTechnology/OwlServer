@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import customHistory from '../history';
+import customHistory from '../customHistory';
 import {
   API_END_POINT,
   REQUEST_DELETE_PATCH,
@@ -23,19 +23,24 @@ const deletePatch = (patch) => {
 
     return fetch( API_END_POINT + '/patch/' + patch._id, {method:'DELETE', credentials: 'same-origin'})
       .then(response => {
-        return response.json();
+        return response.json().then(json =>{
+          if(response.status >= 400){
+            throw new Error(json.message);
+          }
+          return json;
+        });
       })
-      .then( response => {
+      .then( json => {
         dispatch({
           type: PATCH_DELETED,
           patchSeoName: patch.seoName,
-          message: response.message
+          message: json.message
         });
-        window.alert(response.message);
+        window.alert(json.message);
         customHistory.push('/patches/latest')
       })
       .catch((err) => {
-          console.error(err);
+        window.alert(err);
       });
   }
 }
