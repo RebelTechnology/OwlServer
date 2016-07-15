@@ -3,7 +3,7 @@ import { AuthorLink } from 'components';
 
 class PatchTileSmall extends Component {
   render(){
-    const { patch, canEdit } = this.props;
+    const { patch, canEdit, onDeletePatchClick } = this.props;
     if(!patch){
       return (
         <div></div>
@@ -16,8 +16,8 @@ class PatchTileSmall extends Component {
             <div className="patch-title no-pseudo-link">{patch.name}</div>
             { canEdit ? (
               <div className="patch-buttons">
-                <span className="patch-button patch-button-edit"></span>
-                <span className="patch-button patch-button-delete"></span>
+                <a href={'/edit-patch/' + patch.seoName} className="patch-button patch-button-edit"></a>
+                <span onClick={onDeletePatchClick} className="patch-button patch-button-delete"></span>
               </div>) : null
             }    
           </div>
@@ -32,7 +32,8 @@ class PatchTileSmall extends Component {
 
 PatchTileSmall.propTypes = {
   patch: PropTypes.object,
-  canEdit : PropTypes.bool
+  canEdit : PropTypes.bool,
+  onDeletePatchClick: PropTypes.func
 }
 
 export default PatchTileSmall;

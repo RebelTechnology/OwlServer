@@ -1,7 +1,8 @@
 import { 
   REQUEST_PATCH_JAVASCRIPT,
   LOADED_PATCH_JAVASCRIPT,
-  RESET_PATCH_JAVASCRIPT } from 'constants'
+  RESET_PATCH_JAVASCRIPT,
+  RESET_WEB_AUDIO_PATCH } from 'constants'
 
 
 const initialState = {
@@ -24,6 +25,8 @@ const patchJavaScript = (state = initialState, action) => {
         loadedPatch: action.patchId
       }
     case RESET_PATCH_JAVASCRIPT:
+      return initialState;
+    case RESET_WEB_AUDIO_PATCH:
       return initialState;
     default:
       return state

@@ -1,3 +1,4 @@
+export deletePatch from './deletePatch';
 export fetchAuthors from './fetchAuthors';
 export fetchCurrentUser from './fetchCurrentUser';
 export fetchPatchDetails from './fetchPatchDetails';
@@ -7,6 +8,7 @@ export fetchPatchJavaScriptFile from './fetchPatchJavaScriptFile';
 export fetchTags from './fetchTags';
 export resetPatchJavaScriptFile from './resetPatchJavaScriptFile';
 export resetPatchListSubFilter from './resetPatchListSubFilter';
+export resetWebAudioPatch from './resetWebAudioPatch';
 export resetWebAudioPatchParameters from './resetWebAudioPatchParameters';
 export setPatchListTopFilter from './setPatchListTopFilter';
 export setPatchPlaying from './setPatchPlaying';

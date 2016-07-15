@@ -6,8 +6,7 @@ import {
   fetchPatchJavaScriptFile,
   setWebAudioPatch,
   setPatchPlaying,
-  resetPatchJavaScriptFile,
-  resetWebAudioPatchParameters } from 'actions';
+  resetWebAudioPatch } from 'actions';
 
 class PatchPreview extends Component {
   constructor(props){
@@ -57,11 +56,7 @@ class PatchPreview extends Component {
   }
 
   loadPatchOntoOwl(){
-    console.log('load patch');
-  }
-
-  compilePatch(){
-    console.log('compile');
+    console.log('load patch to owl');
   }
 
   startPatchAudio(instance){
@@ -144,7 +139,7 @@ class PatchPreview extends Component {
   }
 
   render(){
-    const { patch, patchJavaScript, webAudioPatch } = this.props;
+    const { patch, patchJavaScript, webAudioPatch, canEdit } = this.props;
     const { audioSelectValue } = this.state;
     const owlIsConnected = false; //TODO get from device
     const firmWareVerison = 'OWL Modular v12'; //TODO getfrom device
@@ -158,7 +153,9 @@ class PatchPreview extends Component {
           patch={patch} 
         />
         <div className="patch-preview-buttons">
-          <button onClick={() => this.compilePatch()} >Compile Patch</button>
+          
+          { canEdit ? (<button onClick={(e) => this.props.onCompileClick(e)} >Compile Patch</button>) : null}
+
           { webAudioPatch.isReady ? (
               <button
                 onClick={() => this.togglePatchAudio()} >
@@ -231,17 +228,14 @@ class PatchPreview extends Component {
 
   componentWillUnmount(){
     this.stopPatchAudio();
-    this.props.setWebAudioPatch({
-      instance : null,
-      isReady: false
-    });
-    this.props.resetPatchJavaScriptFile();
-    this.props.resetWebAudioPatchParameters();
+    this.props.resetWebAudioPatch();
   }
 }
 
 PatchPreview.propTypes = {
-  patch: PropTypes.object
+  patch: PropTypes.object,
+  canEdit : PropTypes.bool,
+  onCompileClick: PropTypes.func
 }
 
 const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatch }) => {
@@ -256,6 +250,5 @@ export default connect(mapStateToProps, {
   fetchPatchJavaScriptFile, 
   setWebAudioPatch,
   setPatchPlaying,
-  resetPatchJavaScriptFile,
-  resetWebAudioPatchParameters
+  resetWebAudioPatch
 })(PatchPreview);

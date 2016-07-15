@@ -1,6 +1,8 @@
-import { REQUEST_PATCHES } from 'constants';
-import { RECEIVE_PATCHES } from 'constants';
-import { RECEIVE_PATCHES_AUTHORS_TAGS } from 'constants';
+import { 
+  REQUEST_PATCHES,
+  RECEIVE_PATCHES,
+  RECEIVE_PATCHES_AUTHORS_TAGS,
+  PATCH_DELETED } from 'constants';
 
 
 const initialState = {
@@ -41,6 +43,13 @@ const patches = (state = initialState, action) => {
       return {
         ...state,
         items: addMissingAuthorNamesToPatches(action.state)
+      }
+    case PATCH_DELETED:
+      return {
+        ...state,
+        items: state.items.filter( patch => {
+          return patch.seoName !== action.patchSeoName;
+        })
       }
     default:
       return state

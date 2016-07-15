@@ -8,3 +8,4 @@ export AuthorLink from './AuthorLink/AuthorLink';
 export PatchSoundcloud from './PatchSoundcloud/PatchSoundcloud';
 export GitCode from './GitCode/GitCode';
 export PatchParameters from './PatchParameters/PatchParameters';
+export AddPatchTile from './AddPatchTile/AddPatchTile';

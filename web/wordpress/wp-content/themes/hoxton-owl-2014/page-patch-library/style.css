@@ -901,10 +901,6 @@ div.patch-tab-container {
     text-decoration: underline;
 }
 
-.compile-patch-container {
-    display: none;
-}
-
 #patch-test-inner-container {
     clear: both;
     text-align: center;

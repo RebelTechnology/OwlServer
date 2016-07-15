@@ -1,4 +1,4 @@
-import { SET_WEB_AUDIO_PATCH, SET_PATCH_PLAYING } from 'constants';
+import { SET_WEB_AUDIO_PATCH, SET_PATCH_PLAYING, RESET_WEB_AUDIO_PATCH } from 'constants';
 
 const initialState = {
   instance: null,
@@ -18,6 +18,8 @@ const webAudioPatch = (state = initialState, action) => {
         ...state,
         isPlaying: action.isPlaying
       }
+    case RESET_WEB_AUDIO_PATCH:
+      return initialState;
     default:
       return state
   }

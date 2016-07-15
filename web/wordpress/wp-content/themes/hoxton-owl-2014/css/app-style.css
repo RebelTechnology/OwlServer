@@ -142,16 +142,15 @@ body { background: #f4f4f4; }
 }
 
 .patch-description, .patch-stats {
+    cursor: default;
     width: 100%;
-    /* padding: 20px; */
-    /* border-radius: 5px; */
     margin-top: 20px;
     margin-bottom: 10px;
-    /* border: 1px solid white; */
 }
 
 .patch-stats a {
     text-decoration: underline;
+    cursor: pointer;
 }
 
 .patch-description {

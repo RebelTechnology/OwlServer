@@ -15,24 +15,24 @@ class PatchParameters extends Component {
       return null;
     }
 
+    const parameters = patch.parameters ? Object.keys(patch.parameters).map((key, i) => {
+      return ( 
+        <Parameter 
+          active={patchIsActive} 
+          onChange={this.handleOnParameterChange} 
+          key={key} 
+          id={key}
+          index={i}
+          name={patch.parameters[key]} 
+          min={0}
+          max={100}
+          initialValue={35}
+        />)
+    }) : null;
+
     return (
       <div className="flexbox flex-center">
-      { Object.keys(patch.parameters).map((key, i) => {
-        return (
-          <Parameter 
-            active={patchIsActive} 
-            onChange={this.handleOnParameterChange} 
-            key={key} 
-            id={key}
-            index={i}
-            name={patch.parameters[key]} 
-            min={0}
-            max={100}
-            initialValue={35}
-          />
-        )
-        })
-      }
+      { parameters }
       </div>
     );
   }

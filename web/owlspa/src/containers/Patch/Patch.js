@@ -13,17 +13,23 @@ class Patch extends Component {
   }
 
   render(){
-    const { id, name, published, authorName, description, tags, seoName } = this.props;
+    const { id, name, published, authorName, description, tags, seoName, canEdit, onDeletePatchClick } = this.props;
     return (
       <div className="patch-tile" onClick={ (e) => this.handlePatchClick(e, seoName) } >
         <div className="patch-title-controls">
           <div>
             <span className="patch-title">{ name }</span>
-              { !published ?
-                (<div className="patch-visibility">
-                  PRIVATE
-                </div>): null
-              }
+            { !published ?
+              (<div className="patch-visibility">
+                PRIVATE
+              </div>): null
+            }
+            { canEdit ? (
+              <div className="patch-buttons">
+                <a href={'/edit-patch/' + seoName} className="patch-button patch-button-edit"></a>
+                <span onClick={onDeletePatchClick} className="patch-button patch-button-delete"></span>
+              </div>) : null
+            }    
           </div> 
           <AuthorLink author={authorName} />
           <span className="patch-description-list-view">{ description }</span>     
@@ -46,7 +52,9 @@ Patch.propTypes = {
   published: PropTypes.bool,
   authorName: PropTypes.string,
   description: PropTypes.string,
-  tags: PropTypes.array
+  tags: PropTypes.array,
+  canEdit: PropTypes.bool,
+  onDeletePatchClick: PropTypes.func
 }
 
 Patch.contextTypes = {

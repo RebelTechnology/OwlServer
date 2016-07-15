@@ -18,7 +18,8 @@ class PatchStats extends Component {
   }
 
   render(){
-    const { patch } = this.props;
+    const { patch, canEdit } = this.props;
+
     if(!patch){
       return (
         <div></div>
@@ -72,10 +73,12 @@ class PatchStats extends Component {
             </div>
             ): null
           }
-          <div className="patch-stats-row compile-patch-container">
-             <span className="parameter-label">Build</span>
-             <span><a className="compileLink sysex" href="#">Compile Patch</a></span>
-          </div>
+          { canEdit ? (
+            <div className="patch-stats-row">
+               <span className="parameter-label">Build</span>
+               <span><a className="parameter-value compileLink sysex" onClick={(e) => this.props.onCompileClick(e)} >Compile Patch</a></span>
+            </div>): null
+          }
           <div className="patch-stats-row">
             { patch.tags ? patch.tags.map( tag => <Tag key={tag} tag={tag} />): null }
           </div>
@@ -86,7 +89,9 @@ class PatchStats extends Component {
 }
 
 PatchStats.propTypes = {
-  patch: PropTypes.object
+  patch: PropTypes.object,
+  canEdit : PropTypes.bool,
+  onCompileClick: PropTypes.func
 }
 
 export default PatchStats;

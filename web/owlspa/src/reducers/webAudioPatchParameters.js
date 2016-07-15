@@ -1,4 +1,7 @@
-import { SET_WEB_AUDIO_PATCH_PARAMETER, RESET_WEB_AUDIO_PATCH_PARAMETERS } from 'constants';
+import { 
+  SET_WEB_AUDIO_PATCH_PARAMETER,
+  RESET_WEB_AUDIO_PATCH_PARAMETERS,
+  RESET_WEB_AUDIO_PATCH } from 'constants';
 
 const initialState = [];
 
@@ -13,6 +16,8 @@ const webAudioPatchParameters = (state = initialState, action) => {
     case SET_WEB_AUDIO_PATCH_PARAMETER:
       return makeNewArray(action.parameter, state);
     case RESET_WEB_AUDIO_PATCH_PARAMETERS:
+      return initialState;
+    case RESET_WEB_AUDIO_PATCH:
       return initialState;
     default:
       return state

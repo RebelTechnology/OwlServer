@@ -1,11 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import {
-  setPatchListTopFilter,
-  fetchPatchesAuthorsTags
-} from 'actions';
+import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch } from 'actions';
 import { Patch , SubFilter } from 'containers';
-import { PatchCounter } from 'components';
+import { PatchCounter, AddPatchTile } from 'components';
 
 class PatchList extends Component {
   componentWillMount(){
@@ -63,30 +60,53 @@ class PatchList extends Component {
         return patches.filter(patch => patch.published);
     }
   }
+
+  handleOnDeletePatchClick(e, patch){
+    e.preventDefault();
+    e.stopPropagation();
+    this.props.deletePatch(patch);
+  }
+
+  currentUserCanEdit(patch){
+    if(!patch){
+      return false;
+    }
+    const { currentUser:user } = this.props;
+    const { author } = patch;
+    if(author && (user.ID || user.display_name)){
+      return author.name === user.display_name || author.wordpressId === user.ID;
+    }
+    return false;
+  }
+
   render(){
     const { patches, patchListFilter, patchListFilter:{topFilter}, routeParams, currentUser } = this.props;
     const filteredPatches = this.getFilteredSortedPatches(patches.items, patchListFilter, currentUser);
+    const patchesToBeRendered = filteredPatches.map( patch => {
+      return (
+        <Patch 
+          key={patch._id}
+          id={patch._id}
+          name={patch.name}
+          published={patch.published}
+          authorName={patch.author.name}
+          description={patch.description}
+          tags={patch.tags}
+          seoName={patch.seoName}
+          canEdit={this.currentUserCanEdit(patch)}
+          onDeletePatchClick={(e) => this.handleOnDeletePatchClick(e, patch)}
+        />
+      );
+    });
+
     return (
       <div>
         {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter routeParams={routeParams} /> : null}
         <div className="wrapper flexbox">
           <div className="content-container">
             <PatchCounter patches={filteredPatches} myPatches={topFilter === 'my-patches'} />
-              { filteredPatches.map(
-                patch => {
-                  return (
-                    <Patch 
-                      key={patch._id}
-                      id={patch._id}
-                      name={patch.name}
-                      published={patch.published}
-                      authorName={patch.author.name}
-                      description={patch.description}
-                      tags={patch.tags}
-                      seoName={patch.seoName}
-                    />
-                  );
-                })}
+            { topFilter === 'my-patches' ? (<AddPatchTile />) : null }
+            { patchesToBeRendered }
           </div>
         </div>
       </div>
@@ -109,5 +129,6 @@ function mapStateToProps({ patches, patchListFilter, currentUser }){
 
 export default connect(mapStateToProps, {
   setPatchListTopFilter,
-  fetchPatchesAuthorsTags
+  fetchPatchesAuthorsTags,
+  deletePatch
 })(PatchList);
