@@ -15,3 +15,4 @@ export setPatchPlaying from './setPatchPlaying';
 export setWebAudioPatch from './setWebAudioPatch';
 export setWebAudioPatchParameter from './setWebAudioPatchParameter';
 export togglePatchListSubFilter from './togglePatchListSubFilter';
+export fetchPatchCodeFiles from './fetchPatchCodeFiles';

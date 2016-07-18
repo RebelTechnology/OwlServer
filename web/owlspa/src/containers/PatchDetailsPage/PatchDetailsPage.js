@@ -1,8 +1,8 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import { fetchPatchDetails, deletePatch } from 'actions';
-import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, GitCode } from 'components';
-import { PatchPreview } from 'containers';
+import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud } from 'components';
+import { PatchPreview, PatchCode } from 'containers';
 
 class PatchDetailsPage extends Component {
   componentWillMount(){
@@ -80,7 +80,7 @@ class PatchDetailsPage extends Component {
 
             <PatchPreview onCompileClick={this.handleCompileClick} canEdit={canEdit} patch={patch} />
 
-            <GitCode github={patch.github} />
+            <PatchCode patchId={patch._id} fileUrls={patch.github} />
 
           </div>
 
