@@ -93,7 +93,7 @@ class PatchList extends Component {
           description={patch.description}
           tags={patch.tags}
           seoName={patch.seoName}
-          canEdit={true}
+          canEdit={this.currentUserCanEdit(patch)}
           onDeletePatchClick={(e) => this.handleOnDeletePatchClick(e, patch)}
         />
       );
