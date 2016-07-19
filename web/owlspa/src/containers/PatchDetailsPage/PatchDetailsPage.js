@@ -43,7 +43,6 @@ class PatchDetailsPage extends Component {
     const { patchDetails, currentUser , routeParams:{patchSeoName} } = this.props;
     const patch = patchDetails.patches[patchSeoName];
     const canEdit = currentUser.isAdmin || this.currentUserCanEdit(patch);
-    console.log('patch', patch);
 
     if(!patch){
       return (

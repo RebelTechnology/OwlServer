@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+
 import { parseUrl } from 'utils';
 import {
   REQUEST_PATCH_CODE_FILE,
@@ -63,6 +63,10 @@ const fetchGithubFile = (fileUrl) => {
   return fetchFile(url, {method:'GET', mode:'cors'});
 }
 
+const decodeBase64AndRemoveNewLines = (base64) => {
+  return window.atob(base64.replace(/\n/g, ''));
+}
+
 const fetchPatchCodeFiles = (fileUrls, patchId) => {
   return (dispatch) => {
 
@@ -85,8 +89,10 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
           index
         });
         fetchHoxtonFile(fileUrl).then( json => {
+          //TODO dispatch for hoxton files.
           console.log('hox',json);
         }).catch( err => {
+          console.error(err);
           dispatch({
             type: REQUEST_PATCH_CODE_FILE_FAILED,
             patchId,
@@ -107,7 +113,7 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
               type: RECEIVE_PATCH_CODE_FILE,
               patchId,
               index,
-              fileString: window.atob(json.content)
+              fileString: decodeBase64AndRemoveNewLines(json.content)
             });
           } else {
             dispatch({
@@ -118,6 +124,7 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
             });
           }
         }).catch( err => {
+          console.error(err);
           dispatch({
             type: REQUEST_PATCH_CODE_FILE_FAILED,
             patchId,

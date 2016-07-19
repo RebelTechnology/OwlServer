@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+
 import { 
   REQUEST_PATCH_DETAILS,
   RECEIVE_PATCH_DETAILS,

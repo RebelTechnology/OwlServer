@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+
 import { REQUEST_CURRENT_USER, RECEIVE_CURRENT_USER } from 'constants';
 
 const fetchCurrentUser = () => {

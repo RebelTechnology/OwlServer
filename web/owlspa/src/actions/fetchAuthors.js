@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+
 import {
   API_END_POINT,
   REQUEST_AUTHORS,

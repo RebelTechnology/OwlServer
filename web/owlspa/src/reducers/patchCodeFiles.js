@@ -13,7 +13,7 @@ const patchCodeFiles = (state = initialState, action) => {
         ...state,
         [action.patchId]:{
           ...state[action.patchId],
-          [action.index]:[action.fileString]
+          [action.index]: action.fileString
         }
       }
     case REQUEST_PATCH_CODE_FILE:

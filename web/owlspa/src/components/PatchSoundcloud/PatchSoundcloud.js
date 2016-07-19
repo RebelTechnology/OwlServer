@@ -8,6 +8,7 @@ class PatchSoundcloud extends Component {
   }
   render(){
     const { soundcloud } = this.props;
+    return null;
     if(!soundcloud){
       return null;
     }

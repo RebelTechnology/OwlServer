@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { fetchPatchCodeFiles } from 'actions';
 import classNames from 'classnames';
 import { parseUrl } from 'utils';
+import pdfu from 'pd-fileutils';
 
 class PatchCode extends Component {
   constructor(props){
@@ -52,11 +53,18 @@ class PatchCode extends Component {
       return null;
     }
 
-    console.log('patchCodeFiles',patchCodeFiles);
-
     const isGitHubfile = this.isGitHubfile(fileUrls[activeTab]);
-    const fileString = patchCodeFiles[patchId] ? patchCodeFiles[patchId][activeTab] : null;
+    const activeTabFileString = patchCodeFiles[patchId] ? patchCodeFiles[patchId][activeTab] : null;
+    const activeTabFileName = this.getFileName(fileUrls[activeTab]);
+    const isPdFile = /\.pd$/i.test(activeTabFileName);
+    let pdPatchSvg = null;
 
+    if(isPdFile && typeof activeTabFileString === 'string' && activeTabFileString !== 'Loading...'){
+      const pdPatch = pdfu.parse(activeTabFileString);
+      const svgString = pdfu.renderSvg(pdPatch, {svgFile: false});
+      pdPatchSvg = <div dangerouslySetInnerHTML={{__html: svgString}} />
+    }
+    
     const tabNavItems = fileUrls.map((fileUrl, i )=> {
       return (
         <li onClick={(e) => this.handleTabClick(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
@@ -75,9 +83,11 @@ class PatchCode extends Component {
             </ul>
             <div className="tab-content">
               { isGitHubfile ? <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> : null}
-              <pre className="prettyprint">
-                {fileString}
-              </pre>
+              { isPdFile ? pdPatchSvg : (
+                <pre className="prettyprint">
+                  {activeTabFileString}
+                </pre>)
+              }
             </div>
           </div>
       </div>

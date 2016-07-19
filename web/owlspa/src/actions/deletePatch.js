@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+
 import customHistory from '../customHistory';
 import {
   API_END_POINT,
