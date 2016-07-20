@@ -1,6 +1,7 @@
 export App from './App/App';
 export SubFilter from './SubFilter/SubFilter';
 export NavBar from './NavBar/NavBar';
+export OwlControl from './OwlControl/OwlControl';
 export Patch from './Patch/Patch';
 export PatchList from './PatchList/PatchList';
 export PatchDetailsPage from './PatchDetailsPage/PatchDetailsPage';

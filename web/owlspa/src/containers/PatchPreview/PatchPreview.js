@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { PatchParameters } from 'containers';
+import { PatchParameters, OwlControl } from 'containers';
 import { webAudio } from 'lib';
 import { 
   fetchPatchJavaScriptFile,
@@ -53,10 +53,6 @@ class PatchPreview extends Component {
     this.audioNode.load();
     this.audioNode.play();
     this.props.webAudioPatch.instance.useFileInput(this.audioNode);
-  }
-
-  loadPatchOntoOwl(){
-    console.log('load patch to owl');
   }
 
   startPatchAudio(instance){
@@ -141,8 +137,6 @@ class PatchPreview extends Component {
   render(){
     const { patch, patchJavaScript, webAudioPatch, canEdit } = this.props;
     const { audioSelectValue } = this.state;
-    const owlIsConnected = false; //TODO get from device
-    const firmWareVerison = 'OWL Modular v12'; //TODO getfrom device
     const audioSampleBasePath = '/wp-content/themes/hoxton-owl-2014/page-patch-library/audio/';
     const playAudioFile = audioSelectValue !== 'none' && audioSelectValue !== 'mic';
 
@@ -168,10 +162,6 @@ class PatchPreview extends Component {
               </button>
             )
           }
-          <button 
-            disabled={!owlIsConnected} 
-            onClick={() => this.loadPatchOntoOwl()} >Load Patch to Owl Device
-          </button>
 
           { webAudioPatch.isPlaying ? (
             <div id="patch-test-inner-container">
@@ -220,7 +210,8 @@ class PatchPreview extends Component {
             ) : null}
           </div>
 
-          <p>Connection Status: {firmWareVerison}</p>
+          <OwlControl />
+
         </div>
       </div>
     );
