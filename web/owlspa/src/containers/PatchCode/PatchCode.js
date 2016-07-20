@@ -45,6 +45,14 @@ class PatchCode extends Component {
     return fileUrl;
   }
 
+  getSvgString(fileString){
+    const pdPatch = pdfu.parse(fileString);
+    // this badness because pdfu removes the first random svg on the body when it starts :/
+    const randomSvg = document.createElement('svg');
+    document.body.insertBefore(randomSvg, document.body.firstChild);
+    return pdfu.renderSvg(pdPatch, {svgFile: false});
+  }
+
   render(){
     const { fileUrls, patchCodeFiles, patchId } = this.props;
     const { activeTab } = this.state;
@@ -60,9 +68,7 @@ class PatchCode extends Component {
     let pdPatchSvg = null;
 
     if(isPdFile && typeof activeTabFileString === 'string' && activeTabFileString !== 'Loading...'){
-      const pdPatch = pdfu.parse(activeTabFileString);
-      const svgString = pdfu.renderSvg(pdPatch, {svgFile: false});
-      pdPatchSvg = <div dangerouslySetInnerHTML={{__html: svgString}} />
+      pdPatchSvg = <div dangerouslySetInnerHTML={{__html: this.getSvgString(activeTabFileString)}} />
     }
     
     const tabNavItems = fileUrls.map((fileUrl, i )=> {

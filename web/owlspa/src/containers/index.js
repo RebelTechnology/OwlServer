@@ -7,3 +7,4 @@ export PatchDetailsPage from './PatchDetailsPage/PatchDetailsPage';
 export PatchPreview from './PatchPreview/PatchPreview';
 export Parameter from './Parameter/Parameter';
 export PatchCode from './PatchCode/PatchCode';
+export PatchParameters from './PatchParameters/PatchParameters';

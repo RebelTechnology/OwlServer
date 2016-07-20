@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { PatchParameters, WebAudioButton } from 'components';
+import { PatchParameters } from 'containers';
 import { webAudio } from 'lib';
 import { 
   fetchPatchJavaScriptFile,
