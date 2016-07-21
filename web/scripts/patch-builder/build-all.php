@@ -156,6 +156,8 @@ foreach ( $p as $id => $patch ) {
     echo "\r         " . PHP_EOL;
 }
 
+echo "Leaving off at patch " . ($skip + $count) . " out of " . $total . PHP_EOL;
+
 if (count($failedPatches)) {
 echo PHP_EOL;
 echo 'Patches that did not build' . PHP_EOL;
