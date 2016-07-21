@@ -1,6 +1,6 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
-import { fetchPatchDetails, deletePatch } from 'actions';
+import { fetchPatchDetails, deletePatch, compilePatch } from 'actions';
 import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
 
@@ -28,10 +28,9 @@ class PatchDetailsPage extends Component {
     return false;
   }
 
-  handleCompileClick(e){
+  handleCompileClick(e,patch){
     e.preventDefault();
-    console.log('compile patch');
-    //TODO fire action to compile patch.
+    this.props.compilePatch(patch);
   }
 
   handleDeletePatchClick(e, patch){
@@ -69,7 +68,7 @@ class PatchDetailsPage extends Component {
                 <p>{patch.instructions}</p>
               </div>): null 
             } 
-            <PatchStats onCompileClick={this.handleCompileClick} canEdit={canEdit} patch={patch} />
+            <PatchStats onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} />
             
           </div>
 
@@ -77,7 +76,7 @@ class PatchDetailsPage extends Component {
 
             <PatchSoundcloud soundcloud={patch.soundcloud} />
 
-            <PatchPreview onCompileClick={this.handleCompileClick} canEdit={canEdit} patch={patch} />
+            <PatchPreview onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} />
 
             <PatchCode patchId={patch._id} fileUrls={patch.github} />
 
@@ -96,4 +95,4 @@ const mapStateToProps = ({ patchDetails, currentUser }) => {
   }
 };
 
-export default connect(mapStateToProps, { fetchPatchDetails, deletePatch })(PatchDetailsPage);
+export default connect(mapStateToProps, { fetchPatchDetails, deletePatch, compilePatch })(PatchDetailsPage);

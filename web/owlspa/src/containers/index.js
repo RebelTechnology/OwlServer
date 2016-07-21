@@ -1,5 +1,5 @@
 export App from './App/App';
-export SubFilter from './SubFilter/SubFilter';
+export Modal from './Modal/Modal'; 
 export NavBar from './NavBar/NavBar';
 export OwlControl from './OwlControl/OwlControl';
 export Patch from './Patch/Patch';
@@ -9,3 +9,4 @@ export PatchPreview from './PatchPreview/PatchPreview';
 export Parameter from './Parameter/Parameter';
 export PatchCode from './PatchCode/PatchCode';
 export PatchParameters from './PatchParameters/PatchParameters';
+export SubFilter from './SubFilter/SubFilter';

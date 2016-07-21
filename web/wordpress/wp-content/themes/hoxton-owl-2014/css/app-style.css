@@ -376,11 +376,59 @@ body { background: #f4f4f4; }
     margin-right:30px;
     line-height: 0px;
     padding: 20px;
+    display: inline-block;
 }
 
 .patch-preview-buttons button:disabled {
     background-color: #ccc;
     border-bottom: 2px solid #999;
+}
+
+.patch-compile-button.isCompiling {
+    padding-right: 36px;
+}
+
+/** modal **/
+.modal-overlay {
+    background-color: rgba(0,0,0,0.5);
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: 999999;
+}
+
+/* loader spinner */
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    margin-top: -10px;
+    display: block;
+    height: 20px;
+    width: 20px;
+    background-image:url(../page-patch-library/images/loading-spinner.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    -webkit-animation: spin 0.9s infinite linear;
+    -moz-animation: spin 0.9s infinite linear;
+    -ms-animation: spin 0.9s infinite linear;
+    -o-animation: spin 0.9s infinite linear;
+}
+
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
 }
 
 /* Patch tile */
@@ -877,4 +925,5 @@ h2 {
         width: 48.9%;
     }
 }
+
 

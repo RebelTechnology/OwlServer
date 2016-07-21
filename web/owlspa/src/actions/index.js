@@ -16,3 +16,4 @@ export setWebAudioPatch from './setWebAudioPatch';
 export setWebAudioPatchParameter from './setWebAudioPatchParameter';
 export togglePatchListSubFilter from './togglePatchListSubFilter';
 export fetchPatchCodeFiles from './fetchPatchCodeFiles';
+export compilePatch from './compilePatch';

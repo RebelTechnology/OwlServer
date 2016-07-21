@@ -20,22 +20,18 @@ const isGithubFile = (fileUrl) => {
   return parseUrl(fileUrl).authority.indexOf('github.com') > -1;
 }
 
-const fetchFile = (url, options = {}) => {
-  if(!url){
+const fetchHoxtonFile = (fileUrl) => {
+  if(!fileUrl){
     throw new error('no file url specified');
   }
-  return fetch(url, options)
+  return fetch(parseUrl(fileUrl).path, {method:'GET'})
     .then(response => {
       if(response.status >= 400){
         throw new Error(response.statusText + ' ' + url);
       } else {
-        return response.json();
+        return response.text();
       }
     });
-}
-
-const fetchHoxtonFile = (fileUrl) => {
-  return fetchFile(parseUrl(fileUrl).path, {method:'GET'});
 }
 
 /* 
@@ -59,8 +55,17 @@ const constructGithubApiFileUrl = (fileUrl) => {
 }
 
 const fetchGithubFile = (fileUrl) => {
-  const url = constructGithubApiFileUrl(fileUrl);
-  return fetchFile(url, {method:'GET', mode:'cors'});
+  if(!fileUrl){
+    throw new error('no file url specified');
+  }
+  return fetch(constructGithubApiFileUrl(fileUrl), {method:'GET', mode:'cors'})
+    .then(response => {
+      if(response.status >= 400){
+        throw new Error(response.statusText + ' ' + url);
+      } else {
+        return response.json();
+      }
+    });
 }
 
 const decodeBase64AndRemoveNewLines = (base64) => {
@@ -88,9 +93,13 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
           patchId,
           index
         });
-        fetchHoxtonFile(fileUrl).then( json => {
-          //TODO dispatch for hoxton files.
-          console.log('hox',json);
+        fetchHoxtonFile(fileUrl).then( text => {
+          dispatch({
+            type: RECEIVE_PATCH_CODE_FILE,
+            patchId,
+            index,
+            fileString: text
+          });
         }).catch( err => {
           console.error(err);
           dispatch({

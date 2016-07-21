@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { PatchParameters, OwlControl } from 'containers';
 import { webAudio } from 'lib';
+import classNames from 'classnames';
 import { 
   fetchPatchJavaScriptFile,
   setWebAudioPatch,
@@ -148,7 +149,16 @@ class PatchPreview extends Component {
         />
         <div className="patch-preview-buttons">
           
-          { canEdit ? (<button onClick={(e) => this.props.onCompileClick(e)} >Compile Patch</button>) : null}
+          { canEdit ? (
+            <button 
+              disabled={patch.isCompiling} 
+              className={classNames('patch-compile-button',{isCompiling: patch.isCompiling})}
+              onClick={(e) => this.props.onCompileClick(e)} >
+              {patch.isCompiling ? 'Compiling . . .': 'Compile Patch'}
+              {patch.isCompiling ? <i className="loading-spinner"></i> : null}
+            </button>
+            ) : null
+          }
 
           { webAudioPatch.isReady ? (
               <button

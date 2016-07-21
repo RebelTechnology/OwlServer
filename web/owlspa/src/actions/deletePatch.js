@@ -37,7 +37,7 @@ const deletePatch = (patch) => {
           message: json.message
         });
         window.alert(json.message);
-        customHistory.push('/patches/latest')
+        customHistory.push('/patches/latest');
       })
       .catch((err) => {
         window.alert(err);

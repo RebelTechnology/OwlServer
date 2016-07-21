@@ -75,8 +75,13 @@ class PatchStats extends Component {
           }
           { canEdit ? (
             <div className="patch-stats-row">
-               <span className="parameter-label">Build</span>
-               <span><a className="parameter-value compileLink sysex" onClick={(e) => this.props.onCompileClick(e)} >Compile Patch</a></span>
+              <span className="parameter-label">Build</span>
+              <span className="parameter-value">
+                { patch.isCompiling ? 'Compiling ... ': (
+                    <a className="compileLink sysex" onClick={(e) => this.props.onCompileClick(e)} >Compile Patch</a>
+                  )
+                }
+              </span>
             </div>): null
           }
           <div className="patch-stats-row">

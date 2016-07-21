@@ -34,6 +34,22 @@ var getBuildFormat = function (format) {
     return buildFormat;
 };
 
+
+/**
+ * Convenience function gets wordpress cookie if exists or returns false
+ */
+var getWordpressCookie = function(cookies) {
+    var wpCookie = false;
+    Object.keys(cookies).some(function(key){
+        if(key.lastIndexOf('wordpress_logged_in_') === 0){
+            wpCookie = cookies[key];
+            return true;
+        }
+        return false;
+    });
+    return wpCookie;
+};
+
 /**
  * Downloads the build for the specified patch.
  *
@@ -157,6 +173,18 @@ router.put('/:id', function (req, res) {
     var collection = req.db.get('patches');
     var updatedPatch = req.body.patch;
     var patchAuthor = {};
+
+    // to avoid unnecessary requests if wordpress cookie is available
+    if(req.cookies){
+        var wpCookieFromRequest = getWordpressCookie(req.cookies);
+        if(wpCookieFromRequest){
+            console.log('wp_cookie found in request');
+            credentials = {
+                type:'wordpress',
+                cookie: wpCookieFromRequest
+            }
+        }
+    }
 
     var id = req.params.id;
     if (!/^[a-f\d]{24}$/i.test(id)) {
