@@ -7,7 +7,6 @@ import {
 
 const initialState = {
   isFetching: false,
-  isCompiling: false,
   patches: {}
 };
 
@@ -46,17 +45,17 @@ const patchDetails = (state = initialState, action) => {
           }
         }
       }
-    // case RECEIVE_COMPILE_PATCH:
-    //   return {
-    //     ...state,
-    //     patches : {
-    //       ...state.patches,
-    //       [action.patchSeoName]: {
-    //         ...state.patches[action.patchSeoName],
-    //         isCompiling: false
-    //       }
-    //     }
-    //   }
+    case RECEIVE_COMPILE_PATCH:
+      return {
+        ...state,
+        patches : {
+          ...state.patches,
+          [action.patchSeoName]: {
+            ...state.patches[action.patchSeoName],
+            isCompiling: false
+          }
+        }
+      }
     default:
       return state
   }

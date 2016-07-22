@@ -5,6 +5,9 @@ import {
   RECEIVE_COMPILE_PATCH
 } from 'constants';
 
+import newDialog from './newDialog';
+import fetchPatchDetails from './fetchPatchDetails';
+
 const compilePatch = (patch) => {
   return (dispatch) => {
     if(!patch){
@@ -25,14 +28,40 @@ const compilePatch = (patch) => {
         });
       })
       .then( json => {
-          console.log('SUCCESS!!', json);
-          dispatch({
-            type: RECEIVE_COMPILE_PATCH,
-            patchSeoName: patch.seoName,
-            result: json
-          });
+        dispatch({
+          type: RECEIVE_COMPILE_PATCH,
+          patchSeoName: patch.seoName
+        });
+
+        dispatch(newDialog({
+          header: 'Patch Compiltation ' + (json.success ? 'Succeeded' : 'Failed'),
+          activeDialogTab:json.success ? 0 : 1,
+          isError : !json.success,
+          tabs:[
+            { header:'stdout',
+              contents:json.stdout
+            },
+            {
+              header :'stderr',
+              isError: !json.success,
+              contents:json.stderr
+            }
+          ] 
+        }));
+        
+        if(json.success){
+          dispatch(fetchPatchDetails(patch.seoName));
+        }
       }).catch((err) => {
-        window.alert(err);
+        dispatch(newDialog({
+          header: 'Error',
+          isError : true,
+          tabs:[{
+            header :'Error',
+            isError: true,
+            contents: err
+          }] 
+        }));
       });
   }
 }

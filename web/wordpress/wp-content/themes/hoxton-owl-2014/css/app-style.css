@@ -388,13 +388,73 @@ body { background: #f4f4f4; }
     padding-right: 36px;
 }
 
-/** modal **/
-.modal-overlay {
-    background-color: rgba(0,0,0,0.5);
-    height: 100%;
-    position: absolute;
+/** dialog **/
+
+.modal-dialog {
+    width: 680px;
+}
+
+.modal-dialog .dialog-header {
     width: 100%;
-    z-index: 999999;
+    background: #000;
+    font-size: 18px;
+    font-weight: normal;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+.modal-dialog .dialog-header.error {
+    background: #bd2929;
+}
+
+.modal-dialog .dialog-tabs li {
+    box-sizing: border-box;
+    display: inline-block;
+    color: #a5a3a3;
+    text-transform: capitalize;
+    font-size: 14px;
+    margin-right: 4px;
+    border: 1px solid #ccc;
+    padding: 8px 20px;
+    border-bottom: none;
+    cursor: pointer;
+}
+
+.modal-dialog .dialog-tabs li.active {
+    background: #6d6c6c;
+    color: #fff;
+    border: 1px solid #6d6c6c;
+}
+
+.modal-dialog .dialog-tabs li.error {
+    background: #bd2929;
+}
+
+.modal-dialog .dialog-body {
+    margin-top: -1px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    line-height: 1.3em;
+    font-family: 'Droid Sans Mono', monospace;
+    color: #666;
+    font-weight: normal;
+    padding: 10px;
+    height: 250px;
+    overflow: scroll;
+}
+
+.modal-dialog .dialog-footer {
+    padding: 10px 20px;
+    background: #efecec;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.modal-dialog .dialog-footer button {
+    display: inline-block;
+    padding: 20px;
+    line-height: 1px;
 }
 
 /* loader spinner */
@@ -917,6 +977,9 @@ h2 {
         padding-top: 32px;
         white-space: nowrap;
         background-image: none;
+    }
+    .modal-dialog {
+        width: 400px;
     }
 }
 

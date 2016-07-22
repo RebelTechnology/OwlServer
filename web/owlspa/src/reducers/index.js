@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import thunk from 'redux-thunk';
 import patches from './patches';
+import dialog from './dialog';
 import tags from './tags';
 import authors from './authors';
 import patchListFilter from './patchListFilter';
@@ -14,6 +15,7 @@ import patchCodeFiles from './patchCodeFiles';
 
 const rootReducer = combineReducers({
   authors,
+  dialog,
   patches,
   patchListFilter,
   patchDetails,
