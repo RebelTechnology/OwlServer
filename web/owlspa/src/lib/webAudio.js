@@ -152,6 +152,26 @@ owl.initPatchAudio = function () {
         return that;
     };
 
+    that.setPushButtonDown = function() {
+        if(WEB_setButtons){
+            var buttonState = WEB_getButtons();
+            buttonState |= 0x02;
+            buttonState &= ~0x04;
+            buttonState |= 0x08; 
+            WEB_setButtons(buttonState);
+        }
+    };
+
+    that.setPushButtonUp = function() {
+        if(WEB_setButtons){
+            var buttonState = WEB_getButtons();
+            buttonState &= ~0x02;
+            buttonState |= 0x04;
+            buttonState &= ~0x08; 
+            WEB_setButtons(buttonState);
+        }
+    };
+
     that.getButtons = function() {
         if(WEB_getButtons){
             return WEB_getButtons();
@@ -169,6 +189,19 @@ owl.initPatchAudio = function () {
             WEB_setButtons(values);
         }
         return that;
+    };
+
+    that.getPushButtonLedColour = function(){
+        if(WEB_getButtons){
+            var buttonState = WEB_getButtons();
+            if(buttonState & 0x04){ // bit 3 high is green
+                return 'green';
+            }
+            if(buttonState & 0x08){ // bit 4 high is red
+                return 'red';
+            }
+        }
+        return null;
     };
 
     that.connectToOutput = function(options){

@@ -13,7 +13,8 @@ class PatchPreview extends Component {
   constructor(props){
     super(props);
     this.state = {
-      audioSelectValue : 'none'
+      audioSelectValue : 'none',
+      pushButtonLedColour : null
     };
   }
   
@@ -21,6 +22,31 @@ class PatchPreview extends Component {
     const { patch, patch:{jsAvailable}, fetchPatchJavaScriptFile } = this.props;
     if(webAudio.webAudioApiIsAvailable() && jsAvailable){
       fetchPatchJavaScriptFile(patch);
+    }
+  }
+
+  handlePushButtonDown(e){
+    this.props.webAudioPatch.instance.setPushButtonDown();
+    this.getWebAudioPatchPushButtonLedColour();
+  }
+
+  handlePushButtonUp(e){
+    this.props.webAudioPatch.instance.setPushButtonUp();
+    this.getWebAudioPatchPushButtonLedColour();
+  }
+
+  getWebAudioPatchPushButtonLedColour(options){
+    options = options || {};
+    const { webAudioPatch } = this.props
+    if(webAudioPatch.instance){
+      const pushButtonLedColour = webAudioPatch.instance.getPushButtonLedColour();
+      if(this.state.pushButtonLedColour !== pushButtonLedColour){
+        this.setState({ pushButtonLedColour });
+      }
+    }
+    if(options.poll){
+      this.pushButtonLedTimeout = () => this.getWebAudioPatchPushButtonLedColour({poll:true});
+      window.setTimeout(this.pushButtonLedTimeout, 500);
     }
   }
 
@@ -67,6 +93,7 @@ class PatchPreview extends Component {
       });
 
       this.props.setPatchPlaying(true);
+      this.getWebAudioPatchPushButtonLedColour({poll:true});
     }
   }
 
@@ -74,6 +101,7 @@ class PatchPreview extends Component {
     const { instance } = this.props.webAudioPatch;
     if(instance){
       instance.disconnectFromOutput();
+      window.clearTimeout(this.pushButtonLedTimeout);
       this.props.setPatchPlaying(false);
     }
   }
@@ -147,6 +175,22 @@ class PatchPreview extends Component {
           patchIsActive={webAudioPatch.isPlaying} 
           patch={patch} 
         />
+
+        <div 
+          className={classNames('patch-push-button', {active:webAudioPatch.isPlaying})}
+          onMouseDown={(e) => webAudioPatch.isPlaying && this.handlePushButtonDown(e) }
+          onMouseUp={(e) => webAudioPatch.isPlaying && this.handlePushButtonUp(e) }
+          onTouchStart={(e) => webAudioPatch.isPlaying && this.handlePushButtonDown(e) }
+          onTouchEnd={(e) => webAudioPatch.isPlaying && this.handlePushButtonUp(e) }>
+          <div 
+            style={
+              {backgroundColor: (webAudioPatch.isPlaying && this.state.pushButtonLedColour) ? this.state.pushButtonLedColour : '#ececec'}
+            } 
+            className="patch-push-button-led">
+          </div>
+          <label>Pushbutton</label>
+        </div>
+
         <div className="patch-preview-buttons">
           
           { canEdit ? (
@@ -175,9 +219,6 @@ class PatchPreview extends Component {
 
           { webAudioPatch.isPlaying ? (
             <div id="patch-test-inner-container">
-
-              <input type="button" value="Pushbutton" id="patch-test-pushbutton" />
-              
               <label for="patch-test-source">Audio Input:</label>
               <select 
                 id="patch-test-source" 

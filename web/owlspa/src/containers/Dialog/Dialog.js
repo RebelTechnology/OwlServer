@@ -7,7 +7,6 @@ import classNames from 'classnames';
 class Dialog extends Component {
 
   closeModal(){
-    console.log('closing modal');
     this.props.closeDialog();
   }
 

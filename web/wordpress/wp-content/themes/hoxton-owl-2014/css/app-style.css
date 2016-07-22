@@ -340,6 +340,10 @@ body { background: #f4f4f4; }
     cursor: ns-resize;
 }
 
+.patch-knob:last-child {
+    margin-right:0;
+}
+
 .patch-knob.active {
     color:#ed7800;
 }
@@ -386,6 +390,51 @@ body { background: #f4f4f4; }
 
 .patch-compile-button.isCompiling {
     padding-right: 36px;
+}
+
+.patch-push-button {
+    display: block;
+    position: relative;
+    width: 100px;
+    height: 65px;
+    margin: 42px auto 10px;
+    cursor: pointer;
+}
+
+.patch-push-button-led {
+    margin: auto;
+    display: block;
+    width: 40px;
+    height: 40px;
+    background-color: #ececec;
+    border-radius: 20px;
+    -webkit-box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
+    -moz-box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
+    box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
+}
+
+.patch-push-button.active:active .patch-push-button-led {
+    -webkit-box-shadow: inset 0px 0px 2px 2px rgba(0,0,0,0.25);
+    -moz-box-shadow: inset 0px 0px 2px 2px rgba(0,0,0,0.25);
+    box-shadow: inset 0px 0px 2px 2px rgba(0,0,0,0.25);
+}
+
+.patch-push-button label {
+    display: block;
+    color: #eee;
+    text-transform: uppercase;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%,0);
+}
+
+.patch-push-button.active label {
+    color: #ed7800;
+} 
+
+.patch-preview-buttons #push-button:hover {
+
 }
 
 /** dialog **/
@@ -681,9 +730,6 @@ body { background: #f4f4f4; }
 }
 
 .patch-button:hover {
-    /*transform:rotate(180deg);
-    color: green;
-    transition: .3s;*/
     cursor: pointer;
 }
 
