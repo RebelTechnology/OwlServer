@@ -4,6 +4,7 @@ import {
   REQUEST_PATCH_JAVASCRIPT,
   LOADED_PATCH_JAVASCRIPT
 } from 'constants';
+import newDialog from './newDialog';
 
 const fetchPatchJavaScriptFile = (patch) => {
   return (dispatch) => {
@@ -18,6 +19,15 @@ const fetchPatchJavaScriptFile = (patch) => {
           patchId: patch._id
         });
       }).catch(err => {
+        dispatch(newDialog({
+          header: 'Error trying to run the patch',
+          isError : true,
+          tabs:[{
+            header :'Error',
+            isError: true,
+            contents: 'Darn it there was an Error trying to load or run this patch in the browser.'
+          }] 
+        }));
         console.error(err);
       })
   }

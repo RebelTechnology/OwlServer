@@ -1,5 +1,5 @@
 import React, { PropTypes, Component }  from 'react';
-import { NavBar } from 'containers';
+import { NavBar, Dialog } from 'containers';
 import { fetchCurrentUser } from 'actions';
 import { connect } from 'react-redux';
 
@@ -10,6 +10,7 @@ class App extends Component {
   render(){ 
     return (
       <div>
+        <Dialog />
         <NavBar location={this.props.location} routeParams={this.props.routeParams} />
         {this.props.children}
       </div>

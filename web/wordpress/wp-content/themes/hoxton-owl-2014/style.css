@@ -639,6 +639,7 @@ form[class^="bbp"] input[type=password] {
 }
 
 .tab-content {
+  overflow: scroll;
   position: relative;
   padding: 40px 20px ;
   min-height: 100px;
