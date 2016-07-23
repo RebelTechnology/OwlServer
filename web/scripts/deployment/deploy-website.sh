@@ -41,14 +41,16 @@ else
 fi
 echo "This is $HOSTNAME, assuming $TARGET_ENV environment."
 
-# Delete previous clone
-rm -rf $DIR/$CLONE_DIR
+# # Delete previous clone
+# rm -rf $DIR/$CLONE_DIR
 
-# Clone repository
-echo "Cloning $CLONE_DIR repository..."
-git clone --quiet $REPO_URL $DIR/$CLONE_DIR
-cd $DIR/$CLONE_DIR
+# Clone or update repository
+if [ -d $DIR/$CLONE_DIR ]; then
+    echo "Cloning $CLONE_DIR repository..."
+    git clone --quiet $REPO_URL $DIR/$CLONE_DIR
+fi
 echo "Checking out '$GIT_BRANCH' branch..."
+cd $DIR/$CLONE_DIR
 git checkout $GIT_BRANCH > /dev/null
 git pull origin $GIT_BRANCH > /dev/null
 cd - > /dev/null
