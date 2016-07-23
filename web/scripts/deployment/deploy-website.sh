@@ -65,8 +65,8 @@ cd - > /dev/null
 
 # Update Wordpress
 echo "Updating Wordpress files..."
-rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
-mv $DIR/$CLONE_DIR/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
+# rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
+rsync -rav $DIR/$CLONE_DIR/web/wordpress/wp-content/themes/hoxton-owl-2014 $DIR/../httpdocs/wp-content/themes/
 cp -a $DIR/$CLONE_DIR/web/wordpress/robots.txt $DIR/../httpdocs/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../httpdocs/wp-content/plugins/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-patch-uploader.php $DIR/../httpdocs/wp-content/plugins/
