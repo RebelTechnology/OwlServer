@@ -1,15 +1,16 @@
 /*
  * http://thealphanerd.io/blog/from-faust-to-webaudio/
+ *
+ * This legacy file has been imported more or less as is and should be re-written for react
  */
 
-var owl = owl || {};
+var owl = {};
 
-owl.initWebAudioApi = function(){
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-    return new AudioContext();
-}
+owl.audioContext = null;
 
-owl.context = owl.context || owl.initWebAudioApi();
+owl.webAudioApiIsAvailable = function(){
+    return (!!window.AudioContext || !!window.webkitAudioContext);
+};
 
 // Cross-browser compatibility for getUserMedia
 navigator.getUserMedia = navigator.getUserMedia ||
@@ -17,8 +18,13 @@ navigator.getUserMedia = navigator.getUserMedia ||
     navigator.mozGetUserMedia ||
     navigator.msGetUserMedia;
 
-owl.initPatchAudio = function (options) {
-    options = options || {};
+owl.initPatchAudio = function () {
+    if(owl.webAudioApiIsAvailable()){
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        owl.audioContext = owl.audioContext || new AudioContext(); // makes sure there's only one audioContext 
+    } else {
+        throw new Error('no web audio api');
+    }
     
     var WEB_setup = Module.cwrap('WEB_setup', 'number', ['number', 'number']);
     var WEB_processBlock = Module.cwrap('WEB_processBlock', 'number', ['number', 'number']);
@@ -34,17 +40,15 @@ owl.initPatchAudio = function (options) {
         WEB_getButtons = Module.cwrap('WEB_getButtons', 'number', []);
     }catch(x){}
 
-    var that = {};
+    var that = {}
     that.model = {
         inputNode: null,
-        fileNode: owl.context.createMediaElementSource(document.getElementById('patch-test-audio')),
+        fileNode: null,
         micNode: null
     };
     that.vectorsize = 2048;      
-    console.log("audio[fs "+owl.context.sampleRate+"][bs "+that.vectorsize+"]");
-    WEB_setup(owl.context.sampleRate, that.vectorsize);
-    // for (i = 0; i < 5; i++)
-    //  console.log("parameter "+i+": "+WEB_getParameterName(i));
+    console.log("audio[fs "+owl.audioContext.sampleRate+"][bs "+that.vectorsize+"]");
+    WEB_setup(owl.audioContext.sampleRate, that.vectorsize);
 
     // Bind to C++ Member Functions
     that.getNumInputs = function () {
@@ -108,7 +112,7 @@ owl.initPatchAudio = function (options) {
             that.connectInput(that.model.micNode);
         } else {
             navigator.getUserMedia.call(navigator, {audio: true}, function (stream) {
-                that.model.micNode = owl.context.createMediaStreamSource(stream);
+                that.model.micNode = owl.audioContext.createMediaStreamSource(stream);
                 that.connectInput(that.model.micNode);
             }, function (err) {
                 console.error(err);
@@ -116,7 +120,8 @@ owl.initPatchAudio = function (options) {
         }
     }
 
-    that.useFileInput = function () {
+    that.useFileInput = function (audioNode) {
+        that.model.fileNode = that.model.fileNode || owl.audioContext.createMediaElementSource(audioNode);
         that.connectInput(that.model.fileNode);
     }
 
@@ -169,60 +174,51 @@ owl.initPatchAudio = function (options) {
     that.connectToOutput = function(options){
         options = options || {};
         if(options.outputs === 1){
-            var splitter = owl.context.createChannelSplitter(2);
+            var splitter = owl.audioContext.createChannelSplitter(2);
             that.scriptNode.connect(splitter);
             that.outputNode = splitter;
         } else {
             that.outputNode = that.scriptNode;
         }
-        that.outputNode.connect(owl.context.destination);
+        that.outputNode.connect(owl.audioContext.destination);
     };
 
     that.disconnectFromOutput = function(){
         that.outputNode.disconnect();
     };
 
-    var init = function () {
-        var i;
-        that.ptrsize = 4; // assuming pointer in emscripten are 32bits
-        // that.vectorsize = 2048;
-        that.samplesize = 4;
+    that.ptrsize = 4; // assuming pointer in emscripten are 32bits
+    // that.vectorsize = 2048;
+    that.samplesize = 4;
 
-        // Get input / output counts
-        that.numIn = that.getNumInputs();
-        that.numOut = that.getNumOutputs();
+    // Get input / output counts
+    that.numIn = that.getNumInputs();
+    that.numOut = that.getNumOutputs();
 
-        // Create OWL patch web audio node
-        that.scriptNode = owl.context.createScriptProcessor(that.vectorsize, that.numIn, that.numOut);
-        that.scriptNode.onaudioprocess = that.compute;
+    // Create OWL patch web audio node
+    that.scriptNode = owl.audioContext.createScriptProcessor(that.vectorsize, that.numIn, that.numOut);
+    that.scriptNode.onaudioprocess = that.compute;
 
-        // Connect output of OWL processor to audio out
-            // that.scope = new WavyJones(owl.context, "oscilloscope");
-            // that.scope.connect(owl.context.destination);
-        // that.scriptNode.connect(that.scope);
+    // TODO the below calls to malloc are not yet being freed, potential memory leak
+    // allocate memory for input / output arrays
+    that.ins = Module._malloc(that.ptrsize * that.numIn);
 
-        // TODO the below calls to malloc are not yet being freed, potential memory leak
-        // allocate memory for input / output arrays
-        that.ins = Module._malloc(that.ptrsize * that.numIn);
+    // assign to our array of pointer elements an array of 32bit floats, one for each channel. currently we assume pointers are 32bits
+    for (var i = 0; i < that.numIn; i++) { 
+        // assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
+        HEAP32[(that.ins >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize); 
+    }
 
-        // assign to our array of pointer elements an array of 32bit floats, one for each channel. currently we assume pointers are 32bits
-        for (i = 0; i < that.numIn; i++) { 
-            // assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
-            HEAP32[(that.ins >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize); 
-        }
+    //ptrsize, change to eight or use Runtime.QUANTUM? or what?
+    that.outs = Module._malloc(that.ptrsize * that.numOut); 
 
-        //ptrsize, change to eight or use Runtime.QUANTUM? or what?
-        that.outs = Module._malloc(that.ptrsize * that.numOut); 
-
-        // assign to our array of pointer elements an array of 64bit floats, one for each channel. currently we assume pointers are 32bits
-        for (i = 0; i < that.numOut; i++) { 
-            // assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
-            HEAP32[(that.outs >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize);
-        }
-        return that;
-    };
-
-    init();
+    // assign to our array of pointer elements an array of 64bit floats, one for each channel. currently we assume pointers are 32bits
+    for (var i = 0; i < that.numOut; i++) { 
+        // assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
+        HEAP32[(that.outs >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize);
+    }
 
     return that;
 };
+
+export default owl;

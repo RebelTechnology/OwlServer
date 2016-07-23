@@ -483,7 +483,7 @@ HoxtonOwl.patchForm = {
                                 for (var i = 0, max = data.items.length; i < max; i++) {
                                     results.push({
                                         id: parseInt(data.items[i].ID),
-                                        text: data.items[i].data.display_name
+                                        text: data.items[i].display_name
                                     });
                                 }
 
