@@ -53,6 +53,13 @@ git checkout $GIT_BRANCH > /dev/null
 git pull origin $GIT_BRANCH > /dev/null
 cd - > /dev/null
 
+echo "Building React SPA bundle..."
+cd $DIR/$CLONE_DIR/web/owlspa
+npm install
+npm run buildprod
+# npm run test
+cd - > /dev/null
+
 # Update Wordpress
 echo "Updating Wordpress files..."
 rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
@@ -107,5 +114,5 @@ chown -R www-data:www-data $DIR/../logs
 chmod 664 $DIR/../logs/*
 
 # Delete temp repo clone
-echo "Deleting temp repo clone..."
-rm -rf $DIR/$CLONE_DIR
+# echo "Deleting temp repo clone..."
+# rm -rf $DIR/$CLONE_DIR
