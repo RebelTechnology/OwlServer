@@ -45,7 +45,8 @@ echo "This is $HOSTNAME, assuming $TARGET_ENV environment."
 # rm -rf $DIR/$CLONE_DIR
 
 # Clone or update repository
-if [ -d $DIR/$CLONE_DIR ]; then
+if [ ! -d $DIR/$CLONE_DIR ]
+then
     echo "Cloning $CLONE_DIR repository..."
     git clone --quiet $REPO_URL $DIR/$CLONE_DIR
 fi
