@@ -7,3 +7,4 @@ export PatchCounter from './PatchCounter/PatchCounter';
 export AuthorLink from './AuthorLink/AuthorLink';
 export PatchSoundcloud from './PatchSoundcloud/PatchSoundcloud';
 export AddPatchTile from './AddPatchTile/AddPatchTile';
+export PatchPushButton from './PatchPushButton/PatchPushButton';

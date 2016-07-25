@@ -1,41 +1,54 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { owlCmd } from 'lib';
+import { connectToOwl, loadPatchOnToOwl } from 'actions';
 
 class OwlControl extends Component {
 
-  loadPatchOntoOwl(){
-    console.log('load patch to owl');
+  connectToOwl(){
+    this.props.connectToOwl();
+  }
+
+  loadPatchOnToOwl(){
+    this.props.loadPatchOnToOwl(this.props.patch);
   }
 
   render(){
-    //const { currentUser } = this.props;
+    const { owlState } = this.props;
 
-    const owlIsConnected = false; //TODO get from device
     const firmWareVerison = 'OWL Modular v12'; //TODO getfrom device
     
     return (
       <div>
-        <p>Owl Control</p>
-        <button 
-          disabled={!owlIsConnected} 
-          onClick={() => this.loadPatchOntoOwl()} >Load Patch to Owl Device
-        </button>
+        { owlState.isConnected ? ( 
+          <button 
+            onClick={() => this.loadPatchOnToOwl()}
+            disabled={owlState.patchIsLoading}>
+            {owlState.patchIsLoading ? 'Loading ... ' : 'Load to Owl'}
+            {owlState.patchIsLoading ? <i className="loading-spinner"></i> : null}
+          </button> 
+          ) : (
+            <button 
+              onClick={() => this.connectToOwl()}
+              disabled={owlState.isConnecting}>
+                {owlState.isConnecting ? 'Connecting ... ' : 'Connect to Owl'}
+                {owlState.isConnecting ? <i className="loading-spinner"></i> : null}
+            </button>
+          ) }
+
         <p>Connection Status: {firmWareVerison}</p>
       </div>
     );
   }
 }
 
-// OwlControl.propTypes = {
-//   location: PropTypes.object.isRequired,
-//   routeParams: PropTypes.object
-// }
+OwlControl.propTypes = {
+  patch: PropTypes.object.isRequired
+}
 
-const mapStateToProps = ({ currentUser }) => {
+const mapStateToProps = ({ owlState }) => {
   return { 
-    currentUser
+    owlState
   }
 }
 
-export default connect(mapStateToProps)(OwlControl);
+export default connect(mapStateToProps, { connectToOwl, loadPatchOnToOwl })(OwlControl);

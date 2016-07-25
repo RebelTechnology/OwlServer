@@ -1,5 +1,6 @@
 export closeDialog from './closeDialog';
 export compilePatch from './compilePatch';
+export connectToOwl from './connectToOwl';
 export deletePatch from './deletePatch';
 export fetchAuthors from './fetchAuthors';
 export fetchCurrentUser from './fetchCurrentUser';
@@ -9,6 +10,7 @@ export fetchPatches from './fetchPatches';
 export fetchPatchesAuthorsTags from './fetchPatchesAuthorsTags';
 export fetchPatchJavaScriptFile from './fetchPatchJavaScriptFile';
 export fetchTags from './fetchTags';
+export loadPatchOnToOwl from './loadPatchOnToOwl';
 export newDialog from './newDialog';
 export resetPatchJavaScriptFile from './resetPatchJavaScriptFile';
 export resetPatchListSubFilter from './resetPatchListSubFilter';

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { PatchParameters, OwlControl } from 'containers';
+import { PatchPushButton } from 'components';
 import { webAudio } from 'lib';
 import classNames from 'classnames';
 import { 
@@ -14,7 +15,7 @@ class PatchPreview extends Component {
     super(props);
     this.state = {
       audioSelectValue : 'none',
-      pushButtonLedColour : null
+      pushButtonLedColour : '#ececec'
     };
   }
   
@@ -27,27 +28,34 @@ class PatchPreview extends Component {
 
   handlePushButtonDown(e){
     this.props.webAudioPatch.instance.setPushButtonDown();
-    this.getWebAudioPatchPushButtonLedColour();
+    this.updatePushButtonLedColour();
   }
 
   handlePushButtonUp(e){
     this.props.webAudioPatch.instance.setPushButtonUp();
-    this.getWebAudioPatchPushButtonLedColour();
+    this.updatePushButtonLedColour();
   }
 
-  getWebAudioPatchPushButtonLedColour(options){
-    options = options || {};
-    const { webAudioPatch } = this.props
-    if(webAudioPatch.instance){
-      const pushButtonLedColour = webAudioPatch.instance.getPushButtonLedColour();
-      if(this.state.pushButtonLedColour !== pushButtonLedColour){
-        this.setState({ pushButtonLedColour });
-      }
+  updatePushButtonLedColour(){
+    if(this.props.webAudioPatch.instance){
+      const pushButtonLedColour = this.props.webAudioPatch.instance.getPushButtonLedColour();
+      this.setState({ pushButtonLedColour });
     }
-    if(options.poll){
-      this.pushButtonLedTimeout = () => this.getWebAudioPatchPushButtonLedColour({poll:true});
-      window.setTimeout(this.pushButtonLedTimeout, 500);
+  }
+
+  clearPollForPushButtonLedColour(){
+    if(this.pushButtonLedTimeout){
+      window.clearTimeout(this.pushButtonLedTimeout);
+      this.pushButtonLedTimeout = null;
     }
+  }
+
+  pollForPushButtonLedColour(){
+    this.clearPollForPushButtonLedColour();
+    if(this.props.webAudioPatch.isPlaying){
+      this.updatePushButtonLedColour();
+    }
+    this.pushButtonLedTimeout = window.setTimeout(() => this.pollForPushButtonLedColour(), 500);  
   }
 
   createPatchInstance(){
@@ -93,7 +101,7 @@ class PatchPreview extends Component {
       });
 
       this.props.setPatchPlaying(true);
-      this.getWebAudioPatchPushButtonLedColour({poll:true});
+      this.pollForPushButtonLedColour();
     }
   }
 
@@ -101,8 +109,8 @@ class PatchPreview extends Component {
     const { instance } = this.props.webAudioPatch;
     if(instance){
       instance.disconnectFromOutput();
-      window.clearTimeout(this.pushButtonLedTimeout);
       this.props.setPatchPlaying(false);
+      this.clearPollForPushButtonLedColour();
     }
   }
 
@@ -176,20 +184,11 @@ class PatchPreview extends Component {
           patch={patch} 
         />
 
-        <div 
-          className={classNames('patch-push-button', {active:webAudioPatch.isPlaying})}
-          onMouseDown={(e) => webAudioPatch.isPlaying && this.handlePushButtonDown(e) }
-          onMouseUp={(e) => webAudioPatch.isPlaying && this.handlePushButtonUp(e) }
-          onTouchStart={(e) => webAudioPatch.isPlaying && this.handlePushButtonDown(e) }
-          onTouchEnd={(e) => webAudioPatch.isPlaying && this.handlePushButtonUp(e) }>
-          <div 
-            style={
-              {backgroundColor: (webAudioPatch.isPlaying && this.state.pushButtonLedColour) ? this.state.pushButtonLedColour : '#ececec'}
-            } 
-            className="patch-push-button-led">
-          </div>
-          <label>Pushbutton</label>
-        </div>
+        <PatchPushButton
+          isActive={webAudioPatch.isPlaying}
+          ledColour={webAudioPatch.isPlaying ? this.state.pushButtonLedColour : '#ececec'}
+          onPushButtonDown={(e)=>this.handlePushButtonDown(e)}
+          onPushButtonUp={(e)=>this.handlePushButtonUp(e)} />
 
         <div className="patch-preview-buttons">
           
@@ -219,7 +218,7 @@ class PatchPreview extends Component {
 
           { webAudioPatch.isPlaying ? (
             <div id="patch-test-inner-container">
-              <label for="patch-test-source">Audio Input:</label>
+              <label htmlFor="patch-test-source">Audio Input:</label>
               <select 
                 id="patch-test-source" 
                 onChange={e => this.handleChangeAudioSource(e)}
@@ -261,7 +260,7 @@ class PatchPreview extends Component {
             ) : null}
           </div>
 
-          <OwlControl />
+          <OwlControl patch={patch} />
 
         </div>
       </div>

@@ -12,20 +12,22 @@ import webAudioPatchParameters from './webAudioPatchParameters';
 import webAudioPatch from './webAudioPatch';
 import patchPlaying from './patchPlaying';
 import patchCodeFiles from './patchCodeFiles';
+import owlState from './owlState';
 
 const rootReducer = combineReducers({
   authors,
+  currentUser,
   dialog,
+  owlState,
   patches,
   patchListFilter,
   patchDetails,
-  tags,
-  currentUser,
   patchJavaScript,
-  webAudioPatchParameters,
-  webAudioPatch,
   patchPlaying,
-  patchCodeFiles
+  patchCodeFiles,
+  tags,
+  webAudioPatch,
+  webAudioPatchParameters
 });
 
 export default rootReducer;

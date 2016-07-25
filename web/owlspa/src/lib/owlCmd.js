@@ -1,10 +1,11 @@
 /*
 *
 *  This file is a concat of legacy files owlcmd.js and midiclient.js
-*
+*  should ideally be re-written to be inline with the rest of the spa
 */
 
 import * as openWareMidi from './openWareMidi';
+import { API_END_POINT } from 'constants';
 
 const {
     MIDI_SYSEX_MANUFACTURER,
@@ -14,14 +15,6 @@ const {
 } = openWareMidi;
 
 var monitorTask = undefined;
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}
 
 function noteOn(note, velocity) {
   console.log("received noteOn "+note+"/"+velocity);
@@ -33,7 +26,7 @@ function noteOff(note) {
 
 function getStringFromSysex(data, startOffset, endOffset){
   var str = "";
-  for(i=startOffset; i<(data.length-endOffset) && data[i] != 0x00; ++i)
+  for(var i=startOffset; i<(data.length-endOffset) && data[i] != 0x00; ++i)
     str += String.fromCharCode(data[i]);
   return str;
 }
@@ -125,11 +118,9 @@ function sendStatusRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE);
 }
 
-var doStatusRequestLoop = true;
 function statusRequestLoop() {
-    sendStatusRequest();
-    if(doStatusRequestLoop)
-	setTimeout(statusRequestLoop, 2000);
+    //sendStatusRequest();
+	//setTimeout(statusRequestLoop, 2000);
 }
 
 function setParameter(pid, value){
@@ -142,7 +133,7 @@ function selectOwlPatch(pid){
 
     console.log("select patch "+pid);
 
-    for(i=0; i<5; ++i) {
+    for(var i=0; i<5; ++i) {
         $("#p"+i).text(""); // clear the prototype slider names
     }
     
@@ -154,7 +145,7 @@ function sendLoadRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
 }
 
-function onMidiInitialised(){
+function onMidiInitialised(callback){
 
     // auto set the input and output to an OWL
     
@@ -176,16 +167,20 @@ function onMidiInitialised(){
             break;
         }        
     }
-
+    
     if (inConnected && outConnected) {
         console.log('connected to an OWL');
-        $('#ourstatus').text('Connected to an OWL')
-        $('#load-owl-button').show();
+        // $('#ourstatus').text('Connected to an OWL')
+        // $('#load-owl-button').show();
     } else {
         console.log('failed to connect to an OWL');
-        $('#ourstatus').text('Failed to connect to an OWL')
-        $('#load-owl-button').hide();
+        // $('#ourstatus').text('Failed to connect to an OWL')
+        // $('#load-owl-button').hide();
     }
+
+    callback && callback({
+        isConnected: inConnected && outConnected
+    });
 
     // sendLoadRequest(); // load patches
     sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
@@ -198,104 +193,100 @@ function updatePermission(name, status) {
 }
 
 function connectToOwl() {
-    if(navigator && navigator.requestMIDIAccess)
-    {
-        navigator.requestMIDIAccess({sysex:true});
-    }
-    HoxtonOwl.midiClient.initialiseMidi(onMidiInitialised);
+    return new Promise((resolve, reject)=>{
+        HoxtonOwl.midiClient.initialiseMidi(function(){
+            onMidiInitialised((owlConnection) => {
+                if(owlConnection.isConnected){
+                    resolve(owlConnection);
+                } else {
+                    reject(owlConnection);
+                }
+            });
+        });
+    });
 }
 
-// function hookupButtonEvents() {
-    // Check for Midi/Midi SysEx permissions
-
-    // if(navigator && navigator.permissions){
-    // 	navigator.permissions.query({name:'midi', sysex:false}).then(function(p) {
-    //         updatePermission('midi', p.status);
-    //         p.onchange = function() {
-    // 		updatePermission('midi', this.status);
-    //         };
-    // 	});
-
-    // 	navigator.permissions.query({name:'midi', sysex:true}).then(function(p) {
-    //         updatePermission('midi-sysex', p.status);
-    //         p.onchange = function() {
-    // 		updatePermission('midi-sysex', this.status);
-    // 		initialiseMidi(onMidiInitialised);
-    //         };
-    // 	});
-    // }
-
-    // $("#midi").on('click', function() {
-    // 	if(navigator && navigator.requestMIDIAccess)
-    //         navigator.requestMIDIAccess({sysex:false});
-    // });
-
-    // $("#connect").on('click', connectToOwl);
-
-    // $("#monitor").on('click', function() {
-    // 	if(monitorTask == undefined){
-    // 	    monitorTask = window.setInterval(sendStatusRequest, 1000);
-    // 	}else{
-    // 	    clearInterval(monitorTask);
-    // 	    monitorTask = undefined;
-    // 	}
-    // });
-
-    // initialiseMidi(onMidiInitialised);
-    
-    // $('#clear').on('click', function() {
-    // 	$('#log').empty();
-    // 	return false;
-    // });
-// }
 
 function sendProgramData(data){
-    var from = 0;
-    console.log("sending program data "+data.length+" bytes");  
-    for(var i=0; i<data.length; ++i){
-    if(data[i] == 0xf0){
-        from = i;
-    }else if(data[i] == 0xf7){
-        console.log("sending "+(i-from)+" bytes sysex");
-        msg = data.subarray(from, i+1);
-        HoxtonOwl.midiClient.logMidiData(msg);
-        if(HoxtonOwl.midiClient.midiOutput)
-        {
-            HoxtonOwl.midiClient.midiOutput.send(msg, 0);            
+    return new Promise( (resolve, reject) => {
+        console.log("sending program data "+data.length+" bytes"); 
+        var chunks = chunkData(data);
+        sendDataChunks(0, chunks, resolve);
+    });
+}
+
+function chunkData(data){
+    var chunks = [];
+    var start = 0;
+    for(var i = 0; i < data.length; ++i){
+        if(data[i] == 0xf0){
+            start = i;
+        } else if(data[i] == 0xf7){
+            chunks.push(data.subarray(start, i + 1));
         }
-        sleep(1);
     }
+    return chunks;
+}
+
+var sendDataTimeout;
+function sendDataChunks(index, chunks, resolve){
+    index = index || 0;
+    if(sendDataTimeout){
+        window.clearTimeout(sendDataTimeout);
+        sendDataTimeout = null;
+    }
+    if(index < chunks.length){
+        HoxtonOwl.midiClient.logMidiData(chunks[index]);
+        if(HoxtonOwl.midiClient.midiOutput){
+            console.log("sending chunk "+ index + ' with '+ chunks[index].length +" bytes sysex");
+            HoxtonOwl.midiClient.midiOutput.send(chunks[index], 0);            
+        }
+        sendDataTimeout = window.setTimeout(function(){
+            sendDataChunks(++index, chunks, resolve);
+        },0);
+    } else {
+        resolve && resolve();
     }
 }
 
 function sendProgramRun(){
     console.log("sending sysex run command");
-    var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, 
-           OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7 ];
+    var msg = [
+        0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, 
+        OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7
+    ];
     HoxtonOwl.midiClient.logMidiData(msg);
-    if(HoxtonOwl.midiClient.midiOutput)
-    {
+    if(HoxtonOwl.midiClient.midiOutput){
         HoxtonOwl.midiClient.midiOutput.send(msg, 0);
     }
       
 }
 
 function sendProgramFromUrl(url){
-    console.log("sending patch from url "+url);
-    var oReq = new XMLHttpRequest();
-    oReq.responseType = "arraybuffer";
-    oReq.onload = function (oEvent) {
-    console.log("here");    
-    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-    if(arrayBuffer) {
-        console.log("there");   
-        var data = new Uint8Array(arrayBuffer);
-        sendProgramData(data);
-        sendProgramRun();
-    }
-    }
-    oReq.open("GET", url, true);
-    oReq.send();
+    return new Promise((resolve, reject) => {
+        console.log("sending patch from url "+url);
+        var oReq = new XMLHttpRequest();
+        oReq.responseType = "arraybuffer";
+        oReq.onload = function (oEvent) {   
+            var arrayBuffer = oReq.response; // Note: not oReq.responseText
+            if(arrayBuffer) {  
+                var data = new Uint8Array(arrayBuffer);
+                resolve(
+                    sendProgramData(data).then(function(){
+                        sendProgramRun();
+                    }, function(err){
+                        console.error(err);
+                    })
+                );
+            }
+        }
+        oReq.open("GET", url, true);
+        oReq.send();
+    });
+}
+
+function loadPatchFromServer(patchId){
+    return sendProgramFromUrl(API_END_POINT + '/builds/' + patchId + '?format=sysx&amp;download=1');
 }
 
 
@@ -317,7 +308,7 @@ HoxtonOwl.midiClient = {
     midiInput: null,
     midiOutputs: [],
     midiOutput: null,
-    midiInitialisedCallback: 'undefined',
+    midiInitialisedCallback: null,
 
     logMidiEvent: function(ev){
         HoxtonOwl.midiClient.logMidiData(ev.data);
@@ -333,10 +324,10 @@ HoxtonOwl.midiClient = {
         log("MIDI sysex options: "+options);
         log("MIDI sysex: "+midi.sysexEnabled);
         log("MIDI onstatechange: "+midi.onstatechange);
-        midiAccess = midi;
+        HoxtonOwl.midiClient.midiAccess = midi;
 
         var i = 0;
-        var inputs = midiAccess.inputs.values();
+        var inputs = HoxtonOwl.midiClient.midiAccess.inputs.values();
         for(var input = inputs.next(); input && !input.done; input = inputs.next()) {
             HoxtonOwl.midiClient.midiInputs.push(input.value);
             console.log("added MIDI input "+input.value.name+" ("+input.value.manufacturer+") "+input.value.id);
@@ -345,7 +336,7 @@ HoxtonOwl.midiClient = {
             console.log("No MIDI input devices present.")
 
         i = 0;
-        var outputs = midiAccess.outputs.values();
+        var outputs = HoxtonOwl.midiClient.midiAccess.outputs.values();
         for(var output = outputs.next(); output && !output.done; output = outputs.next()) {
             HoxtonOwl.midiClient.midiOutputs.push(output.value);
             console.log("added MIDI output "+output.value.name+" ("+output.value.manufacturer+") "+output.value.id);
@@ -353,8 +344,8 @@ HoxtonOwl.midiClient = {
         if(outputs.size === 0)
         console.log("No MIDI output devices present.")
 
-        if(midiInitialisedCallback)
-        midiInitialisedCallback();
+        if(HoxtonOwl.midiClient.midiInitialisedCallback)
+        HoxtonOwl.midiClient.midiInitialisedCallback();
     },
 
     onMIDIReject: function(err) {
@@ -463,13 +454,19 @@ HoxtonOwl.midiClient = {
     },
 
     initialiseMidi: function(callback){
-        midiInitialisedCallback = callback;
+        HoxtonOwl.midiClient.midiInitialisedCallback = callback;
         var options = { sysex: true };
-        if(navigator.requestMIDIAccess)
-        navigator.requestMIDIAccess( { sysex: true } ).then( this.onMIDIInit, this.onMIDIReject );
-        else
-        alert("No MIDI support present in your browser.")
+        if(navigator.requestMIDIAccess){
+            navigator.requestMIDIAccess( { sysex: true } ).then( this.onMIDIInit, this.onMIDIReject );
+        } else {
+            alert("No MIDI support present in your browser.")
+        }
     }
 
+}
+
+export default {
+    connectToOwl : connectToOwl,
+    loadPatchFromServer : loadPatchFromServer
 }
 
