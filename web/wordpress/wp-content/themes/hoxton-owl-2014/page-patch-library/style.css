@@ -203,6 +203,11 @@ span.parameter-label {
     text-align: left;
 }
 
+.patch-stats .parameter-label:after {
+    content:" : ";
+    font-size: 15px;
+}
+
 .patch-stats .parameter-value {
     padding: 0;
     font-size: 11px;
@@ -700,9 +705,7 @@ div.white-box2 {
     border: 1px solid #d3d3d3;
     border-radius: 5px;
     height: auto;
-    margin-top: 20px;
     margin-bottom: 20px;
-/*    overflow: hidden; */
     padding: 20px;
     width: 100%;
 }
@@ -739,22 +742,14 @@ div.patch-library h2.bolder {
         margin-left: 0px;
     }
     .patch-tile-small, .patch-description, .patch-instructions {
-        width: 33% !important;
+        width: 32%;
         height: auto;
         margin-top: 0px;
         margin-bottom: 0px;
-        display: inline;
-    }
-    .patch-stats {
-        display: none;
-        clear: both;
-        width: 100%;
+        display: block;
     }
     .patch-description, .patch-instructions {
-        margin-left: 20px;
-    }
-    #one-third .tag {
-        display: none;
+        margin-left: 2%;
     }
     .video-wrapper1 {
         display: none;
@@ -799,14 +794,14 @@ div.patch-library h2.bolder {
         flex-wrap: wrap;
     }
     .patch-tile-small {
-        width: 100% !important;
+        width: 100%;
     }
     /* .patch-stats {
         width: 49.5%;
         margin-left: 1%;
     } */
     .patch-description, .patch-instructions {
-        width: 100% !important;
+        width: 100%;
         margin-left: 0px;
         margin-top: 10px;
     }
