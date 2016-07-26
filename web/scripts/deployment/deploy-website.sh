@@ -41,22 +41,32 @@ else
 fi
 echo "This is $HOSTNAME, assuming $TARGET_ENV environment."
 
-# Delete previous clone
-rm -rf $DIR/$CLONE_DIR
+# # Delete previous clone
+# rm -rf $DIR/$CLONE_DIR
 
-# Clone repository
-echo "Cloning $CLONE_DIR repository..."
-git clone --quiet $REPO_URL $DIR/$CLONE_DIR
-cd $DIR/$CLONE_DIR
+# Clone or update repository
+if [ ! -d $DIR/$CLONE_DIR ]
+then
+    echo "Cloning $CLONE_DIR repository..."
+    git clone --quiet $REPO_URL $DIR/$CLONE_DIR
+fi
 echo "Checking out '$GIT_BRANCH' branch..."
+cd $DIR/$CLONE_DIR
 git checkout $GIT_BRANCH > /dev/null
 git pull origin $GIT_BRANCH > /dev/null
 cd - > /dev/null
 
+echo "Building React SPA bundle..."
+cd $DIR/$CLONE_DIR/web/owlspa
+npm install
+npm run buildprod
+# npm run test
+cd - > /dev/null
+
 # Update Wordpress
 echo "Updating Wordpress files..."
-rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
-mv $DIR/$CLONE_DIR/web/wordpress/wp-content/themes/hoxton-owl-2014/ $DIR/../httpdocs/wp-content/themes/
+# rm -rf $DIR/../httpdocs/wp-content/themes/hoxton-owl-2014
+rsync -rav $DIR/$CLONE_DIR/web/wordpress/wp-content/themes/hoxton-owl-2014 $DIR/../httpdocs/wp-content/themes/
 cp -a $DIR/$CLONE_DIR/web/wordpress/robots.txt $DIR/../httpdocs/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../httpdocs/wp-content/plugins/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-patch-uploader.php $DIR/../httpdocs/wp-content/plugins/
@@ -107,5 +117,5 @@ chown -R www-data:www-data $DIR/../logs
 chmod 664 $DIR/../logs/*
 
 # Delete temp repo clone
-echo "Deleting temp repo clone..."
-rm -rf $DIR/$CLONE_DIR
+# echo "Deleting temp repo clone..."
+# rm -rf $DIR/$CLONE_DIR

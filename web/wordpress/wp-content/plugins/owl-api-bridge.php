@@ -124,6 +124,11 @@ add_filter('xmlrpc_methods', 'owl_new_xmlrpc_methods');
  */
 function owl_usernameAutocomplete()
 {
+    //make sure only an admin can run this IMHO bad function
+    if(!current_user_can('update_core')){
+        wp_send_json(null);
+        wp_die();
+    }
 
     global $wpdb;
 
@@ -144,14 +149,21 @@ function owl_usernameAutocomplete()
         'items' => array()
     );
 
-    $result['items'] = $userQuery->results;
+    $results = $userQuery->get_results();
+    foreach ($results as $value) {
+        $userinfo = [];
+        $userinfo['ID'] = $value->ID;
+        $userinfo['display_name'] = $value->display_name;
+        array_push($result['items'],$userinfo);
+        unset($userinfo);
+        unset($value);
+    }
 
     wp_send_json($result);
     wp_die();
 }
 
 add_action('wp_ajax_owl-username-autocomplete', 'owl_usernameAutocomplete');
-add_action('wp_ajax_nopriv_owl-username-autocomplete', 'owl_usernameAutocomplete');
 
 /**
  * Provides an AJAX endpoint for retrieving WordPress's authentication cookie.
@@ -181,6 +193,37 @@ function owl_getAuthCookie($return = false)
 }
 
 add_action('wp_ajax_owl-get-auth-cookie', 'owl_getAuthCookie');
-add_action('wp_ajax_nopriv_owl-get-auth-cookie', 'owl_getAuthCookie');
+
+
+/**
+ * Provides an AJAX endpoint for retrieving the current logged in usersname, id, displayname, and if they're an admin
+ *
+ */
+function owl_getCurrentUserInfo()
+{
+    $user_info = [];
+    if(is_user_logged_in ()){
+        $all_user_data = wp_get_current_user();
+        $user_info['isAdmin'] = current_user_can('update_core');
+        $user_info['display_name'] = $all_user_data->display_name;
+        $user_info['ID'] = $all_user_data->ID;
+        $user_info['user_login'] = $all_user_data->user_login;
+        $user_info['loggedIn'] = true;
+    } else {
+        $user_info['loggedIn'] = false;
+    }
+
+    $response = [];
+    $response['status'] = 200;
+    $response['result'] = $user_info;
+
+    wp_send_json($response);
+    wp_die();
+}
+
+add_action('wp_ajax_owl-get-current-user-info', 'owl_getCurrentUserInfo');
+add_action('wp_ajax_nopriv_owl-get-current-user-info', 'owl_getCurrentUserInfo');
+
+
 
 // EOF

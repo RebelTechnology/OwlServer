@@ -204,13 +204,19 @@
     add_filter('query_vars', 'add_patch_query_var');
     
     add_action('init', 'add_patch_rewrite_rules');
+    
     function add_patch_rewrite_rules() {
-        
-        // Single patch page
-        add_rewrite_rule('(patch-library)/patch/(.+)/?$', 'index.php?pagename=$matches[1]&patch=$matches[2]', 'top');
         
         // Edit patch page
         add_rewrite_rule('edit-patch/(.+)/?$', 'index.php?pagename=edit-patch&patch=$matches[1]', 'top');
         
         flush_rewrite_rules();
     }
+
+    function add_owl_spa_rewrite_rules() {
+        // all subpaths off patch-library/ redirect to patch-library/ so bundle.js is always served by WP and then js can control routing client side.
+        add_rewrite_rule('patch-library/(.+)/?$', 'index.php?pagename=patch-library', 'top');
+        flush_rewrite_rules();
+    }
+
+    add_action('init', 'add_owl_spa_rewrite_rules');

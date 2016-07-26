@@ -84,6 +84,23 @@ var finishPatch = function (patch) {
 
 };
 
+
+/**
+ * gets wordpress cookie if exists or returns false
+ */
+var getWordpressCookie = function(cookies) {
+    var wpCookie = false;
+    Object.keys(cookies).some(function(key){
+        if(key.lastIndexOf('wordpress_logged_in_') === 0){
+            wpCookie = cookies[key];
+            return true;
+        }
+        return false;
+    });
+    return wpCookie;
+};
+
+
 /**
  * Retrieves a single patch.
  *
@@ -375,6 +392,18 @@ router.delete('/:id', function (req, res) {
     var username;
     var isAdmin = false;
     var wpUserId;
+
+    // to avoid unnecessary requests if wordpress cookie is available
+    if(req.cookies){
+        var wpCookieFromRequest = getWordpressCookie(req.cookies);
+        if(wpCookieFromRequest){
+            console.log('wp_cookie found in request');
+            credentials = {
+                type:'wordpress',
+                cookie: wpCookieFromRequest
+            }
+        }
+    }
 
     Q.fcall(function () {
 

@@ -39,14 +39,17 @@ else
 fi
 echo "This is $HOSTNAME, assuming $TARGET_ENV environment."
 
-# Delete previous clone
-rm -rf $DIR/$CLONE_DIR
+# # Delete previous clone
+# rm -rf $DIR/$CLONE_DIR
 
-# Clone repository
-echo "Cloning $CLONE_DIR repository..."
-git clone --quiet $REPO_URL $DIR/$CLONE_DIR
-cd $DIR/$CLONE_DIR
+# Clone or update repository
+if [ ! -d $DIR/$CLONE_DIR ]
+then
+    echo "Cloning $CLONE_DIR repository..."
+    git clone --quiet $REPO_URL $DIR/$CLONE_DIR
+fi
 echo "Checking out '$GIT_BRANCH' branch..."
+cd $DIR/$CLONE_DIR
 git checkout $GIT_BRANCH > /dev/null
 git pull origin $GIT_BRANCH > /dev/null
 cd - > /dev/null
@@ -55,8 +58,9 @@ cd - > /dev/null
 echo "Copying files..."
 mv $DIR/../api/api-settings.js /tmp
 mv $DIR/../api/node_modules /tmp
-rm -rf $DIR/../api
-cp -a $DIR/OwlServer/web/api $DIR/../
+# rm -rf $DIR/../api
+# cp -a $DIR/OwlServer/web/api $DIR/../
+rsync -rav $DIR/OwlServer/web/api $DIR/../
 mv /tmp/api-settings.js $DIR/../api/
 mv /tmp/node_modules $DIR/../api/
 
@@ -86,8 +90,8 @@ chown root:root $DIR/deploy-api.sh
 chmod 744 $DIR/deploy-api.sh
 
 # Delete temp repo clone
-echo "Deleting temp repo clone..."
-rm -rf $DIR/$CLONE_DIR
+# echo "Deleting temp repo clone..."
+# rm -rf $DIR/$CLONE_DIR
 
 # Restart service
 echo "Restarting service..."

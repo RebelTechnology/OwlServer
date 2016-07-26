@@ -25,6 +25,8 @@ function usage() {
     echo PHP_EOL;
     echo 'Options:' . PHP_EOL;
     echo '  --interval=<seconds> Interval in seconds before compiling the next patch. Defaults ' . DEFAULT_INTERVAL . ' to seconds.' . PHP_EOL;
+    echo '  --skip=<X> 	 	 Skip the first X items.' . PHP_EOL;
+    echo '  --limit=<X> 	 Process max X items.' . PHP_EOL;
     echo '  --web                Compiles a patch into JavaScript instead of into .sysx.' . PHP_EOL;
     echo '  --no-color           Suppresses coloured output.' . PHP_EOL;
     echo '  --dry-run            Dry run.' . PHP_EOL;
@@ -34,6 +36,8 @@ $shortopts  = 'h';
 $longopts  = [
     'help',
     'interval:',
+    'skip:',
+    'limit:',
     'no-color',
     'web',
 ];
@@ -52,6 +56,16 @@ if (isset($options['web']) && false === $options['web']) {
 $interval = DEFAULT_INTERVAL;
 if (isset($options['interval'])) {
     $interval = intval($options['interval']);
+}
+
+$skip = 0;
+if (isset($options['skip'])) {
+    $skip = intval($options['skip']);
+}
+
+$limit = 0;
+if (isset($options['limit'])) {
+    $limit = intval($options['limit']);
 }
 
 $colouredOutput = true;
@@ -85,22 +99,29 @@ try {
     exit(1);
 }
 $p = $patches->find();
+if($limit != 0)
+  $p->limit($limit);
+if($skip != 0)
+  $p->skip($skip);
+
 $total = $p->count();
 echo 'Found ' . $total . ' patches.' . PHP_EOL;
 
 $failedPatches = [];
 $count = 0;
 $successful = 0;
-while ($patch = $p->getNext()) {
+
+foreach ( $p as $id => $patch ) {
 
     // Don't try to compile patches with no source code available
     $patchType = getPatchType($patch);
     if (PATCH_TYPE_UNKNOWN == $patchType) {
+        echo 'Skipping ' . $patch['name'] .' (' . $id . ')... ' . PHP_EOL;
         continue;
     }
 
-    echo 'Compiling ' . $patch['name'] .' (' . $patch['_id'] . ')... ' . PHP_EOL;
-    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . ($makeTarget == MAKE_TARGET_MINIFY ? ' --web ' : ' ') . $patch['_id'] . ' > /dev/null 2> /dev/null';
+    echo 'Compiling ' . $patch['name'] .' (' . $id . ')... ' . PHP_EOL;
+    $cmd = 'php ' . __DIR__ . '/patch-builder.php ' . ($makeTarget == MAKE_TARGET_MINIFY ? ' --web ' : ' ') . $id . ' > /dev/null 2> /dev/null';
     $exitStatus = 0;
     if (!$dryRun) {
         system($cmd, $exitStatus);
@@ -134,6 +155,8 @@ while ($patch = $p->getNext()) {
     }
     echo "\r         " . PHP_EOL;
 }
+
+echo "Leaving off at patch " . ($skip + $count) . " out of " . $total . PHP_EOL;
 
 if (count($failedPatches)) {
 echo PHP_EOL;

@@ -197,6 +197,23 @@ span.parameter-label {
     color: #909090;
 }
 
+.patch-stats .parameter-label {
+    width: 100px;
+    display: inline-block;
+    text-align: left;
+}
+
+.patch-stats .parameter-label:after {
+    content:" : ";
+    font-size: 15px;
+}
+
+.patch-stats .parameter-value {
+    padding: 0;
+    font-size: 11px;
+    color: #231f20;
+}
+
 .patch-stats2 span.parameter-value {
     font-size: 12px;
     color: #333;
@@ -458,7 +475,8 @@ input.knob {
 }
 
 .patch-author {
-    padding-top: 20px;
+    display: inline-block;
+    margin-top: 10px;
 }
 
 .patch-title {
@@ -466,24 +484,24 @@ input.knob {
     background: #231f20;
     padding: 10px;
     line-height: 30px;
-    transition: .3s;
+    transition: .2s;
 }
 
 .author-name {
-    display: inline;
+    display: inline-block;
     background: #5d5d5d;
     padding: 10px;
-    transition: .3s;
+    transition: .2s;
 }
 
 .author-name:hover {
     background: #fff;
-    transition: .3s;
+    transition: .2s;
 }
 
 .author-name:hover {
     color: #000;
-    transition: .3s;
+    transition: .2s;
 }
 
 .play-button {
@@ -688,7 +706,6 @@ div.white-box2 {
     border-radius: 5px;
     height: auto;
     margin-bottom: 20px;
-/*    overflow: hidden; */
     padding: 20px;
     width: 100%;
 }
@@ -725,22 +742,14 @@ div.patch-library h2.bolder {
         margin-left: 0px;
     }
     .patch-tile-small, .patch-description, .patch-instructions {
-        width: 33% !important;
+        width: 32%;
         height: auto;
         margin-top: 0px;
         margin-bottom: 0px;
-        display: inline;
-    }
-    .patch-stats {
-        display: none;
-        clear: both;
-        width: 100%;
+        display: block;
     }
     .patch-description, .patch-instructions {
-        margin-left: 20px;
-    }
-    #one-third .tag {
-        display: none;
+        margin-left: 2%;
     }
     .video-wrapper1 {
         display: none;
@@ -785,14 +794,14 @@ div.patch-library h2.bolder {
         flex-wrap: wrap;
     }
     .patch-tile-small {
-        width: 100% !important;
+        width: 100%;
     }
     /* .patch-stats {
         width: 49.5%;
         margin-left: 1%;
     } */
     .patch-description, .patch-instructions {
-        width: 100% !important;
+        width: 100%;
         margin-left: 0px;
         margin-top: 10px;
     }
@@ -887,13 +896,8 @@ div.patch-tab-container {
     text-decoration: underline;
 }
 
-.compile-patch-container {
-    display: none;
-}
-
 #patch-test-inner-container {
     clear: both;
-    display: none;
     text-align: center;
 }
 
