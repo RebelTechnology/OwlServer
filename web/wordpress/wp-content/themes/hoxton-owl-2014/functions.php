@@ -214,7 +214,7 @@
     }
 
     function add_owl_spa_rewrite_rules() {
-        // all subpaths off patch-library-spa/ redirect to patch-library-spa/ so bundle.js is always served by WP and then js can control routing client side.
+        // all subpaths off patch-library/ redirect to patch-library/ so bundle.js is always served by WP and then js can control routing client side.
         add_rewrite_rule('patch-library/(.+)/?$', 'index.php?pagename=patch-library', 'top');
         flush_rewrite_rules();
     }

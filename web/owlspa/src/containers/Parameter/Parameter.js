@@ -93,7 +93,7 @@ class Parameter extends Component {
 
     return (
         <div className={styleClases} onMouseDown={this.handleMouseDown}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+          <svg width="100" height="100" viewBox="0 0 100 100">
             <path style={{fill:'none',stroke:'#eee', strokeWidth:10}} d="
               M 22, 79
               A 40,40 0 1,1 78,79
@@ -101,7 +101,6 @@ class Parameter extends Component {
             />
           </svg>
           <svg 
-            xmlns="http://www.w3.org/2000/svg" 
             style={{position:'absolute', top:0, left:0, transform:'rotate('+ this.getParameterValueAsRotationDegrees(parameterValue)+'deg)'}} 
             width="100" 
             height="100" 

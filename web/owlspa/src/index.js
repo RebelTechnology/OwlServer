@@ -18,3 +18,5 @@ ReactDOM.render((
     <Router history={customHistory} routes={routes} />
   </Provider>
 ), document.getElementById('owl-spa'));
+
+export const dispatch = store.dispatch; // to allow non react lib files like owlCmd to be able to dispatch actions.
