@@ -4,7 +4,7 @@
   "private": true,
   "description": "single page application for the owl",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "karma start --single-run",
     "buildprod": "NODE_ENV=production webpack -p --config webpack.prod.config.js",
     "start": "webpack --config webpack.dev.config.js --watch"
   },
