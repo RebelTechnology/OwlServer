@@ -72,17 +72,6 @@ class PatchStats extends Component {
           </div>
           ): null
         }
-        { canEdit ? (
-          <div className="patch-stats-row">
-            <span className="parameter-label">Build</span>
-            <span className="parameter-value">
-              { patch.isCompiling ? 'Compiling ... ': (
-                  <a className="compileLink sysex" onClick={(e) => this.props.onCompileClick(e)} >Compile Patch</a>
-                )
-              }
-            </span>
-          </div>): null
-        }
         <div className="patch-stats-row">
           { patch.tags ? patch.tags.map( tag => <Tag key={tag} tag={tag} />): null }
         </div>
@@ -93,8 +82,7 @@ class PatchStats extends Component {
 
 PatchStats.propTypes = {
   patch: PropTypes.object,
-  canEdit : PropTypes.bool,
-  onCompileClick: PropTypes.func
+  canEdit : PropTypes.bool
 }
 
 export default PatchStats;

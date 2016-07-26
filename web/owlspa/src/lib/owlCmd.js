@@ -6,6 +6,12 @@
 
 import * as openWareMidi from './openWareMidi';
 import { API_END_POINT } from 'constants';
+import {
+    owlDispatchPresetChange,
+    owlDispatchPatchStatus,
+    owlDispatchFirmWareVersion,
+    owlDispatchProgramMessage
+} from 'actions';
 
 const {
     MIDI_SYSEX_MANUFACTURER,
@@ -36,50 +42,49 @@ function sendCommand(cmd){
 }
 
 function registerPatch(idx, name){
-    $('#patchnames').append($("<option>").attr('value',idx).text(name));
-}
-
-function log(msg){
-    $('#log').append('<li><span class="badge">' + msg + '</span></li>');
+    //$('#patchnames').append($("<option>").attr('value',idx).text(name));
 }
 
 function systemExclusive(data) {
     if(data.length > 3 && data[0] == 0xf0
        && data[1] == MIDI_SYSEX_MANUFACTURER
        && data[2] == MIDI_SYSEX_DEVICE){
-	// console.log("sysex: 0x"+data[3].toString(16)+" length: "+data.length);
-	switch(data[3]){
-	case OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND:
+    // console.log("sysex: 0x"+data[3].toString(16)+" length: "+data.length);
+    switch(data[3]){
+        case OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND:
             var name = getStringFromSysex(data, 5, 1);
-	    var idx = data[4];
-	    registerPatch(idx, name);
-	    // log("preset "+idx+": "+name);
-	    break;
-	case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
+            var idx = data[4];
+
+            // registerPatch(idx, name);
+            owlDispatchPresetChange({preset:idx,name:name});   
+            console.log("preset "+idx+": "+name);
+            break;
+        case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
             var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
             var name = getStringFromSysex(data, 5, 1);
-	    var pid = data[4]+1;
-	    console.log("parameter "+pid+" :"+name);
-	    $("#p"+pid).text(name); // update the prototype slider names
-	    break;
-	case OpenWareMidiSysexCommand.SYSEX_PROGRAM_STATS:
+            var pid = data[4]+1;
+            console.log("parameter "+pid+" :"+name);
+            break;
+        case OpenWareMidiSysexCommand.SYSEX_PROGRAM_STATS:
             var msg = getStringFromSysex(data, 4, 1);
-	    $("#patchstatus").text(msg);	    
-	    break;
-	case OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION:
+            console.log('PATCH STATUS: ',msg);
+            owlDispatchPatchStatus(msg);    
+            break;
+        case OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION:
             var msg = getStringFromSysex(data, 4, 1);
-	    $("#ourstatus").text("Connected to "+msg);	    
-	    break;
-	case OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE:
+            owlDispatchFirmWareVersion(msg);
+            //console.log('FIRMWARE VERSION: ',msg);
+            break;
+        case OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE:
             var msg = getStringFromSysex(data, 4, 1);
-	    $("#patchmessage").text("["+msg+"]");
-	    break;
-	case OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS:
-	default:
+            owlDispatchProgramMessage(msg)
+            console.log('PROGRAM MESSAGE: ',msg);
+            break;
+        case OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS:
+        default:
             var msg = getStringFromSysex(data, 4, 1);
-	    log("Unhandled message: "+msg);
-	    break;
-	}
+            break;
+        }
     }
 }
 
@@ -87,25 +92,25 @@ function controlChange(cc, value){
     console.log("received CC "+cc+": "+value);
     switch(cc){
     case OpenWareMidiControl.PATCH_PARAMETER_A:
-	$("#p1").val(value);
-	break;
+    //$("#p1").val(value);
+    break;
     case OpenWareMidiControl.PATCH_PARAMETER_B:
-	$("#p2").val(value);
-	break;
+    //$("#p2").val(value);
+    break;
     case OpenWareMidiControl.PATCH_PARAMETER_C:
-	$("#p3").val(value);
-	break;
+    //$("#p3").val(value);
+    break;
     case OpenWareMidiControl.PATCH_PARAMETER_Da:
-	$("#p4").val(value);
-	break;
+    //$("#p4").val(value);
+    break;
     }
 }
 
 function programChange(pc){
     console.log("received PC "+pc);
-    var name = $("#patchnames option:eq("+pc+")").text();
+    //var name = $("#patchnames option:eq("+pc+")").text();
     console.log("patch name "+name);
-    $("#patchname").text(name);			    
+    //$("#patchname").text(name);               
 }
 
 
@@ -118,9 +123,17 @@ function sendStatusRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE);
 }
 
-function statusRequestLoop() {
-    //sendStatusRequest();
-	//setTimeout(statusRequestLoop, 2000);
+var pollRequestTimeout;
+function pollOwlStatus() {
+    sendStatusRequest();
+    clearPollRequestTimeout();
+    pollRequestTimeout = window.setTimeout(pollOwlStatus, 2000);
+}
+
+function clearPollRequestTimeout(){
+    if(pollRequestTimeout){
+        window.clearTimeout(pollRequestTimeout);
+    }
 }
 
 function setParameter(pid, value){
@@ -184,12 +197,10 @@ function onMidiInitialised(callback){
 
     // sendLoadRequest(); // load patches
     sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
-    statusRequestLoop();
 }
 
 function updatePermission(name, status) {
     console.log('update permission for ' + name + ' with ' + status);
-    log('update permission for ' + name + ' with ' + status);
 }
 
 function connectToOwl() {
@@ -238,7 +249,7 @@ function sendDataChunks(index, chunks, resolve){
     if(index < chunks.length){
         HoxtonOwl.midiClient.logMidiData(chunks[index]);
         if(HoxtonOwl.midiClient.midiOutput){
-            console.log("sending chunk "+ index + ' with '+ chunks[index].length +" bytes sysex");
+            //console.log("sending chunk "+ index + ' with '+ chunks[index].length +" bytes sysex");
             HoxtonOwl.midiClient.midiOutput.send(chunks[index], 0);            
         }
         sendDataTimeout = window.setTimeout(function(){
@@ -321,9 +332,9 @@ HoxtonOwl.midiClient = {
     },
 
     onMIDIInit: function(midi, options) {
-        log("MIDI sysex options: "+options);
-        log("MIDI sysex: "+midi.sysexEnabled);
-        log("MIDI onstatechange: "+midi.onstatechange);
+        //console.log("MIDI sysex options: "+options);
+        //console.log("MIDI sysex: "+midi.sysexEnabled);
+        //console.log("MIDI onstatechange: "+midi.onstatechange);
         HoxtonOwl.midiClient.midiAccess = midi;
 
         var i = 0;
@@ -467,6 +478,8 @@ HoxtonOwl.midiClient = {
 
 export default {
     connectToOwl : connectToOwl,
-    loadPatchFromServer : loadPatchFromServer
+    loadPatchFromServer : loadPatchFromServer,
+    startPollingOwlStatus: pollOwlStatus,
+    stopPollingOwlStatus: clearPollRequestTimeout
 }
 

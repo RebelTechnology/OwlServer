@@ -7,6 +7,7 @@ import newDialog from './newDialog';
 
 const loadPatchOnToOwl = (patch) => {
   return (dispatch) => {
+    owlCmd.stopPollingOwlStatus();
     dispatch({
       type: BEGIN_LOAD_PATCH_ON_TO_OWL
     });
@@ -16,22 +17,24 @@ const loadPatchOnToOwl = (patch) => {
         type: COMPLETE_LOAD_PATCH_ON_TO_OWL,
         patchLoaded: true
       });
-    }, (err)=>{
+    }, (err) => {
       dispatch({
         type: COMPLETE_LOAD_PATCH_ON_TO_OWL,
         patchLoaded: false
       });
       console.error(err);
       dispatch(newDialog({
-        header: 'Failed to load patch on to Owl',
+        header: 'Failed to load patch on to OWL',
         isError : true,
         tabs:[{
           header :'Error',
           isError: true,
-          contents: 'Failed to load patch to Owl'
+          contents: 'Failed to load patch to OWL'
         }] 
       }));
-    });
+    }).then(()=>{
+      owlCmd.startPollingOwlStatus();
+    })
   }
 }
 

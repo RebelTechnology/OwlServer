@@ -197,7 +197,7 @@ class PatchPreview extends Component {
               disabled={patch.isCompiling} 
               className={classNames('patch-compile-button',{isCompiling: patch.isCompiling})}
               onClick={(e) => this.props.onCompileClick(e)} >
-              {patch.isCompiling ? 'Compiling . . .': 'Compile Patch'}
+              {patch.isCompiling ? 'Compiling . . .': 'Compile'}
               {patch.isCompiling ? <i className="loading-spinner"></i> : null}
             </button>
             ) : null
@@ -205,19 +205,21 @@ class PatchPreview extends Component {
 
           { webAudioPatch.isReady ? (
               <button
+                style={{display:'inline-block'}}
                 onClick={() => this.togglePatchAudio()} >
                 { webAudioPatch.isPlaying ? 'stop audio':'start audio' }
               </button>
             ) : (
               <button 
+                style={{display:'inline-block'}}
                 disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
-                onClick={() => this.handleTestPatchButtonClick()} >Test Patch in Browser
+                onClick={() => this.handleTestPatchButtonClick()} >Play
               </button>
             )
           }
 
           { webAudioPatch.isPlaying ? (
-            <div id="patch-test-inner-container">
+            <div className="audio-input-selector">
               <label htmlFor="patch-test-source">Audio Input:</label>
               <select 
                 id="patch-test-source" 
@@ -247,22 +249,19 @@ class PatchPreview extends Component {
               </audio>
             </div>
           ) : null }
-          
-          <div className="error-msg">
-            {!webAudio.webAudioApiIsAvailable() ? (
-              <div>
-                <p><strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.</p>
-                <p>consider upgrading your browser. Here's a 
-                  <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a> 
-                  of browsers that do support the Web Audio API.
-                </p>
-                </div>
-            ) : null}
-          </div>
-
-          <OwlControl patch={patch} />
-
         </div>
+        <div className="error-msg">
+          {!webAudio.webAudioApiIsAvailable() ? (
+            <div>
+              <p><strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.</p>
+              <p>consider upgrading your browser. Here's a 
+                <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a> 
+                of browsers that do support the Web Audio API.
+              </p>
+              </div>
+          ) : null}
+        </div>
+        <OwlControl patch={patch} />
       </div>
     );
   }

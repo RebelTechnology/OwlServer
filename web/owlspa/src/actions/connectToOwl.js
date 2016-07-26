@@ -16,7 +16,9 @@ const connectToOwl = () => {
         type: RECEIVE_CONNECTION_FROM_OWL,
         isConnected: result.isConnected
       });
-    }, (err)=>{
+      owlCmd.startPollingOwlStatus();
+    }, 
+    (err) => {
       dispatch({
         type: RECEIVE_CONNECTION_FROM_OWL,
         isConnected: false
