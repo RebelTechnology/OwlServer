@@ -44,7 +44,7 @@ class SkinHoxtonOWL2014 extends SkinTemplate {
 
         $out->addHeadItem(
             'hoxton-owl-2014/css/google-fonts',
-            "<link href='http://fonts.googleapis.com/css?family=Ubuntu:100,300,400,500,700|Montserrat:400,700' rel='stylesheet' type='text/css'>"
+            "<link href='//fonts.googleapis.com/css?family=Ubuntu:100,300,400,500,700|Montserrat:400,700' rel='stylesheet' type='text/css'>"
         );
 
     }
