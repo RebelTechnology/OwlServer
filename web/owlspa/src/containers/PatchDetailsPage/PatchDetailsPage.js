@@ -68,7 +68,7 @@ class PatchDetailsPage extends Component {
                 <p>{patch.instructions}</p>
               </div>): null 
             } 
-            <PatchStats onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} />
+            <PatchStats canEdit={canEdit} patch={patch} />
             
           </div>
 

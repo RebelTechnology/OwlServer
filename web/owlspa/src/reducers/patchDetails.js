@@ -3,7 +3,9 @@ import {
   RECEIVE_PATCH_DETAILS,
   PATCH_DELETED,
   REQUEST_COMPILE_PATCH,
-  RECEIVE_COMPILE_PATCH } from 'constants';
+  RECEIVE_COMPILE_PATCH,
+  PATCH_COMPILATION_FAILED
+} from 'constants';
 
 const initialState = {
   isFetching: false,
@@ -46,6 +48,17 @@ const patchDetails = (state = initialState, action) => {
         }
       }
     case RECEIVE_COMPILE_PATCH:
+      return {
+        ...state,
+        patches : {
+          ...state.patches,
+          [action.patchSeoName]: {
+            ...state.patches[action.patchSeoName],
+            isCompiling: false
+          }
+        }
+      }
+    case PATCH_COMPILATION_FAILED:
       return {
         ...state,
         patches : {

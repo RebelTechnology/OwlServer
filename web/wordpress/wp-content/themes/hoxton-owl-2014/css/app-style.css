@@ -334,7 +334,7 @@ body { background: #f4f4f4; }
 /* Patch knobs */
 
 .patch-knob {
-    color:#eee;
+    color:#717171;
     position: relative;
     margin-right: 30px;
     cursor: ns-resize;
@@ -372,15 +372,16 @@ body { background: #f4f4f4; }
 /* Patch Preview Controls */
 
 .patch-preview-buttons {
-    margin: 30px auto 10px;
-    width: 470px;
+    margin-left: 10px;
 }
 
 .patch-preview-buttons button {
-    margin-right:30px;
+    width: 165px;
+    margin-right: 30px;
     line-height: 0px;
     padding: 20px;
-    display: inline-block;
+    margin-bottom: 15px;
+    display: block;
 }
 
 .patch-preview-buttons button:disabled {
@@ -421,7 +422,7 @@ body { background: #f4f4f4; }
 
 .patch-push-button label {
     display: block;
-    color: #eee;
+    color: #717171;
     text-transform: uppercase;
     position: absolute;
     bottom: 0;
@@ -435,6 +436,50 @@ body { background: #f4f4f4; }
 
 .patch-preview-buttons #push-button:hover {
 
+}
+
+.audio-input-selector {
+    display: inline-block;
+}
+.audio-input-selector label {
+    margin-right: 15px;
+    text-transform: uppercase;
+    color: #e19758;
+}
+
+
+/** owl-control  **/
+.owl-control {
+    margin-left: 10px;
+    overflow: hidden;
+}
+
+.owl-control .owl-stats {
+    float: left;
+    margin-left: 30px;
+    margin-top: 13px;
+    font-size: 15px;
+    width: 320px;
+}
+
+.owl-control button {
+    float: left;
+    padding: 20px;
+    line-height: 0px;
+    width: 165px;
+}
+
+.owl-control .owl-stats p {
+    line-height: 1em;
+}
+
+.owl-control .owl-stats span {
+    text-transform: uppercase;
+    color:#e19758;
+}
+
+.error-msg {
+    text-align: center;
 }
 
 /** dialog **/
@@ -948,23 +993,37 @@ h2 {
     #one-third {
         width: 100%;
         display: flex;
+        flex-wrap: wrap;
     }
     #two-thirds {
         width: 100%;
         clear: both;
         margin-left: 0px;
     }
-    .patch-tile-small, .patch-description, .patch-stats {
-        width: 33%;
+    .patch-tile-small, .patch-description {
+        width: 32%;
         height: auto;
         margin-top: 0px;
         margin-bottom: 0px;
     }
-    .patch-description, .patch-stats {
-        margin-left: 20px;
+    .patch-description {
+        margin-left: 2%;
     }
-    #one-third .tag {
-        display: none;
+    .patch-stats {
+        border: 1px dotted #b7b7b7;
+        border-radius: 5px;
+        text-align: center;
+        padding: 10px;
+    }
+
+    .patch-stats .patch-stats-row {
+        display: inline-block;
+        border: none;
+        margin-right: 15px;
+    }
+    .patch-stats .parameter-label {
+        width:auto;
+        margin-right: 8px;
     }
 }
 
@@ -996,17 +1055,12 @@ h2 {
         flex-wrap: wrap;
     }
     .patch-tile-small {
-        width: 49.5%;
-    }
-    .patch-stats {
-        width: 49.5%;
-        margin-left: 1%;
+        width: 100%;
     }
     .patch-description {
         width: 100%;
         margin-left: 0px;
         margin-top: 10px;
-        order: 3;
     }
 }
 
