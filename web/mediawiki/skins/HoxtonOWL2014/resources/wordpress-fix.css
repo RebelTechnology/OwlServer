@@ -60,3 +60,7 @@ div.bbp-username {
 #wpTextbox1 {
     width: 100%;
 }
+
+a:visited {
+    color: inherit;
+}
