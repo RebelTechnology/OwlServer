@@ -6,6 +6,10 @@ class CreatePatchPage extends Component {
   componentWillMount(){
   }
 
+  handleFileUploadChange(e){
+    console.log(e.target.files);
+  }
+
   render(){ 
     const { currentUser } = this.props;
 
@@ -21,14 +25,17 @@ class CreatePatchPage extends Component {
                 
                   <label>
                     GitHub URL:
-                    <input type="url" id="frm-patch-github_#index#" name="github[#index#]" />
+                    <input type="url" id="frm-patch-github_#index#" name="github[#index#]" style={{width:'70%', marginLeft:'10px'}} />
                   </label>
-                <div className="row">
+                <div className="row" style={{margin:'20px 0 10px 0'}}>
                   <div className="file-upload-container">
                     Upload a file
-                    <input type="file" size="60" id="frm-patch-file" name="files[]" multiple />
+                    <input type="file" id="frm-patch-file" name="files[]" multiple onChange={(e) => this.handleFileUploadChange(e)} />
                   </div>
                   <div className="error-message" style={{marginTop: '10px'}}></div>
+                  <div>
+                    <span>Supported File Types:  .c  .h  .cpp  .hpp  .pd  .dsp  .s</span>
+                  </div>
                 </div>
               </fieldset>
             </form>
