@@ -1,11 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 
-class AddPatchTile extends Component {
+class CreatePatchTile extends Component {
   render(){
     return (
       <a href="/add-patch/" className="patch-tile patch-tile-new">
         <div className="patch-title-controls patch-title-controls-new">
-          <span className="patch-title">Add a new patch</span>
+          <span className="patch-title">Create patch</span>
         </div>
         <div className="patch-baseline"></div>
       </a>
@@ -13,4 +13,4 @@ class AddPatchTile extends Component {
   }
 }
 
-export default AddPatchTile;
+export default CreatePatchTile;

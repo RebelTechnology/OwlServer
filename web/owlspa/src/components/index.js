@@ -6,5 +6,5 @@ export PatchTileSmall from './PatchTileSmall/PatchTileSmall';
 export PatchCounter from './PatchCounter/PatchCounter';
 export AuthorLink from './AuthorLink/AuthorLink';
 export PatchSoundcloud from './PatchSoundcloud/PatchSoundcloud';
-export AddPatchTile from './AddPatchTile/AddPatchTile';
+export CreatePatchTile from './CreatePatchTile/CreatePatchTile';
 export PatchPushButton from './PatchPushButton/PatchPushButton';

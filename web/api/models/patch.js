@@ -316,7 +316,7 @@ var patchModel = {
         },
 
         cycles: {
-            required: false, // ...but required, if published == true
+            required: false, 
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'cycles', error: { status: 400 }};
@@ -332,7 +332,7 @@ var patchModel = {
         },
 
         bytes: {
-            required: false, // ...but required, if published == true
+            required: false, 
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'bytes', error: { status: 400 }};
@@ -434,7 +434,7 @@ var patchModel = {
                 throw err;
             }
 
-            if (patch.published == true && ('instructions' == key || 'cycles' == key || 'bytes' == key)) {
+            if (patch.published == true && ('instructions' == key )) {
                 patchModel.fields[key].required = true;
             }
 

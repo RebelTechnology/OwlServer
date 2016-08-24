@@ -54,8 +54,8 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                     <?php endif; ?>
 
                     <div class="row">
-                        <label for="frm-patch-published" class="required">Published?</label>
-                        <select class="form-control" id="frm-patch-published" name="published" required>
+                        <label for="frm-patch-published">Published?</label>
+                        <select class="form-control" id="frm-patch-published" name="published">
                             <option value="1">Yes</option>
                             <option value="0" selected>No</option>
                         </select>
@@ -96,8 +96,8 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         </div>
                     </fieldset>
                     <div class="row">
-                        <label for="frm-patch-inputs" class="required">Inputs</label>
-                        <select class="form-control" id="frm-patch-inputs" name="inputs" required>
+                        <label for="frm-patch-inputs">Inputs</label>
+                        <select class="form-control" id="frm-patch-inputs" name="inputs">
                             <option>0</option>
                             <option>1</option>
                             <option>2</option>
@@ -105,8 +105,8 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                         <div class="error-message"></div>
                     </div>
                     <div class="row">
-                        <label for="frm-patch-outputs" class="required">Outputs</label>
-                        <select class="form-control" id="frm-patch-outputs" name="outputs" required>
+                        <label for="frm-patch-outputs">Outputs</label>
+                        <select class="form-control" id="frm-patch-outputs" name="outputs">
                             <option>0</option>
                             <option>1</option>
                             <option>2</option>
@@ -155,14 +155,6 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                             <div class="error-message" style="margin-top: 10px;"></div>
                         </div>
                     </fieldset>
-                    <div class="row">
-                        <label for="frm-patch-cycles">CPU cycles</label> <input class="form-control" type="number" min="0" id="frm-patch-cycles" name="cycles"><label class="percent">%</label>
-                        <div class="error-message"></div>
-                    </div>
-                    <div class="row">
-                        <label for="frm-patch-bytes">Memory bytes</label> <input class="form-control" type="number" min="0" id="frm-patch-bytes" name="bytes">
-                        <div class="error-message"></div>
-                    </div>
                     <div class="row">
                         <label for="frm-patch-tags">Tags</label>
                         <select class="form-control" id="frm-patch-tags" name="tags" multiple="multiple"></select>

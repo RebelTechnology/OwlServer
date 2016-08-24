@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch } from 'actions';
 import { Patch , SubFilter } from 'containers';
-import { PatchCounter, AddPatchTile } from 'components';
+import { PatchCounter, CreatePatchTile } from 'components';
 
 class PatchList extends Component {
   componentWillMount(){
@@ -105,7 +105,7 @@ class PatchList extends Component {
         <div className="wrapper flexbox">
           <div className="content-container">
             <PatchCounter patches={filteredPatches} myPatches={topFilter === 'my-patches'} />
-            { topFilter === 'my-patches' ? (<AddPatchTile />) : null }
+            { topFilter === 'my-patches' ? (<CreatePatchTile />) : null }
             { patchesToBeRendered }
           </div>
         </div>

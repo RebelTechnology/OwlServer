@@ -77,8 +77,6 @@ HoxtonOwl.patchForm = {
             if (patch.parameters.e) $('#frm-patch-parameters-e').val(patch.parameters.e);
         }
 
-        if (patch.cycles) $('#frm-patch-cycles').val(patch.cycles);
-        if (patch.bytes) $('#frm-patch-bytes').val(patch.bytes);
         if (patch.inputs) $('#frm-patch-inputs').val(patch.inputs).trigger('change');
         if (patch.outputs) $('#frm-patch-outputs').val(patch.outputs).trigger('change');
 
@@ -241,34 +239,6 @@ HoxtonOwl.patchForm = {
             patch.author = author;
         }
 
-        var percent = $.trim($('#frm-patch-cycles').val());
-        if (published && '' === percent) {
-            $('#frm-patch-cycles').
-                addClass('invalid').
-                siblings('div.error-message').
-                text('This field is required for published patches.').
-                show();
-            location = '#form-top';
-            return;
-        }
-        if ('' !== percent) {
-            patch.cycles = HoxtonOwl.Patch.prototype.percentToCycles(percent); // FIXME - what precision is required here?
-        }
-
-        var bytes = $('#frm-patch-bytes').val();
-        if (published && '' === bytes) {
-            $('#frm-patch-bytes').
-                addClass('invalid').
-                siblings('div.error-message').
-                text('This field is required for published patches.').
-                show();
-            location = '#form-top';
-            return;
-        }
-        if ('' !== bytes) {
-            patch.bytes = Math.round(bytes);
-        }
-
         if ($('#frm-patch-id').length) {
             var patchId = $('#frm-patch-id').val();
             if ('' !== patchId) {
@@ -411,27 +381,11 @@ HoxtonOwl.patchForm = {
             $('label[for=frm-patch-instructions]').removeClass('required');
             $('#frm-patch-instructions').removeAttr('required');
 
-            // CPU
-            $('label[for=frm-patch-cycles]').removeClass('required');
-            $('#frm-patch-cycles').removeAttr('required');
-
-            // Memory
-            $('label[for=frm-patch-bytes]').removeClass('required');
-            $('#frm-patch-bytes').removeAttr('required');
-
         } else { // published
 
             // Instructions
             $('label[for=frm-patch-instructions]').addClass('required');
             $('#frm-patch-instructions').attr('required', '');
-
-            // CPU
-            $('label[for=frm-patch-cycles]').addClass('required');
-            $('#frm-patch-cycles').attr('required', '');
-
-            // Memory
-            $('label[for=frm-patch-bytes]').addClass('required');
-            $('#frm-patch-bytes').attr('required', '');
 
         }
     },
