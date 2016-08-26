@@ -67,7 +67,9 @@ export const REMOVE_UPLOADED_FILE = 'REMOVE_UPLOADED_FILE';
 export const GITHUB_URL_FIELD_CHANGE = 'GITHUB_URL_FIELD_CHANGE';
 export const ADD_GITHUB_FILE = 'ADD_GITHUB_FILE';
 export const REMOVE_GITHUB_FILE = 'REMOVE_GITHUB_FILE';
+export const SOURCE_FILE_CHANGE = 'SOURCE_FILE_CHANGE';
 
 export const API_END_POINT = '//' + window.location.host + '/api';
 export const WORDPRESS_AJAX_END_POINT = '//' + window.location.host + '/wp-admin/admin-ajax.php';
+export const PATCH_UPLOAD_DIR = window.location.protocol + '//' + window.location.host + '/wp-content/uploads/patch-files/';
 

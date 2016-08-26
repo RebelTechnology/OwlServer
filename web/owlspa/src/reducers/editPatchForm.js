@@ -4,6 +4,7 @@ import {
   ERROR_UPLOADING_PATCH_FILE,
   REMOVE_UPLOADED_FILE,
   ADD_GITHUB_FILE,
+  SOURCE_FILE_CHANGE,
   GITHUB_URL_FIELD_CHANGE,
   REMOVE_GITHUB_FILE } from 'constants';
 
@@ -57,10 +58,19 @@ const editPatchForm = (state = initialState, action) => {
       return { 
         ...state,
         sourceFiles: [
-          ...dedupeFiles(state.sourceFiles, action.gitHubFile),
-          ...action.gitHubFile
+          ...dedupeFiles(state.sourceFiles, [action.gitHubFile]),
+          action.gitHubFile
         ],
         gitHubURLField: ''
+      }
+
+    case SOURCE_FILE_CHANGE:
+      return {
+        ...state,
+        sourceFiles: [
+          ...dedupeFiles(state.sourceFiles, [action.sourceFile]),
+          action.sourceFile
+        ]
       }
 
     case ERROR_UPLOADING_PATCH_FILE:

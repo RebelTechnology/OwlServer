@@ -2,7 +2,8 @@ import {
   WORDPRESS_AJAX_END_POINT,
   UPLOADING_PATCH_FILES,
   PATCH_FILES_UPLOADED,
-  ERROR_UPLOADING_PATCH_FILE
+  ERROR_UPLOADING_PATCH_FILE,
+  PATCH_UPLOAD_DIR
 } from 'constants';
 import newDialog from './newDialog';
 
@@ -59,9 +60,13 @@ const uploadPatchFiles = (patchFileList, patchId) => {
         if(fileErrors){
           throw new Error(fileErrors);
         } else {
+          const files = response.files.map(file => {
+            file.path = PATCH_UPLOAD_DIR + file.path;
+            return file;
+          });
           dispatch({
             type: PATCH_FILES_UPLOADED,
-            files: response.files
+            files: files
           });
         }
       }).catch((err) => {

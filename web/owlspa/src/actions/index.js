@@ -29,6 +29,7 @@ export setPatchListTopFilter from './setPatchListTopFilter';
 export setPatchPlaying from './setPatchPlaying';
 export setWebAudioPatch from './setWebAudioPatch';
 export setWebAudioPatchParameter from './setWebAudioPatchParameter';
+export sourceFileChange from './sourceFileChange';
 export startPollingOwlStatus from './startPollingOwlStatus';
 export stopPollingOwlStatus from './stopPollingOwlStatus';
 export togglePatchListSubFilter from './togglePatchListSubFilter';
