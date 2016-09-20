@@ -157,7 +157,7 @@ router.get('/:id', function (req, res) {
 /**
  * Builds the specified patch.
  *
- * PUT /patch/{patchId}
+ * PUT /builds/{patchId}
  */
 router.put('/:id', function (req, res) {
 
