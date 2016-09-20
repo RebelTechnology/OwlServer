@@ -435,9 +435,6 @@ var patchModel = {
             }
 
             if (patch.published == true && (key === 'instructions' || key === 'description')) {
-                if(key === 'description'){
-                    console.log('WHY AM I HERE? ', patch.published);
-                }
                 patchModel.fields[key].required = true;
             }
 

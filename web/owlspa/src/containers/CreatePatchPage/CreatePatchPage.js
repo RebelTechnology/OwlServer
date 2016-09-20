@@ -69,7 +69,6 @@ class CreatePatchPage extends Component {
     const { patchName, sourceFiles } = this.props.editPatchForm;
     this.props.savePatch({
       name: patchName,
-      description: '',
       inputs: 2,
       outputs: 2,
       published: 0,

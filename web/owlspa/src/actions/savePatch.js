@@ -1,7 +1,8 @@
 import {
   API_END_POINT,
   PATCH_SAVING,
-  PATCH_SAVED
+  PATCH_SAVED,
+  ERROR_SAVING_PATCH
 } from 'constants';
 import newDialog from './newDialog';
 
@@ -36,8 +37,16 @@ const savePatch = (patch) => {
       })
       .then( response => {
         if (response.status >= 400) {
-          throw new Error('bad status: ' + response.status);
+          if(response.message){
+            throw new Error(response.message);
+          } else {
+            throw new Error('bad status: ' + response.status);
+          }
         } 
+
+        dispatch({
+          type: PATCH_SAVED
+        });
         
       }).catch((err) => {
         dispatch(newDialog({
@@ -49,9 +58,9 @@ const savePatch = (patch) => {
             contents: err.message
           }] 
         }));
-        // dispatch({
-        //   type: ERROR_UPLOADING_PATCH_FILE
-        // });
+        dispatch({
+          type: ERROR_SAVING_PATCH
+        });
       });
   }
 }

@@ -248,7 +248,7 @@ router.post('/', function(req, res) {
 
     }).catch(function (error) {
     
-        console.log('error in request: ', error);
+        console.log('error: ', error);
 
         if(error.status){
             return res.status(error.status).json(error);

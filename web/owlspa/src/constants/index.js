@@ -72,6 +72,7 @@ export const UPDATE_PATCH_NAME = 'UPDATE_PATCH_NAME';
 
 export const PATCH_SAVING = 'PATCH_SAVING';
 export const PATCH_SAVED = 'PATCH_SAVED';
+export const ERROR_SAVING_PATCH = 'ERROR_SAVING_PATCH';
 
 export const API_END_POINT = '//' + window.location.host + '/api';
 export const WORDPRESS_AJAX_END_POINT = '//' + window.location.host + '/wp-admin/admin-ajax.php';
