@@ -7,23 +7,34 @@ import {
   addGitHubFile,
   removeGitHubFile,
   gitHubURLFieldChange,
-  sourceFileChange
+  sourceFileChange,
+  updatePatchName,
+  savePatch
 } from 'actions';
 
 class CreatePatchPage extends Component {
+
+  componentWillMount(){
+    this.props.updatePatchName('untitled-patch-' + this.generateUUID());
+  }
 
   generateUUID(){
     let time = new Date().getTime();
     if(window.performance && typeof window.performance.now === "function"){
         time += performance.now();
     }
-    let uuid = 'xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    let uuid = 'xxxxxxxxxxxx'.replace(/[x]/g, function(c) {
         let r = (time + Math.random()*16)%16 | 0;
         time = Math.floor(time/16);
         return (c=='x' ? r : (r&0x3|0x8)).toString(16);
     });
     return uuid;
-}
+  }
+
+  handlePatchNameChange(e){
+    e.preventDefault();
+    this.props.updatePatchName(e.target.value);
+  }
 
   handleFileUploadChange(e){
     this.props.uploadPatchFiles(e.target.files);
@@ -55,7 +66,15 @@ class CreatePatchPage extends Component {
 
   handleSaveClick(e){
     e.preventDefault();
-    console.log('saving');
+    const { patchName, sourceFiles } = this.props.editPatchForm;
+    this.props.savePatch({
+      name: patchName,
+      description: '',
+      inputs: 2,
+      outputs: 2,
+      published: 0,
+      github: sourceFiles.map(file => file.path)
+    });  
   }
 
   handleSaveAndCompileClick(e){
@@ -70,6 +89,7 @@ class CreatePatchPage extends Component {
 
   render(){ 
     const { currentUser, editPatchForm } = this.props;
+    const { patchName } = editPatchForm;
     const sourceFiles = editPatchForm.sourceFiles.sort((a,b)=>{
       return (a.name).localeCompare(b.name);
     }).map( (file, i) => {
@@ -101,7 +121,8 @@ class CreatePatchPage extends Component {
                     className="form-control" 
                     type="text" 
                     id="frm-patch-name" 
-                    placeholder={'untitled-patch-' + this.generateUUID()}
+                    value={patchName}
+                    onChange={(e) => this.handlePatchNameChange(e)}
                     name="name" />
                 </div>
               </fieldset>
@@ -175,5 +196,7 @@ export default connect(mapStateToProps, {
   gitHubURLFieldChange,
   addGitHubFile,
   removeGitHubFile,
-  sourceFileChange
+  savePatch,
+  sourceFileChange,
+  updatePatchName
 })(CreatePatchPage);

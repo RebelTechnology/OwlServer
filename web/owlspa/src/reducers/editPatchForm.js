@@ -6,7 +6,8 @@ import {
   ADD_GITHUB_FILE,
   SOURCE_FILE_CHANGE,
   GITHUB_URL_FIELD_CHANGE,
-  REMOVE_GITHUB_FILE } from 'constants';
+  REMOVE_GITHUB_FILE,
+  UPDATE_PATCH_NAME } from 'constants';
 
 const dedupeFiles = (sourceFiles , newFiles) => {
   return sourceFiles.filter(sourceFile => {
@@ -18,12 +19,19 @@ const dedupeFiles = (sourceFiles , newFiles) => {
 
 const initialState = {
   isUploading: false,
-  sourceFiles:[],
-  gitHubURLField:''
+  sourceFiles: [],
+  gitHubURLField: '',
+  patchName: ''
 };
 
 const editPatchForm = (state = initialState, action) => {
   switch (action.type) {
+    case UPDATE_PATCH_NAME:
+      return { 
+        ...state,
+        patchName: action.patchName
+      }
+
     case UPLOADING_PATCH_FILES:
       return { 
         ...state,
@@ -78,7 +86,6 @@ const editPatchForm = (state = initialState, action) => {
         ...state,
         isUploading: false
       }
-
 
     default:
       return state

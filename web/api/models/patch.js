@@ -114,7 +114,7 @@ var patchModel = {
         },
 
         description: {
-            required: true,
+            required: false, // ...but required, if published == true
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'description', error: { status: 400 }};
@@ -434,7 +434,10 @@ var patchModel = {
                 throw err;
             }
 
-            if (patch.published == true && ('instructions' == key )) {
+            if (patch.published == true && (key === 'instructions' || key === 'description')) {
+                if(key === 'description'){
+                    console.log('WHY AM I HERE? ', patch.published);
+                }
                 patchModel.fields[key].required = true;
             }
 
@@ -467,7 +470,7 @@ var patchModel = {
         var keys = Object.keys(patchModel.fields);
 
         for (key in patch) {
-            if (-1 === keys.indexOf(key)) {
+            if (keys.indexOf(key) === -1) {
                 delete patch[key];
             }
         }

@@ -68,6 +68,10 @@ export const GITHUB_URL_FIELD_CHANGE = 'GITHUB_URL_FIELD_CHANGE';
 export const ADD_GITHUB_FILE = 'ADD_GITHUB_FILE';
 export const REMOVE_GITHUB_FILE = 'REMOVE_GITHUB_FILE';
 export const SOURCE_FILE_CHANGE = 'SOURCE_FILE_CHANGE';
+export const UPDATE_PATCH_NAME = 'UPDATE_PATCH_NAME';
+
+export const PATCH_SAVING = 'PATCH_SAVING';
+export const PATCH_SAVED = 'PATCH_SAVED';
 
 export const API_END_POINT = '//' + window.location.host + '/api';
 export const WORDPRESS_AJAX_END_POINT = '//' + window.location.host + '/wp-admin/admin-ajax.php';

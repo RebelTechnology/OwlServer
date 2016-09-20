@@ -169,7 +169,6 @@ router.put('/:id', function (req, res) {
     var username;
     var isAdmin = false;
     var wpUserId;
-
     var collection = req.db.get('patches');
     var updatedPatch = req.body.patch;
     var patchAuthor = {};
