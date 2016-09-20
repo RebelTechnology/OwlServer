@@ -51,4 +51,13 @@ Retrieves a list of all authors.
 #### GET /tags/
 Retrieves a list of all tags.
 
+### Builds (Compilation)
+
+#### GET /builds/:id[?format={sysex|sysx|js}]
+Returns the build for the specified patch.
+The `format` parameter defaults to `sysx`.
+
+#### PUT /builds/:id
+Builds the specified patch.
+
 [1]: http://hoxtonowl.com/ "Hoxton OpenWare Laboratory"
