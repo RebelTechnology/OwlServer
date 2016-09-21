@@ -1,6 +1,8 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 import { 
+  clearSourceFileErrors,
   compilePatch,
   uploadPatchFiles, 
   removeUploadedPatchFile,
@@ -15,7 +17,7 @@ import {
 class CreatePatchPage extends Component {
 
   componentWillMount(){
-    this.props.updatePatchName('untitled-patch-' + this.generateUUID());
+    this.props.updatePatchName('untitled-' + this.generateUUID());
   }
 
   generateUUID(){
@@ -67,6 +69,7 @@ class CreatePatchPage extends Component {
   handleSaveClick(e){
     e.preventDefault();
     const { patchName, sourceFiles } = this.props.editPatchForm;
+    this.props.clearSourceFileErrors();
     this.props.savePatch({
       name: patchName,
       inputs: 2,
@@ -88,7 +91,8 @@ class CreatePatchPage extends Component {
 
   render(){ 
     const { currentUser, editPatchForm } = this.props;
-    const { patchName } = editPatchForm;
+    const { patchName, sourceFileErrors, invalidFields } = editPatchForm;
+    console.log('invalidFields', invalidFields);
     const sourceFiles = editPatchForm.sourceFiles.sort((a,b)=>{
       return (a.name).localeCompare(b.name);
     }).map( (file, i) => {
@@ -98,10 +102,14 @@ class CreatePatchPage extends Component {
             type="url" 
             value={file.path}
             style={{width: '70%', marginLeft:'10px'}}
+            className={ classNames({ 'invalid': !!sourceFileErrors[i] }) }
             onChange={(e)=>this.handleSourceFileChange(e, file)}
             id={'frm-patch-github_' + i} 
             name={'github['+ i +']'} />
           <button style={{ display:'inline-block', marginLeft:'10px' }} onClick={(e) => this.handleRemoveFile(e, file)}>remove</button>
+          { sourceFileErrors[i] ? (
+            <div className="error-message" style={{ display:'block' }}> { sourceFileErrors[i] } </div>
+          ) : null }
         </div>
       );
     });
@@ -117,12 +125,15 @@ class CreatePatchPage extends Component {
                 <div className="row">
                   <label htmlFor="frm-patch-name">Name</label>
                   <input 
-                    className="form-control" 
+                    className={ classNames('form-control', {'invalid': !!invalidFields.name }) } 
                     type="text" 
                     id="frm-patch-name" 
                     value={patchName}
                     onChange={(e) => this.handlePatchNameChange(e)}
                     name="name" />
+                    { invalidFields.name ? (
+                      <div className="error-message" style={{ display:'block' }}> { invalidFields.name } </div>
+                    ) : null }
                 </div>
               </fieldset>
               <fieldset id="frm-patch-github">
@@ -197,5 +208,6 @@ export default connect(mapStateToProps, {
   removeGitHubFile,
   savePatch,
   sourceFileChange,
-  updatePatchName
+  updatePatchName,
+  clearSourceFileErrors
 })(CreatePatchPage);

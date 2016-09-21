@@ -206,9 +206,6 @@ router.put('/:id', function (req, res) {
 
         console.log('Checking credentials...');
 
-        console.log(req.body);
-        console.log(credentials);
-
         if (!credentials) {
             var e = new Error('Access denied (1).');
             e.status = 401;

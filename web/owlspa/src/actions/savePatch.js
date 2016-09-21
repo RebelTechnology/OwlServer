@@ -2,7 +2,9 @@ import {
   API_END_POINT,
   PATCH_SAVING,
   PATCH_SAVED,
-  ERROR_SAVING_PATCH
+  ERROR_SAVING_PATCH,
+  ERROR_IN_SOURCE_FILE_URL,
+  INVALID_FIELD_DATA
 } from 'constants';
 import newDialog from './newDialog';
 
@@ -33,17 +35,34 @@ const savePatch = (patch) => {
       body: JSON.stringify({ patch })
     })
       .then(response => {
-        return response.json();
+        return response.json().then(json => {       
+          if(json.type === 'not_valid' && json.field){
+            if(json.field === 'github'){
+              dispatch({
+                type: ERROR_IN_SOURCE_FILE_URL,
+                index: json.index,
+                error: json.message || 'error with file url'
+              });
+            } else {
+              dispatch({
+                type: INVALID_FIELD_DATA,
+                field: json.field,
+                error: json.message
+              });
+            }
+          }
+
+          if (response.status >= 400) {
+            if(json.message){
+              throw new Error(json.message);
+            } else {
+              throw new Error('Error saving patch');
+            }
+          } 
+        });
       })
       .then( response => {
-        if (response.status >= 400) {
-          if(response.message){
-            throw new Error(response.message);
-          } else {
-            throw new Error('bad status: ' + response.status);
-          }
-        } 
-
+        
         dispatch({
           type: PATCH_SAVED
         });

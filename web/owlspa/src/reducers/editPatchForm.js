@@ -9,6 +9,9 @@ import {
   REMOVE_GITHUB_FILE,
   UPDATE_PATCH_NAME,
   ERROR_SAVING_PATCH,
+  ERROR_IN_SOURCE_FILE_URL,
+  CLEAR_SOURCE_FILE_ERRORS,
+  INVALID_FIELD_DATA,
   PATCH_SAVING,
   PATCH_SAVED } from 'constants';
 
@@ -20,12 +23,20 @@ const dedupeFiles = (sourceFiles , newFiles) => {
   });
 }
 
+const pushSourceFileError = (sourceFileErrors, index, error) => {
+  let newSourceFileErrors = [ ...sourceFileErrors ];
+  newSourceFileErrors[index] = error;
+  return newSourceFileErrors;
+};
+
 const initialState = {
   isUploading: false,
   isSavingPatch: false,
   sourceFiles: [],
   gitHubURLField: '',
-  patchName: ''
+  patchName: '',
+  sourceFileErrors:[],
+  invalidFields: {}
 };
 
 const editPatchForm = (state = initialState, action) => {
@@ -101,6 +112,27 @@ const editPatchForm = (state = initialState, action) => {
       return {
         ...state,
         isUploading: false
+      }
+
+    case ERROR_IN_SOURCE_FILE_URL:
+      return {
+        ...state,
+        sourceFileErrors: pushSourceFileError(state.sourceFileErrors, action.index, action.error)
+      }
+
+    case CLEAR_SOURCE_FILE_ERRORS:
+      return {
+        ...state,
+        sourceFileErrors: []
+      }
+
+    case INVALID_FIELD_DATA:
+      return {
+        ...state,
+        invalidFields: {
+          ...state.invalidFields,
+          [action.field]: action.error
+        }
       }
 
     default:
