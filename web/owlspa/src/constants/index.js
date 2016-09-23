@@ -59,4 +59,26 @@ export const OWL_FIRMWARE_VERSION_RECEIVED = 'OWL_FIRMWARE_VERSION_RECEIVED';
 export const OWL_PATCH_STATUS_RECEIVED = 'OWL_PATCH_STATUS_RECEIVED';
 export const OWL_PROGRAM_MESSAGE_RECEIVED = 'OWL_PROGRAM_MESSAGE_RECEIVED';
 
+export const UPLOADING_PATCH_FILES = 'UPLOADING_PATCH_FILES'; 
+export const PATCH_FILES_UPLOADED = 'PATCH_FILES_UPLOADED'; 
+export const ERROR_UPLOADING_PATCH_FILE = 'ERROR_UPLOADING_PATCH_FILE';
+export const REMOVE_UPLOADED_FILE = 'REMOVE_UPLOADED_FILE';
+
+export const GITHUB_URL_FIELD_CHANGE = 'GITHUB_URL_FIELD_CHANGE';
+export const ADD_GITHUB_FILE = 'ADD_GITHUB_FILE';
+export const REMOVE_GITHUB_FILE = 'REMOVE_GITHUB_FILE';
+export const SOURCE_FILE_CHANGE = 'SOURCE_FILE_CHANGE';
+export const UPDATE_PATCH_NAME = 'UPDATE_PATCH_NAME';
+
+export const PATCH_SAVING = 'PATCH_SAVING';
+export const PATCH_SAVED = 'PATCH_SAVED';
+export const ERROR_SAVING_PATCH = 'ERROR_SAVING_PATCH';
+export const ERROR_IN_SOURCE_FILE_URL = 'ERROR_IN_SOURCE_FILE_URL';
+export const CLEAR_SOURCE_FILE_ERRORS = 'CLEAR_SOURCE_FILE_ERRORS';
+export const CLEAR_EDIT_PATCH_FORM = 'CLEAR_EDIT_PATCH_FORM';
+export const INVALID_FIELD_DATA = 'INVALID_FIELD_DATA';
+
 export const API_END_POINT = '//' + window.location.host + '/api';
+export const WORDPRESS_AJAX_END_POINT = '//' + window.location.host + '/wp-admin/admin-ajax.php';
+export const PATCH_UPLOAD_DIR = window.location.protocol + '//' + window.location.host + '/wp-content/uploads/patch-files/';
+

@@ -25,6 +25,21 @@ var summaryFields = {
 };
 
 /**
+ * Convenience function gets wordpress cookie if exists or returns false
+ */
+var getWordpressCookie = function(cookies) {
+    var wpCookie = false;
+    Object.keys(cookies).some(function(key){
+        if(key.lastIndexOf('wordpress_logged_in_') === 0){
+            wpCookie = cookies[key];
+            return true;
+        }
+        return false;
+    });
+    return wpCookie;
+};
+
+/**
  * Retrieves all patches.
  *
  * GET /patches
@@ -93,6 +108,18 @@ router.post('/', function(req, res) {
     var newPatch = req.body.patch;
     var patchAuthor = {};
 
+    // to avoid unnecessary requests if wordpress cookie is available
+    if(req.cookies){
+        var wpCookieFromRequest = getWordpressCookie(req.cookies);
+        if(wpCookieFromRequest){
+            console.log('wp_cookie found in request');
+            credentials = {
+                type:'wordpress',
+                cookie: wpCookieFromRequest
+            }
+        }
+    }
+
     Q.fcall(function () {
 
         /* ~~~~~~~~~~~~~~~~~~~
@@ -102,17 +129,17 @@ router.post('/', function(req, res) {
         console.log('Checking credentials...');
 
         if (!credentials) {
-	    throw {
-		message: "Access denied (1).",
-		status: 401
-	    }
+        throw {
+        message: "Access denied (1).",
+        status: 401
+        }
         }
 
         if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-	    throw {
-		message: "Access denied (2).",
-		status: 401
-	    }
+        throw {
+        message: "Access denied (2).",
+        status: 401
+        }
         }
 
         wpCookie = credentials.cookie;
@@ -177,13 +204,13 @@ router.post('/', function(req, res) {
          *  Save patch
          * ~~~~~~~~~~~~ */
 
-        if (null !== doc) {
-	    throw {
-		type: 'not_valid',
-		field: 'name',
-		message: 'Patch name is already taken.',
-		status: 400
-	    }
+        if (doc !== null) {
+            throw {
+                type: 'not_valid',
+                field: 'name',
+                message: 'Patch name is already taken.',
+                status: 400
+            }
         }
 
         newPatch.downloadCount = 0; // set download count
@@ -220,17 +247,20 @@ router.post('/', function(req, res) {
         };
 
     }).catch(function (error) {
-	if(error.status){
-	    return res.status(error.status).json(error);
-	}else if(error.error){
-            var status = error.error.status || 500;
-	    return res.status(status).json(error);
-	}else{
+    
+        console.log('error: ', error);
+
+        if(error.status){
+            return res.status(error.status).json(error);
+        } else if(error.error){
+                var status = error.error.status || 500;
+            return res.status(status).json(error);
+        } else {
             return res.status(500).json({
-		message: error.toString(),
-		status: 500
+                message: error.toString(),
+                status: 500
             });
-	}
+        }
     }).done(function (response) {
 
         if ('ServerResponse' === response.constructor.name) {

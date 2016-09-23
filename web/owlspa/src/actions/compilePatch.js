@@ -69,7 +69,7 @@ const compilePatch = (patch) => {
           tabs:[{
             header :'Error',
             isError: true,
-            contents: err
+            contents: err.message
           }] 
         }));
       });

@@ -470,6 +470,23 @@ form[class^="bbp"] input[type=password] {
   padding-left: 21%;
 }
 
+#patch-add-edit-form .btn-row button {
+  margin-right: 15px;
+}
+
+#patch-add-edit-form .btn-large {
+  width: 165px;
+  margin-right: 30px;
+  line-height: 0px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+#patch-add-edit-form .btn-large:disabled {
+  background-color: #ccc; 
+  border-bottom: 2px solid #999;
+}
+
 #patch-add-edit-form .row:before, #patch-add-edit-form .row:after {
   content: " ";
   display: table;

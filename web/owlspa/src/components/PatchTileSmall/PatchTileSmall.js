@@ -4,6 +4,7 @@ import { AuthorLink } from 'components';
 class PatchTileSmall extends Component {
   render(){
     const { patch, canEdit, onDeletePatchClick } = this.props;
+    const author = patch.author;
     if(!patch){
       return (
         <div></div>
@@ -22,7 +23,9 @@ class PatchTileSmall extends Component {
             }    
           </div>
           <div>
-            <AuthorLink author={patch.author.name} />
+            { author ? (
+              <AuthorLink author={ author.name } />
+            ) : null}
           </div>
         </div>
       </div>
