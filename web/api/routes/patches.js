@@ -177,6 +177,9 @@ router.post('/', function(req, res) {
             if (patchAuthor.name) {
                 delete patchAuthor.name;
             }
+        }
+        
+        if(!isAdmin || (isAdmin && (!newPatch.author || !newPatch.author.wordpressId))){
             patchAuthor.wordpressId = wpUserId;
         }
 
@@ -215,7 +218,8 @@ router.post('/', function(req, res) {
 
         newPatch.downloadCount = 0; // set download count
         newPatch = patchModel.sanitize(newPatch);
-        if (!isAdmin) {
+        
+        if(!isAdmin || (isAdmin && (!newPatch.author || !newPatch.author.wordpressId))){
             newPatch.author = patchAuthor;
         }
 
