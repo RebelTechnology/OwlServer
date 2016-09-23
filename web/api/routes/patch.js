@@ -125,6 +125,8 @@ router.get('/:id', function (req, res) {
     .then(finishPatch)
     .catch(function (error) {
 
+        console.log(error);
+
         var status = error.status || 500;
         return res.status(status).json({
             message: error.toString(),

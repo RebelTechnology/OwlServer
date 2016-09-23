@@ -20,7 +20,6 @@ const fetchPatchDetails = (patchSeoName) => {
           if (response.status >= 400) {
             console.error('bad status:', response.status);
           } else {
-            console.log('patchDetails', response.result);
             dispatch({
               type: RECEIVE_PATCH_DETAILS,
               patchDetails: response.result
