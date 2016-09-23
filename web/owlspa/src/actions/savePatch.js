@@ -1,3 +1,5 @@
+import customHistory from '../customHistory';
+import { compilePatch } from 'actions';
 import {
   API_END_POINT,
   PATCH_SAVING,
@@ -8,9 +10,12 @@ import {
 } from 'constants';
 import newDialog from './newDialog';
 
-const savePatch = (patch) => {
+const redirectToPatchDetails = (patchSeoName) => {
+  customHistory.push('/patch/'+ patchSeoName);
+}
+
+const savePatch = (patch, options = {}) => {
   return (dispatch) => {
-    console.log('saving patch:', patch);
     dispatch({
       type: PATCH_SAVING
     });
@@ -59,13 +64,21 @@ const savePatch = (patch) => {
               throw new Error('Error saving patch');
             }
           } 
+          return json;
         });
       })
-      .then( response => {
+      .then( json => {
         
-        dispatch({
-          type: PATCH_SAVED
-        });
+        dispatch({type: PATCH_SAVED});
+
+        if(options.compile){
+          dispatch(compilePatch({
+            seoName: json.seoName,
+            _id: json._id
+          }));
+        }
+
+        redirectToPatchDetails(json.seoName);
         
       }).catch((err) => {
         dispatch(newDialog({

@@ -1,8 +1,10 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
+import customHistory from '../../customHistory';
 import classNames from 'classnames';
 import { 
   clearSourceFileErrors,
+  clearEditPatchForm,
   compilePatch,
   uploadPatchFiles, 
   removeUploadedPatchFile,
@@ -68,6 +70,20 @@ class CreatePatchPage extends Component {
 
   handleSaveClick(e){
     e.preventDefault();
+    this.savePatch();
+  }
+
+  handleSaveAndCompileClick(e){
+    e.preventDefault();
+    this.savePatch({ compile: true });
+  }
+
+  handleCancelClick(e){
+    e.preventDefault();
+    customHistory.push('/patches/my-patches');
+  }
+
+  savePatch(options){
     const { patchName, sourceFiles } = this.props.editPatchForm;
     this.props.clearSourceFileErrors();
     this.props.savePatch({
@@ -76,23 +92,12 @@ class CreatePatchPage extends Component {
       outputs: 2,
       published: 0,
       github: sourceFiles.map(file => file.path)
-    });  
-  }
-
-  handleSaveAndCompileClick(e){
-    e.preventDefault();
-    console.log('save and compile');
-  }
-
-  handleCancelClick(e){
-    e.preventDefault();
-   console.log('CANCEL');
+    }, options);  
   }
 
   render(){ 
     const { currentUser, editPatchForm } = this.props;
-    const { patchName, sourceFileErrors, invalidFields } = editPatchForm;
-    console.log('invalidFields', invalidFields);
+    const { patchName, sourceFileErrors, invalidFields, isSavingPatch } = editPatchForm;
     const sourceFiles = editPatchForm.sourceFiles.sort((a,b)=>{
       return (a.name).localeCompare(b.name);
     }).map( (file, i) => {
@@ -181,15 +186,33 @@ class CreatePatchPage extends Component {
               ): null
             }
               <div className="row btn-row">
-                <button onClick={(e) => this.handleSaveClick(e)} >SAVE</button>
-                <button onClick={(e) => this.handleSaveAndCompileClick(e)} >SAVE &amp; COMPILE</button>
-                <button onClick={(e) => this.handleCancelClick(e)} >CANCEL</button>
+                <button 
+                  disabled={ isSavingPatch }
+                  className="btn-large" 
+                  onClick={(e) => this.handleSaveClick(e)} >
+                  SAVE
+                </button>
+                <button 
+                  disabled={ isSavingPatch }
+                  className="btn-large" 
+                  onClick={(e) => this.handleSaveAndCompileClick(e)} >
+                  SAVE &amp; COMPILE
+                </button>
+                <button 
+                  className="btn-large" 
+                  onClick={(e) => this.handleCancelClick(e)} >
+                  CANCEL
+                </button>
             </div>
             </form>
           </div>
         </div>
       </div>
     );
+  }
+
+  componentWillUnmount(){
+    this.props.clearEditPatchForm();
   }
 }
 
@@ -201,6 +224,7 @@ const mapStateToProps = ({ currentUser, editPatchForm }) => {
 };
 
 export default connect(mapStateToProps, { 
+  clearEditPatchForm,
   uploadPatchFiles,
   removeUploadedPatchFile,
   gitHubURLFieldChange,

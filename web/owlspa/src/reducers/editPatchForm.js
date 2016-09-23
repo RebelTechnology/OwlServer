@@ -11,6 +11,7 @@ import {
   ERROR_SAVING_PATCH,
   ERROR_IN_SOURCE_FILE_URL,
   CLEAR_SOURCE_FILE_ERRORS,
+  CLEAR_EDIT_PATCH_FORM,
   INVALID_FIELD_DATA,
   PATCH_SAVING,
   PATCH_SAVED } from 'constants';
@@ -54,6 +55,12 @@ const editPatchForm = (state = initialState, action) => {
       }
 
     case PATCH_SAVED:
+      return { 
+        ...state,
+        isSavingPatch: false
+      }
+
+    case ERROR_SAVING_PATCH:
       return { 
         ...state,
         isSavingPatch: false
@@ -133,6 +140,11 @@ const editPatchForm = (state = initialState, action) => {
           ...state.invalidFields,
           [action.field]: action.error
         }
+      }
+
+    case CLEAR_EDIT_PATCH_FORM:
+     return {
+        ...initialState
       }
 
     default:

@@ -75,6 +75,7 @@ export const PATCH_SAVED = 'PATCH_SAVED';
 export const ERROR_SAVING_PATCH = 'ERROR_SAVING_PATCH';
 export const ERROR_IN_SOURCE_FILE_URL = 'ERROR_IN_SOURCE_FILE_URL';
 export const CLEAR_SOURCE_FILE_ERRORS = 'CLEAR_SOURCE_FILE_ERRORS';
+export const CLEAR_EDIT_PATCH_FORM = 'CLEAR_EDIT_PATCH_FORM';
 export const INVALID_FIELD_DATA = 'INVALID_FIELD_DATA';
 
 export const API_END_POINT = '//' + window.location.host + '/api';

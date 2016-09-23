@@ -13,7 +13,8 @@ class PatchDetailsPage extends Component {
   }
 
   patchIsCached(patchSeoName){
-    return !!this.props.patchDetails.patches[patchSeoName];
+    const patchDetails = this.props.patchDetails.patches[patchSeoName];
+    return !!(patchDetails && patchDetails.seoName && patchDetails._id);
   }
 
   currentUserCanEdit(patch){

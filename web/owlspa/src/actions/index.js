@@ -1,4 +1,5 @@
 export addGitHubFile from './addGitHubFile';
+export clearEditPatchForm from './clearEditPatchForm';
 export clearSourceFileErrors from './clearSourceFileErrors';
 export closeDialog from './closeDialog';
 export compilePatch from './compilePatch';
