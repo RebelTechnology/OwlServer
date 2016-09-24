@@ -34,6 +34,7 @@ function usage() {
     echo '  --name=<patch-name> Finds patch by name.' . PHP_EOL;
     echo '  --sysex             Build only the sysex target.' . PHP_EOL;
     echo '  --web               Build only the JavaScript target.' . PHP_EOL;
+    echo '  --gen               Build GEN patch.' . PHP_EOL;
     echo PHP_EOL;
     echo 'Debug options:' . PHP_EOL;
     echo '  --only-show-files   Only show files that would be downloaded from GitHub.' . PHP_EOL;
@@ -206,6 +207,7 @@ $longopts  = [
     'name:',
     'web',
     'sysex',
+    'gen',
 ];
 $options = getopt($shortopts, $longopts);
 
@@ -251,6 +253,10 @@ if (isset($options['name'])) {
 $makeTarget = MAKE_TARGET_SYSX;
 if (isset($options['web']) && false === $options['web']) {
     $makeTarget = MAKE_TARGET_MINIFY; // Same as MAKE_TARGET_WEB, but yields minified JS file
+}
+
+if (isset($options['gen']) && false === $options['gen']) {
+   $buildCmd = 'make gen';
 }
 
 /*
@@ -375,8 +381,8 @@ if($buildCmd = 'make sysx') {
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
     $cmd  = 'make ';
-        // Specify where to find Emscripten's config file
-        $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
+    // Specify where to find Emscripten's config file
+    $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
     $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
     $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
     $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
@@ -400,6 +406,29 @@ if($buildCmd = 'make sysx') {
     }
     $cmd .= $makeTarget;
 
+    if (!(isset($options['sysex']) && false === $options['sysex'])
+         && MAKE_TARGET_SYSX == $makeTarget) {
+      $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
+    }
+
+
+}else if($buildCmd = 'make gen') {
+
+    // First source file only
+    $sourceFile = $sourceFiles[0];
+    $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
+    $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
+
+    $cmd  = 'make ';
+    // Specify where to find Emscripten's config file
+    $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
+    $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
+    $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
+    $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
+    $cmd .= 'PATCHIN=' .     $patch['inputs']  .' ';
+    $cmd .= 'PATCHOUT='.     $patch['outputs'] .' ';
+    $cmd .= 'GEN=' . escapeshellarg($className) . ' ';
+    $cmd .= $makeTarget;
     if (!(isset($options['sysex']) && false === $options['sysex'])
          && MAKE_TARGET_SYSX == $makeTarget) {
       $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
