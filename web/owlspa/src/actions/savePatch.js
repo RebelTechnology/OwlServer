@@ -76,9 +76,12 @@ const savePatch = (patch, options = {}) => {
               dispatch(compilePatch({
                 seoName: json.seoName,
                 _id: json._id
-              }));
+              })).then(()=>{
+                redirectToPatchDetails(json.seoName);
+              });
+            } else {
+              redirectToPatchDetails(json.seoName);
             }
-            redirectToPatchDetails(json.seoName);
           });
         } else {
           throw new Error('Error saving patch: patch ID missing');

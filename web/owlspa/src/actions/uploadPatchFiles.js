@@ -55,6 +55,11 @@ const uploadPatchFiles = (patchFileList, patchId) => {
         if (response.status >= 400) {
           throw new Error('bad status: ' + response.status);
         } 
+
+        if(!response.files){
+          throw new Error('no files returned from server');
+        }
+
         const fileErrors = getFileErrors(response.files)
         if(fileErrors){
           throw new Error(fileErrors);
