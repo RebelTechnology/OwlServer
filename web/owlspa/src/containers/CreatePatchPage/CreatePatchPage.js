@@ -97,7 +97,7 @@ class CreatePatchPage extends Component {
 
   render(){ 
     const { currentUser, editPatchForm } = this.props;
-    const { patchName, sourceFileErrors, invalidFields, isSavingPatch } = editPatchForm;
+    const { patchName, sourceFileErrors, invalidFields, isSavingPatch, isCompiling } = editPatchForm;
     const sourceFiles = editPatchForm.sourceFiles.sort((a,b)=>{
       return (a.name).localeCompare(b.name);
     }).map( (file, i) => {
@@ -187,16 +187,18 @@ class CreatePatchPage extends Component {
             }
               <div className="row btn-row">
                 <button 
-                  disabled={ isSavingPatch }
+                  disabled={ (isSavingPatch || isCompiling ) }
                   className="btn-large" 
                   onClick={(e) => this.handleSaveClick(e)} >
-                  SAVE
+                  {isSavingPatch ? 'Saving . . .': 'Save'}
+                  {isSavingPatch ? <i className="loading-spinner"></i> : null}
                 </button>
                 <button 
-                  disabled={ isSavingPatch }
+                  disabled={ (isSavingPatch || isCompiling )}
                   className="btn-large" 
                   onClick={(e) => this.handleSaveAndCompileClick(e)} >
-                  SAVE &amp; COMPILE
+                  {isSavingPatch ? 'Saving . . .' : ( isCompiling ? 'Compiling . . .' : 'Save and Compile')}
+                  {isSavingPatch || isCompiling ? <i className="loading-spinner"></i> : null}
                 </button>
                 <button 
                   className="btn-large" 

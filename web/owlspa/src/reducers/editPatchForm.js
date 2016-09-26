@@ -14,7 +14,10 @@ import {
   CLEAR_EDIT_PATCH_FORM,
   INVALID_FIELD_DATA,
   PATCH_SAVING,
-  PATCH_SAVED } from 'constants';
+  PATCH_SAVED,
+  REQUEST_COMPILE_PATCH,
+  RECEIVE_COMPILE_PATCH,
+  PATCH_COMPILATION_FAILED } from 'constants';
 
 const dedupeFiles = (sourceFiles , newFiles) => {
   return sourceFiles.filter(sourceFile => {
@@ -33,6 +36,7 @@ const pushSourceFileError = (sourceFileErrors, index, error) => {
 const initialState = {
   isUploading: false,
   isSavingPatch: false,
+  isCompiling: false,
   sourceFiles: [],
   gitHubURLField: '',
   patchName: '',
@@ -145,6 +149,24 @@ const editPatchForm = (state = initialState, action) => {
     case CLEAR_EDIT_PATCH_FORM:
      return {
         ...initialState
+      }
+
+    case REQUEST_COMPILE_PATCH:
+      return {
+        ...state,
+        isCompiling : true
+      }
+
+    case RECEIVE_COMPILE_PATCH:
+      return {
+        ...state,
+        isCompiling : false
+      }
+
+    case PATCH_COMPILATION_FAILED:
+      return {
+        ...state,
+        isCompiling : false
       }
 
     default:
