@@ -88,8 +88,8 @@ class CreatePatchPage extends Component {
     this.props.clearSourceFileErrors();
     this.props.savePatch({
       name: patchName,
-      inputs: 2,
-      outputs: 2,
+      inputs: 0,
+      outputs: 0,
       published: 0,
       github: sourceFiles.map(file => file.path)
     }, options);  

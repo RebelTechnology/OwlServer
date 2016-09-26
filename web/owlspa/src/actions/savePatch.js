@@ -1,5 +1,5 @@
 import customHistory from '../customHistory';
-import { compilePatch } from 'actions';
+import { compilePatch, cleanUpTmpPatchFiles } from 'actions';
 import {
   API_END_POINT,
   PATCH_SAVING,
@@ -69,16 +69,20 @@ const savePatch = (patch, options = {}) => {
       })
       .then( json => {
         
-        dispatch({type: PATCH_SAVED});
-
-        if(options.compile){
-          dispatch(compilePatch({
-            seoName: json.seoName,
-            _id: json._id
-          }));
+        if(json._id){
+          dispatch({type: PATCH_SAVED});
+          dispatch(cleanUpTmpPatchFiles(json._id)).then(() => {            
+            if(options.compile){
+              dispatch(compilePatch({
+                seoName: json.seoName,
+                _id: json._id
+              }));
+            }
+            redirectToPatchDetails(json.seoName);
+          });
+        } else {
+          throw new Error('Error saving patch: patch ID missing');
         }
-
-        redirectToPatchDetails(json.seoName);
         
       }).catch((err) => {
         dispatch(newDialog({
