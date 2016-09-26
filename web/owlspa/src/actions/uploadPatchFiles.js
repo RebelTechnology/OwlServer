@@ -26,7 +26,6 @@ const getFileErrors = (files) => {
 
 const uploadPatchFiles = (patchFileList, patchId) => {
   return (dispatch) => {
-    console.log('posting patch files:', patchFileList);
     dispatch({
       type: UPLOADING_PATCH_FILES
     });
