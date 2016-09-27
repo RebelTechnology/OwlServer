@@ -14,7 +14,11 @@ class PatchCode extends Component {
   }
 
   componentWillMount(){
-    const { fileUrls, patchId, patchCodeFiles } = this.props;
+    this.checkForNewPatchCodeFiles(this.props);
+  }
+
+  checkForNewPatchCodeFiles(props){
+    const { fileUrls, patchId, patchCodeFiles } = props;
     if(fileUrls && fileUrls.length && !patchCodeFiles[patchId]){
       this.props.fetchPatchCodeFiles(fileUrls, patchId);
     }
@@ -51,6 +55,10 @@ class PatchCode extends Component {
     const randomSvg = document.createElement('svg');
     document.body.insertBefore(randomSvg, document.body.firstChild);
     return pdfu.renderSvg(pdPatch, {svgFile: false});
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.checkForNewPatchCodeFiles(nextProps);
   }
 
   render(){
