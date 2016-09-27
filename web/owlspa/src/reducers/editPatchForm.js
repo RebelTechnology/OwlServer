@@ -5,6 +5,7 @@ import {
   REMOVE_UPLOADED_FILE,
   ADD_GITHUB_FILE,
   SOURCE_FILE_CHANGE,
+  SET_MAIN_SOURCE_FILE,
   GITHUB_URL_FIELD_CHANGE,
   REMOVE_GITHUB_FILE,
   UPDATE_PATCH_NAME,
@@ -17,15 +18,53 @@ import {
   PATCH_SAVED,
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
-  PATCH_COMPILATION_FAILED } from 'constants';
+  PATCH_COMPILATION_FAILED
+} from 'constants';
 
-const dedupeFiles = (sourceFiles , newFiles) => {
-  return sourceFiles.filter(sourceFile => {
-    return !newFiles.some(newFile => {
+const setMainSourcefile = (sourceFiles, mainSourceFile) => {
+  return sourceFiles.map(sourceFile => {
+    return {
+      ...sourceFile,
+      mainFile: sourceFile.name === mainSourceFile.name
+    };
+  });
+};
+
+const updateExisitingSourceFiles = (sourceFiles, newFiles) => {
+  return sourceFiles.map(sourceFile => {
+    let updatedSourceFile =  { ...sourceFile };
+    newFiles.some((newFile, i) => {
+      if(newFile.name === updatedSourceFile.name){
+        updatedSourceFile = {
+          ...sourceFile,
+          ...newFile
+        }
+      }
+      return newFile.name === updatedSourceFile.name;
+    });
+    return updatedSourceFile;
+  });
+};
+
+const addOnlyNewSourceFiles = (sourceFiles, newFiles) => {
+  return newFiles.filter(newFile => {
+    return !sourceFiles.some(sourceFile => {
       return newFile.name === sourceFile.name;
     });
-  });
-}
+  }).map(newFile => {
+    newFile.timeStamp = new Date().getTime();
+    return newFile;
+  }).concat(sourceFiles);
+};
+
+const updateSourceFiles = (sourceFiles , newFiles) => {
+  newFiles = Array.isArray(newFiles) ? newFiles : [newFiles];
+  if(sourceFiles.length === 0){
+    newFiles[0].mainFile = true;
+  }
+  let updatedSourceFiles = updateExisitingSourceFiles(sourceFiles, newFiles);
+  return addOnlyNewSourceFiles(updatedSourceFiles, newFiles);
+};
 
 const pushSourceFileError = (sourceFileErrors, index, error) => {
   let newSourceFileErrors = [ ...sourceFileErrors ];
@@ -81,8 +120,7 @@ const editPatchForm = (state = initialState, action) => {
         ...state,
         isUploading: false,
         sourceFiles: [
-          ...dedupeFiles(state.sourceFiles, action.files),
-          ...action.files
+          ...updateSourceFiles(state.sourceFiles, action.files)
         ]
       }
 
@@ -104,8 +142,7 @@ const editPatchForm = (state = initialState, action) => {
       return { 
         ...state,
         sourceFiles: [
-          ...dedupeFiles(state.sourceFiles, [action.gitHubFile]),
-          action.gitHubFile
+          ...updateSourceFiles(state.sourceFiles, action.gitHubFile)
         ],
         gitHubURLField: ''
       }
@@ -114,8 +151,15 @@ const editPatchForm = (state = initialState, action) => {
       return {
         ...state,
         sourceFiles: [
-          ...dedupeFiles(state.sourceFiles, [action.sourceFile]),
-          action.sourceFile
+          ...updateSourceFiles(state.sourceFiles, action.sourceFile)
+        ]
+      }
+
+    case SET_MAIN_SOURCE_FILE:
+      return {
+        ...state,
+        sourceFiles: [
+          ...setMainSourcefile(state.sourceFiles, action.mainSourceFile)
         ]
       }
 

@@ -29,6 +29,7 @@ export resetWebAudioPatch from './resetWebAudioPatch';
 export resetWebAudioPatchParameters from './resetWebAudioPatchParameters';
 export savePatch from './savePatch';
 export setActiveDialogTab from './setActiveDialogTab';
+export setMainSourceFile from './setMainSourceFile';
 export setPatchListTopFilter from './setPatchListTopFilter';
 export setPatchPlaying from './setPatchPlaying';
 export setWebAudioPatch from './setWebAudioPatch';
