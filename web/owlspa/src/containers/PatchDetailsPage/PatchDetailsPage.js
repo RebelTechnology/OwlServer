@@ -36,7 +36,7 @@ class PatchDetailsPage extends Component {
 
   handleDeletePatchClick(e, patch){
     e.preventDefault();
-    this.props.deletePatch(patch);
+    this.props.deletePatch(patch, {redirect: 'my-patches'});
   }
 
   render(){ 
