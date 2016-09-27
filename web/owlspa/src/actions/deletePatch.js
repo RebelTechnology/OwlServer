@@ -5,7 +5,7 @@ import {
   PATCH_DELETED
 } from 'constants';
 
-const deletePatch = (patch) => {
+const deletePatch = (patch, options = {}) => {
   return (dispatch) => {
     if(!window.confirm('Are you sure you want to delete this patch?')){
       return;
@@ -36,7 +36,9 @@ const deletePatch = (patch) => {
           message: json.message
         });
         window.alert(json.message);
-        customHistory.push('/patches/latest');
+        if(options.redirect){
+          customHistory.push('/patches/' + options.redirect);
+        }
       })
       .catch((err) => {
         window.alert(err);
