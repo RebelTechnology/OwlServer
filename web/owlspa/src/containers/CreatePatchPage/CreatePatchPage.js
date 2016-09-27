@@ -3,17 +3,18 @@ import { connect } from 'react-redux';
 import customHistory from '../../customHistory';
 import classNames from 'classnames';
 import { 
-  clearSourceFileErrors,
-  clearEditPatchForm,
-  compilePatch,
-  uploadPatchFiles, 
-  removeUploadedPatchFile,
   addGitHubFile,
-  removeGitHubFile,
+  clearEditPatchForm,
+  clearSourceFileErrors,
+  compilePatch,
   gitHubURLFieldChange,
+  removeGitHubFile,
+  removeUploadedPatchFile,
+  savePatch,
+  setMainSourceFile,
   sourceFileChange,
   updatePatchName,
-  savePatch
+  uploadPatchFiles
 } from 'actions';
 
 class CreatePatchPage extends Component {
@@ -55,6 +56,7 @@ class CreatePatchPage extends Component {
   handleRemoveFile(e, file){
     e.preventDefault();
     e.stopPropagation();
+    this.props.clearSourceFileErrors();
     this.props.removeUploadedPatchFile(file.name);
   }
 
@@ -64,8 +66,13 @@ class CreatePatchPage extends Component {
 
   handleSourceFileChange(e,file){
     e.preventDefault();
+    this.props.clearSourceFileErrors();
     file.path = e.target.value;
     this.props.sourceFileChange(file);
+  }
+
+  handleMainFileChange(e, file){
+    this.props.setMainSourceFile(file);
   }
 
   handleSaveClick(e){
@@ -97,20 +104,29 @@ class CreatePatchPage extends Component {
 
   render(){ 
     const { currentUser, editPatchForm } = this.props;
-    const { patchName, sourceFileErrors, invalidFields, isSavingPatch, isCompiling } = editPatchForm;
-    const sourceFiles = editPatchForm.sourceFiles.sort((a,b)=>{
-      return (a.name).localeCompare(b.name);
+    const { patchName, sourceFileErrors, invalidFields, isSavingPatch, isCompiling, sourceFiles } = editPatchForm;
+    const sortedSourceFiles = sourceFiles.sort((a,b) => {
+      if(a.mainFile){ return -1; }
+      if(b.mainFile){ return 1; }
+      return a.timeStamp - b.timeStamp;
     }).map( (file, i) => {
       return (
         <div className="row" key={file.name}>
           <input 
             type="url" 
             value={file.path}
-            style={{width: '70%', marginLeft:'10px'}}
+            style={{width: '60%', marginLeft:'10px', marginRight:'10px'}}
             className={ classNames({ 'invalid': !!sourceFileErrors[i] }) }
             onChange={(e)=>this.handleSourceFileChange(e, file)}
             id={'frm-patch-github_' + i} 
             name={'github['+ i +']'} />
+
+          {file.mainFile ? 'Main File' : (
+            <button onClick={(e)=>this.handleMainFileChange(e, file)}>
+              Set Main
+            </button>
+          )}
+          
           <button style={{ display:'inline-block', marginLeft:'10px' }} onClick={(e) => this.handleRemoveFile(e, file)}>remove</button>
           { sourceFileErrors[i] ? (
             <div className="error-message" style={{ display:'block' }}> { sourceFileErrors[i] } </div>
@@ -149,7 +165,7 @@ class CreatePatchPage extends Component {
                     <label>Upload Files</label>
                     <div className="form-control">
                         <div className="file-upload-container">
-                            Choose files...
+                            {editPatchForm.isUploading ? 'Uploading...' : 'Choose files...' }
                             {editPatchForm.isUploading ? null : (
                               <input 
                                 type="file" 
@@ -178,10 +194,10 @@ class CreatePatchPage extends Component {
 
             </fieldset>
 
-            { editPatchForm.sourceFiles.length ? (
+            { sortedSourceFiles.length ? (
                 <fieldset>
                   <legend>Source Files</legend>
-                  { sourceFiles }
+                  { sortedSourceFiles }
                 </fieldset> 
               ): null
             }
@@ -233,6 +249,7 @@ export default connect(mapStateToProps, {
   addGitHubFile,
   removeGitHubFile,
   savePatch,
+  setMainSourceFile,
   sourceFileChange,
   updatePatchName,
   clearSourceFileErrors

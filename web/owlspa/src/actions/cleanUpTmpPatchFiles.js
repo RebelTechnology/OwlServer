@@ -4,7 +4,6 @@ import {
 
 const cleanUpTmpPatchFiles = (patchId) => {
   return (dispatch) => {
-    console.log('attempting cleanup for ', patchId);
     if(!patchId){
       return;
     }
