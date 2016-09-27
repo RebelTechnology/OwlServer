@@ -4,7 +4,7 @@ export Dialog from './Dialog/Dialog';
 export NavBar from './NavBar/NavBar';
 export OwlControl from './OwlControl/OwlControl';
 export Patch from './Patch/Patch';
-export PatchList from './PatchList/PatchList';
+export PatchListPage from './PatchListPage/PatchListPage';
 export PatchDetailsPage from './PatchDetailsPage/PatchDetailsPage';
 export PatchPreview from './PatchPreview/PatchPreview';
 export Parameter from './Parameter/Parameter';
