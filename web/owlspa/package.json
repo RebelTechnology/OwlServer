@@ -32,14 +32,16 @@
     "karma": "^1.1.0",
     "karma-chai": "^0.1.0",
     "karma-chai-plugins": "^0.7.0",
-    "karma-chrome-launcher": "^1.0.1",
     "karma-mocha": "^1.1.1",
     "karma-mocha-reporter": "^2.0.4",
+    "karma-phantomjs-launcher": "^1.0.2",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
     "mocha": "^2.5.3",
+    "phantomjs": "^2.1.7",
     "react-addons-test-utils": "^15.1.0",
     "redux-thunk": "^2.1.0",
+    "sinon": "^2.0.0-pre.3",
     "webpack": "^1.13.1"
   },
   "dependencies": {

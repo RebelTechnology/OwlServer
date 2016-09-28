@@ -2,6 +2,7 @@ import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import customHistory from '../../customHistory';
 import classNames from 'classnames';
+import { CompilationTypeSelector } from 'components';
 import { 
   addGitHubFile,
   clearEditPatchForm,
@@ -90,6 +91,10 @@ class CreatePatchPage extends Component {
     customHistory.push('/patches/my-patches');
   }
 
+  handleCompilationTypeChange(compilationType){
+    console.log('new goddamn comilation type! ', compilationType);
+  }
+
   savePatch(options){
     const { patchName, sourceFiles } = this.props.editPatchForm;
     this.props.clearSourceFileErrors();
@@ -164,39 +169,46 @@ class CreatePatchPage extends Component {
                     ) : null }
                 </div>
               </fieldset>
+
+              <CompilationTypeSelector 
+                compilationType={'cpp'}
+                allTypes={['cpp','faust','pd','gen']}
+                onSelectorChange={this.handleCompilationTypeChange}
+              />
+              
               <fieldset id="frm-patch-github">
                 <legend>Add Source Files</legend>
                 <div className="info-message" style={{ marginBottom: '15px' }}>Upload files or add files from GitHub.</div>
                 
                 <div className="row">
-                    <label>Upload Files</label>
-                    <div className="form-control">
-                        <div className="file-upload-container">
-                            {editPatchForm.isUploading ? 'Uploading...' : 'Choose files...' }
-                            {editPatchForm.isUploading ? null : (
-                              <input 
-                                type="file" 
-                                id="frm-patch-file" 
-                                name="files[]" 
-                                multiple 
-                                onChange={(e) => this.handleFileUploadChange(e)} />
-                            )}
-                        </div>
+                  <label>Upload Files</label>
+                  <div className="form-control">
+                    <div className="file-upload-container">
+                      {editPatchForm.isUploading ? 'Uploading...' : 'Choose files...' }
+                      {editPatchForm.isUploading ? null : (
+                        <input 
+                          type="file" 
+                          id="frm-patch-file" 
+                          name="files[]" 
+                          multiple 
+                          onChange={(e) => this.handleFileUploadChange(e)} />
+                      )}
                     </div>
-                    <div className="info-message" style={{marginBottom: '15px'}}>
-                      Supported File Types:  .c  .h  .cpp  .hpp  .pd  .dsp  .s
-                    </div>
+                  </div>
+                  <div className="info-message" style={{marginBottom: '15px'}}>
+                    Supported File Types:  .c  .h  .cpp  .hpp  .pd  .dsp  .s
+                  </div>
                 </div>
 
                 <div id="frm-patch-github_template" className="row repeat">
-                    <label htmlFor="frm-patch-github_#index#">GitHub File Url</label>
-                    <div className="form-control">
-                        <input 
-                          type="url" 
-                          value={editPatchForm.gitHubURLField}
-                          onChange={(e) => this.handleGitHubURLFieldChange(e)}/>
-                        <button onClick={(e)=> this.handleAddGithubUrlClick(e)} style={{ marginLeft:'20px' }}>ADD</button>
-                    </div>
+                  <label htmlFor="frm-patch-github_#index#">GitHub File Url</label>
+                  <div className="form-control">
+                    <input 
+                      type="url" 
+                      value={editPatchForm.gitHubURLField}
+                      onChange={(e) => this.handleGitHubURLFieldChange(e)}/>
+                    <button onClick={(e)=> this.handleAddGithubUrlClick(e)} style={{ marginLeft:'20px' }}>ADD</button>
+                  </div>
                 </div>
 
             </fieldset>
