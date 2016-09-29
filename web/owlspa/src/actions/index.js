@@ -38,5 +38,6 @@ export sourceFileChange from './sourceFileChange';
 export startPollingOwlStatus from './startPollingOwlStatus';
 export stopPollingOwlStatus from './stopPollingOwlStatus';
 export togglePatchListSubFilter from './togglePatchListSubFilter';
+export updateCompilationType from './updateCompilationType';
 export uploadPatchFiles from './uploadPatchFiles';
 export updatePatchName from './updatePatchName';

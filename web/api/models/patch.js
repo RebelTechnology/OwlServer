@@ -58,6 +58,23 @@ var patchModel = {
             }
         },
 
+        compilationType: {
+            required: false,
+            validate: function (val) {
+                
+                var err = { type: 'not_valid', field: 'compilationType', error: { status: 400 }};
+                var validTypes = ['cpp', 'faust', 'pd' ,'gen'];
+
+                if (typeof val !== 'string' || validTypes.indexOf((val).toLowerCase()) === -1) {
+                    err.message = 'Value not valid.';
+                    throw err;
+                }
+            },
+            sanitize: function (val) {
+                return String(val);
+            }
+        },
+
         author: {
             required: false,
             validate: function (val) {
@@ -395,7 +412,7 @@ var patchModel = {
         },
 
         published: {
-            require: false,
+            required: false,
             validate: function (val) {
                 // no validation needed
             },
@@ -406,7 +423,7 @@ var patchModel = {
         },
 
         downloadCount: {
-            require: false,
+            required: false,
             validate: function (val) {
                 
                 var err = { type: 'not_valid', field: 'downloadCount', error: { status: 400 }};

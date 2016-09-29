@@ -35,7 +35,6 @@ const deletePatch = (patch, options = {}) => {
           patchSeoName: patch.seoName,
           message: json.message
         });
-        window.alert(json.message);
         if(options.redirect){
           customHistory.push('/patches/' + options.redirect);
         }
