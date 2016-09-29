@@ -14,6 +14,7 @@ import {
   savePatch,
   setMainSourceFile,
   sourceFileChange,
+  updateCompilationType,
   updatePatchName,
   uploadPatchFiles
 } from 'actions';
@@ -92,11 +93,11 @@ class CreatePatchPage extends Component {
   }
 
   handleCompilationTypeChange(compilationType){
-    console.log('new goddamn comilation type! ', compilationType);
+    this.props.updateCompilationType(compilationType);
   }
 
   savePatch(options){
-    const { patchName, sourceFiles } = this.props.editPatchForm;
+    const { patchName, sourceFiles, compilationType } = this.props.editPatchForm;
     this.props.clearSourceFileErrors();
     this.props.savePatch({
       name: patchName,
@@ -109,6 +110,7 @@ class CreatePatchPage extends Component {
         d:'D',
         e:'E'
       },
+      compilationType: compilationType,
       published: 0,
       github: sourceFiles.map(file => file.path)
     }, options);  
@@ -116,12 +118,24 @@ class CreatePatchPage extends Component {
 
   render(){ 
     const { currentUser, editPatchForm } = this.props;
-    const { patchName, sourceFileErrors, invalidFields, isSavingPatch, isCompiling, sourceFiles } = editPatchForm;
+    const { 
+      patchName,
+      sourceFileErrors, 
+      invalidFields, 
+      isSavingPatch, 
+      isCompiling, 
+      sourceFiles, 
+      compilationType 
+    } = editPatchForm;
+    let mainSourceFile = null;
     const sortedSourceFiles = sourceFiles.sort((a,b) => {
       if(a.mainFile){ return -1; }
       if(b.mainFile){ return 1; }
       return a.timeStamp - b.timeStamp;
     }).map( (file, i) => {
+      if(file.mainFile){
+        mainSourceFile = file;
+      }
       return (
         <div className="row" key={file.name}>
           <input 
@@ -169,13 +183,14 @@ class CreatePatchPage extends Component {
                     ) : null }
                 </div>
               </fieldset>
-
-              <CompilationTypeSelector 
-                compilationType={'cpp'}
-                allTypes={['cpp','faust','pd','gen']}
-                onSelectorChange={this.handleCompilationTypeChange}
-              />
-              
+                { sortedSourceFiles.length ? (
+                    <CompilationTypeSelector 
+                      mainSourceFile={mainSourceFile}
+                      compilationType={compilationType}
+                      onCompilationTypeChange={(val) => this.handleCompilationTypeChange(val)} 
+                    />
+                  ) : null 
+                }
               <fieldset id="frm-patch-github">
                 <legend>Add Source Files</legend>
                 <div className="info-message" style={{ marginBottom: '15px' }}>Upload files or add files from GitHub.</div>
@@ -270,6 +285,7 @@ export default connect(mapStateToProps, {
   savePatch,
   setMainSourceFile,
   sourceFileChange,
+  updateCompilationType,
   updatePatchName,
   clearSourceFileErrors
 })(CreatePatchPage);

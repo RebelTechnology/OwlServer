@@ -2,24 +2,58 @@ import React, { Component, PropTypes } from 'react';
 
 class CompilationTypeSelector extends Component {
 
-  render(){
-    const { onSelectorChange, allTypes, compilationType} = this.props;
-
-    if(!allTypes || !compilationType){
-      return null;
+  componentWillMount(){
+    if(this.props.mainSourceFile && this.props.mainSourceFile.name){
+      this.checkAndUpdateCompilatonType(this.props.mainSourceFile.name);
     }
+  }
+
+  getFileExtention(fileName){
+    const dotIndex = fileName.lastIndexOf('.');
+    if( dotIndex === -1){
+      return null;
+    } else {
+      return fileName.substr(dotIndex + 1);
+    }
+  }
+
+  getCompilationTypeFromMainFileName(mainFileName){
+    switch(this.getFileExtention(mainFileName)){
+      case 'dsp':
+        return 'faust';
+      case 'pd':
+        return 'pd';
+      default:
+        return 'cpp';
+    };
+  }
+
+  checkAndUpdateCompilatonType(mainFileName){
+    const newCompilationType = this.getCompilationTypeFromMainFileName(mainFileName);
+      this.props.onCompilationTypeChange(newCompilationType);
+  }
+
+  componentWillReceiveProps(newProps){
+    if(!this.props.mainSourceFile && newProps.mainSourceFile && newProps.mainSourceFile.name){
+      this.checkAndUpdateCompilatonType(newProps.mainSourceFile.name);
+    }
+  }
+
+  render(){
+    const { onCompilationTypeChange, compilationType, mainSourceFile } = this.props;
+    const allCompilationTypes = ['cpp', 'pd', 'faust', 'gen'];
 
     return (
       <fieldset>
-        <legend>Compilation</legend>
+        <legend>Compilation Type</legend>
         <div className="row">
           <label>Type</label>
           <select 
             style={{fontSize:'18px'}}
             name="compilationtype" 
-            onChange={(e) => onSelectorChange(e.target.value)}
+            onChange={(e) => onCompilationTypeChange(e.target.value)}
             value={compilationType}>
-            { allTypes.map(type => {
+            { allCompilationTypes.map(type => {
                 return (<option key={type} value={type}>{type}</option>);
               }) 
             }
@@ -32,8 +66,8 @@ class CompilationTypeSelector extends Component {
 
 CompilationTypeSelector.propTypes = {
   compilationType: PropTypes.string,
-  allTypes: PropTypes.array,
-  onSelectorChange : PropTypes.func
+  mainSourceFile: PropTypes.object,
+  onCompilationTypeChange : PropTypes.func
 };
 
 export default CompilationTypeSelector;
