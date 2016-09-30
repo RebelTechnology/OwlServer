@@ -451,19 +451,16 @@ var patchModel = {
                 throw err;
             }
 
-            if (patch.published == true && (key === 'instructions' || key === 'description')) {
-                patchModel.fields[key].required = true;
-            }
-
             if (typeof patch[key] === 'undefined') {
 
                 // Check for required fields
                 if (patchModel.fields[key].required === true) {
+                    patchModel.throwErrorForMissingRequiredField(key);
+                }
 
-                    err.message = 'This field is required.';
-                    err.type = 'field_required';
-                    err.field = key;
-                    throw err;
+                // instructions and description are required if patch is published
+                if (patch.published == true && (key === 'instructions' || key === 'description')) {
+                    patchModel.throwErrorForMissingRequiredField(key);
                 }
 
             } else {
@@ -494,6 +491,14 @@ var patchModel = {
 
     generateSeoName: function(patch) {
         return patch.name.replace(/[^a-z0-9]+/gi, '_');
+    },
+
+    throwErrorForMissingRequiredField: function(field){
+        console.log('Error missing required field: ', field);
+        err.message = 'This field is required.';
+        err.type = 'field_required';
+        err.field = field;
+        throw err;
     }
 };
 
