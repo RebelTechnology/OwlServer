@@ -372,7 +372,7 @@ if ($onlyDloadFiles) {
  *
  */
 
-if($buildCmd = 'make sysx') {
+if($buildCmd == 'make sysx') {
 
     // First source file only
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
@@ -412,7 +412,7 @@ if($buildCmd = 'make sysx') {
     }
 
 
-}else if($buildCmd = 'make gen') {
+}else if($buildCmd == 'make gen') {
 
     // First source file only
     $sourceFile = $sourceFiles[0];
