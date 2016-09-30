@@ -2,14 +2,14 @@ var webpackConfig = require('./webpack.prod.config');
 
 module.exports = function (config) {
   config.set({
-    browsers: [ 'Chrome' ],
+    browsers: [ 'PhantomJS' ],
     files: [
       'test/tests.bundle.js'
     ],
     exclude: ['*.css'],  
     frameworks: [ 'chai', 'mocha' ],
     plugins: [
-      'karma-chrome-launcher',
+      'karma-phantomjs-launcher',
       'karma-chai',
       'karma-mocha',
       'karma-mocha-reporter',

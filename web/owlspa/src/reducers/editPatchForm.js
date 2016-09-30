@@ -18,7 +18,8 @@ import {
   PATCH_SAVED,
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
-  PATCH_COMPILATION_FAILED
+  PATCH_COMPILATION_FAILED,
+  UPDATE_COMPILATION_TYPE
 } from 'constants';
 
 const setMainSourcefile = (sourceFiles, mainSourceFile) => {
@@ -80,7 +81,8 @@ const initialState = {
   gitHubURLField: '',
   patchName: '',
   sourceFileErrors:[],
-  invalidFields: {}
+  invalidFields: {},
+  compilationType:'cpp'
 };
 
 const editPatchForm = (state = initialState, action) => {
@@ -211,6 +213,12 @@ const editPatchForm = (state = initialState, action) => {
       return {
         ...state,
         isCompiling : false
+      }
+
+    case UPDATE_COMPILATION_TYPE:
+      return {
+        ...state,
+        compilationType : action.compilationType
       }
 
     default:

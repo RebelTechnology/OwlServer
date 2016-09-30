@@ -283,9 +283,15 @@ router.put('/:id', function (req, res) {
          * ~~~~~~~~~~~~~~~ */
 
         var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH;
+        
         if (format === 'js') {
             cmd += ' --web';
         }
+        
+        if(patch.compilationType === 'gen'){
+            cmd += ' --gen';
+        }
+
         cmd += ' ' + id;
         console.log('Running command "' + cmd + '"...');
 

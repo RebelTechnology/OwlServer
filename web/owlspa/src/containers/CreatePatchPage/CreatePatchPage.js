@@ -2,6 +2,7 @@ import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import customHistory from '../../customHistory';
 import classNames from 'classnames';
+import { CompilationTypeSelector } from 'components';
 import { 
   addGitHubFile,
   clearEditPatchForm,
@@ -13,6 +14,7 @@ import {
   savePatch,
   setMainSourceFile,
   sourceFileChange,
+  updateCompilationType,
   updatePatchName,
   uploadPatchFiles
 } from 'actions';
@@ -90,8 +92,12 @@ class CreatePatchPage extends Component {
     customHistory.push('/patches/my-patches');
   }
 
+  handleCompilationTypeChange(compilationType){
+    this.props.updateCompilationType(compilationType);
+  }
+
   savePatch(options){
-    const { patchName, sourceFiles } = this.props.editPatchForm;
+    const { patchName, sourceFiles, compilationType } = this.props.editPatchForm;
     this.props.clearSourceFileErrors();
     this.props.savePatch({
       name: patchName,
@@ -104,6 +110,7 @@ class CreatePatchPage extends Component {
         d:'D',
         e:'E'
       },
+      compilationType: compilationType,
       published: 0,
       github: sourceFiles.map(file => file.path)
     }, options);  
@@ -111,12 +118,24 @@ class CreatePatchPage extends Component {
 
   render(){ 
     const { currentUser, editPatchForm } = this.props;
-    const { patchName, sourceFileErrors, invalidFields, isSavingPatch, isCompiling, sourceFiles } = editPatchForm;
+    const { 
+      patchName,
+      sourceFileErrors, 
+      invalidFields, 
+      isSavingPatch, 
+      isCompiling, 
+      sourceFiles, 
+      compilationType 
+    } = editPatchForm;
+    let mainSourceFile = null;
     const sortedSourceFiles = sourceFiles.sort((a,b) => {
       if(a.mainFile){ return -1; }
       if(b.mainFile){ return 1; }
       return a.timeStamp - b.timeStamp;
     }).map( (file, i) => {
+      if(file.mainFile){
+        mainSourceFile = file;
+      }
       return (
         <div className="row" key={file.name}>
           <input 
@@ -164,39 +183,47 @@ class CreatePatchPage extends Component {
                     ) : null }
                 </div>
               </fieldset>
+                { sortedSourceFiles.length ? (
+                    <CompilationTypeSelector 
+                      mainSourceFile={mainSourceFile}
+                      compilationType={compilationType}
+                      onCompilationTypeChange={(val) => this.handleCompilationTypeChange(val)} 
+                    />
+                  ) : null 
+                }
               <fieldset id="frm-patch-github">
                 <legend>Add Source Files</legend>
                 <div className="info-message" style={{ marginBottom: '15px' }}>Upload files or add files from GitHub.</div>
                 
                 <div className="row">
-                    <label>Upload Files</label>
-                    <div className="form-control">
-                        <div className="file-upload-container">
-                            {editPatchForm.isUploading ? 'Uploading...' : 'Choose files...' }
-                            {editPatchForm.isUploading ? null : (
-                              <input 
-                                type="file" 
-                                id="frm-patch-file" 
-                                name="files[]" 
-                                multiple 
-                                onChange={(e) => this.handleFileUploadChange(e)} />
-                            )}
-                        </div>
+                  <label>Upload Files</label>
+                  <div className="form-control">
+                    <div className="file-upload-container">
+                      {editPatchForm.isUploading ? 'Uploading...' : 'Choose files...' }
+                      {editPatchForm.isUploading ? null : (
+                        <input 
+                          type="file" 
+                          id="frm-patch-file" 
+                          name="files[]" 
+                          multiple 
+                          onChange={(e) => this.handleFileUploadChange(e)} />
+                      )}
                     </div>
-                    <div className="info-message" style={{marginBottom: '15px'}}>
-                      Supported File Types:  .c  .h  .cpp  .hpp  .pd  .dsp  .s
-                    </div>
+                  </div>
+                  <div className="info-message" style={{marginBottom: '15px'}}>
+                    Supported File Types:  .c  .h  .cpp  .hpp  .pd  .dsp  .s
+                  </div>
                 </div>
 
                 <div id="frm-patch-github_template" className="row repeat">
-                    <label htmlFor="frm-patch-github_#index#">GitHub File Url</label>
-                    <div className="form-control">
-                        <input 
-                          type="url" 
-                          value={editPatchForm.gitHubURLField}
-                          onChange={(e) => this.handleGitHubURLFieldChange(e)}/>
-                        <button onClick={(e)=> this.handleAddGithubUrlClick(e)} style={{ marginLeft:'20px' }}>ADD</button>
-                    </div>
+                  <label htmlFor="frm-patch-github_#index#">GitHub File Url</label>
+                  <div className="form-control">
+                    <input 
+                      type="url" 
+                      value={editPatchForm.gitHubURLField}
+                      onChange={(e) => this.handleGitHubURLFieldChange(e)}/>
+                    <button onClick={(e)=> this.handleAddGithubUrlClick(e)} style={{ marginLeft:'20px' }}>ADD</button>
+                  </div>
                 </div>
 
             </fieldset>
@@ -258,6 +285,7 @@ export default connect(mapStateToProps, {
   savePatch,
   setMainSourceFile,
   sourceFileChange,
+  updateCompilationType,
   updatePatchName,
   clearSourceFileErrors
 })(CreatePatchPage);

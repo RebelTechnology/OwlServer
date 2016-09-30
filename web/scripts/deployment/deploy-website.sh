@@ -60,7 +60,7 @@ echo "Building React SPA bundle..."
 cd $DIR/$CLONE_DIR/web/owlspa
 npm install
 npm run buildprod
-# npm run test
+npm run test:prod
 cd - > /dev/null
 
 # Update Wordpress
