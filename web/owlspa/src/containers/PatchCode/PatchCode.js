@@ -4,6 +4,10 @@ import { fetchPatchCodeFiles } from 'actions';
 import classNames from 'classnames';
 import { parseUrl } from 'utils';
 import pdfu from 'pd-fileutils';
+import brace from 'brace';
+import AceEditor from 'react-ace';
+import 'brace/mode/java';
+import 'brace/theme/github';
 
 class PatchCode extends Component {
   constructor(props){
@@ -57,12 +61,18 @@ class PatchCode extends Component {
     return pdfu.renderSvg(pdPatch, {svgFile: false});
   }
 
+  handleEditPatchCodeClick(e, fileUrl){
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('open editor for file: ', fileUrl);
+  }
+
   componentWillReceiveProps(nextProps){
     this.checkForNewPatchCodeFiles(nextProps);
   }
 
   render(){
-    const { fileUrls, patchCodeFiles, patchId } = this.props;
+    const { fileUrls, patchCodeFiles, patchId, canEdit } = this.props;
     const { activeTab } = this.state;
 
     if(!fileUrls || fileUrls.length === 0){
@@ -83,6 +93,14 @@ class PatchCode extends Component {
       return (
         <li onClick={(e) => this.handleTabClick(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
           <span>{this.getFileName(fileUrl)}</span>
+          { (canEdit && !isGitHubfile && !isPdFile) ? (
+              <a 
+                className="file-edit-link"
+                onClick={(e) => this.handleEditPatchCodeClick(e,activeTabFileString)} 
+              >
+              </a>
+            ) : null 
+          }
           <a onClick={(e)=> e.stopPropagation()} target="_blank" className="file-download-link" href={this.getDownloadUrl(fileUrl)}></a>
         </li>
       )
@@ -97,6 +115,17 @@ class PatchCode extends Component {
             </ul>
             <div className="tab-content">
               { isGitHubfile ? <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> : null}
+              
+              <AceEditor
+                mode="java"
+                theme="github"
+                onLoad={() => { console.log('loaded biatch!')}}
+                onChange={(val) => {console.log(val)}}
+                name="UNIQUE_ID_OF_DIV"
+                editorProps={{$blockScrolling: true}}
+              />
+
+
               { isPdFile ? pdPatchSvg : (
                 <pre className="prettyprint">
                   {activeTabFileString}
@@ -111,7 +140,8 @@ class PatchCode extends Component {
 
 PatchCode.propTypes = {
   fileUrls: PropTypes.array,
-  patchId: PropTypes.string
+  patchId: PropTypes.string,
+  canEdit: PropTypes.bool
 }
 
 const mapStateToProps = ({ patchCodeFiles }) => {
