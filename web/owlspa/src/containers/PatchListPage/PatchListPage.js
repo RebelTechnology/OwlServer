@@ -60,7 +60,7 @@ class PatchListPage extends Component {
       case 'tags':
         return this.filterPatchesByTag(patches, patchListFilter.subFilter);
       case 'my-patches':
-        return this.filterPatchesByCurrentUser(patches, currentUser);
+        return this.filterPatchesByCurrentUser(patches, currentUser).sort((a,b) => b.creationTimeUtc - a.creationTimeUtc);
       default:
         return patches.filter(patch => patch.published);
     }
