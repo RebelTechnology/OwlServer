@@ -85,6 +85,9 @@ HoxtonOwl.Patch = function(p) {
     }
 
     this.downloadCount = p.downloadCount; 
+    if(p.compilationType){
+        this.compilationType = p.compilationType;
+    }
 };
 
 /**

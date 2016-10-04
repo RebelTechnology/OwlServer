@@ -128,6 +128,19 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                             <div id="frm-patch-samples_add" class="add"><a href="#"><span>Add</span></a></div>
                         </div>
                     </fieldset>
+                    <fieldset id="frm-patch-compilation-type">
+                        <legend>Compilation Type</legend>
+                        <div class="row">
+                            <label for="frm-patch-compilation-type-select">Type</label> 
+                            <select id="frm-patch-compilation-type-select" style="font-size:18px" name="compilationtype">
+                                <option value="cpp" selected="selected">cpp</option>
+                                <option value="pd">pd</option>
+                                <option value="faust">faust</option>
+                                <option value="gen">gen</option>
+                            </select>
+                            <div class="error-message"></div>
+                        </div>
+                    </fieldset>
                     <fieldset id="frm-patch-github">
                         <legend>Source files</legend>
                         <div class="info-message" style="margin-bottom: 15px;">Paste one or more files from GitHub, or use the upload button.</div>
