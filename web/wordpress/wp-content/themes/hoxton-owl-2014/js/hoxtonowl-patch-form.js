@@ -109,6 +109,10 @@ HoxtonOwl.patchForm = {
             }
         }
 
+        if(patch.compilationType){
+            $('#frm-patch-compilation-type-select').val(patch.compilationType);
+        }
+
         // GitHub
         if (patch.github && patch.github.length) {
             if (patch.github.length !== 1) {
@@ -232,7 +236,8 @@ HoxtonOwl.patchForm = {
             instructions: instructions,
             inputs: parseInt($('#frm-patch-inputs').val()),
             outputs: parseInt($('#frm-patch-outputs').val()),
-            published: published ? 1 : 0
+            published: published ? 1 : 0,
+            compilationType: $('#frm-patch-compilation-type-select').val()
         };
 
         if (author) {
@@ -571,7 +576,6 @@ HoxtonOwl.patchForm = {
                     errorDiv.html(errorMsg + data.files[i].name + ': ' + data.files[i].msg + '<br />');
                     errorDiv.show();
                 } else {
-                    //console.log(location.protocol + '//' + location.host + '/wp-content/uploads/patch-files/' + data.files[i].path);
                     files.push(location.protocol + '//' + location.host + '/wp-content/uploads/patch-files/' + data.files[i].path);
                 }
             }
