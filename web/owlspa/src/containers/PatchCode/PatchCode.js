@@ -6,7 +6,7 @@ import { parseUrl } from 'utils';
 import pdfu from 'pd-fileutils';
 import brace from 'brace';
 import AceEditor from 'react-ace';
-import 'brace/mode/java';
+import 'brace/mode/c_cpp';
 import 'brace/theme/github';
 
 class PatchCode extends Component {
@@ -71,6 +71,19 @@ class PatchCode extends Component {
     this.checkForNewPatchCodeFiles(nextProps);
   }
 
+  getActiveTabFileString(patchId, index){
+    const { patchCodeFiles } = this.props;
+    if(!patchId || typeof index === 'undefined' || !patchCodeFiles[patchId] || !patchCodeFiles[patchId][index]){
+      return null;
+    }
+    return patchCodeFiles[patchId][index].fileString;
+  }
+
+  handlePatchCodeFileChange(index, newFileString){
+    const { patchId } = this.props;
+    console.log('file updated for patch:', patchId, 'at index:', index);
+  }
+
   render(){
     const { fileUrls, patchCodeFiles, patchId, canEdit } = this.props;
     const { activeTab } = this.state;
@@ -80,9 +93,9 @@ class PatchCode extends Component {
     }
 
     const isGitHubfile = this.isGitHubfile(fileUrls[activeTab]);
-    const activeTabFileString = patchCodeFiles[patchId] ? patchCodeFiles[patchId][activeTab] : null;
+    const activeTabFileString = this.getActiveTabFileString(patchId, activeTab);
     const activeTabFileName = this.getFileName(fileUrls[activeTab]);
-    const isPdFile = /\.pd$/i.test(activeTabFileName);
+    let isPdFile = /\.pd$/i.test(activeTabFileName);
     let pdPatchSvg = null;
 
     if(isPdFile && typeof activeTabFileString === 'string' && activeTabFileString !== 'Loading...'){
@@ -96,7 +109,7 @@ class PatchCode extends Component {
           { (canEdit && !isGitHubfile && !isPdFile) ? (
               <a 
                 className="file-edit-link"
-                onClick={(e) => this.handleEditPatchCodeClick(e,activeTabFileString)} 
+                onClick={(e) => this.handleEditPatchCodeClick(e,i)} 
               >
               </a>
             ) : null 
@@ -116,21 +129,23 @@ class PatchCode extends Component {
             <div className="tab-content">
               { isGitHubfile ? <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> : null}
               
-              <AceEditor
-                mode="java"
-                theme="github"
-                onLoad={() => { console.log('loaded biatch!')}}
-                onChange={(val) => {console.log(val)}}
-                name="UNIQUE_ID_OF_DIV"
-                editorProps={{$blockScrolling: true}}
-              />
-
-
-              { isPdFile ? pdPatchSvg : (
-                <pre className="prettyprint">
-                  {activeTabFileString}
-                </pre>)
+              { !isPdFile && activeTabFileString ? ( 
+                <AceEditor
+                  mode="c_cpp"
+                  theme="github"
+                  width="100%"
+                  height="800px"
+                  readOnly={false}
+                  onChange={ val => this.handlePatchCodeFileChange(activeTab, val)}
+                  onLoad={console.log('editor loaded')}
+                  value={activeTabFileString}
+                  name="ace-editor-unique-id"
+                  editorProps={{$blockScrolling:'Infinity'}}
+                />
+                ) : null
               }
+
+              { isPdFile ? pdPatchSvg : null}
             </div>
           </div>
       </div>
