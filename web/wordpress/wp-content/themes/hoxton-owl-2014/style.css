@@ -474,7 +474,7 @@ form[class^="bbp"] input[type=password] {
   margin-right: 15px;
 }
 
-#patch-add-edit-form .btn-large {
+.btn-large {
   width: 165px;
   margin-right: 30px;
   line-height: 0px;
@@ -482,7 +482,7 @@ form[class^="bbp"] input[type=password] {
   margin-bottom: 15px;
 }
 
-#patch-add-edit-form .btn-large:disabled {
+.btn-large:disabled {
   background-color: #ccc; 
   border-bottom: 2px solid #999;
 }

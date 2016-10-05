@@ -1,7 +1,8 @@
 import {
   REQUEST_PATCH_CODE_FILE,
   RECEIVE_PATCH_CODE_FILE,
-  REQUEST_PATCH_CODE_FILE_FAILED
+  REQUEST_PATCH_CODE_FILE_FAILED,
+  UPDATE_PATCH_CODE_FILE
 } from 'constants';
 
 const initialState = {};
@@ -42,6 +43,15 @@ const patchCodeFiles = (state = initialState, action) => {
         [action.patchId]: updateCodeFile(state[action.patchId], action.index, {
           isLoading: false,
           errorFetching: action.reason
+        })
+      }
+
+    case UPDATE_PATCH_CODE_FILE:
+      return {
+        ...state,
+        [action.patchId]: updateCodeFile(state[action.patchId], action.index, {
+          fileString: action.fileString,
+          edited: true
         })
       }
 

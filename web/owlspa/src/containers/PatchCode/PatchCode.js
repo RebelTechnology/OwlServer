@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { fetchPatchCodeFiles } from 'actions';
+import { fetchPatchCodeFiles, updatePatchCodeFile } from 'actions';
 import classNames from 'classnames';
 import { parseUrl } from 'utils';
 import pdfu from 'pd-fileutils';
@@ -80,8 +80,21 @@ class PatchCode extends Component {
   }
 
   handlePatchCodeFileChange(index, newFileString){
-    const { patchId } = this.props;
+    const { patchId, updatePatchCodeFile } = this.props;
+    updatePatchCodeFile(patchId, index, newFileString);
     console.log('file updated for patch:', patchId, 'at index:', index);
+  }
+
+  handleSavePatchFiles(e){
+    console.log('save files to server');
+  }
+
+  handleSaveAndCompilePatchFiles(e){
+    console.log('save and compile');
+  }
+
+  getPatchCodeHasBeenEdited(files = []){
+    return files.some(file => file.edited);
   }
 
   render(){
@@ -97,6 +110,7 @@ class PatchCode extends Component {
     const activeTabFileName = this.getFileName(fileUrls[activeTab]);
     let isPdFile = /\.pd$/i.test(activeTabFileName);
     let pdPatchSvg = null;
+    let unsavedFileChanges = this.getPatchCodeHasBeenEdited(patchCodeFiles[patchId]);
 
     if(isPdFile && typeof activeTabFileString === 'string' && activeTabFileString !== 'Loading...'){
       pdPatchSvg = <div dangerouslySetInnerHTML={{__html: this.getSvgString(activeTabFileString)}} />
@@ -122,6 +136,28 @@ class PatchCode extends Component {
     return (
       <div className="white-box2" id="git-code">
           <h2 className="bolder">Patch code</h2>
+          {unsavedFileChanges ? (
+            <h6 style={{marginBottom:'10px'}}>
+              <span style={{
+                color: '#e19758',
+                textTransform: 'uppercase',
+                fontSize: '14px',
+                display: 'inline-block',
+                marginRight: '15px'
+              }}>. . . Unsaved Changes</span>
+              <button 
+                onClick={e => this.handleSavePatchFiles(e)}
+                className="btn-large save-patch-code">
+                SAVE
+              </button>
+              <button 
+                onClick={e => this.handleSaveAndCompilePatchFiles(e)}
+                className="btn-large save-and-compile-patch-code">
+                SAVE &amp; COMPILE
+              </button>
+            </h6>
+          ) : null}
+          
           <div id="github-files">
             <ul className="tab-nav">
               {tabNavItems}
@@ -129,7 +165,7 @@ class PatchCode extends Component {
             <div className="tab-content">
               { isGitHubfile ? <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> : null}
               
-              { !isPdFile && activeTabFileString ? ( 
+              { !isPdFile && (activeTabFileString === '' || activeTabFileString) ? ( 
                 <AceEditor
                   mode="c_cpp"
                   theme="github"
@@ -137,7 +173,6 @@ class PatchCode extends Component {
                   height="800px"
                   readOnly={false}
                   onChange={ val => this.handlePatchCodeFileChange(activeTab, val)}
-                  onLoad={console.log('editor loaded')}
                   value={activeTabFileString}
                   name="ace-editor-unique-id"
                   editorProps={{$blockScrolling:'Infinity'}}
@@ -165,4 +200,4 @@ const mapStateToProps = ({ patchCodeFiles }) => {
   }
 }
 
-export default connect(mapStateToProps, { fetchPatchCodeFiles })(PatchCode);
+export default connect(mapStateToProps, { fetchPatchCodeFiles, updatePatchCodeFile })(PatchCode);
