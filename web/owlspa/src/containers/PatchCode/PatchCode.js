@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { fetchPatchCodeFiles, updatePatchCodeFile } from 'actions';
+import { fetchPatchCodeFiles, updatePatchCodeFile, serverSavePatchFiles } from 'actions';
 import classNames from 'classnames';
 import { parseUrl } from 'utils';
 import pdfu from 'pd-fileutils';
@@ -86,7 +86,8 @@ class PatchCode extends Component {
   }
 
   handleSavePatchFiles(e){
-    console.log('save files to server');
+    const { patchId, serverSavePatchFiles, patchCodeFiles } = this.props;
+    serverSavePatchFiles(patchId, patchCodeFiles[patchId]);
   }
 
   handleSaveAndCompilePatchFiles(e){
@@ -175,6 +176,8 @@ class PatchCode extends Component {
                   onChange={ val => this.handlePatchCodeFileChange(activeTab, val)}
                   value={activeTabFileString}
                   name="ace-editor-unique-id"
+                  className="ace-editor"
+                  style={{zIndex:'0'}}
                   editorProps={{$blockScrolling:'Infinity'}}
                 />
                 ) : null
@@ -200,4 +203,4 @@ const mapStateToProps = ({ patchCodeFiles }) => {
   }
 }
 
-export default connect(mapStateToProps, { fetchPatchCodeFiles, updatePatchCodeFile })(PatchCode);
+export default connect(mapStateToProps, { fetchPatchCodeFiles, updatePatchCodeFile, serverSavePatchFiles })(PatchCode);

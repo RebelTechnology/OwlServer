@@ -23,6 +23,7 @@ const patchCodeFiles = (state = initialState, action) => {
         ...state,
         [action.patchId]: updateCodeFile(state[action.patchId], action.index, {
           fileString: action.fileString,
+          fileUrl: action.fileUrl,
           edited: false,
           isLoading: false,
           errorFetching: null
