@@ -72,8 +72,13 @@ const uploadPatchFiles = (patchFileList, patchId) => {
             type: PATCH_FILES_UPLOADED,
             files: files
           });
+
+          return {
+            success: true
+          };
         }
       }).catch((err) => {
+        
         dispatch(newDialog({
           header: 'File Upload Error',
           isError : true,
@@ -83,9 +88,14 @@ const uploadPatchFiles = (patchFileList, patchId) => {
             contents: err.message
           }] 
         }));
+        
         dispatch({
           type: ERROR_UPLOADING_PATCH_FILE
         });
+        
+        return {
+          error: err.message
+        };
       });
   }
 }
