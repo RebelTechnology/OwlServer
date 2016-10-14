@@ -673,12 +673,17 @@ form[class^="bbp"] input[type=password] {
 }
 
 .file-edit-link {
-  background: url('/wp-content/themes/hoxton-owl-2014/page-patch-library/images/pencil.png') no-repeat center center;
-  background-size: 80%;
+  background: url('/wp-content/themes/hoxton-owl-2014/page-patch-library/images/pencil.svg') no-repeat center center;
+  background-size: 96%;
   height: 15px;
   width: 20px;
   display: inline-block;
   margin-left: 10px;
+  background-color: rgba(255,255,255,0);
+}
+
+.edit-mode .file-edit-link {
+  background-image: url('/wp-content/themes/hoxton-owl-2014/page-patch-library/images/pencil_orange.svg');
 }
 
 /* GitHub file tabs */

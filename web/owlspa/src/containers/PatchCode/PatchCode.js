@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { fetchPatchCodeFiles, updatePatchCodeFile, serverSavePatchFiles } from 'actions';
+import { fetchPatchCodeFiles, updatePatchCodeFile, serverSavePatchFiles } from 'actions'; 
 import classNames from 'classnames';
 import { parseUrl } from 'utils';
 import pdfu from 'pd-fileutils';
@@ -13,7 +13,8 @@ class PatchCode extends Component {
   constructor(props){
     super(props);
     this.state = {
-      activeTab: 0
+      activeTab: 0,
+      editModeActive: false
     };
   }
 
@@ -22,16 +23,16 @@ class PatchCode extends Component {
   }
 
   checkForNewPatchCodeFiles(props){
-    const { fileUrls, patchId, patchCodeFiles } = props;
-    if(fileUrls && fileUrls.length && !patchCodeFiles[patchId]){
-      this.props.fetchPatchCodeFiles(fileUrls, patchId);
+    const { fileUrls, patch, patchCodeFiles } = props;
+    if(fileUrls && fileUrls.length && !patchCodeFiles[patch._id]){
+      this.props.fetchPatchCodeFiles(fileUrls, patch._id);
     }
   }
 
   handleTabClick(e,tabIndex){
     e.preventDefault();
     e.stopPropagation();
-    this.setState({activeTab:tabIndex});
+    this.setState({activeTab: tabIndex});
   }
 
   getFileName(url){
@@ -39,11 +40,13 @@ class PatchCode extends Component {
   }
 
   isGitHubfile(fileUrl){
-    if(!fileUrl){
-      return false;
-    }
     const domain = parseUrl(fileUrl).authority;
-    return  domain.indexOf('github.com') > -1;
+    return domain.indexOf('github.com') > -1;
+  }
+
+  isHoxtonFile(fileUrl){
+    const domain = parseUrl(fileUrl).authority;
+    return domain.indexOf('hoxtonowl.com') > -1;
   }
 
   getDownloadUrl(fileUrl){
@@ -61,10 +64,10 @@ class PatchCode extends Component {
     return pdfu.renderSvg(pdPatch, {svgFile: false});
   }
 
-  handleEditPatchCodeClick(e, fileUrl){
+  handleEditPatchCodeFileClick(e, fileUrl){
     e.preventDefault();
     e.stopPropagation();
-    console.log('open editor for file: ', fileUrl);
+    this.setState({ editModeActive: !this.state.editModeActive });
   }
 
   componentWillReceiveProps(nextProps){
@@ -79,19 +82,27 @@ class PatchCode extends Component {
     return patchCodeFiles[patchId][index].fileString;
   }
 
+  getOnlyHoxtonHostedFiles(fileList){
+    return fileList.filter(file => {
+      return this.isHoxtonFile(file.fileUrl);
+    })
+  }
+
   handlePatchCodeFileChange(index, newFileString){
-    const { patchId, updatePatchCodeFile } = this.props;
-    updatePatchCodeFile(patchId, index, newFileString);
-    console.log('file updated for patch:', patchId, 'at index:', index);
+    const { patch, updatePatchCodeFile } = this.props;
+    updatePatchCodeFile(patch._id, index, newFileString);
   }
 
   handleSavePatchFiles(e){
-    const { patchId, serverSavePatchFiles, patchCodeFiles } = this.props;
-    serverSavePatchFiles(patchId, patchCodeFiles[patchId]);
+    const { serverSavePatchFiles, patch, patchCodeFiles } = this.props;
+    const fileList = this.getOnlyHoxtonHostedFiles(patchCodeFiles[patch._id]);
+    serverSavePatchFiles(patch, fileList);
   }
 
   handleSaveAndCompilePatchFiles(e){
-    console.log('save and compile');
+    const { serverSavePatchFiles, patch, patchCodeFiles } = this.props;
+    const fileList = this.getOnlyHoxtonHostedFiles(patchCodeFiles[patch._id]);
+    serverSavePatchFiles(patch, fileList, {compile: true});
   }
 
   getPatchCodeHasBeenEdited(files = []){
@@ -99,19 +110,22 @@ class PatchCode extends Component {
   }
 
   render(){
-    const { fileUrls, patchCodeFiles, patchId, canEdit } = this.props;
-    const { activeTab } = this.state;
+    const { fileUrls, patchCodeFiles, patch, canEdit } = this.props;
+    const { activeTab, editModeActive } = this.state;
 
-    if(!fileUrls || fileUrls.length === 0){
+    if(!fileUrls || fileUrls.length === 0 || !patchCodeFiles || !patchCodeFiles[patch._id]){
       return null;
     }
 
     const isGitHubfile = this.isGitHubfile(fileUrls[activeTab]);
-    const activeTabFileString = this.getActiveTabFileString(patchId, activeTab);
+    const activeTabFileString = this.getActiveTabFileString(patch._id, activeTab);
     const activeTabFileName = this.getFileName(fileUrls[activeTab]);
-    let isPdFile = /\.pd$/i.test(activeTabFileName);
+    const filesAreSaving = patchCodeFiles[patch._id].some(file => file.isSaving);
+    const isPdFile = /\.pd$/i.test(activeTabFileName);
+    const unsavedFileChanges = this.getPatchCodeHasBeenEdited(patchCodeFiles[patch._id]);
+    const isHoxtonFile = this.isHoxtonFile(fileUrls[activeTab]);
+    const editorReadOnly = !canEdit || filesAreSaving || !isHoxtonFile || !editModeActive;
     let pdPatchSvg = null;
-    let unsavedFileChanges = this.getPatchCodeHasBeenEdited(patchCodeFiles[patchId]);
 
     if(isPdFile && typeof activeTabFileString === 'string' && activeTabFileString !== 'Loading...'){
       pdPatchSvg = <div dangerouslySetInnerHTML={{__html: this.getSvgString(activeTabFileString)}} />
@@ -121,15 +135,17 @@ class PatchCode extends Component {
       return (
         <li onClick={(e) => this.handleTabClick(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
           <span>{this.getFileName(fileUrl)}</span>
-          { (canEdit && !isGitHubfile && !isPdFile) ? (
+          { (canEdit && this.isHoxtonFile(fileUrl)) && i === activeTab ? (
               <a 
                 className="file-edit-link"
-                onClick={(e) => this.handleEditPatchCodeClick(e,i)} 
+                onClick={(e) => this.handleEditPatchCodeFileClick(e,i)} 
               >
               </a>
             ) : null 
           }
-          <a onClick={(e)=> e.stopPropagation()} target="_blank" className="file-download-link" href={this.getDownloadUrl(fileUrl)}></a>
+          { i === activeTab ? (
+            <a onClick={(e)=> e.stopPropagation()} target="_blank" className="file-download-link" href={this.getDownloadUrl(fileUrl)}></a>
+          ) : null }
         </li>
       )
     });
@@ -139,27 +155,31 @@ class PatchCode extends Component {
           <h2 className="bolder">Patch code</h2>
           {unsavedFileChanges ? (
             <h6 style={{marginBottom:'10px'}}>
-              <span style={{
-                color: '#e19758',
-                textTransform: 'uppercase',
-                fontSize: '14px',
-                display: 'inline-block',
-                marginRight: '15px'
-              }}>. . . Unsaved Changes</span>
+                <span style={{
+                  color: '#e19758',
+                  textTransform: 'uppercase',
+                  fontSize: '14px',
+                  display: 'inline-block',
+                  marginRight: '15px'
+                }}>. . . Unsaved Changes</span>
               <button 
                 onClick={e => this.handleSavePatchFiles(e)}
+                disabled={filesAreSaving}
                 className="btn-large save-patch-code">
-                SAVE
+                {filesAreSaving ? '. . . SAVING': 'SAVE'}
+                {filesAreSaving ? <i className="loading-spinner"></i> : null}
               </button>
               <button 
                 onClick={e => this.handleSaveAndCompilePatchFiles(e)}
+                disabled={filesAreSaving}
                 className="btn-large save-and-compile-patch-code">
-                SAVE &amp; COMPILE
+                {filesAreSaving ? '. . . SAVING': 'SAVE & COMPILE'}
+                {filesAreSaving ? <i className="loading-spinner"></i> : null}
               </button>
             </h6>
           ) : null}
           
-          <div id="github-files">
+          <div id="github-files" className={ classNames({'edit-mode': editModeActive }) }>
             <ul className="tab-nav">
               {tabNavItems}
             </ul>
@@ -172,7 +192,7 @@ class PatchCode extends Component {
                   theme="github"
                   width="100%"
                   height="800px"
-                  readOnly={false}
+                  readOnly={editorReadOnly}
                   onChange={ val => this.handlePatchCodeFileChange(activeTab, val)}
                   value={activeTabFileString}
                   name="ace-editor-unique-id"
@@ -182,7 +202,6 @@ class PatchCode extends Component {
                 />
                 ) : null
               }
-
               { isPdFile ? pdPatchSvg : null}
             </div>
           </div>
@@ -193,7 +212,7 @@ class PatchCode extends Component {
 
 PatchCode.propTypes = {
   fileUrls: PropTypes.array,
-  patchId: PropTypes.string,
+  patch: PropTypes.object,
   canEdit: PropTypes.bool
 }
 
@@ -203,4 +222,8 @@ const mapStateToProps = ({ patchCodeFiles }) => {
   }
 }
 
-export default connect(mapStateToProps, { fetchPatchCodeFiles, updatePatchCodeFile, serverSavePatchFiles })(PatchCode);
+export default connect(mapStateToProps, { 
+  fetchPatchCodeFiles,
+  updatePatchCodeFile,
+  serverSavePatchFiles
+})(PatchCode);
