@@ -474,7 +474,7 @@ form[class^="bbp"] input[type=password] {
   margin-right: 15px;
 }
 
-#patch-add-edit-form .btn-large {
+.btn-large {
   width: 165px;
   margin-right: 30px;
   line-height: 0px;
@@ -482,7 +482,7 @@ form[class^="bbp"] input[type=password] {
   margin-bottom: 15px;
 }
 
-#patch-add-edit-form .btn-large:disabled {
+.btn-large:disabled {
   background-color: #ccc; 
   border-bottom: 2px solid #999;
 }
@@ -670,6 +670,20 @@ form[class^="bbp"] input[type=password] {
   width: 20px;
   display: inline-block;
   margin-left: 10px;
+}
+
+.file-edit-link {
+  background: url('/wp-content/themes/hoxton-owl-2014/page-patch-library/images/pencil.svg') no-repeat center center;
+  background-size: 96%;
+  height: 15px;
+  width: 20px;
+  display: inline-block;
+  margin-left: 10px;
+  background-color: rgba(255,255,255,0);
+}
+
+.edit-mode .file-edit-link {
+  background-image: url('/wp-content/themes/hoxton-owl-2014/page-patch-library/images/pencil_orange.svg');
 }
 
 /* GitHub file tabs */

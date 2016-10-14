@@ -11,14 +11,14 @@ const isHoxtonOwlFile = (fileUrl) => {
     return false;
   }
   return parseUrl(fileUrl).authority.indexOf('hoxtonowl.com') > -1;
-}
+};
 
 const isGithubFile = (fileUrl) => {
   if(!fileUrl){
     return false;
   }
   return parseUrl(fileUrl).authority.indexOf('github.com') > -1;
-}
+};
 
 const fetchHoxtonFile = (fileUrl) => {
   if(!fileUrl){
@@ -32,7 +32,7 @@ const fetchHoxtonFile = (fileUrl) => {
         return response.text();
       }
     });
-}
+};
 
 /* 
 * constructGithubApiFileUrl
@@ -52,7 +52,7 @@ const constructGithubApiFileUrl = (fileUrl) => {
   const filePath = fragments.slice(5).join('/');
   const branch = fragments[4];
   return `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`;
-}
+};
 
 const fetchGithubFile = (fileUrl) => {
   if(!fileUrl){
@@ -66,11 +66,11 @@ const fetchGithubFile = (fileUrl) => {
         return response.json();
       }
     });
-}
+};
 
 const decodeBase64AndRemoveNewLines = (base64) => {
   return window.atob(base64.replace(/\n/g, ''));
-}
+};
 
 const fetchPatchCodeFiles = (fileUrls, patchId) => {
   return (dispatch) => {
@@ -98,7 +98,8 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
             type: RECEIVE_PATCH_CODE_FILE,
             patchId,
             index,
-            fileString: text
+            fileString: text,
+            fileUrl
           });
         }).catch( err => {
           console.error(err);
@@ -122,7 +123,8 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
               type: RECEIVE_PATCH_CODE_FILE,
               patchId,
               index,
-              fileString: decodeBase64AndRemoveNewLines(json.content)
+              fileString: decodeBase64AndRemoveNewLines(json.content),
+              fileUrl
             });
           } else {
             dispatch({

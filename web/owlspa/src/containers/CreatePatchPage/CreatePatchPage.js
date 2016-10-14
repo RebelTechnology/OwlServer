@@ -16,7 +16,7 @@ import {
   sourceFileChange,
   updateCompilationType,
   updatePatchName,
-  uploadPatchFiles
+  serverUploadPatchFiles
 } from 'actions';
 
 class CreatePatchPage extends Component {
@@ -44,7 +44,7 @@ class CreatePatchPage extends Component {
   }
 
   handleFileUploadChange(e){
-    this.props.uploadPatchFiles(e.target.files);
+    this.props.serverUploadPatchFiles(e.target.files);
   }
 
   handleAddGithubUrlClick(e){
@@ -277,7 +277,7 @@ const mapStateToProps = ({ currentUser, editPatchForm }) => {
 
 export default connect(mapStateToProps, { 
   clearEditPatchForm,
-  uploadPatchFiles,
+  serverUploadPatchFiles,
   removeUploadedPatchFile,
   gitHubURLFieldChange,
   addGitHubFile,

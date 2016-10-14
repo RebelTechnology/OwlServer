@@ -24,7 +24,7 @@ const getFileErrors = (files) => {
   },'');
 }
 
-const uploadPatchFiles = (patchFileList, patchId) => {
+const serverUploadPatchFiles = (patchFileList, patchId) => {
   return (dispatch) => {
     dispatch({
       type: UPLOADING_PATCH_FILES
@@ -32,7 +32,14 @@ const uploadPatchFiles = (patchFileList, patchId) => {
 
     const formData = new FormData();
     for (var i = 0; i < patchFileList.length; i++) {
+      
+      if(patchFileList[i].toString() === '[object File]'){
         formData.append('files[]', patchFileList[i]);
+      }
+
+      if(patchFileList[i].toString() === '[object Blob]'){
+        formData.append('files[]', patchFileList[i], patchFileList[i].name);
+      }
     }
 
     if (patchId) {
@@ -53,7 +60,7 @@ const uploadPatchFiles = (patchFileList, patchId) => {
       })
       .then( response => {
         if (response.status >= 400) {
-          throw new Error('bad status: ' + response.status);
+          throw new Error('bad server status: ' + response.status);
         } 
 
         if(!response.files){
@@ -72,8 +79,15 @@ const uploadPatchFiles = (patchFileList, patchId) => {
             type: PATCH_FILES_UPLOADED,
             files: files
           });
+
+          return {
+            success: true
+          };
         }
       }).catch((err) => {
+
+        console.error && console.error(err);
+        
         dispatch(newDialog({
           header: 'File Upload Error',
           isError : true,
@@ -83,11 +97,16 @@ const uploadPatchFiles = (patchFileList, patchId) => {
             contents: err.message
           }] 
         }));
+        
         dispatch({
           type: ERROR_UPLOADING_PATCH_FILE
         });
+        
+        return {
+          error: err.message
+        };
       });
   }
 }
 
-export default uploadPatchFiles;
+export default serverUploadPatchFiles;
