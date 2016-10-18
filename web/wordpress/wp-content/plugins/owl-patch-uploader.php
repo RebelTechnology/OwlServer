@@ -78,7 +78,7 @@ function getApiBaseUrl()
         if ($_SERVER['APPLICATION_ENV'] == 'staging') {
             $apiBaseUrl = 'http://staging.hoxtonowl.com/api';
         } elseif ($_SERVER['APPLICATION_ENV'] == 'production') {
-            $apiBaseUrl = 'http://www.hoxtonowl.com/api';
+            $apiBaseUrl = 'https://www.hoxtonowl.com/api';
         }
     }
 
