@@ -159,20 +159,24 @@ class PatchCode extends Component {
           <h2 className="bolder">Patch code</h2>
           {canEdit ? (
             <h6 className="patchcode-toolbar" style={{marginBottom:'10px'}}>
-              <button 
-                onClick={e => this.handleEditPatchCodeClick(e)}
-                disabled={filesAreSaving}
-                style={ editModeActive ? {backgroundColor:'#c52374', borderBottomColor: '#86154e'} : {} }
-                className="btn-large edit-patch-code">
-                { editModeActive ? 'EDITING' : 'EDIT'}
-              </button>
-              <button 
-                onClick={e => this.handleSavePatchFiles(e)}
-                disabled={filesAreSaving || !unsavedFileChanges}
-                className="btn-large save-patch-code">
-                {filesAreSaving ? '. . . SAVING': 'SAVE'}
-                {filesAreSaving ? <i className="loading-spinner"></i> : null}
-              </button>
+              { !isPdFile ? (
+                <button 
+                  onClick={e => this.handleEditPatchCodeClick(e)}
+                  disabled={filesAreSaving}
+                  style={ editModeActive ? {backgroundColor:'#c52374', borderBottomColor: '#86154e'} : {} }
+                  className="btn-large edit-patch-code">
+                  { editModeActive ? 'EDITING' : 'EDIT'}
+                </button>
+              ) : null }
+              { !isPdFile ? (
+                <button 
+                  onClick={e => this.handleSavePatchFiles(e)}
+                  disabled={filesAreSaving || !unsavedFileChanges}
+                  className="btn-large save-patch-code">
+                  {filesAreSaving ? '. . . SAVING': 'SAVE'}
+                  {filesAreSaving ? <i className="loading-spinner"></i> : null}
+                </button>
+              ) : null }
               <button 
                 onClick={e => this.handleSaveAndCompilePatchFiles(e, {unsavedFileChanges})}
                 disabled={filesAreSaving || patch.isCompiling}
@@ -192,7 +196,7 @@ class PatchCode extends Component {
             <ul className="tab-nav">
               {tabNavItems}
             </ul>
-            <div className="tab-content">
+            <div className="tab-content" style={editorNightMode ? {backgroundColor: '#272822'} : {}}>
               { isGitHubfile ? <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> : null}
               
               { !isPdFile && (activeTabFileString === '' || activeTabFileString) ? ( 

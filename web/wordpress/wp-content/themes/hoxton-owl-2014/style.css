@@ -785,13 +785,12 @@ body.login {
 }
 
 a.github-link {
-    display: block;
-    position: absolute;
-    top: 15px;
-    right: 30px;
-    text-decoration: underline;
-    color: #ed7800;
-    background: white;
+  display: block;
+  position: absolute;
+  top: 15px;
+  right: 30px;
+  text-decoration: underline;
+  color: #ed7800;
 }
 
 /* Fix for login, register and reset pass pages */
