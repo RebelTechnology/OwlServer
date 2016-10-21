@@ -191,17 +191,6 @@ class PatchPreview extends Component {
           onPushButtonUp={(e)=>this.handlePushButtonUp(e)} />
 
         <div className="patch-preview-buttons">
-          
-          { canEdit ? (
-            <button 
-              disabled={patch.isCompiling} 
-              className={classNames('patch-compile-button',{isCompiling: patch.isCompiling})}
-              onClick={(e) => this.props.onCompileClick(e)} >
-              {patch.isCompiling ? 'Compiling . . .': 'Compile'}
-              {patch.isCompiling ? <i className="loading-spinner"></i> : null}
-            </button>
-            ) : null
-          }
 
           { webAudioPatch.isReady ? (
               <button

@@ -79,7 +79,7 @@ class PatchDetailsPage extends Component {
 
             <PatchPreview onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} />
 
-            <PatchCode canEdit={canEdit} patch={patch} fileUrls={patch.github} />
+            <PatchCode onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} fileUrls={patch.github} />
 
           </div>
 

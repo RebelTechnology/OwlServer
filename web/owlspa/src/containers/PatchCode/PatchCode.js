@@ -8,13 +8,15 @@ import brace from 'brace';
 import AceEditor from 'react-ace';
 import 'brace/mode/c_cpp';
 import 'brace/theme/github';
+import 'brace/theme/monokai';
 
 class PatchCode extends Component {
   constructor(props){
     super(props);
     this.state = {
       activeTab: 0,
-      editModeActive: false
+      editModeActive: false,
+      editorNightMode: false
     };
   }
 
@@ -64,10 +66,16 @@ class PatchCode extends Component {
     return pdfu.renderSvg(pdPatch, {svgFile: false});
   }
 
-  handleEditPatchCodeFileClick(e, fileUrl){
+  handleEditPatchCodeClick(e){
     e.preventDefault();
     e.stopPropagation();
     this.setState({ editModeActive: !this.state.editModeActive });
+  }
+
+  editorToggelDayNightMode(e){
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({ editorNightMode: !this.state.editorNightMode });
   }
 
   componentWillReceiveProps(nextProps){
@@ -99,10 +107,14 @@ class PatchCode extends Component {
     serverSavePatchFiles(patch, fileList);
   }
 
-  handleSaveAndCompilePatchFiles(e){
-    const { serverSavePatchFiles, patch, patchCodeFiles } = this.props;
-    const fileList = this.getOnlyHoxtonHostedFiles(patchCodeFiles[patch._id]);
-    serverSavePatchFiles(patch, fileList, {compile: true});
+  handleSaveAndCompilePatchFiles(e, options={}){
+    if(options.unsavedFileChanges){
+      const { serverSavePatchFiles, patch, patchCodeFiles } = this.props;
+      const fileList = this.getOnlyHoxtonHostedFiles(patchCodeFiles[patch._id]);
+      serverSavePatchFiles(patch, fileList, {compile: true});
+    } else {
+      this.props.onCompileClick(e);
+    }
   }
 
   getPatchCodeHasBeenEdited(files = []){
@@ -111,7 +123,7 @@ class PatchCode extends Component {
 
   render(){
     const { fileUrls, patchCodeFiles, patch, canEdit } = this.props;
-    const { activeTab, editModeActive } = this.state;
+    const { activeTab, editModeActive, editorNightMode } = this.state;
 
     if(!fileUrls || fileUrls.length === 0 || !patchCodeFiles || !patchCodeFiles[patch._id]){
       return null;
@@ -135,14 +147,6 @@ class PatchCode extends Component {
       return (
         <li onClick={(e) => this.handleTabClick(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
           <span>{this.getFileName(fileUrl)}</span>
-          { (canEdit && this.isHoxtonFile(fileUrl)) && i === activeTab ? (
-              <a 
-                className="file-edit-link"
-                onClick={(e) => this.handleEditPatchCodeFileClick(e,i)} 
-              >
-              </a>
-            ) : null 
-          }
           { i === activeTab ? (
             <a onClick={(e)=> e.stopPropagation()} target="_blank" className="file-download-link" href={this.getDownloadUrl(fileUrl)}></a>
           ) : null }
@@ -153,28 +157,37 @@ class PatchCode extends Component {
     return (
       <div className="white-box2" id="git-code">
           <h2 className="bolder">Patch code</h2>
-          {unsavedFileChanges ? (
-            <h6 style={{marginBottom:'10px'}}>
-                <span style={{
-                  color: '#e19758',
-                  textTransform: 'uppercase',
-                  fontSize: '14px',
-                  display: 'inline-block',
-                  marginRight: '15px'
-                }}>. . . Unsaved Changes</span>
+          {canEdit ? (
+            <h6 className="patchcode-toolbar" style={{marginBottom:'10px'}}>
+              { !isPdFile ? (
+                <button 
+                  onClick={e => this.handleEditPatchCodeClick(e)}
+                  disabled={filesAreSaving}
+                  style={ editModeActive ? {backgroundColor:'#c52374', borderBottomColor: '#86154e'} : {} }
+                  className="btn-large edit-patch-code">
+                  { editModeActive ? 'EDITING' : 'EDIT'}
+                </button>
+              ) : null }
+              { !isPdFile ? (
+                <button 
+                  onClick={e => this.handleSavePatchFiles(e)}
+                  disabled={filesAreSaving || !unsavedFileChanges}
+                  className="btn-large save-patch-code">
+                  {filesAreSaving ? '. . . SAVING': 'SAVE'}
+                  {filesAreSaving ? <i className="loading-spinner"></i> : null}
+                </button>
+              ) : null }
               <button 
-                onClick={e => this.handleSavePatchFiles(e)}
-                disabled={filesAreSaving}
-                className="btn-large save-patch-code">
-                {filesAreSaving ? '. . . SAVING': 'SAVE'}
-                {filesAreSaving ? <i className="loading-spinner"></i> : null}
+                onClick={e => this.handleSaveAndCompilePatchFiles(e, {unsavedFileChanges})}
+                disabled={filesAreSaving || patch.isCompiling}
+                className="btn-large save-and-compile-patch-code">
+                {unsavedFileChanges ? 'SAVE & COMPILE' : 'COMPILE' }
+                {filesAreSaving || patch.isCompiling ? <i className="loading-spinner"></i> : null}
               </button>
               <button 
-                onClick={e => this.handleSaveAndCompilePatchFiles(e)}
-                disabled={filesAreSaving}
-                className="btn-large save-and-compile-patch-code">
-                {filesAreSaving ? '. . . SAVING': 'SAVE & COMPILE'}
-                {filesAreSaving ? <i className="loading-spinner"></i> : null}
+                onClick={e => this.editorToggelDayNightMode(e)}
+                className="btn-large">
+                {editorNightMode ? 'DAY': 'NIGHT'}
               </button>
             </h6>
           ) : null}
@@ -183,13 +196,13 @@ class PatchCode extends Component {
             <ul className="tab-nav">
               {tabNavItems}
             </ul>
-            <div className="tab-content">
+            <div className="tab-content" style={editorNightMode ? {backgroundColor: '#272822'} : {}}>
               { isGitHubfile ? <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> : null}
               
               { !isPdFile && (activeTabFileString === '' || activeTabFileString) ? ( 
                 <AceEditor
                   mode="c_cpp"
-                  theme="github"
+                  theme={ editorNightMode ? 'monokai' : 'github'}
                   width="100%"
                   height="800px"
                   readOnly={editorReadOnly}
@@ -213,7 +226,8 @@ class PatchCode extends Component {
 PatchCode.propTypes = {
   fileUrls: PropTypes.array,
   patch: PropTypes.object,
-  canEdit: PropTypes.bool
+  canEdit: PropTypes.bool,
+  onCompileClick: PropTypes.func
 }
 
 const mapStateToProps = ({ patchCodeFiles }) => {
