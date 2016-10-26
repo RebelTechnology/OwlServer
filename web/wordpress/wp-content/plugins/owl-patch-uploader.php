@@ -410,7 +410,7 @@ function owl_patchFileUpload()
 
         // Check extension - see https://github.com/pingdynasty/OwlServer/issues/90#issuecomment-140124580
         $ext = pathinfo($targetFile, PATHINFO_EXTENSION);
-        if (!in_array($ext, [ 'c', 'h', 'cpp', 'hpp', 'pd', 'dsp', 's'])) {
+        if (!in_array($ext, [ 'c', 'h', 'cpp', 'hpp', 'pd', 'dsp', 's', 'maxproj', 'cc', 'maxpat', 'gendsp'])) {
             $result['files'][] = [
                 'name' => $uploadedFile,
                 'err'  => true,
