@@ -19,6 +19,12 @@ class CompilationTypeSelector extends Component {
 
   getCompilationTypeFromMainFileName(mainFileName){
     switch(this.getFileExtention(mainFileName)){
+      case 'gendsp':
+        return 'gen';
+      case 'maxpat':
+        return 'gen';
+      case 'maxproj':
+        return 'gen';
       case 'dsp':
         return 'faust';
       case 'pd':
