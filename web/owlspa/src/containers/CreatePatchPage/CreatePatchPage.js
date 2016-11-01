@@ -211,7 +211,7 @@ class CreatePatchPage extends Component {
                     </div>
                   </div>
                   <div className="info-message" style={{marginBottom: '15px'}}>
-                    Supported File Types:  .c  .h  .cpp  .hpp  .pd  .dsp  .s .cc .maxpat .maxproj .gendsp
+                    Supported File Types:  .c  .h  .cpp  .hpp  .pd  .dsp  .s .cc .gendsp
                   </div>
                 </div>
 
