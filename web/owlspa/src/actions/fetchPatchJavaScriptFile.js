@@ -11,7 +11,7 @@ const fetchPatchJavaScriptFile = (patch) => {
     dispatch({
       type: REQUEST_PATCH_JAVASCRIPT
     });
-    return getScript(API_END_POINT + '/builds/'+ patch._id +'?format=js&download=0')
+    return getScript(API_END_POINT + '/builds/'+ patch._id +'?format=js&download=0&cachebust='+ new Date().getTime())
       .then(()=>{
         dispatch({
           type: LOADED_PATCH_JAVASCRIPT,
