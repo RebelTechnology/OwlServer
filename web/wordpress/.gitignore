@@ -20,9 +20,10 @@
 !/wp-content/themes/hoxton-owl-2014/
 !/wp-content/themes/hoxton-owl-2014/**
 
-# Unfortunately, the above method reintroduces other 
+# Unfortunately, the above method reintroduces other
 # undesirable files, so we re-ignore them:
 .DS_Store
 /wp-content/themes/hoxton-owl-2014/node_modules/
+/wp-content/themes/hoxton-owl-2014/page-patch-library/js/bundle.js*
 
 # Add to the bottom of this list any files you wish to track.
