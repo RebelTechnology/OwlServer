@@ -8,8 +8,7 @@
     "test:dev": "karma start",
     "buildprod": "NODE_ENV=production webpack -p --config webpack.prod.config.js",
     "builddev": "webpack --config webpack.dev.config.js",
-    "start": "webpack --config webpack.dev.config.js --watch",
-    "webpack": "webpack"
+    "start": "webpack --config webpack.dev.config.js --watch"
   },
   "repository": {
     "type": "git",
