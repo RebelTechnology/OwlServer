@@ -8,6 +8,7 @@ import {
 
 import newDialog from './newDialog';
 import fetchPatchDetails from './fetchPatchDetails';
+import fetchPatchJavaScriptFile from './fetchPatchJavaScriptFile';
 
 const compilePatch = (patch) => {
   return (dispatch) => {
@@ -35,6 +36,7 @@ const compilePatch = (patch) => {
             patchSeoName: patch.seoName
           });
           dispatch(fetchPatchDetails(patch.seoName));
+          dispatch(fetchPatchJavaScriptFile(patch))
         } else {
           dispatch({
             type: PATCH_COMPILATION_FAILED,
