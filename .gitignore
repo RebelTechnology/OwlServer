@@ -31,5 +31,10 @@ node_modules
 **/bundle.js
 **/bundle.js.map
 
+#ignore webpack hot module replacement files
+*.hot-update.js
+*.hot-update.js.map
+*.hot-update.json
+
 #osx system file
 .DS_Store
