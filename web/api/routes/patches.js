@@ -109,14 +109,14 @@ router.post('/', function(req, res) {
     var patchAuthor = {};
 
     // to avoid unnecessary requests if wordpress cookie is available
-    if(req.cookies){
+    if(req.cookies) {
         var wpCookieFromRequest = getWordpressCookie(req.cookies);
         if(wpCookieFromRequest){
             console.log('wp_cookie found in request');
             credentials = {
                 type:'wordpress',
                 cookie: wpCookieFromRequest
-            }
+            };
         }
     }
 
@@ -129,17 +129,17 @@ router.post('/', function(req, res) {
         console.log('Checking credentials...');
 
         if (!credentials) {
-        throw {
-        message: "Access denied (1).",
-        status: 401
-        }
+          throw {
+            message: "Access denied (1).",
+            status: 401
+          };
         }
 
         if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-        throw {
-        message: "Access denied (2).",
-        status: 401
-        }
+          throw {
+            message: "Access denied (2).",
+            status: 401
+          };
         }
 
         wpCookie = credentials.cookie;
@@ -178,7 +178,7 @@ router.post('/', function(req, res) {
                 delete patchAuthor.name;
             }
         }
-        
+
         if(!isAdmin || (isAdmin && (!newPatch.author || !newPatch.author.wordpressId))){
             patchAuthor.wordpressId = wpUserId;
         }
@@ -218,7 +218,7 @@ router.post('/', function(req, res) {
 
         newPatch.downloadCount = 0; // set download count
         newPatch = patchModel.sanitize(newPatch);
-        
+
         if(!isAdmin || (isAdmin && (!newPatch.author || !newPatch.author.wordpressId))){
             newPatch.author = patchAuthor;
         }
@@ -251,7 +251,7 @@ router.post('/', function(req, res) {
         };
 
     }).catch(function (error) {
-    
+
         console.log('error: ', error);
 
         if(error.status){
