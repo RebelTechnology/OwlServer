@@ -2,6 +2,7 @@
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
+require('dotenv').config();
 var express = require('express');
 var cors = require('cors');
 var path = require('path');
@@ -16,6 +17,16 @@ var monk = require('monk');
 var apiSettings = require('./api-settings');
 var db = monk(apiSettings.mongoConnectionString);
 
+if (!process.env.API_PASSWORD) {
+  console.error('Error: Make sure that `.env` file exists and that it contains the API_PASSWORD setting in it.')
+  process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+  console.error('Error: Make sure that `.env` file exists and that it contains the JWT_SECRET setting in it.')
+  process.exit(1);
+}
+
 var swaggerize = require('swaggerize-express');
 
 var patches = require('./routes/patches');
@@ -23,6 +34,7 @@ var patch   = require('./routes/patch');
 var authors = require('./routes/authors');
 var tags    = require('./routes/tags');
 var builds  = require('./routes/builds');
+var session = require('./routes/session');
 
 var app = express();
 app.use(cors());
@@ -54,6 +66,7 @@ app.use('/patch', patch);
 app.use('/tags', tags);
 app.use('/authors', authors);
 app.use('/builds', builds);
+app.use('/session', session);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
