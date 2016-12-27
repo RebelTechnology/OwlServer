@@ -1,7 +1,7 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import { fetchPatchDetails, deletePatch, compilePatch } from 'actions';
-import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud } from 'components';
+import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
 
 class PatchDetailsPage extends Component {
@@ -58,17 +58,12 @@ class PatchDetailsPage extends Component {
 
             <PatchTileSmall patch={patch} canEdit={canEdit} onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} />
 
-            <div className="patch-description">
-                <h2>Description</h2>
-                <p>{patch.description}</p>
-            </div>
+            <PatchDetailsTile title="Description" text={patch.description} canEdit={canEdit} />
             
-            { patch.instructions ? (
-              <div className="patch-instructions">
-                <h2>Instructions</h2>
-                <p>{patch.instructions}</p>
-              </div>): null 
-            } 
+            { patch.instructions &&
+              <PatchDetailsTile title="Instructions" text={patch.instructions} canEdit={canEdit} style={{background: 'grey'}} />
+            }
+
             <PatchStats canEdit={canEdit} patch={patch} />
             
           </div>

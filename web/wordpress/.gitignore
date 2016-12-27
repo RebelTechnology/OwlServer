@@ -25,5 +25,6 @@
 .DS_Store
 /wp-content/themes/hoxton-owl-2014/node_modules/
 /wp-content/themes/hoxton-owl-2014/page-patch-library/js/bundle.js*
+/wp-content/themes/hoxton-owl-2014/page-patch-library/css/owlspa.css*
 
 # Add to the bottom of this list any files you wish to track.
