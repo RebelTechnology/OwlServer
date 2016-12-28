@@ -11,7 +11,7 @@ import {
   gitHubURLFieldChange,
   removeGitHubFile,
   removeUploadedPatchFile,
-  savePatch,
+  serverSavePatch,
   setMainSourceFile,
   sourceFileChange,
   updateCompilationType,
@@ -99,7 +99,7 @@ class CreatePatchPage extends Component {
   savePatch(options){
     const { patchName, sourceFiles, compilationType } = this.props.editPatchForm;
     this.props.clearSourceFileErrors();
-    this.props.savePatch({
+    this.props.serverSavePatch({
       name: patchName,
       inputs: 2,
       outputs: 2,
@@ -283,7 +283,7 @@ export default connect(mapStateToProps, {
   gitHubURLFieldChange,
   addGitHubFile,
   removeGitHubFile,
-  savePatch,
+  serverSavePatch,
   setMainSourceFile,
   sourceFileChange,
   updateCompilationType,

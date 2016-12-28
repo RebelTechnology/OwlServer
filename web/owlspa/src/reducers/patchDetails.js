@@ -1,6 +1,7 @@
 import { 
   REQUEST_PATCH_DETAILS,
   RECEIVE_PATCH_DETAILS,
+  EDIT_PATCH_DETAILS,
   PATCH_DELETED,
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
@@ -26,6 +27,17 @@ const patchDetails = (state = initialState, action) => {
         patches: {
           ...state.patches,
           [action.patchDetails.seoName]:action.patchDetails
+        }
+      }
+    case EDIT_PATCH_DETAILS:
+      return {
+        ...state,
+        patches: {
+          ...state.patches,
+          [action.patchSeoName]:{
+            ...state.patches[action.patchSeoName],
+            ...action.patchDetails
+          }
         }
       }
     case PATCH_DELETED:

@@ -23,7 +23,7 @@
 .patch-details-tile textarea {
   line-height: 1.5;
   font-size: 14px;
-  font-family: Ubuntu, sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   width: 100%;
   height: 100px;
   resize: none;

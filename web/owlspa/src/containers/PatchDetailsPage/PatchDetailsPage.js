@@ -1,6 +1,13 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
-import { fetchPatchDetails, deletePatch, compilePatch } from 'actions';
+import { 
+  fetchPatchDetails,
+  deletePatch,
+  compilePatch,
+  serverSavePatchAndExitEditMode,
+  setEditModeForPatchDetails,
+  editPatchDetails
+} from 'actions';
 import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
 
@@ -39,10 +46,38 @@ class PatchDetailsPage extends Component {
     this.props.deletePatch(patch, {redirect: 'my-patches'});
   }
 
+  handlePatchDecriptionChange(description){
+    const {editPatchDetails, routeParams:{patchSeoName}, patchDetails} = this.props;
+    editPatchDetails(patchSeoName, {description});
+  }
+
+  handlePatchInstructionsChange(instructions){
+    const {editPatchDetails, routeParams:{patchSeoName}, patchDetails} = this.props;
+    editPatchDetails(patchSeoName, {instructions});
+  }
+
+  savePatchDetails(){
+    const { routeParams:{patchSeoName}, patchDetails, serverSavePatchAndExitEditMode } = this.props;
+    const patch = patchDetails.patches[patchSeoName];
+    serverSavePatchAndExitEditMode(patch);
+  }
+
+  handleDescriptionEditClick(){
+    const {setEditModeForPatchDetails, routeParams:{patchSeoName}} = this.props;
+    setEditModeForPatchDetails(patchSeoName, {description: true});
+  }
+
+  handleInstructionsEditClick(){
+    const {setEditModeForPatchDetails, routeParams:{patchSeoName}} = this.props;
+    setEditModeForPatchDetails(patchSeoName, {instructions: true});
+  }
+
   render(){ 
-    const { patchDetails, currentUser , routeParams:{patchSeoName} } = this.props;
+    const { patchDetails, currentUser , routeParams:{patchSeoName}, patchDetailsEditMode } = this.props;
     const patch = patchDetails.patches[patchSeoName];
     const canEdit = currentUser.isAdmin || this.currentUserCanEdit(patch);
+    const descriptionEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].description;
+    const instructionsEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].instructions;
 
     if(!patch){
       return (
@@ -58,10 +93,25 @@ class PatchDetailsPage extends Component {
 
             <PatchTileSmall patch={patch} canEdit={canEdit} onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} />
 
-            <PatchDetailsTile title="Description" text={patch.description} canEdit={canEdit} />
+            <PatchDetailsTile 
+              title="Description" 
+              text={patch.description} 
+              canEdit={canEdit} 
+              editMode={descriptionEditMode}
+              onTextChange={val => this.handlePatchDecriptionChange(val)}
+              handleEditClick={e => this.handleDescriptionEditClick(e)}
+              handleSaveClick={e => this.savePatchDetails(e)} />
             
-            { patch.instructions &&
-              <PatchDetailsTile title="Instructions" text={patch.instructions} canEdit={canEdit} style={{background: 'grey'}} />
+            { (patch.instructions || canEdit ) &&
+              <PatchDetailsTile 
+                style={{background: 'grey'}} 
+                title="Instructions" 
+                text={patch.instructions} 
+                canEdit={canEdit} 
+                editMode={instructionsEditMode}
+                onTextChange={(val) => this.handlePatchInstructionsChange(val)} 
+                handleEditClick={e => this.handleInstructionsEditClick(e)}
+                handleSaveClick={e => this.savePatchDetails(e)} />
             }
 
             <PatchStats canEdit={canEdit} patch={patch} />
@@ -84,11 +134,19 @@ class PatchDetailsPage extends Component {
   }
 }
 
-const mapStateToProps = ({ patchDetails, currentUser }) => {
+const mapStateToProps = ({ patchDetails, patchDetailsEditMode, currentUser }) => {
   return {
     patchDetails,
+    patchDetailsEditMode,
     currentUser
   }
 };
 
-export default connect(mapStateToProps, { fetchPatchDetails, deletePatch, compilePatch })(PatchDetailsPage);
+export default connect(mapStateToProps, { 
+  fetchPatchDetails,
+  deletePatch,
+  compilePatch,
+  serverSavePatchAndExitEditMode,
+  setEditModeForPatchDetails,
+  editPatchDetails
+})(PatchDetailsPage);
