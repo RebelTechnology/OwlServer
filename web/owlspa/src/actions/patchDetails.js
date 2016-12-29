@@ -3,7 +3,7 @@ import {
   EXIT_EDIT_MODE_FOR_PATCH_DETAILS
 } from 'constants';
 
-import serverSavePatch from './serverSavePatch';
+import serverUpdatePatch from './serverUpdatePatch';
 
 export const setEditModeForPatchDetails = (patchSeoName, fieldsInEditMode) => {
   return {
@@ -20,10 +20,12 @@ export const exitEditModeForPatchDetails = (patchSeoName) => {
   };
 }
 
-export const serverSavePatchAndExitEditMode = (patch) => {
+export const serverUpdatePatchAndExitEditMode = (patch) => {
   return (dispatch) => {
-    dispatch(serverSavePatch(patch)).then(() => {
-      dispatch(exitEditModeForPatchDetails(patch.seoName))
+    dispatch(serverUpdatePatch(patch)).then((result) => {
+      if(result === 'patch updated'){
+        dispatch(exitEditModeForPatchDetails(patch.seoName))
+      }
     })
   }
 }

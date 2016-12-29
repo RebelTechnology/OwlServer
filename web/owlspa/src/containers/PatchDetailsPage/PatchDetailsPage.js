@@ -4,7 +4,7 @@ import {
   fetchPatchDetails,
   deletePatch,
   compilePatch,
-  serverSavePatchAndExitEditMode,
+  serverUpdatePatchAndExitEditMode,
   setEditModeForPatchDetails,
   editPatchDetails
 } from 'actions';
@@ -56,10 +56,10 @@ class PatchDetailsPage extends Component {
     editPatchDetails(patchSeoName, {instructions});
   }
 
-  savePatchDetails(){
-    const { routeParams:{patchSeoName}, patchDetails, serverSavePatchAndExitEditMode } = this.props;
+  updatePatchDetails(){
+    const { routeParams:{patchSeoName}, patchDetails, serverUpdatePatchAndExitEditMode } = this.props;
     const patch = patchDetails.patches[patchSeoName];
-    serverSavePatchAndExitEditMode(patch);
+    serverUpdatePatchAndExitEditMode(patch);
   }
 
   handleDescriptionEditClick(){
@@ -95,23 +95,25 @@ class PatchDetailsPage extends Component {
 
             <PatchDetailsTile 
               title="Description" 
-              text={patch.description} 
+              text={patch.description}
+              isSaving={patchDetails.isSaving} 
               canEdit={canEdit} 
               editMode={descriptionEditMode}
               onTextChange={val => this.handlePatchDecriptionChange(val)}
               handleEditClick={e => this.handleDescriptionEditClick(e)}
-              handleSaveClick={e => this.savePatchDetails(e)} />
+              handleSaveClick={e => this.updatePatchDetails(e)} />
             
             { (patch.instructions || canEdit ) &&
               <PatchDetailsTile 
                 style={{background: 'grey'}} 
                 title="Instructions" 
                 text={patch.instructions} 
+                isSaving={patchDetails.isSaving}
                 canEdit={canEdit} 
                 editMode={instructionsEditMode}
                 onTextChange={(val) => this.handlePatchInstructionsChange(val)} 
                 handleEditClick={e => this.handleInstructionsEditClick(e)}
-                handleSaveClick={e => this.savePatchDetails(e)} />
+                handleSaveClick={e => this.updatePatchDetails(e)} />
             }
 
             <PatchStats canEdit={canEdit} patch={patch} />
@@ -146,7 +148,7 @@ export default connect(mapStateToProps, {
   fetchPatchDetails,
   deletePatch,
   compilePatch,
-  serverSavePatchAndExitEditMode,
+  serverUpdatePatchAndExitEditMode,
   setEditModeForPatchDetails,
   editPatchDetails
 })(PatchDetailsPage);

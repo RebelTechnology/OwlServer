@@ -5,20 +5,25 @@ import styles from './PatchDetailsTile.css';
 class PatchDetailsTile extends Component {
 
   render(){
-    const { canEdit, title, text, style, onTextChange, handleEditClick, handleSaveClick, editMode } = this.props;
+    const { canEdit, title, text, style, onTextChange, handleEditClick, handleSaveClick, editMode, isSaving } = this.props;
 
     return (
       <div styleName="patch-details-tile" style={style}>
         { canEdit && (
             <div>
-              { !editMode && <button onClick={ handleEditClick }>edit</button> }
-              { editMode && <button onClick={ handleSaveClick }>save</button> }
+              { !editMode && <button disabled={isSaving} onClick={ handleEditClick }>edit</button> }
+              { editMode && <button disabled={isSaving} onClick={ handleSaveClick }>save</button> }
             </div>
           )
         }
         <h2>{title}</h2>
         { editMode ? (
-            <textarea value={text} onChange={ e => onTextChange(e.target.value) }></textarea>
+            <textarea 
+              style={{backgroundColor: isSaving ? '#bbb' : 'intial'}} 
+              disabled={isSaving} 
+              value={text} 
+              onChange={ e => onTextChange(e.target.value) } 
+            />
           ) : (
             <p>{text}</p>
           ) 
@@ -32,6 +37,7 @@ PatchDetailsTile.defaultProps = {
   onTextChange: () => {},
   handleSaveClick: () => {},
   handleEditClick: () => {},
+  isSaving: false,
   editMode: false,
   text: ''
 }
@@ -40,6 +46,7 @@ PatchDetailsTile.propTypes = {
   title: PropTypes.string,
   text: PropTypes.string,
   canEdit : PropTypes.bool,
+  isSaving: PropTypes.bool,
   editMode: PropTypes.bool,
   style: PropTypes.object,
   onTextChange: PropTypes.func,

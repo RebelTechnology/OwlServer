@@ -3,12 +3,16 @@ import {
   RECEIVE_PATCH_DETAILS,
   EDIT_PATCH_DETAILS,
   PATCH_DELETED,
+  PATCH_SAVING,
+  PATCH_SAVED,
+  ERROR_SAVING_PATCH,
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
   PATCH_COMPILATION_FAILED
 } from 'constants';
 
 const initialState = {
+  isSaving: false,
   isFetching: false,
   patches: {}
 };
@@ -47,6 +51,21 @@ const patchDetails = (state = initialState, action) => {
           ...state.patches,
           [action.patchSeoName]: null
         }
+      }
+    case PATCH_SAVING:
+      return {
+        ...state,
+        isSaving: true
+      }
+    case PATCH_SAVED:
+      return {
+        ...state,
+        isSaving: false
+      }
+    case ERROR_SAVING_PATCH:
+      return {
+        ...state,
+        isSaving: false
       }
     case REQUEST_COMPILE_PATCH:
       return {
