@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import CSSModules from 'react-css-modules';
 import styles from './PatchDetailsTile.css';
+import { IconButton } from 'components';
 
 class PatchDetailsTile extends Component {
 
@@ -10,9 +11,9 @@ class PatchDetailsTile extends Component {
     return (
       <div styleName="patch-details-tile" style={style}>
         { canEdit && (
-            <div>
-              { !editMode && <button disabled={isSaving} onClick={ handleEditClick }>edit</button> }
-              { editMode && <button disabled={isSaving} onClick={ handleSaveClick }>save</button> }
+            <div styleName="button-wrapper">
+              { !editMode && <IconButton name={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ handleEditClick } /> }
+              { editMode && <IconButton name={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={ handleSaveClick } /> }
             </div>
           )
         }

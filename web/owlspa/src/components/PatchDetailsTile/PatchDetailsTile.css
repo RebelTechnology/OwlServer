@@ -1,4 +1,5 @@
 .patch-details-tile {
+  position: relative;
   border: 1px solid white;
   border-radius: 5px;
   color: #fff;
@@ -28,6 +29,13 @@
   height: 100px;
   resize: none;
   border: none;
+  margin-top: 11px;
+}
+
+.button-wrapper {
+  position: absolute;
+  right: 29px;
+  top: 20px;
 }
 
 @media only screen and (max-width: 1430px) {
