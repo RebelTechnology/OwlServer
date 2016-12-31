@@ -1,7 +1,15 @@
 import React, { Component, PropTypes } from 'react';
+import CSSModules from 'react-css-modules';
+import styles from './PatchTileSmall.css';
+import { IconButton } from 'components';
 import { AuthorLink } from 'components';
 
 class PatchTileSmall extends Component {
+
+  handleEditClick(e){
+    const { seoName } = this.props.patch;
+    window.location = '/edit-patch/' + seoName;
+  }
   render(){
     const { patch, canEdit, onDeletePatchClick } = this.props;
     const author = patch.author;
@@ -11,23 +19,17 @@ class PatchTileSmall extends Component {
       )
     }
     return (
-      <div className="patch-tile-small" id="sticker">
-        <div className="patch-title-controls">
-          <div>
-            <div className="patch-title no-pseudo-link">{patch.name}</div>
-            { canEdit ? (
-              <div className="patch-buttons">
-                <a href={'/edit-patch/' + patch.seoName} className="patch-button patch-button-edit"></a>
-                <span onClick={onDeletePatchClick} className="patch-button patch-button-delete"></span>
-              </div>) : null
-            }    
-          </div>
-          <div>
-            { author ? (
-              <AuthorLink author={ author.name } />
-            ) : null}
-          </div>
-        </div>
+      <div styleName="patch-tile-small">
+        <div styleName="patch-title">{patch.name}</div>
+        { canEdit ? (
+          <div styleName="patch-tile-controls">
+            <IconButton name="edit" onClick={e => this.handleEditClick(e)}/>
+            <IconButton name="delete" onClick={ onDeletePatchClick } />
+          </div>) : null
+        }    
+        { author ? (
+          <AuthorLink author={ author.name } />
+        ) : null}
       </div>
     );
   }
@@ -39,4 +41,4 @@ PatchTileSmall.propTypes = {
   onDeletePatchClick: PropTypes.func
 }
 
-export default PatchTileSmall;
+export default CSSModules(PatchTileSmall, styles);
