@@ -3,16 +3,14 @@
  */
 
 require('dotenv').config();
+
 var express = require('express');
 var cors = require('cors');
 var path = require('path');
-//var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var assert = require('assert');
 
-var mongo = require('mongodb');
 var monk = require('monk');
 var apiSettings = require('./api-settings');
 var db = monk(apiSettings.mongoConnectionString);
@@ -27,8 +25,7 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 }
 
-var swaggerize = require('swaggerize-express');
-
+var auth    = require('./middleware/auth');
 var patches = require('./routes/patches');
 var patch   = require('./routes/patch');
 var authors = require('./routes/authors');
@@ -39,18 +36,13 @@ var session = require('./routes/session');
 var app = express();
 app.use(cors());
 
-app.use(swaggerize({
-    api: path.join(__dirname, 'swagger.yaml'),
-    handlers: path.join(__dirname, 'routes')
-}));
-
 //// view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
+app.use(logger('short'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -60,6 +52,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req,res,next) {
     req.db = db; next();
 });
+
+// API authentication middleware
+app.use(auth);
 
 app.use('/patches', patches);
 app.use('/patch', patch);

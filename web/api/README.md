@@ -78,7 +78,7 @@ concatenation of the `nonce` and the API password. The below is the reference co
 
 #### Accessing protected resources
 Whenever the user wants to access a protected route or resource, the user agent
-should send the token, typically in the `Authorization` header using the Bearer
+should send the token in the `Authorization` HTTP header using the Bearer
 schema. The content of the header should look like the following:
 
     Authorization: Bearer <token>

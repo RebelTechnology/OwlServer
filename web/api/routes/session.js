@@ -1,22 +1,5 @@
 'use strict'
 
-/*
- To generate a nonce:
-
-       node -e "console.log(require('crypto').randomBytes(32).toString('hex'));"
-
- To generate the password hash:
-
-       node -e "console.log(.createHash('sha256').update(nonce + password).digest('hex'));"
-
- To request a token from the command line:
-      curl
-        --header "Content-Type: application/json"
-        -d'{"nonce":"nonce", "passwordHash":"..."}'
-        -X POST
-        http://localhost:3000/session
- */
-
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const express = require('express');
@@ -46,7 +29,7 @@ router.post('/', (req, res) => {
     return;
   }
 
-  res.status(401).json({ message: 'Unauthorized', status: 401 });
+  res.status(401).json({ message: 'Unauthorized.', status: 401 });
 
 });
 
