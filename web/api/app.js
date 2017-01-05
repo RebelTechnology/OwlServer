@@ -15,8 +15,8 @@ var monk = require('monk');
 var apiSettings = require('./api-settings');
 var db = monk(apiSettings.mongoConnectionString);
 
-if (!process.env.API_PASSWORD) {
-  console.error('Error: Make sure that `.env` file exists and that it contains the API_PASSWORD setting in it.')
+if (!process.env.API_KEY) {
+  console.error('Error: Make sure that `.env` file exists and that it contains the API_KEY setting in it.')
   process.exit(1);
 }
 

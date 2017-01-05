@@ -3,15 +3,14 @@
  */
 
 var express = require('express');
-var router  = express.Router();
-var url     = require('url');
-var fs      = require('fs');
-var path    = require('path');
-var exec    = require('child-process-promise').exec;
-var Q       = require('q');
+var router = express.Router();
+var url = require('url');
+var fs = require('fs');
+var path = require('path');
+var exec = require('child-process-promise').exec;
+var Q = require('q');
 
-var wordpressBridge = require('../lib/wordpress-bridge.js');
-var apiSettings     = require('../api-settings.js');
+var apiSettings = require('../api-settings.js');
 
 /**
  * Convenience function for determining the build format.
@@ -32,22 +31,6 @@ var getBuildFormat = function (format) {
     }
 
     return buildFormat;
-};
-
-
-/**
- * Convenience function gets wordpress cookie if exists or returns false
- */
-var getWordpressCookie = function(cookies) {
-    var wpCookie = false;
-    Object.keys(cookies).some(function(key){
-        if(key.lastIndexOf('wordpress_logged_in_') === 0){
-            wpCookie = cookies[key];
-            return true;
-        }
-        return false;
-    });
-    return wpCookie;
 };
 
 /**
@@ -161,34 +144,18 @@ router.get('/:id', function (req, res) {
  */
 router.put('/:id', function (req, res) {
 
-    var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
-    var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
-
-    var credentials = req.body.credentials;
-    var wpCookie;
-    var username;
+    const username = res.locals.username;
     var isAdmin = false;
     var wpUserId;
+
     var collection = req.db.get('patches');
     var updatedPatch = req.body.patch;
     var patchAuthor = {};
 
-    // to avoid unnecessary requests if wordpress cookie is available
-    if(req.cookies){
-        var wpCookieFromRequest = getWordpressCookie(req.cookies);
-        if(wpCookieFromRequest){
-            console.log('wp_cookie found in request');
-            credentials = {
-                type:'wordpress',
-                cookie: wpCookieFromRequest
-            }
-        }
-    }
-
     var id = req.params.id;
     if (!/^[a-f\d]{24}$/i.test(id)) {
         return res.status(500).json({
-           message: 'Invalid ID.',
+           message: 'Invalid patch ID.',
            error: { status: 500 }
         });
     }
@@ -198,42 +165,14 @@ router.put('/:id', function (req, res) {
         format = getBuildFormat(req.body.format);
     }
 
-    Q.fcall(function () {
+    Q.fcall(() => {
 
-        /* ~~~~~~~~~~~~~~~~~~~
-         *  Check credentials
-         * ~~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Checking credentials...');
-
-        if (!credentials) {
-            var e = new Error('Access denied (1).');
-            e.status = 401;
-            throw e;
+        // Is user authenticated?
+        if (!res.locals.authenticated) {
+          throw { message: 'Access denied.', status: 401 };
         }
 
-        if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            var e = new Error('Access denied (2).');
-            e.status = 401;
-            throw e;
-        }
-
-        wpCookie = credentials.cookie;
-
-        return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
-
-    }).then(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~
-         *  Get WP user info
-         * ~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Getting WP user info...');
-        username = wpCookie.split('|')[0];
-        return getUserInfo(username);
-
-    }).then(function (wpUserInfo) {
-
+        const wpUserInfo = res.locals.wpUserInfo;
         isAdmin = wpUserInfo.admin;
         wpUserId = wpUserInfo.id;
         console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
@@ -283,11 +222,11 @@ router.put('/:id', function (req, res) {
          * ~~~~~~~~~~~~~~~ */
 
         var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH;
-        
+
         if (format === 'js') {
             cmd += ' --web';
         }
-        
+
         if(patch.compilationType === 'gen'){
             cmd += ' --gen';
         }
@@ -303,9 +242,9 @@ router.put('/:id', function (req, res) {
                 success: true,
                 status:  200
             };
-            
+
             console.log('Command run successfully.');
-            
+
             return response;
 
         }).fail(function (result) {
@@ -316,9 +255,9 @@ router.put('/:id', function (req, res) {
                 success: false,
                 status:  200
             };
-            
+
             console.log('Command failed.');
-            
+
             return response;
 
         });

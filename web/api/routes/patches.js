@@ -94,10 +94,6 @@ router.post('/', (req, res) => {
         throw { message: 'Access denied.', status: 401 };
       }
 
-      /* ~~~~~~~~~~~~~~~~
-       *  Validate patch
-       * ~~~~~~~~~~~~~~~~ */
-
       const wpUserInfo = res.locals.wpUserInfo;
       isAdmin = wpUserInfo.admin;
       wpUserId = wpUserInfo.id;
@@ -116,7 +112,7 @@ router.post('/', (req, res) => {
         }
       }
 
-      if(!isAdmin || (isAdmin && (!newPatch.author || !newPatch.author.wordpressId))){
+      if(!isAdmin || (isAdmin && (!newPatch.author || !newPatch.author.wordpressId))) {
         patchAuthor.wordpressId = wpUserId;
       }
 

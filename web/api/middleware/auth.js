@@ -1,10 +1,6 @@
 'use strict';
 
-const Q = require('q'); // TODO: remove dependency on Q
-
-const wordpressBridge = require('../lib/wordpress-bridge.js');
-const validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie); // TODO: remove dependency on Q
-const getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
+const { validateAuthCookie, getUserInfo } = require('../lib/wordpress-bridge.js');
 
 /**
  * Convenience function gets wordpress cookie if exists or returns false.
@@ -80,6 +76,7 @@ const auth = (req, res, next) => {
       res.locals.authenticated = true;
       res.locals.username = username;
       res.locals.wpUserInfo = wpUserInfo;
+
       // At this point `res.locals` will look like:
       // {
       //    authenticated: true,
@@ -90,6 +87,7 @@ const auth = (req, res, next) => {
       //      admin: true
       //    }
       //  }
+
       next();
     })
     .catch(err => {

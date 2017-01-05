@@ -6,8 +6,8 @@ var express = require('express');
 var router = express.Router();
 var Q = require('q');
 
-var wordpressBridge = require('../lib/wordpress-bridge.js');
-var apiSettings     = require('../api-settings.js');
+const { getUserInfoBatch } = require('../lib/wordpress-bridge.js');
+var apiSettings = require('../api-settings.js');
 
 /**
  * Retrieves all authors.
@@ -33,8 +33,6 @@ router.get('/', function(req, res) {
         count: 0,
         result: []
     };
-
-    var getUserInfoBatch = Q.denodeify(wordpressBridge.getUserInfoBatch);
 
     Q.fcall(function () {
 

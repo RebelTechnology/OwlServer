@@ -1,7 +1,7 @@
 This project exposes some data related to the [OWL][1] project over a RESTful API.
 
 ## Requirements
-* Node.js
+* Node.js >= 6.6.*
 
 ## How to run
 1. Copy file `_meta/api-settings.tpl.js` to root directory and rename it to `api-settings.js`:
@@ -9,7 +9,7 @@ This project exposes some data related to the [OWL][1] project over a RESTful AP
         cp _meta/api-settings.tpl.js api-settings.js
 2. You're likey to want to change variables `API_PORT` and/or `MONGO_DATABASE` in this new file. We are using a port and a MongoDB database for each environment (staging, production).
 3. Copy file `_meta/example.env` to root directory and rename it to `.env` and
-change the `API_PASSWORD` and `JWT_SECRET` settings.
+change the `API_KEY` and `JWT_SECRET` settings.
 4. Install node.js modules:
 
         npm install
@@ -69,12 +69,12 @@ Builds the specified patch.
 #### POST /session
 To authenticate, send a JSON object like the below in the body of the request:
 
-    { "nonce": "some large random number", "passwordHash": "hash" }
+    { "nonce": "some large random number", "apiKeyHash": "hash" }
 
 * `nonce` should be a different large random number sent along with each authentication request;
-* `passwordHash` is the SHA256 hash of the result of the
-concatenation of the `nonce` and the API password. The below is the reference code to generate the hash in Node.js:
-        require('crypto').createHash('sha256').update(nonce + apiPassword).digest('hex');
+* `apiKeyHash` is the SHA256 hash of the result of the
+concatenation of the `nonce` and the API key. Below is the reference code to generate the hash in Node.js:
+        require('crypto').createHash('sha256').update(nonce + apiKey).digest('hex');
 
 #### Accessing protected resources
 Whenever the user wants to access a protected route or resource, the user agent
