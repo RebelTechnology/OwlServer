@@ -1,4 +1,6 @@
 import React, { Component, PropTypes } from 'react';
+import CSSModules from 'react-css-modules';
+import styles from './AuthorLink.css';
 import { Link } from 'react-router';
 
 class AuthorLink extends Component {
@@ -12,8 +14,8 @@ class AuthorLink extends Component {
     }
     return (
 
-      <div className="patch-author" onClick={this.onClick} >
-        <Link className="author-name" to={`/patches/authors/${author}`}>{author}</Link>
+      <div styleName="patch-author" onClick={this.onClick} >
+        <Link styleName="author-name" to={`/patches/authors/${author}`}>{author}</Link>
       </div>
     );
   }
@@ -23,4 +25,4 @@ AuthorLink.propTypes = {
   author: PropTypes.string
 }
 
-export default AuthorLink;
+export default CSSModules(AuthorLink, styles);

@@ -14,8 +14,8 @@ class PatchSoundcloud extends Component {
     }
     return (
       <div>
-        <div class="patch-soundcloud">
-          { soundcloud.map(src => <iframe width="100%" height="250" scrolling="no" frameborder="no" key={src} src={this.getSoundcloudSrcUrl(src)}></iframe>)}
+        <div className="patch-soundcloud">
+          { soundcloud.map(src => <iframe width="100%" height="250" scrolling="no" frameBorder="no" key={src} src={this.getSoundcloudSrcUrl(src)}></iframe>)}
         </div>
       </div>
     );

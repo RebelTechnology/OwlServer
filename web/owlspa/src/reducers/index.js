@@ -6,6 +6,7 @@ import editPatchForm from './editPatchForm';
 import owlState from './owlState';
 import patchCodeFiles from './patchCodeFiles';
 import patchDetails from './patchDetails';
+import patchDetailsEditMode from './patchDetailsEditMode';
 import patches from './patches';
 import patchJavaScript from './patchJavaScript';
 import patchListFilter from './patchListFilter';
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   patches,
   patchListFilter,
   patchDetails,
+  patchDetailsEditMode,
   patchJavaScript,
   patchPlaying,
   patchCodeFiles,

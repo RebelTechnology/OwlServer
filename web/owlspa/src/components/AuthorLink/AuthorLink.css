@@ -1,0 +1,18 @@
+.patch-author {
+  margin-top: 10px;
+}
+
+.author-name {
+  display: inline-block;
+  padding: 10px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 100;
+  background: #5d5d5d;
+  transition: .3s;
+}
+
+.author-name:hover {
+  background: #fff;
+  color: #000;
+}

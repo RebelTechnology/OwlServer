@@ -14,7 +14,7 @@ const redirectToPatchDetails = (patchSeoName) => {
   customHistory.push('/patch/'+ patchSeoName);
 }
 
-const savePatch = (patch, options = {}) => {
+const serverSavePatch = (patch, options = {}) => {
   return (dispatch) => {
     dispatch({
       type: PATCH_SAVING
@@ -71,18 +71,20 @@ const savePatch = (patch, options = {}) => {
         
         if(json._id){
           dispatch({type: PATCH_SAVED});
-          dispatch(cleanUpTmpPatchFiles(json._id)).then(() => {            
-            if(options.compile){
-              dispatch(compilePatch({
-                seoName: json.seoName,
-                _id: json._id
-              })).then(()=>{
+          if(method === 'POST'){
+            dispatch(cleanUpTmpPatchFiles(json._id)).then(() => {            
+              if(options.compile){
+                dispatch(compilePatch({
+                  seoName: json.seoName,
+                  _id: json._id
+                })).then(()=>{
+                  redirectToPatchDetails(json.seoName);
+                });
+              } else {
                 redirectToPatchDetails(json.seoName);
-              });
-            } else {
-              redirectToPatchDetails(json.seoName);
-            }
-          });
+              }
+            });
+          }
         } else {
           throw new Error('Error saving patch: patch ID missing');
         }
@@ -104,4 +106,4 @@ const savePatch = (patch, options = {}) => {
   }
 }
 
-export default savePatch;
+export default serverSavePatch;
