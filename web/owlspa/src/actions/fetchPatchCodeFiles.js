@@ -27,7 +27,7 @@ const fetchHoxtonFile = (fileUrl) => {
   return fetch(parseUrl(fileUrl).path, {method:'GET'})
     .then(response => {
       if(response.status >= 400){
-        throw new Error(response.statusText + ' ' + url);
+        throw new Error(response.statusText + ' ' + fileUrl);
       } else {
         return response.text();
       }

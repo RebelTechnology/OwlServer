@@ -138,14 +138,15 @@ class CreatePatchPage extends Component {
       }
       return (
         <div className="row" key={file.name}>
-          <input 
-            type="url" 
-            value={file.path}
+          <a 
+            href={file.path}
+            target="_blank"
             style={{width: '60%', marginLeft:'10px', marginRight:'10px'}}
             className={ classNames({ 'invalid': !!sourceFileErrors[i] }) }
-            onChange={(e)=>this.handleSourceFileChange(e, file)}
             id={'frm-patch-github_' + i} 
-            name={'github['+ i +']'} />
+          >
+            {file.name}
+          </a>
 
           {file.mainFile ? 'Main File' : (
             <button onClick={(e)=>this.handleMainFileChange(e, file)}>
