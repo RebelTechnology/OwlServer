@@ -1,7 +1,14 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
-import { fetchPatchDetails, deletePatch, compilePatch } from 'actions';
-import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud } from 'components';
+import { 
+  fetchPatchDetails,
+  deletePatch,
+  compilePatch,
+  serverUpdatePatchAndExitEditMode,
+  setEditModeForPatchDetails,
+  editPatchDetails
+} from 'actions';
+import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
 
 class PatchDetailsPage extends Component {
@@ -39,10 +46,38 @@ class PatchDetailsPage extends Component {
     this.props.deletePatch(patch, {redirect: 'my-patches'});
   }
 
+  handlePatchDecriptionChange(description){
+    const {editPatchDetails, routeParams:{patchSeoName}, patchDetails} = this.props;
+    editPatchDetails(patchSeoName, {description});
+  }
+
+  handlePatchInstructionsChange(instructions){
+    const {editPatchDetails, routeParams:{patchSeoName}, patchDetails} = this.props;
+    editPatchDetails(patchSeoName, {instructions});
+  }
+
+  updatePatchDetails(){
+    const { routeParams:{patchSeoName}, patchDetails, serverUpdatePatchAndExitEditMode } = this.props;
+    const patch = patchDetails.patches[patchSeoName];
+    serverUpdatePatchAndExitEditMode(patch);
+  }
+
+  handleDescriptionEditClick(){
+    const {setEditModeForPatchDetails, routeParams:{patchSeoName}} = this.props;
+    setEditModeForPatchDetails(patchSeoName, {description: true});
+  }
+
+  handleInstructionsEditClick(){
+    const {setEditModeForPatchDetails, routeParams:{patchSeoName}} = this.props;
+    setEditModeForPatchDetails(patchSeoName, {instructions: true});
+  }
+
   render(){ 
-    const { patchDetails, currentUser , routeParams:{patchSeoName} } = this.props;
+    const { patchDetails, currentUser , routeParams:{patchSeoName}, patchDetailsEditMode } = this.props;
     const patch = patchDetails.patches[patchSeoName];
     const canEdit = currentUser.isAdmin || this.currentUserCanEdit(patch);
+    const descriptionEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].description;
+    const instructionsEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].instructions;
 
     if(!patch){
       return (
@@ -58,17 +93,29 @@ class PatchDetailsPage extends Component {
 
             <PatchTileSmall patch={patch} canEdit={canEdit} onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} />
 
-            <div className="patch-description">
-                <h2>Description</h2>
-                <p>{patch.description}</p>
-            </div>
+            <PatchDetailsTile 
+              title="Description" 
+              text={patch.description}
+              isSaving={patchDetails.isSaving} 
+              canEdit={canEdit} 
+              editMode={descriptionEditMode}
+              onTextChange={val => this.handlePatchDecriptionChange(val)}
+              handleEditClick={e => this.handleDescriptionEditClick(e)}
+              handleSaveClick={e => this.updatePatchDetails(e)} />
             
-            { patch.instructions ? (
-              <div className="patch-instructions">
-                <h2>Instructions</h2>
-                <p>{patch.instructions}</p>
-              </div>): null 
-            } 
+            { (patch.instructions || canEdit ) &&
+              <PatchDetailsTile 
+                style={{background: 'grey'}} 
+                title="Instructions" 
+                text={patch.instructions} 
+                isSaving={patchDetails.isSaving}
+                canEdit={canEdit} 
+                editMode={instructionsEditMode}
+                onTextChange={(val) => this.handlePatchInstructionsChange(val)} 
+                handleEditClick={e => this.handleInstructionsEditClick(e)}
+                handleSaveClick={e => this.updatePatchDetails(e)} />
+            }
+
             <PatchStats canEdit={canEdit} patch={patch} />
             
           </div>
@@ -89,11 +136,19 @@ class PatchDetailsPage extends Component {
   }
 }
 
-const mapStateToProps = ({ patchDetails, currentUser }) => {
+const mapStateToProps = ({ patchDetails, patchDetailsEditMode, currentUser }) => {
   return {
     patchDetails,
+    patchDetailsEditMode,
     currentUser
   }
 };
 
-export default connect(mapStateToProps, { fetchPatchDetails, deletePatch, compilePatch })(PatchDetailsPage);
+export default connect(mapStateToProps, { 
+  fetchPatchDetails,
+  deletePatch,
+  compilePatch,
+  serverUpdatePatchAndExitEditMode,
+  setEditModeForPatchDetails,
+  editPatchDetails
+})(PatchDetailsPage);

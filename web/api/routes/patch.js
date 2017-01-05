@@ -215,6 +215,18 @@ router.put('/:id', function (req, res) {
     var updatedPatch = req.body.patch;
     var patchAuthor = {};
 
+    // to avoid unnecessary requests if wordpress cookie is available
+    if(req.cookies){
+        var wpCookieFromRequest = getWordpressCookie(req.cookies);
+        if(wpCookieFromRequest){
+            console.log('wp_cookie found in request');
+            credentials = {
+                type:'wordpress',
+                cookie: wpCookieFromRequest
+            }
+        }
+    }
+
     Q.fcall(function () {
 
         /* ~~~~~~~~~~~~~~~~~~~
