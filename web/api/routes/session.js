@@ -9,8 +9,6 @@ const router  = express.Router();
 
 const authenticate = (nonce, givenHash) => {
   const expectedHash = crypto.createHash('sha256').update(nonce + process.env.API_KEY).digest('hex');
-  console.log('given    :', givenHash);
-  console.log('expected :', expectedHash);
   return scmp(Buffer.from(expectedHash, 'hex'), Buffer.from(givenHash, 'hex'));
 };
 
