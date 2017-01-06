@@ -8,16 +8,14 @@ var fs      = require('fs');
 var path    = require('path');
 var Q       = require('q');
 
-var patchModel      = require('../models/patch');
-var wordpressBridge = require('../lib/wordpress-bridge.js');
-var apiSettings     = require('../api-settings.js');
+var patchModel = require('../models/patch');
+const { getUserInfoBatch } = require('../lib/wordpress-bridge.js');
+var apiSettings = require('../api-settings.js');
 
 /**
  * Adds the WP user "display name" to the patch's author info, if necessary.
  */
 var getUserWpDisplayName = function (patch) {
-
-    var getUserInfoBatch = Q.denodeify(wordpressBridge.getUserInfoBatch);
 
     if (null === patch) {
         var e = new Error('Patch not found.');
@@ -83,23 +81,6 @@ var finishPatch = function (patch) {
     return response = { result: patch };
 
 };
-
-
-/**
- * gets wordpress cookie if exists or returns false
- */
-var getWordpressCookie = function(cookies) {
-    var wpCookie = false;
-    Object.keys(cookies).some(function(key){
-        if(key.lastIndexOf('wordpress_logged_in_') === 0){
-            wpCookie = cookies[key];
-            return true;
-        }
-        return false;
-    });
-    return wpCookie;
-};
-
 
 /**
  * Retrieves a single patch.
@@ -200,14 +181,9 @@ router.get('/', function (req, res) {
  *
  * PUT /patch/{id}
  */
-router.put('/:id', function (req, res) {
+router.put('/:id', (req, res) => {
 
-    var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
-    var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
-
-    var credentials = req.body.credentials;
-    var wpCookie;
-    var username;
+    const username = res.locals.username;
     var isAdmin = false;
     var wpUserId;
 
@@ -215,75 +191,31 @@ router.put('/:id', function (req, res) {
     var updatedPatch = req.body.patch;
     var patchAuthor = {};
 
-    // to avoid unnecessary requests if wordpress cookie is available
-    if(req.cookies){
-        var wpCookieFromRequest = getWordpressCookie(req.cookies);
-        if(wpCookieFromRequest){
-            console.log('wp_cookie found in request');
-            credentials = {
-                type:'wordpress',
-                cookie: wpCookieFromRequest
-            }
-        }
-    }
-
     Q.fcall(function () {
 
-        /* ~~~~~~~~~~~~~~~~~~~
-         *  Check credentials
-         * ~~~~~~~~~~~~~~~~~~~ */
+      // Is user authenticated?
+      if (!res.locals.authenticated) {
+        throw { message: 'Access denied.', status: 401 };
+      }
 
-        console.log('Checking credentials...');
+      const wpUserInfo = res.locals.wpUserInfo;
+      isAdmin = wpUserInfo.admin;
+      wpUserId = wpUserInfo.id;
+      console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
+      console.log('WP user ID is ' + wpUserId + '');
 
-        if (!credentials) {
-            var e = new Error('Access denied (1).');
-            e.status = 401;
-            throw e;
-        }
+      // If not an admin, we set the current WP user as patch author,
+      // disregarding any authorship info s/he sent. If an admin,
+      // we blindy trust the authorship information. Not ideal, but
+      // at least keeps code leaner.
+      if (!isAdmin) {
+          // patchAuthor.type = 'wordpress';
+          // patchAuthor.name = username;
+          patchAuthor.wordpressId = wpUserId;
+      }
 
-        if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            var e = new Error('Access denied (2).');
-            e.status = 401;
-            throw e;
-        }
-
-        wpCookie = credentials.cookie;
-
-        return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
-
-    }).then(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~
-         *  Get WP user info
-         * ~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Getting WP user info...');
-        username = wpCookie.split('|')[0];
-        return getUserInfo(username);
-
-    }).then(function (wpUserInfo) {
-
-        /* ~~~~~~~~~~~~~~~~
-         *  Validate patch
-         * ~~~~~~~~~~~~~~~~ */
-
-        isAdmin = wpUserInfo.admin;
-        wpUserId = wpUserInfo.id;
-        console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
-        console.log('WP user ID is ' + wpUserId + '');
-
-        // If not an admin, we set the current WP user as patch author,
-        // disregarding any authorship info s/he sent. If an admin,
-        // we blindy trust the authorship information. Not ideal, but
-        // at least keeps code leaner.
-        if (!isAdmin) {
-            // patchAuthor.type = 'wordpress';
-            // patchAuthor.name = username;
-            patchAuthor.wordpressId = wpUserId;
-        }
-
-        updatedPatch.seoName = patchModel.generateSeoName(updatedPatch);
-        return patchModel.validate(updatedPatch); // will throw an error if patch is not valid
+      updatedPatch.seoName = patchModel.generateSeoName(updatedPatch);
+      return patchModel.validate(updatedPatch); // will throw an error if patch is not valid
 
     }).then(function () {
 
@@ -396,78 +328,27 @@ router.put('/:id', function (req, res) {
  */
 router.delete('/:id', function (req, res) {
 
-    var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
-    var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
-
     var id = req.params.id;
-    var credentials = req.body;
-    var wpCookie;
     var collection = req.db.get('patches');
-    var username;
+    const username = res.locals.username;
     var isAdmin = false;
     var wpUserId;
 
-    // to avoid unnecessary requests if wordpress cookie is available
-    if(req.cookies){
-        var wpCookieFromRequest = getWordpressCookie(req.cookies);
-        if(wpCookieFromRequest){
-            console.log('wp_cookie found in request');
-            credentials = {
-                type:'wordpress',
-                cookie: wpCookieFromRequest
-            }
-        }
-    }
+    Q.fcall(() => {
 
-    Q.fcall(function () {
+      // Is user authenticated?
+      if (!res.locals.authenticated) {
+        throw { message: 'Access denied.', status: 401 };
+      }
 
-        /* ~~~~~~~~~~~~~~~~~~~
-         *  Check credentials
-         * ~~~~~~~~~~~~~~~~~~~ */
+      const wpUserInfo = res.locals.wpUserInfo;
+      isAdmin = wpUserInfo.admin;
+      wpUserId = wpUserInfo.id;
+      console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
+      console.log('WP user ID = ' + wpUserId);
 
-        console.log('Checking credentials...');
-
-        if (!credentials) {
-            var e = new Error('Access denied (1).');
-            e.status = 401;
-            throw e;
-        }
-
-        if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            var e = new Error('Access denied (2).');
-            e.status = 401;
-            throw e;
-        }
-
-        wpCookie = credentials.cookie;
-
-        return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
-
-    }).then(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check if user is WordPress admin
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Checking if WP admin...');
-        username = wpCookie.split('|')[0];
-        console.log('WP username: ' + username);
-
-        return getUserInfo(username);
-
-    }).then(function (wpUserInfo) {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~
-         *  Find specified patch
-         * ~~~~~~~~~~~~~~~~~~~~~~ */
-
-        isAdmin = wpUserInfo.admin;
-        wpUserId = wpUserInfo.id;
-        console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
-        console.log('WP user ID = ' + wpUserId);
-
-        console.log('Finding patch ' + id + '...');
-        return collection.findOne({ _id: id });
+      console.log('Finding patch ' + id + '...');
+      return collection.findOne({ _id: id });
 
     }).then(function (patch) {
 
