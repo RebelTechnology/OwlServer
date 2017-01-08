@@ -183,8 +183,7 @@ router.get('/', function (req, res) {
  */
 router.put('/:id', (req, res) => {
 
-    const username = res.locals.username;
-    var isAdmin = false;
+    var isWpAdmin = false;
     var wpUserId;
 
     var collection = req.db.get('patches');
@@ -199,18 +198,17 @@ router.put('/:id', (req, res) => {
       }
 
       const wpUserInfo = res.locals.wpUserInfo;
-      isAdmin = wpUserInfo.admin;
+      isWpAdmin = wpUserInfo.admin;
       wpUserId = wpUserInfo.id;
-      console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
+      console.log('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.');
       console.log('WP user ID is ' + wpUserId + '');
 
       // If not an admin, we set the current WP user as patch author,
       // disregarding any authorship info s/he sent. If an admin,
       // we blindy trust the authorship information. Not ideal, but
       // at least keeps code leaner.
-      if (!isAdmin) {
+      if (!isWpAdmin) {
           // patchAuthor.type = 'wordpress';
-          // patchAuthor.name = username;
           patchAuthor.wordpressId = wpUserId;
       }
 
@@ -265,7 +263,7 @@ router.put('/:id', (req, res) => {
             throw e;
         }
 
-        if (!isAdmin) {
+        if (!isWpAdmin) {
             if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
                 var e = new Error('You are not authorized to edit this patch.');
                 e.status = 401;
@@ -274,11 +272,11 @@ router.put('/:id', (req, res) => {
         }
 
         updatedPatch = patchModel.sanitize(updatedPatch);
-        if (!isAdmin) {
+        if (!isWpAdmin) {
             updatedPatch.author = patchAuthor;
         }
 
-        if (!isAdmin) {
+        if (!isWpAdmin) {
             updatedPatch.creationTimeUtc = patch.creationTimeUtc;
         } else {
             if (!updatedPatch.creationTimeUtc) {
@@ -330,8 +328,7 @@ router.delete('/:id', function (req, res) {
 
     var id = req.params.id;
     var collection = req.db.get('patches');
-    const username = res.locals.username;
-    var isAdmin = false;
+    var isWpAdmin = false;
     var wpUserId;
 
     Q.fcall(() => {
@@ -342,9 +339,9 @@ router.delete('/:id', function (req, res) {
       }
 
       const wpUserInfo = res.locals.wpUserInfo;
-      isAdmin = wpUserInfo.admin;
+      isWpAdmin = wpUserInfo.admin;
       wpUserId = wpUserInfo.id;
-      console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
+      console.log('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.');
       console.log('WP user ID = ' + wpUserId);
 
       console.log('Finding patch ' + id + '...');
@@ -357,7 +354,7 @@ router.delete('/:id', function (req, res) {
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
         // This code must be here because we need the value of patch.author.name
-        if (!isAdmin && (patch.author.wordpressId !== wpUserId)) {
+        if (!isWpAdmin && (patch.author.wordpressId !== wpUserId)) {
 
             console.log(patch.author);
             var e = new Error('You are not authorized to delete this patch.');

@@ -25,37 +25,34 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 }
 
-var auth    = require('./middleware/auth');
-var patches = require('./routes/patches');
-var patch   = require('./routes/patch');
-var authors = require('./routes/authors');
-var tags    = require('./routes/tags');
-var builds  = require('./routes/builds');
-var session = require('./routes/session');
+// Load middleware
+const auth = require('./middleware/auth');
 
-var app = express();
+// Load routes
+const patches = require('./routes/patches');
+const patch = require('./routes/patch');
+const authors = require('./routes/authors');
+const tags = require('./routes/tags');
+const builds = require('./routes/builds');
+const session = require('./routes/session');
+
+const app = express();
+
+// Middleware
 app.use(cors());
-
-//// view engine setup
-//app.set('views', path.join(__dirname, 'views'));
-//app.set('view engine', 'jade');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('short'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Make our db accessible to our router
-app.use(function(req,res,next) {
-    req.db = db; next();
+app.use(function(req,res,next) { // Make our db accessible to our router
+  req.db = db; next();
 });
 
-// API authentication middleware
-app.use(auth);
+auth(app); // Authentication middleware
 
+// Routes
 app.use('/patches', patches);
 app.use('/patch', patch);
 app.use('/tags', tags);
@@ -65,9 +62,9 @@ app.use('/session', session);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
 // error handlers
@@ -75,24 +72,23 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.json( {
-            message: err.message,
-            error: err
-        });
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.json( {
+      message: err.message,
+      error: err
     });
+  });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: {}
+  });
 });
-
 
 module.exports = app;

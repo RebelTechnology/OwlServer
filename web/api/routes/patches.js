@@ -3,12 +3,13 @@
  */
 
 var express = require('express');
-var router  = express.Router();
-var url     = require('url');
-var Q       = require('q'); // TODO: Remove dependency on Q
+var router = express.Router();
+var url = require('url');
+var Q = require('q'); // TODO: Remove dependency on Q
 
-var patchModel      = require('../models/patch');
-var apiSettings     = require('../api-settings.js');
+var patchModel = require('../models/patch');
+var apiSettings = require('../api-settings.js');
+const authTypes = require('../middleware/auth/auth-types');
 
 var summaryFields = {
     _id: 1,
@@ -79,8 +80,7 @@ router.get('/', function(req, res) {
  */
 router.post('/', (req, res) => {
 
-    const username = res.locals.username;
-    var isAdmin = false;
+    var isWpAdmin = false;
     var wpUserId;
 
     var collection = req.db.get('patches');
@@ -94,26 +94,23 @@ router.post('/', (req, res) => {
         throw { message: 'Access denied.', status: 401 };
       }
 
-      const wpUserInfo = res.locals.wpUserInfo;
-      isAdmin = wpUserInfo.admin;
-      wpUserId = wpUserInfo.id;
-      console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
-      console.log('WP user ID is ' + wpUserId + '');
+      const userInfo = res.locals.userInfo;
+      if (userInfo.type === authTypes.AUTH_TYPE_WORDPRESS) {
+        wpUserId = userInfo.id;
+        console.log('WP user ID is ' + wpUserId + '');
+        isWpAdmin = wpUserInfo.admin;
+        console.log('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.');
 
-      // If not an admin, we set the current WP user as patch author,
-      // disregarding any authorship info s/he sent. If an admin,
-      // we blindy trust the authorship information. Not ideal, but
-      // at least keeps code leaner.
-      if (!isAdmin) {
-        // patchAuthor.type = 'wordpress';
-        // patchAuthor.name = username;
-        if (patchAuthor.name) {
-            delete patchAuthor.name;
+        // If not a WP admin, we set the current WP user as patch author,
+        // disregarding any authorship info s/he sent.
+        //
+        // If a WP admin, we blindy trust the authorship information. Not ideal,
+        // but at least keeps code leaner.
+        if(!isWpAdmin || (isWpAdmin && (!newPatch.author || !newPatch.author.wordpressId))) {
+          patchAuthor.wordpressId = wpUserId;
         }
-      }
-
-      if(!isAdmin || (isAdmin && (!newPatch.author || !newPatch.author.wordpressId))) {
-        patchAuthor.wordpressId = wpUserId;
+      } elseif (userInfo.type === authTypes.AUTH_TYPE_TOKEN) { // token authentication
+        patchAuthor.name = userInfo.name;
       }
 
       newPatch.seoName = patchModel.generateSeoName(newPatch);
@@ -152,20 +149,17 @@ router.post('/', (req, res) => {
         newPatch.downloadCount = 0; // set download count
         newPatch = patchModel.sanitize(newPatch);
 
-        if(!isAdmin || (isAdmin && (!newPatch.author || !newPatch.author.wordpressId))){
-            newPatch.author = patchAuthor;
-        }
-
         delete newPatch._id;
         console.log('Patch to be inserted: \n' + JSON.stringify(newPatch, null, 4));
 
+        // Set patch creation date
         var now = new Date().getTime();
-        if (!isAdmin) {
-            newPatch.creationTimeUtc = now; // set creation date
+        if (!isWpAdmin) {
+          newPatch.creationTimeUtc = now;
         } else {
-            if (!newPatch.creationTimeUtc) {
-                newPatch.creationTimeUtc = now; // set creation date
-            }
+          if (!newPatch.creationTimeUtc) {
+            newPatch.creationTimeUtc = now;
+          }
         }
 
         return collection.insert(newPatch);

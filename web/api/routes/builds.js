@@ -144,8 +144,7 @@ router.get('/:id', function (req, res) {
  */
 router.put('/:id', function (req, res) {
 
-    const username = res.locals.username;
-    var isAdmin = false;
+    var isWpAdmin = false;
     var wpUserId;
 
     var collection = req.db.get('patches');
@@ -173,18 +172,17 @@ router.put('/:id', function (req, res) {
         }
 
         const wpUserInfo = res.locals.wpUserInfo;
-        isAdmin = wpUserInfo.admin;
+        isWpAdmin = wpUserInfo.admin;
         wpUserId = wpUserInfo.id;
-        console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
+        console.log('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.');
         console.log('WP user ID is ' + wpUserId + '');
 
         // If not an admin, we set the current WP user as patch author,
         // disregarding any authorship info s/he sent. If an admin,
         // we blindy trust the authorship information. Not ideal, but
         // at least keeps code leaner.
-        if (!isAdmin) {
+        if (!isWpAdmin) {
             // patchAuthor.type = 'wordpress';
-            // patchAuthor.name = username;
             if (patchAuthor.name) {
                 delete patchAuthor.name;
             }
@@ -209,7 +207,7 @@ router.put('/:id', function (req, res) {
          *  Check if user can compile patch
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-        if (!isAdmin) {
+        if (!isWpAdmin) {
             if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
                 var e = new Error('You are not authorized to compile this patch.');
                 e.status = 401;

@@ -1,6 +1,7 @@
 'use strict';
 
-const { validateAuthCookie, getUserInfo } = require('../lib/wordpress-bridge.js');
+const { validateAuthCookie, getUserInfo } = require('../../lib/wordpress-bridge.js');
+const authTypes = require('./auth-types');
 
 /**
  * Convenience function gets wordpress cookie if exists or returns false.
@@ -21,15 +22,18 @@ const getWordpressCookie = cookies => {
 };
 
 /**
- * Authentication middleware.
+ * WordPress authentication middleware.
  *
  * @param {Object} req
  * @param {Object} res
  * @param {Function} next
  */
-const auth = (req, res, next) => {
+const wordpressAuth = (req, res, next) => {
 
-  res.locals.authenticated = false;
+  if (res.locals.authenticated) {
+    next(); // already authenticated in some other way
+    return;
+  }
 
   let credentials = req.body.credentials;
 
@@ -39,7 +43,7 @@ const auth = (req, res, next) => {
     if (wpCookieFromRequest) {
       console.log('auth: WP cookie found in request.');
       credentials = {
-        type: 'wordpress',
+        type: authTypes.AUTH_TYPE_WORDPRESS,
         cookie: wpCookieFromRequest
       };
     }
@@ -55,7 +59,7 @@ const auth = (req, res, next) => {
     return;
   }
 
-  let username;
+  let wpUsername;
   const wpCookie = credentials.cookie;
 
   Promise.resolve()
@@ -69,21 +73,29 @@ const auth = (req, res, next) => {
         throw { message: 'Not authorized.', status: 401 };
       }
       console.log('auth: Getting WP user info...');
-      username = wpCookie.split('|')[0];
-      return getUserInfo(username);
+      wpUsername = wpCookie.split('|')[0];
+      return getUserInfo(wpUsername);
     })
     .then(wpUserInfo => {
+
+      if (!wpUserInfo) {
+        throw { message: 'Internal error.', status: 500 };
+      }
+
       res.locals.authenticated = true;
-      res.locals.username = username;
-      res.locals.wpUserInfo = wpUserInfo;
+      res.locals.userInfo = {
+        type: 'wordpress',
+        wpUsername,
+      };
+      Object.assign(res.locals.userInfo, wpUserInfo);
 
       // At this point `res.locals` will look like:
       // {
       //    authenticated: true,
-      //    username: 'jdoe',
-      //    wpUserInfo: {
+      //    userInfo: {
+      //      type: 'wordpress',
       //      id: 1,
-      //      display_name: 'JohnDoe',
+      //      wpUsername: 'jdoe',
       //      admin: true
       //    }
       //  }
@@ -99,4 +111,4 @@ const auth = (req, res, next) => {
     });
 };
 
-module.exports = auth;
+module.exports = wordpressAuth;
