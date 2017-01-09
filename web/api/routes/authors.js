@@ -115,11 +115,9 @@ router.get('/', function(req, res) {
 
     }).catch(function (error) {
 
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            status: status
-        });
+      const message = error.message || JSON.stringify(error);
+      const status = error.status || 500;
+      return res.status(status).json({ message, status });
 
     }).done(function (response) {
 

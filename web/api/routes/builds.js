@@ -120,11 +120,9 @@ router.get('/:id', function (req, res) {
 
     }).catch(function (error) {
 
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            status: status
-        });
+      const message = error.message || JSON.stringify(error);
+      const status = error.status || 500;
+      return res.status(status).json({ message, status });
 
     }).done(function (response) {
 
@@ -144,58 +142,58 @@ router.get('/:id', function (req, res) {
  */
 router.put('/:id', function (req, res) {
 
-    var isWpAdmin = false;
-    var wpUserId;
+  let isWpAdmin = false;
+  let wpUserId;
 
-    var collection = req.db.get('patches');
-    var updatedPatch = req.body.patch;
-    var patchAuthor = {};
+  const collection = req.db.get('patches');
+  let patchAuthor = {};
 
-    var id = req.params.id;
-    if (!/^[a-f\d]{24}$/i.test(id)) {
-        return res.status(500).json({
-           message: 'Invalid patch ID.',
-           error: { status: 500 }
-        });
+  var id = req.params.id;
+  if (!/^[a-f\d]{24}$/i.test(id)) {
+    return res.status(500).json({
+      message: 'Invalid patch ID.',
+      error: { status: 500 }
+    });
+  }
+
+  var format = 'sysx'; // default
+  if (req.body.format) {
+    format = getBuildFormat(req.body.format);
+  }
+
+  Q.fcall(() => {
+
+    // Is user authenticated?
+    if (!res.locals.authenticated) {
+      throw { message: 'Access denied.', status: 401 };
     }
 
-    var format = 'sysx'; // default
-    if (req.body.format) {
-        format = getBuildFormat(req.body.format);
+    const wpUserInfo = res.locals.wpUserInfo;
+    isWpAdmin = wpUserInfo.admin;
+    wpUserId = wpUserInfo.id;
+    console.log('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.');
+    console.log('WP user ID is ' + wpUserId + '');
+
+    // If not an admin, we set the current WP user as patch author,
+    // disregarding any authorship info s/he sent. If an admin,
+    // we blindy trust the authorship information. Not ideal, but
+    // at least keeps code leaner.
+    if (!isWpAdmin) {
+        // patchAuthor.type = 'wordpress';
+        if (patchAuthor.name) {
+            delete patchAuthor.name;
+        }
+        patchAuthor.wordpressId = wpUserId;
     }
 
-    Q.fcall(() => {
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     *  Retrieve patch from database
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-        // Is user authenticated?
-        if (!res.locals.authenticated) {
-          throw { message: 'Access denied.', status: 401 };
-        }
+    return collection.findById(id);
 
-        const wpUserInfo = res.locals.wpUserInfo;
-        isWpAdmin = wpUserInfo.admin;
-        wpUserId = wpUserInfo.id;
-        console.log('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.');
-        console.log('WP user ID is ' + wpUserId + '');
-
-        // If not an admin, we set the current WP user as patch author,
-        // disregarding any authorship info s/he sent. If an admin,
-        // we blindy trust the authorship information. Not ideal, but
-        // at least keeps code leaner.
-        if (!isWpAdmin) {
-            // patchAuthor.type = 'wordpress';
-            if (patchAuthor.name) {
-                delete patchAuthor.name;
-            }
-            patchAuthor.wordpressId = wpUserId;
-        }
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Retrieve patch from database
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        return collection.findById(id);
-
-    }).then(function (patch) {
+  })
+    .then(function (patch) {
 
         if (null === patch) {
             var e = new Error('Patch not found.');
@@ -263,7 +261,7 @@ router.put('/:id', function (req, res) {
     }).catch(function (error) {
         var status = error.status || 500;
         return res.status(status).json({
-            message: error.toString(),
+            message: error.message || JSON.stringify(error),
             stdout: error.stdout,
             stderr: error.stderr,
             success: false,

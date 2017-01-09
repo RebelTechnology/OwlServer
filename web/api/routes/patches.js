@@ -78,14 +78,15 @@ router.get('/', function(req, res) {
  *
  * POST /patches
  */
-router.post('/', (req, res) => {
 
-    var isWpAdmin = false;
-    var wpUserId;
+ router.post('/', (req, res) => {
 
-    var collection = req.db.get('patches');
-    var newPatch = req.body.patch;
-    var patchAuthor = {};
+    let isWpAdmin = false;
+    let wpUserId;
+
+    const collection = req.db.get('patches');
+    let newPatch = req.body.patch;
+    const patchAuthor = {};
 
     Q.fcall(() => {
 
@@ -96,23 +97,21 @@ router.post('/', (req, res) => {
 
       const userInfo = res.locals.userInfo;
       if (userInfo.type === authTypes.AUTH_TYPE_WORDPRESS) {
-        wpUserId = userInfo.id;
+        wpUserId = userInfo.wpUserId;
         console.log('WP user ID is ' + wpUserId + '');
-        isWpAdmin = wpUserInfo.admin;
+        isWpAdmin = userInfo.wpAdmin;
         console.log('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.');
 
         // If not a WP admin, we set the current WP user as patch author,
         // disregarding any authorship info s/he sent.
-        //
-        // If a WP admin, we blindy trust the authorship information. Not ideal,
-        // but at least keeps code leaner.
         if(!isWpAdmin || (isWpAdmin && (!newPatch.author || !newPatch.author.wordpressId))) {
           patchAuthor.wordpressId = wpUserId;
         }
-      } elseif (userInfo.type === authTypes.AUTH_TYPE_TOKEN) { // token authentication
+      } else if (userInfo.type === authTypes.AUTH_TYPE_TOKEN) { // token authentication
         patchAuthor.name = userInfo.name;
       }
 
+      newPatch.author = patchAuthor;
       newPatch.seoName = patchModel.generateSeoName(newPatch);
       return patchModel.validate(newPatch); // will throw an error if patch is not valid
 
@@ -123,9 +122,7 @@ router.post('/', (req, res) => {
          *  (in a case insensitive fashion)
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-        var regExpEscape = function(str) {
-            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-        };
+        const regExpEscape = str => str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");;
 
         var nameRegexp = new RegExp('^' + regExpEscape(newPatch.name) + '$', 'i');
         var seoNameRegexp = new RegExp('^' + regExpEscape(newPatch.seoName) + '$', 'i');
@@ -179,19 +176,10 @@ router.post('/', (req, res) => {
 
     }).catch(function (error) {
 
-        console.log('error: ', error);
+        const message = error.message || JSON.stringify(error);
+        const status = error.status || 500;
+        return res.status(status).json({ message, status });
 
-        if(error.status){
-            return res.status(error.status).json(error);
-        } else if(error.error){
-                var status = error.error.status || 500;
-            return res.status(status).json(error);
-        } else {
-            return res.status(500).json({
-                message: error.toString(),
-                status: 500
-            });
-        }
     }).done(function (response) {
 
         if ('ServerResponse' === response.constructor.name) {

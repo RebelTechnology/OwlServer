@@ -22,7 +22,7 @@ var patchModel = {
         },
 
         name: {
-            required: true,
+            required: false,
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'name', error: { status: 400 }};
@@ -61,7 +61,7 @@ var patchModel = {
         compilationType: {
             required: false,
             validate: function (val) {
-                
+
                 var err = { type: 'not_valid', field: 'compilationType', error: { status: 400 }};
                 var validTypes = ['cpp', 'faust', 'pd' ,'gen'];
 
@@ -76,7 +76,7 @@ var patchModel = {
         },
 
         author: {
-            required: false,
+            required: true,
             validate: function (val) {
 
                 var err = { type: 'not_valid', field: 'author', error: { status: 400 }};
@@ -202,7 +202,7 @@ var patchModel = {
         },
 
         inputs: {
-            required: true,
+            required: false,
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'inputs', error: { status: 400 }};
@@ -218,7 +218,7 @@ var patchModel = {
         },
 
         outputs: {
-            required: true,
+            required: false,
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'outputs', error: { status: 400 }};
@@ -333,7 +333,7 @@ var patchModel = {
         },
 
         cycles: {
-            required: false, 
+            required: false,
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'cycles', error: { status: 400 }};
@@ -349,7 +349,7 @@ var patchModel = {
         },
 
         bytes: {
-            required: false, 
+            required: false,
             validate: function(val) {
 
                 var err = { type: 'not_valid', field: 'bytes', error: { status: 400 }};
@@ -425,7 +425,7 @@ var patchModel = {
         downloadCount: {
             required: false,
             validate: function (val) {
-                
+
                 var err = { type: 'not_valid', field: 'downloadCount', error: { status: 400 }};
 
                 if (!/^\d+$/.test(val)) {
@@ -478,24 +478,45 @@ var patchModel = {
 
     sanitize: function(patch) {
 
-        var keys = Object.keys(patchModel.fields);
+      var keys = Object.keys(patchModel.fields);
 
-        for (key in patch) {
-            if (keys.indexOf(key) === -1) {
-                delete patch[key];
-            }
-        }
+      for (key in patch) {
+          if (keys.indexOf(key) === -1) {
+              delete patch[key];
+          }
+      }
 
-        return patch;
+      // Default values:
+      if (!patch.name) {
+        const randomId = () => (Math.random()*0xFFFF<<0).toString(16);
+        patch.name = 'untitled-' + randomId() + randomId() + randomId();
+      }
+      if ('undefined' === typeof patch.inputs) {
+        patch.inputs = 0;
+      }
+      if ('undefined' === typeof patch.outputs) {
+        patch.outputs = 0;
+      }
+      if (!patch.compilationType) {
+        patch.compilationType = 'cpp';
+      }
+      // published
+      // github
+      // seoName ???
+      // downloadCount ???
+      // creationTimeUtc ???
+
+      return patch;
     },
 
     generateSeoName: function(patch) {
         return patch.name.replace(/[^a-z0-9]+/gi, '_');
     },
 
-    throwErrorForMissingRequiredField: function(field){
+    throwErrorForMissingRequiredField: function(field) {
         console.log('Error missing required field: ', field);
-        err.message = 'This field is required.';
+        const err = {};
+        err.message = `Field '${field}' is required.`;
         err.type = 'field_required';
         err.field = field;
         throw err;

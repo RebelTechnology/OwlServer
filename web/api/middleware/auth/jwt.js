@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const authTypes = require('./auth-types');
 
-const TOKEN_MAX_AGE = 1209600; // 60 * 60 * 24 * 7 * 2 seconds = 2 weeks
+const TOKEN_MAX_AGE = 1209600; // = 60 * 60 * 24 * 7 * 2 seconds = 2 weeks
 
 /**
  * JWT authentication middleware.
@@ -53,9 +53,9 @@ const jwtAuth = (req, res, next) => {
     }
   } catch (err) {
     const status = err.status || 500;
-    console.error(err.message || err.toString());
+    console.error(err.message || JSON.stringify(err));
     res.status(status).json({
-      message: err.message || err.toString(),
+      message: err.message || JSON.stringify(err),
       status: status,
     });
     return;
@@ -71,7 +71,7 @@ const jwtAuth = (req, res, next) => {
   // {
   //    authenticated: true,
   //    userInfo: {
-  //      type: 'external',
+  //      type: 'tk',
   //      name: 'API user'
   //    }
   //  }

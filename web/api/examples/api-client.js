@@ -90,9 +90,22 @@ class ApiClient {
 
   /**
    * Returns the specified patch.
+   *
+   * @param {string} patchId
+   * @return {Promise<Patch>}
    */
   getPatch(patchId) {
     return this._request('GET', `/patch/${patchId}`);
+  }
+
+  /**
+   * Creates a new patch.
+   *
+   * @param {Patch} patch
+   * @return {Promise}
+   */
+  newPatch(patch) {
+    return this._request('POST', '/patches', patch);
   }
 
   /**

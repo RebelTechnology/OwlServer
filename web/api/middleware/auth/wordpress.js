@@ -54,7 +54,7 @@ const wordpressAuth = (req, res, next) => {
     return;
   }
 
-  if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
+  if (!credentials.type || authTypes.AUTH_TYPE_WORDPRESS !== credentials.type || !credentials.cookie) {
     next();
     return;
   }
@@ -84,8 +84,10 @@ const wordpressAuth = (req, res, next) => {
 
       res.locals.authenticated = true;
       res.locals.userInfo = {
-        type: 'wordpress',
+        type: authTypes.AUTH_TYPE_WORDPRESS,
+        wpUserId: wpUserInfo.id,
         wpUsername,
+        wpAdmin: !!wpUserInfo.admin,
       };
       Object.assign(res.locals.userInfo, wpUserInfo);
 
@@ -93,21 +95,19 @@ const wordpressAuth = (req, res, next) => {
       // {
       //    authenticated: true,
       //    userInfo: {
-      //      type: 'wordpress',
-      //      id: 1,
+      //      type: 'wp',
+      //      wpUserId: 1,
       //      wpUsername: 'jdoe',
-      //      admin: true
+      //      wpAdmin: true
       //    }
       //  }
 
       next();
     })
-    .catch(err => {
-      const status = err.status || 500;
-      res.status(status).json({
-        message: err.message || err.toString(),
-        status: status
-      });
+    .catch(error => {
+      const message = error.message || JSON.stringify(error);
+      const status = error.status || 500;
+      return res.status(status).json({ message, status });
     });
 };
 
