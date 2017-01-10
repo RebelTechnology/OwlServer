@@ -120,6 +120,8 @@ router.get('/:id', function (req, res) {
 
     }).catch(function (error) {
 
+      console.error(error);
+      console.error(error.stack);
       const message = error.message || JSON.stringify(error);
       const status = error.status || 500;
       return res.status(status).json({ message, status });
@@ -258,24 +260,24 @@ router.put('/:id', function (req, res) {
 
         });
 
-    }).catch(function (error) {
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.message || JSON.stringify(error),
-            stdout: error.stdout,
-            stderr: error.stderr,
-            success: false,
-            status: status
-        });
-
-    }).done(function (response) {
-
-        if (response.constructor && 'ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
+    })
+    .catch(error => {
+      console.error(error);
+      console.error(error.stack);
+      const status = error.status || 500;
+      return res.status(status).json({
+        message: error.message || JSON.stringify(error),
+        stdout: error.stdout,
+        stderr: error.stderr,
+        success: false,
+        status: status
+      });
+    })
+    .done(function (response) {
+      if (response.constructor && 'ServerResponse' === response.constructor.name) {
+        return response;
+      }
+      return res.status(200).json(response);
     });
 });
 

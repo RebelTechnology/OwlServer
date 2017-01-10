@@ -80,6 +80,20 @@ class ApiClient {
   }
 
   /**
+   * Returns all authors.
+   *
+   * @param {boolean} onlyWithPublicPatches
+   * @return {Promise<{count: number,result: Array}>}
+   */
+  getAuthors(onlyWithPublicPatches = true) {
+    let url = '/authors';
+    if (!onlyWithPublicPatches) {
+      url += '?onlyWithPublicPatches=0'
+    }
+    return this._request('GET', url);
+  }
+
+  /**
    * Returns all patches.
    *
    * @return {Promise<Array[Patch]>}

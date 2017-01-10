@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const Q = require('q');
 
-const patchModel = require('../models/patch');
+const Patch = require('../models/patch');
 const { getUserInfoBatch } = require('../lib/wordpress-bridge.js');
 const apiSettings = require('../api-settings.js');
 const authTypes = require('../middleware/auth/auth-types');
@@ -16,7 +16,7 @@ const authTypes = require('../middleware/auth/auth-types');
 /**
  * Adds the WP user "display name" to the patch's author info, if necessary.
  */
-var getUserWpDisplayName = function (patch) {
+var getUserWpDisplayName = patch => {
 
     if (null === patch) {
         var e = new Error('Patch not found.');
@@ -33,7 +33,7 @@ var getUserWpDisplayName = function (patch) {
         // FIXME - This should not be a batch call
         // This should call instead 'getUserInfo()'
 
-        return getUserInfoBatch([ parseInt(patch.author.wordpressId) ]).then(function (result) {
+        return getUserInfoBatch([ parseInt(patch.author.wordpressId) ]).then(result => {
 
             if (patch.author.wordpressId in result) {
                 patch.author.name = result[patch.author.wordpressId].display_name;
@@ -51,7 +51,7 @@ var getUserWpDisplayName = function (patch) {
 /**
  * Completes patch info with extra information.
  */
-var finishPatch = function (patch) {
+var finishPatch = patch => {
 
     /*
      * Get patch SysEx
@@ -90,35 +90,27 @@ var finishPatch = function (patch) {
  *
  * FIXME: Private patches should be returned only to their owners.
  */
-router.get('/:id', function (req, res) {
+router.get('/:id', (req, res) => {
 
-    var id = req.params.id;
-    var collection = req.db.get('patches');
+  const id = req.params.id;
+  const collection = req.db.get('patches');
 
-    Q.fcall(function () {
-
-        /*
-         * Get patch by ID
-         */
-
-        return collection.findOne({ _id: id });
-
-    }).then(getUserWpDisplayName)
+  Q
+    .fcall(() => collection.findOne({ _id: id })) // Get patch by ID
+    .then(getUserWpDisplayName)
     .then(finishPatch)
-    .catch(function (error) {
-
-        const message = error.message || JSON.stringify(error);
-        const status = error.status || 500;
-        return res.status(status).json({ message, status });
-
-    }).done(function (response) {
-
-        if ('ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
+    .catch(error => {
+      console.error(error);
+      console.error(error.stack);
+      const message = error.message || JSON.stringify(error);
+      const status = error.status || 500;
+      return res.status(status).json({ message, status });
+    })
+    .done(response => {
+      if ('ServerResponse' === response.constructor.name) {
+        return response;
+      }
+      return res.status(200).json(response);
     });
 });
 
@@ -129,7 +121,7 @@ router.get('/:id', function (req, res) {
  *
  * FIXME: Private patches should be returned only to their owners.
  */
-router.get('/', function (req, res) {
+router.get('/', (req, res) => {
 
     var query = {};
     var collection = req.db.get('patches');
@@ -138,7 +130,7 @@ router.get('/', function (req, res) {
         query.seoName = req.query.seoName;
     }
 
-    Q.fcall(function () {
+    Q.fcall(() => {
 
         if (0 === Object.keys(query).length) {
             var e = new Error('You must specify at least 1 search parameter.');
@@ -154,13 +146,13 @@ router.get('/', function (req, res) {
 
     }).then(getUserWpDisplayName)
     .then(finishPatch)
-    .catch(function (error) {
-
+    .catch(error => {
+      console.error(error);
+      console.error(error.stack);
       const message = error.message || JSON.stringify(error);
       const status = error.status || 500;
       return res.status(status).json({ message, status });
-
-    }).done(function (response) {
+    }).done(response => {
 
         if ('ServerResponse' === response.constructor.name) {
             return response;
@@ -182,10 +174,11 @@ router.put('/:id', (req, res) => {
   let wpUserId;
 
   const collection = req.db.get('patches');
-  let updatedPatch = req.body.patch;
+  const updatedPatch = new Patch();
+  Object.assign(updatedPatch, req.body.patch);
   const patchAuthor = {};
 
-  Q.fcall(function () {
+  Q.fcall(() => {
 
     // Is user authenticated?
     if (!res.locals.authenticated) {
@@ -211,17 +204,14 @@ router.put('/:id', (req, res) => {
       patchAuthor.wordpressId = wpUserId;
     }
 
-    updatedPatch.seoName = patchModel.generateSeoName(updatedPatch);
-    return patchModel.validate(updatedPatch); // will throw an error if patch is not valid
+    updatedPatch.generateSeoName();
+    return updatedPatch.validate(); // will throw an error if patch is not valid
 
   })
-  .then(function () {
+  .then(() => {
 
-    // Make sure that no other patches are named the same (in a case
-    // insensitive fashion)
-
+    // Make sure that no other patches are named the same (in a case insensitive fashion)
     const regExpEscape = str => str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-
     const nameRegexp = new RegExp('^' + regExpEscape(updatedPatch.name) + '$', 'i');
     const seoNameRegexp = new RegExp('^' + regExpEscape(updatedPatch.seoName) + '$', 'i');
     return collection.findOne({
@@ -230,9 +220,8 @@ router.put('/:id', (req, res) => {
         { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp }]},
       ]
     });
-
   })
-  .then(function (doc) {
+  .then(doc => {
 
     // Retrieve patch before updating it
     if (null !== doc) {
@@ -244,7 +233,7 @@ router.put('/:id', (req, res) => {
     }
     return collection.findById(updatedPatch._id);
   })
-  .then(function (patch) {
+  .then(patch => {
 
     // Save patch
     if (null === patch) {
@@ -261,7 +250,7 @@ router.put('/:id', (req, res) => {
       }
     }
 
-    updatedPatch = patchModel.sanitize(updatedPatch);
+    updatedPatch.sanitize();
     if (!isWpAdmin) {
       updatedPatch.author = patchAuthor;
     }
@@ -277,26 +266,28 @@ router.put('/:id', (req, res) => {
     console.log('Patch to be updated: \n' + JSON.stringify(updatedPatch, null, 4));
     return collection.updateById(updatedPatch._id, updatedPatch);
   })
-  .then(function (patch) {
+  .then(patch => {
 
     // Confirms that the patch was actually inserted
     console.log('Patch ' + updatedPatch._id + ' updated.');
     return {
-        message: 'Patch updated.',
-        _id:     updatedPatch._id,
-        seoName: updatedPatch.seoName
+      message: 'Patch updated.',
+      _id:     updatedPatch._id,
+      seoName: updatedPatch.seoName,
     };
   })
-  .catch(function (error) {
+  .catch(error => {
+    console.error(error);
+    console.error(error.stack);
     const message = error.message || JSON.stringify(error);
     const status = error.status || 500;
     return res.status(status).json({ message, status });
   })
-  .done(function (response) {
-      if ('ServerResponse' === response.constructor.name) {
-        return response;
-      }
-      return res.status(200).json(response);
+  .done(response => {
+    if ('ServerResponse' === response.constructor.name) {
+      return response;
+    }
+    return res.status(200).json(response);
   });
 });
 
@@ -305,7 +296,7 @@ router.put('/:id', (req, res) => {
  *
  * DELETE /patch/{id}
  */
-router.delete('/:id', function (req, res) {
+router.delete('/:id', (req, res) => {
 
   let isWpAdmin = false;
   let wpUserId;
@@ -333,7 +324,7 @@ router.delete('/:id', function (req, res) {
     console.log('Finding patch ' + id + '...');
     return collection.findOne({ _id: id });
   })
-  .then(function (patch) {
+  .then(patch => {
     if (!patch) {
         var e = new Error('Patch not found.');
         e.status = 404;
@@ -359,14 +350,16 @@ router.delete('/:id', function (req, res) {
     }
     return { message: 'Patch deleted successfully.' };
   })
-  .catch(function (error) {
+  .catch(error => {
+    console.error(error);
+    console.error(error.stack);
     var status = error.status || 500;
     return res.status(status).json({
         message: error.message || JSON.stringify(error),
         status: status
     });
   })
-  .done(function (response) {
+  .done(response => {
     if ('ServerResponse' === response.constructor.name) {
       return response;
     }
