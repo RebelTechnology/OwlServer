@@ -18,15 +18,15 @@ router.get('/', (req, res) => {
   authorModel
     .getAll(onlyForPublicPatches)
     .then(result => {
-      const response = { count: result.length, result };
+      const response = { success: true, count: result.length, result };
       return res.status(200).json(response);
     })
     .catch(error => {
-      console.error(error);
-      console.error(error.stack);
+      process.stderr.write(error + '\n');
+      process.stderr.write(error.stack + '\n');
       const message = error.message || JSON.stringify(error);
       const status = error.status || 500;
-      return res.status(status).json({ message, status });
+      return res.status(status).json({ success: false, message, status });
     });
 });
 

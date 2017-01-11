@@ -13,7 +13,7 @@ class Author {
    * @param {Object} db
    */
   constructor(db) {
-    this._db = db;
+    this._collection = db.get('patches');
   }
 
   /**
@@ -34,7 +34,6 @@ class Author {
      * WordPress user ID.
      */
 
-    const collection = this._db.get('patches');
     let authorWpIds = []; // an array whose values are WordPress user IDs
     const authorNames = {}; // an object whose keys are non-WP author names
     const result = [];
@@ -44,7 +43,7 @@ class Author {
       query = { published: onlyForPublicPatches };
     }
     return Promise.resolve()
-      .then(() => collection.find(query, { fields: { author: 1, published: 1 }}))
+      .then(() => this._collection.find(query, { fields: { author: 1, published: 1 }}))
       .then(patches => {
         for (let i = 0, max = patches.length; i < max; i++) {
           if (patches[i] && patches[i].author) {
@@ -95,6 +94,11 @@ class Author {
 
         return result;
       })
+      .catch(err => {
+        process.stderr.write(err + '\n');
+        process.stderr.write(err.stack + '\n');
+        return Promise.reject(new Error('Internal error.')); // masks real error
+      });
   }
 
   /*

@@ -17,7 +17,7 @@ const client = wordpress.createClient({
  * @param {string} cookie
  * @return {Promise<string,Error>}
  */
-const validateAuthCookie = function (cookie) {
+const validateAuthCookie = cookie => {
   return new Promise((resolve, reject) => {
     client.call('owl.validateAuthCookie', cookie, (error, data) => {
       if (error) {
@@ -35,7 +35,7 @@ const validateAuthCookie = function (cookie) {
  * @param {string} username
  * @return {Promise<Object,Error>}
  */
-const getUserInfo = function (username) {
+const getUserInfo = username => {
   return new Promise((resolve, reject) => {
     client.call('owl.getUserInfo', username, (error, data) => {
       if (error) {
@@ -53,7 +53,7 @@ const getUserInfo = function (username) {
  * @param {Array} userIds
  * @return {Promise<Array<Object>,Error>}
  */
-const getUserInfoBatch = function (userIds) {
+const getUserInfoBatch = userIds => {
   return new Promise((resolve, reject) => {
     client.call('owl.getUserInfoBatch', userIds, (error, data) => {
       if (error) {

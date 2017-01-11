@@ -11,7 +11,7 @@ class Tag {
    * @param {Object} db
    */
   constructor(db) {
-    this._db = db;
+    this._collection = db.get('patches');
   }
 
   /**
@@ -21,29 +21,26 @@ class Tag {
    * @return {Promise<Array<string>>}
    */
   getAll(onlyForPublicPatches = true) {
-    const collection = this._db.get('patches');
-    const nativeCol = collection.col;
+
     const query = {};
     if (onlyForPublicPatches) {
       query.published = true;
     }
-    return new Promise((resolve, reject) => {
-      nativeCol.aggregate(
+    return this._collection.aggregate(
         { $match: query },
         { $project: { tags: 1 }},
         { $unwind: '$tags' },
         { $group: { _id: '$tags' }},
         { $project: { _id: 1, insensitive: { $toLower: '$_id' }}}, // case-insensitive ordering
         { $sort: { insensitive: 1 }},
-        { $project: { _id: 1 }},
-        (err, result) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(result.map(current => current._id));
-        }
-      );
-    });
+        { $project: { _id: 1 }}
+      )
+      .then(result => result.map(current => current._id))
+      .catch(err => {
+        process.stderr.write(err + '\n');
+        process.stderr.write(err.stack + '\n');
+        return Promise.reject(new Error('Internal error.')); // masks real error
+      });
   }
 }
 

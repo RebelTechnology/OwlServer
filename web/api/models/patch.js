@@ -1,98 +1,117 @@
 'use strict';
 
-const patchFieldValidators = require('./patch-field-validators');
+const escapeStringRegexp = require('escape-string-regexp');
 
-class PatchValidationError extends Error {
-  constructor(message = 'Illegal patch.') {
-    super(message);
-    this.field = field;
-    this.type = 'not_valid';
-    this.status = 400;
+const Patch = require('../lib/patch');
+
+/**
+ * Patch model.
+ */
+class PatchModel {
+
+  /**
+   * Class constructor.
+   *
+   * @param {Object} db
+   */
+  constructor(db) {
+    this._collection = db.get('patches');
+  }
+
+  /**
+   * Retrieves the patch with the specified patch ID.
+   *
+   * @param {string} id
+   * @return {Promise<Patch>}
+   */
+  getById(id) {
+    return this._getOne({ _id: id });
+  }
+
+  /**
+   * Retrieves the patch with the specified SEO name.
+   *
+   * @param {string} seoName
+   * @return {Promise<Patch>}
+   */
+  getBySeoName(seoName) {
+    return this._getOne({ seoName });
+  }
+
+  /**
+   * Returns whether the specified name has already been taken.
+   *
+   * A specific patch ID to ignore can be optionally specified.
+   *
+   * @param {string} name
+   * @param {string} seoName
+   * @param {?string} ignorePatchId
+   * @return {Promise<boolean>}
+   */
+  patchNameTaken(name, seoName, ignorePatchId) {
+
+    const nameRegexp = new RegExp('^' + escapeStringRegexp(name) + '$', 'i');
+    const seoNameRegexp = new RegExp('^' + escapeStringRegexp(seoName) + '$', 'i');
+    let query;
+    if (ignorePatchId) {
+      query = {
+        $and: [
+          { _id: { $ne: this._collection.id(ignorePatchId)}},
+          { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp }]},
+        ]
+      };
+    } else {
+      query = { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] };
+    }
+    return this._collection.findOne(query)
+    .then(doc => !!doc)
+    .catch(err => {
+      process.stderr.write(err + '\n');
+      process.stderr.write(err.stack + '\n');
+      return Promise.reject(new Error('Internal error.')); // masks real error
+    });
+  }
+
+  /**
+   * Retrieves a single patch from the database.
+   *
+   * @private
+   * @param {Object} query
+   * @return {Promise<?Patch>}
+   */
+  _getOne(query) {
+
+    return this._collection.findOne(query)
+      .then(result => {
+        if (!result) { // Patch not found
+          return null;
+        }
+        const patch = new Patch();
+        Object.assign(patch, result);
+        return patch;
+      })
+      .catch(err => {
+        process.stderr.write(err + '\n');
+        process.stderr.write(err.stack + '\n');
+        return Promise.reject(new Error('Internal error.')); // masks real error
+      });
+  }
+
+  /**
+   * Updates the specified patch.
+   *
+   * @param {string} _id
+   * @param {Patch} patch
+   * @return {Promise}
+   */
+  update(_id, patch) {
+    return this._collection.update({ _id }, patch)
+    .catch(err => {
+      process.stderr.write(err + '\n');
+      process.stderr.write(err.stack + '\n');
+      return Promise.reject(new Error('Internal error.')); // masks real error
+    });
   }
 }
 
-class Patch {
-
-  validate() {
-    for (let field in patchFieldValidators) {
-
-      if (typeof this[field] === 'undefined') {
-
-        // Check for required fields
-        if (patchFieldValidators[field].required === true) {
-          this.throwErrorForMissingRequiredField(field);
-        }
-
-        // instructions and description are required if patch is published
-        if (this.published && (field === 'instructions' || field === 'description')) {
-          this.throwErrorForMissingRequiredField(field);
-        }
-      } else {
-
-        // Validate single fields
-        patchFieldValidators[field].validate(this[field]);
-        if (patchFieldValidators[field].sanitize) {
-          // if a sanitization function exist, call it and then revalidate
-          // just in case...
-          this[field] = patchFieldValidators[field].sanitize(this[field]);
-          patchFieldValidators[field].validate(this[field]);
-        }
-      }
-    }
-  }
-
-  sanitize() {
-
-    // Default values:
-    if (!this.inputs) {
-      this.inputs = 0;
-    }
-    if (!this.outputs) {
-      this.outputs = 0;
-    }
-    if (!this.parameters) {
-      this.parameters = {};
-    }
-    if (!this.compilationType) {
-      this.compilationType = 'cpp';
-    }
-    this.published = this.published ? true : false;
-    this.github = [];
-    if (!this.downloadCount) {
-      this.downloadCount = 0;
-    }
-    // The below fields should all be generated somewhere else:
-    // - seoName
-    // - creationTimeUtc
-
-    // Delete unrecognized fields
-    var keys = Object.keys(patchFieldValidators);
-    for (let key in this) {
-      if (keys.indexOf(key) === -1) {
-        delete this[key];
-      }
-    }
-  }
-
-  generateRandomName() {
-    if (!this.name) {
-      const randomId = () => (Math.random() * 0xFFFF<<0).toString(16);
-      this.name = 'untitled-' + randomId() + randomId() + randomId();
-    }
-  }
-
-  generateSeoName() {
-    this.seoName = this.name.replace(/[^a-z0-9]+/gi, '_');
-  }
-
-  throwErrorForMissingRequiredField(field) {
-    console.log('Error missing required field: ', field);
-    const err = {};
-    err.message = `Field '${field}' is required.`;
-    err.type = 'field_required';
-    err.field = field;
-    throw err;
-  }
-}
-
-module.exports = Patch;
+module.exports = PatchModel;

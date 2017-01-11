@@ -1,6 +1,4 @@
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
+'use strict';
 
 require('dotenv').config();
 
@@ -16,12 +14,12 @@ var apiSettings = require('./api-settings');
 var db = monk(apiSettings.mongoConnectionString);
 
 if (!process.env.API_KEY) {
-  console.error('Error: Make sure that `.env` file exists and that it contains the API_KEY setting in it.')
+  process.stderr.write('Error: Make sure that `.env` file exists and that it contains the API_KEY setting in it.\n');
   process.exit(1);
 }
 
 if (!process.env.JWT_SECRET) {
-  console.error('Error: Make sure that `.env` file exists and that it contains the JWT_SECRET setting in it.')
+  process.stderr.write('Error: Make sure that `.env` file exists and that it contains the JWT_SECRET setting in it.');
   process.exit(1);
 }
 
@@ -73,7 +71,7 @@ app.use((req, res, next) => {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use((err, req, res, next) => {
+  app.use((err, req, res) => {
     res.status(err.status || 500);
     res.json( {
       message: err.message,
@@ -84,7 +82,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
@@ -92,5 +90,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-module.exports = app;
+process.stdout.write('API started.\n');
+process.on('SIGTERM', () => {
+  process.stdout.write('Ooops... Got SIGINT\'d. Bye!\n');
+  process.exit();
+});
 
+module.exports = app;

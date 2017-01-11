@@ -1,14 +1,11 @@
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
+'use strict';
 
 const express = require('express');
 const router = express.Router();
 const url = require('url');
 const Q = require('q'); // TODO: Remove dependency on Q
 
-const Patch = require('../models/patch');
-const apiSettings = require('../api-settings.js');
+const Patch = require('../lib/patch');
 const authTypes = require('../middleware/auth/auth-types');
 
 const summaryFields = {
@@ -36,40 +33,34 @@ const summaryFields = {
  * FIXME - Only WP admins/patch authors should be able to retrieve all/their private patches.
  */
 router.get('/', (req, res) => {
+  const urlParts = url.parse(req.url, true);
+  const query = urlParts.query;
+  const collection = req.db.get('patches');
 
-    var urlParts = url.parse(req.url, true);
-    var query = urlParts.query;
+  const summaryFields2 = {};
+  for (let field in summaryFields) { // shallow copy
+    summaryFields2[field] = summaryFields[field];
+  }
+  summaryFields2.lowercase = { $toLower: '$name' }; // Used below to sort patches by name
+  const filter = { $match: {}};
+  if ('author.name' in query && query['author.name'] !== '') {
+    filter.$match['author.name'] = query['author.name'];
+  }
+  if ('author.wordpressId' in query && query['author.wordpressId'] !== '') {
+    filter.$match['author.wordpressId'] = query['author.wordpressId'];
+  }
 
-    var collection = req.db.get('patches');
-    var nativeCol = collection.col;
-
-    var summaryFields2 = {};
-    for (field in summaryFields) { // shallow copy
-        summaryFields2[field] = summaryFields[field];
-    }
-    summaryFields2.lowercase = { $toLower: '$name' }; // Used below to sort patches by name
-
-    var filter = { $match: {}};
-
-    if ('author.name' in query && query['author.name'] !== '') {
-        filter.$match['author.name'] = query['author.name'];
-    }
-
-    if ('author.wordpressId' in query && query['author.wordpressId'] !== '') {
-        filter.$match['author.wordpressId'] = query['author.wordpressId'];
-    }
-
-    // filter.$match['published'] = true;
-
-    nativeCol.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, { $project: summaryFields }, (err, result) => {
-        if (err !== null) {
-            return res.status(500).json({ message: err, status: 500 });
-        } else {
-            var response = {};
-            response.count = result.length;
-            response.result = result;
-            return res.status(200).json(response);
-        }
+  collection.aggregate(filter, { $project: summaryFields2 }, { $sort: { lowercase: 1 }}, { $project: summaryFields })
+    .then(result => {
+      var response = { count: result.length, result };
+      return res.status(200).json(response);
+    })
+    .catch(error => {
+      process.stderr.write(error + '\n');
+      process.stderr.write(error.stack + '\n');
+      const message = error.message || JSON.stringify(error);
+      const status = error.status || 500;
+      return res.status(status).json({ success: false, message, status });
     });
 });
 

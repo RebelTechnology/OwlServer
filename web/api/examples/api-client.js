@@ -88,7 +88,7 @@ class ApiClient {
   getAuthors(onlyForPublicPatches = true) {
     let url = '/authors';
     if (!onlyForPublicPatches) {
-      url += '?onlyForPublicPatches=0'
+      url += '?onlyForPublicPatches=0';
     }
     return this._request('GET', url);
   }
@@ -102,7 +102,7 @@ class ApiClient {
   getTags(onlyForPublicPatches = true) {
     let url = '/tags';
     if (!onlyForPublicPatches) {
-      url += '?onlyForPublicPatches=0'
+      url += '?onlyForPublicPatches=0';
     }
     return this._request('GET', url);
   }
@@ -113,17 +113,27 @@ class ApiClient {
    * @return {Promise<Array[Patch]>}
    */
   getPatches() {
-    return this._request('GET', '/patches')
+    return this._request('GET', '/patches');
   }
 
   /**
    * Returns the specified patch.
    *
    * @param {string} patchId
-   * @return {Promise<Patch>}
+   * @return {Promise<?Patch>}
    */
   getPatch(patchId) {
     return this._request('GET', `/patch/${patchId}`);
+  }
+
+  /**
+   * Returns the patch with the specified SEO name.
+   *
+   * @param {string} seoName
+   * @return {Promise<?Patch>}
+   */
+  getPatchBySeoName(seoName) {
+    return this._request('GET', `/patch/?seoName=${seoName}`);
   }
 
   /**
@@ -182,7 +192,7 @@ class ApiClient {
         res.on('data', chunk => data += chunk);
         res.on('end', () => resolve({ res, data: data ? JSON.parse(data) : data }));
       });
-      req.on('error', e => reject(e));
+      req.on('error', err => reject(err));
       if (body) {
         req.write(encodedBody);
       }

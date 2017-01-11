@@ -7,7 +7,6 @@ class PatchFieldValidationError extends Error {
     super(message);
     this.field = field;
     this.type = 'not_valid';
-    this.status = 400;
   }
 }
 
