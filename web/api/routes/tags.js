@@ -1,41 +1,33 @@
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
+'use strict';
 
-var express = require('express');
-var router  = express.Router();
+const router = require('express').Router();
+
+const TagModel = require('../models/tag');
 
 /**
  * Retrieves all tags.
  *
  * GET /tags
  */
-router.get('/', function(req, res) {
-
-    var collection = req.db.get('patches');
-    var nativeCol = collection.col;
-    nativeCol.aggregate(
-
-        { $project: { tags: 1 }},
-        { $unwind: '$tags' },
-        { $group: { _id: '$tags' }},
-        { $project: { _id: 1, insensitive: { $toLower: '$_id' }}}, // case-insensitive ordering
-        { $sort: { insensitive: 1 }},
-        { $project: { _id: 1 }},
-
-        function(err, result) {
-            if (err !== null) {
-                return res.status(500).json({message: err});
-            } else {
-                var tags = [];
-                for (var i = 0; i < result.length; i++) {
-                    var tag = result[i]._id;
-                    tags.push(tag);
-                }
-                return res.status(200).json({ count: tags.length, result: tags });
-            }
-        }
-    );
+router.get('/', (req, res) => {
+  const tagModel = new TagModel(req.db);
+  let onlyForPublicPatches = true;
+  if (req.query.onlyForPublicPatches == '0' || req.query.onlyForPublicPatches === 'false') {
+    onlyForPublicPatches = false;
+  }
+  tagModel
+    .getAll(onlyForPublicPatches)
+    .then(result => {
+      const response = { count: result.length, result };
+      return res.status(200).json(response);
+    })
+    .catch(error => {
+      console.error(error);
+      console.error(error.stack);
+      const message = error.message || JSON.stringify(error);
+      const status = error.status || 500;
+      return res.status(status).json({ message, status });
+    });
 });
 
 module.exports = router;

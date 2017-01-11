@@ -17,12 +17,12 @@ class Author {
   }
 
   /**
-   * Returns all patches.
+   * Returns all authors.
    *
-   * @type {boolean} [onlyWithPublicPatches=true]
+   * @type {boolean} [onlyForPublicPatches=true]
    * @return {Promise<Array<{name: string, wordpressId: ?number}>>}
    */
-  getAll(onlyWithPublicPatches = true) {
+  getAll(onlyForPublicPatches = true) {
 
     /*
      * Authors can either be:
@@ -40,16 +40,12 @@ class Author {
     const result = [];
 
     let query = {};
-    if (onlyWithPublicPatches) {
-      query = { published: onlyWithPublicPatches };
+    if (onlyForPublicPatches) {
+      query = { published: onlyForPublicPatches };
     }
-    console.log('author model: query = '); // FIXME
-    console.log(query); // FIXME
     return Promise.resolve()
       .then(() => collection.find(query, { fields: { author: 1, published: 1 }}))
       .then(patches => {
-        console.log('author model: patches.length = '); // FIXME
-        console.log(patches.length); // FIXME
         for (let i = 0, max = patches.length; i < max; i++) {
           if (patches[i] && patches[i].author) {
             if (patches[i].author.wordpressId) {
@@ -100,6 +96,26 @@ class Author {
         return result;
       })
   }
+
+  /*
+  // With Mongo's map-reduce:
+  db.patches.mapReduce(function () {
+    var onlyForPublicPatches = true;
+    if ((onlyForPublicPatches && this.published) || !onlyForPublicPatches) {
+      emit(this.author, { author: this.author })
+    }
+  }, function (name, data) {
+    var result = {};
+    if (data[0].author.name) {
+      result.name = data[0].author.name;
+    }
+    if (data[0].author.wordpressId) {
+      result.wordpressId = data[0].author.wordpressId;
+    }
+    return result;
+  }, { out: 'mapreduce_authors' })
+  db.mapreduce_authors.find()
+   */
 }
 
 module.exports = Author;

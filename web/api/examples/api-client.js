@@ -82,13 +82,27 @@ class ApiClient {
   /**
    * Returns all authors.
    *
-   * @param {boolean} onlyWithPublicPatches
+   * @param {boolean} onlyForPublicPatches
    * @return {Promise<{count: number,result: Array}>}
    */
-  getAuthors(onlyWithPublicPatches = true) {
+  getAuthors(onlyForPublicPatches = true) {
     let url = '/authors';
-    if (!onlyWithPublicPatches) {
-      url += '?onlyWithPublicPatches=0'
+    if (!onlyForPublicPatches) {
+      url += '?onlyForPublicPatches=0'
+    }
+    return this._request('GET', url);
+  }
+
+  /**
+   * Returns all tags.
+   *
+   * @param {boolean} onlyForPublicPatches
+   * @return {Promise<{count: number,result: Array}>}
+   */
+  getTags(onlyForPublicPatches = true) {
+    let url = '/tags';
+    if (!onlyForPublicPatches) {
+      url += '?onlyForPublicPatches=0'
     }
     return this._request('GET', url);
   }

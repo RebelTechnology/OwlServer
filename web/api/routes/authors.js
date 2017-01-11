@@ -1,7 +1,6 @@
 'use strict';
 
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 
 const AuthorModel = require('../models/author');
 
@@ -12,12 +11,12 @@ const AuthorModel = require('../models/author');
  */
 router.get('/', (req, res) => {
   const authorModel = new AuthorModel(req.db);
-  let onlyWithPublicPatches = true;
-  if (req.query.onlyWithPublicPatches == '0' || req.query.onlyWithPublicPatches === 'false') {
-    onlyWithPublicPatches = false;
+  let onlyForPublicPatches = true;
+  if (req.query.onlyForPublicPatches == '0' || req.query.onlyForPublicPatches === 'false') {
+    onlyForPublicPatches = false;
   }
   authorModel
-    .getAll(!!req.query.onlyWithPublicPatches)
+    .getAll(onlyForPublicPatches)
     .then(result => {
       const response = { count: result.length, result };
       return res.status(200).json(response);
