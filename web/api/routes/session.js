@@ -25,12 +25,11 @@ router.post('/', (req, res) => {
 
   if (authenticate(nonce, apiKeyHash)) {
     const token = jwt.sign({ iss: 'Rebel Technology', sub: 'OWL API' }, process.env.JWT_SECRET);
-    res.status(200).json({ message: 'Authenticated.', token });
+    res.status(200).json({ success: true, message: 'Authenticated.', token });
     return;
   }
 
   return errorResponse({ message: 'Unauthorized', status: 401, public: true });
-
 });
 
 module.exports = router;
