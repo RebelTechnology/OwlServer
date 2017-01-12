@@ -3,6 +3,7 @@
 const jwt = require('jsonwebtoken');
 
 const authTypes = require('./auth-types');
+const errorResponse = require('../../lib/error-response');
 
 const TOKEN_MAX_AGE = 1209600; // = 60 * 60 * 24 * 7 * 2 seconds = 2 weeks
 
@@ -33,11 +34,12 @@ const jwtAuth = (req, res, next) => {
   }
 
   // Verify token
-  let tokenPayload
+  let tokenPayload;
   try {
     tokenPayload = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    process.stderr.write('Token signature verification failed.\n');
+    process.stderr.write(err.stack + '\n');
     next();
     return;
   }
@@ -45,27 +47,21 @@ const jwtAuth = (req, res, next) => {
   // Check if token expired
   try {
     if (!tokenPayload.iat) {
-      throw { message: 'auth: Cannot determined when token was issued.', status: 500 };
+      throw { public: true, message: 'auth: Cannot determined when token was issued.', status: 500 };
     }
     const tokenAge = new Date().getTime() / 1000 - tokenPayload.iat;
     if (tokenAge > TOKEN_MAX_AGE) {
-      throw { message: 'auth: Token expired!', status: 401 };
+      throw { public: true, message: 'auth: Token expired!', status: 401 };
     }
   } catch (err) {
-    const status = err.status || 500;
-    console.error(err.message || JSON.stringify(err));
-    res.status(status).json({
-      message: err.message || JSON.stringify(err),
-      status: status,
-    });
-    return;
+    return errorResponse(err, res);
   }
 
   res.locals.authenticated = true;
   res.locals.userInfo = {
     type: authTypes.AUTH_TYPE_TOKEN,
     name: 'API user', // meh...
-  }
+  };
 
   // At this point `res.locals` will look like:
   // {

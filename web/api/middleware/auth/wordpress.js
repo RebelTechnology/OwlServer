@@ -2,6 +2,7 @@
 
 const { validateAuthCookie, getUserInfo } = require('../../lib/wordpress-bridge.js');
 const authTypes = require('./auth-types');
+const errorResponse = require('../../lib/error-response');
 
 /**
  * Convenience function gets wordpress cookie if exists or returns false.
@@ -41,7 +42,7 @@ const wordpressAuth = (req, res, next) => {
   if (req.cookies) {
     const wpCookieFromRequest = getWordpressCookie(req.cookies);
     if (wpCookieFromRequest) {
-      console.log('auth: WP cookie found in request.');
+      process.stdout.write('auth: WP cookie found in request.\n');
       credentials = {
         type: authTypes.AUTH_TYPE_WORDPRESS,
         cookie: wpCookieFromRequest
@@ -64,22 +65,22 @@ const wordpressAuth = (req, res, next) => {
 
   Promise.resolve()
     .then(() => {
-      console.log('auth: Verifying WP user cookie...')
+      process.stdout.write('auth: Verifying WP user cookie...\n');
       return validateAuthCookie(wpCookie); // Should throw an error if cookie is not valid. FIXME: what error? handled where?
     })
     .then(result => {
       if (!result) {
-        console.log('auth: WP cookie verification failed.');
-        throw { message: 'Not authorized.', status: 401 };
+        process.stdout.write('auth: WP cookie verification failed.\n');
+        throw { public: true, message: 'Not authorized.', status: 401 };
       }
-      console.log('auth: Getting WP user info...');
+      process.stdout.write('auth: Getting WP user info...\n');
       wpUsername = wpCookie.split('|')[0];
       return getUserInfo(wpUsername);
     })
     .then(wpUserInfo => {
 
       if (!wpUserInfo) {
-        throw { message: 'Internal error.', status: 500 };
+        throw new Error();
       }
 
       res.locals.authenticated = true;
@@ -104,11 +105,7 @@ const wordpressAuth = (req, res, next) => {
 
       next();
     })
-    .catch(error => {
-      const message = error.message || JSON.stringify(error);
-      const status = error.status || 500;
-      return res.status(status).json({ message, status });
-    });
+    .catch(error => errorResponse(error, res));
 };
 
 module.exports = wordpressAuth;

@@ -26,7 +26,7 @@ class Tag {
     if (onlyForPublicPatches) {
       query.published = true;
     }
-    return this._collection.aggregate(
+    return this._collection.aggregate([
         { $match: query },
         { $project: { tags: 1 }},
         { $unwind: '$tags' },
@@ -34,13 +34,11 @@ class Tag {
         { $project: { _id: 1, insensitive: { $toLower: '$_id' }}}, // case-insensitive ordering
         { $sort: { insensitive: 1 }},
         { $project: { _id: 1 }}
-      )
-      .then(result => result.map(current => current._id))
-      .catch(err => {
-        process.stderr.write(err + '\n');
-        process.stderr.write(err.stack + '\n');
-        return Promise.reject(new Error('Internal error.')); // masks real error
-      });
+    ])
+    .then(result => {
+      // console.log(result);
+      return result.map(current => current._id);
+    });
   }
 }
 

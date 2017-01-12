@@ -4,6 +4,19 @@ const escapeStringRegexp = require('escape-string-regexp');
 
 const Patch = require('../lib/patch');
 
+const summaryFields = {
+  _id: 1,
+  name: 1,
+  'author.name': 1,
+  'author.url': 1,
+  'author.wordpressId': 1,
+  tags: 1,
+  seoName: 1,
+  creationTimeUtc: 1,
+  published: 1,
+  description: 1
+};
+
 /**
  * Patch model.
  */
@@ -16,6 +29,31 @@ class PatchModel {
    */
   constructor(db) {
     this._collection = db.get('patches');
+  }
+
+  /**
+   * Returns all patches that match the given query.
+   *
+   * @param {Object} filters - A key/value map for filtering patches. At present
+   *                           these fields are supported: 'author.name' and
+   *                           'author.wordpressId'
+   * @return {Promise<Array<Patch>>}
+   */
+  find(filters = {}) {
+    const queryFilter = { $match: {}};
+    if (filters['author.name']) {
+      queryFilter.$match['author.name'] =filters['author.name'];
+    }
+    if (filters['author.wordpressId']) {
+      queryFilter.$match['author.wordpressId'] =filters['author.wordpressId'];
+    }
+    const projection = Object.assign({}, summaryFields, { lowercase: { $toLower: '$name' }});
+    return this._collection.aggregate([
+      queryFilter,
+      { $project: projection },
+      { $sort: { lowercase: 1 }},
+      { $project: summaryFields }
+    ]);
   }
 
   /**
@@ -63,13 +101,7 @@ class PatchModel {
     } else {
       query = { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] };
     }
-    return this._collection.findOne(query)
-    .then(doc => !!doc)
-    .catch(err => {
-      process.stderr.write(err + '\n');
-      process.stderr.write(err.stack + '\n');
-      return Promise.reject(new Error('Internal error.')); // masks real error
-    });
+    return this._collection.findOne(query).then(doc => !!doc);
   }
 
   /**
@@ -89,12 +121,17 @@ class PatchModel {
         const patch = new Patch();
         Object.assign(patch, result);
         return patch;
-      })
-      .catch(err => {
-        process.stderr.write(err + '\n');
-        process.stderr.write(err.stack + '\n');
-        return Promise.reject(new Error('Internal error.')); // masks real error
       });
+  }
+
+  /**
+   * Creates a new patch.
+   *
+   * @param {Patch} patch
+   * @return {Promise}
+   */
+  insert(patch) {
+    return this._collection.insert(patch);
   }
 
   /**
@@ -105,12 +142,27 @@ class PatchModel {
    * @return {Promise}
    */
   update(_id, patch) {
-    return this._collection.update({ _id }, patch)
-    .catch(err => {
-      process.stderr.write(err + '\n');
-      process.stderr.write(err.stack + '\n');
-      return Promise.reject(new Error('Internal error.')); // masks real error
-    });
+    return this._collection.update({ _id }, patch);
+  }
+
+  /**
+   * Increments the download count of the specified patch.
+   *
+   * @param {string} _id
+   * @return {Promise}
+   */
+  incrementDownloadCount(_id) {
+    return this._collection.update({ _id }, { $inc: { downloadCount: 1 }});
+  }
+
+  /**
+   * Deletes a patch.
+   *
+   * @param {string} _id
+   * @return {Promise}
+   */
+  delete(_id) {
+    return this._collection.remove({ _id });
   }
 }
 

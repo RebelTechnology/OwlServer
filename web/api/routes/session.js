@@ -1,11 +1,11 @@
-'use strict'
+'use strict';
 
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const express = require('express');
+const router  = require('express').Router();
 const scmp = require('scmp');
 
-const router  = express.Router();
+const errorResponse = require('../lib/error-response');
 
 const authenticate = (nonce, givenHash) => {
   const expectedHash = crypto.createHash('sha256').update(nonce + process.env.API_KEY).digest('hex');
@@ -17,12 +17,10 @@ router.post('/', (req, res) => {
   const { nonce, apiKeyHash } = req.body;
 
   if ('string' !== typeof nonce) {
-    res.status(400).json({ message: 'Missing or invalid nonce.', status: 400 });
-    return;
+    return errorResponse({ message: 'Missing or invalid nonce.', status: 400, public: true }, res);
   }
   if ('string' !== typeof apiKeyHash) {
-    res.status(400).json({ message: 'Missing or invalid password hash.', status: 400 });
-    return;
+    return errorResponse({ message: 'Missing or invalid password hash.', status: 400, public: true });
   }
 
   if (authenticate(nonce, apiKeyHash)) {
@@ -31,7 +29,7 @@ router.post('/', (req, res) => {
     return;
   }
 
-  res.status(401).json({ message: 'Unauthorized.', status: 401 });
+  return errorResponse({ message: 'Unauthorized', status: 401, public: true });
 
 });
 

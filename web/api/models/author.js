@@ -93,11 +93,6 @@ class Author {
         });
 
         return result;
-      })
-      .catch(err => {
-        process.stderr.write(err + '\n');
-        process.stderr.write(err.stack + '\n');
-        return Promise.reject(new Error('Internal error.')); // masks real error
       });
   }
 

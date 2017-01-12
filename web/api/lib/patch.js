@@ -16,6 +16,7 @@ class PatchValidationError extends Error {
     super(message);
     this.field = field;
     this.type = 'field_required';
+    this.public = true;
   }
 }
 

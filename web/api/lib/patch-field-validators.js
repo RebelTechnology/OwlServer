@@ -7,6 +7,7 @@ class PatchFieldValidationError extends Error {
     super(message);
     this.field = field;
     this.type = 'not_valid';
+    this.public = true;
   }
 }
 
@@ -26,7 +27,7 @@ const patchFieldValidators = {
     validate(val) {
       if (typeof val !== 'string') {
         throw new PatchFieldValidationError('name');
-      };
+      }
 
       if(val.length < 1 || val.length > 255) {
         throw new PatchFieldValidationError('name', 'This field should be at least 1 and at most 255 characters long.');
@@ -210,16 +211,16 @@ const patchFieldValidators = {
       }
 
       if (!Array.isArray(val)) {
-        throw newPatchFieldValidationError('soundcloud');
+        throw new PatchFieldValidationError('soundcloud');
       }
 
       for (let i = 0, max = val.length; i < max; i++) {
         if (typeof val[i] !== 'string') {
-          throw newPatchFieldValidationError('soundcloud');
+          throw new PatchFieldValidationError('soundcloud');
         }
         // https://soundcloud.com/hoxtonowl/johan-larsby-conny-distortion
         if (!/^https?:\/\/(?:www\.)?soundcloud\.com\/.+\/.+$/i.test(val[i])) {
-          const err = newPatchFieldValidationError('soundcloud', 'URL does not seem a valid SoundCloud track.');
+          const err = new PatchFieldValidationError('soundcloud', 'URL does not seem a valid SoundCloud track.');
           err.index = i;
           throw err;
         }
@@ -236,7 +237,7 @@ const patchFieldValidators = {
       }
 
       if (!Array.isArray(val)) {
-        throw newPatchFieldValidationError('github', 'Illegal value.');
+        throw new PatchFieldValidationError('github', 'Illegal value.');
       }
 
       let url;
@@ -250,7 +251,7 @@ const patchFieldValidators = {
       ];
       for (let i = 0, max = val.length; i < max; i++) {
         if (typeof val[i] !== 'string') {
-          const err = newPatchFieldValidationError('github', 'Invalid URL (1).');
+          const err = new PatchFieldValidationError('github', 'Invalid URL (1).');
           err.index = i;
           throw err;
         }
@@ -258,13 +259,13 @@ const patchFieldValidators = {
         url = urlParser.parse(val[i]);
 
         if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-          const err = newPatchFieldValidationError('github', 'Invalid URL (2).');
+          const err = new PatchFieldValidationError('github', 'Invalid URL (2).');
           err.index = i;
           throw err;
         }
 
         if (validHosts.indexOf(url.host) === -1) {
-          const err = newPatchFieldValidationError('github', 'Source files can only be hosted on our servers or on GitHub.');
+          const err = new PatchFieldValidationError('github', 'Source files can only be hosted on our servers or on GitHub.');
           err.index = i;
           throw err;
         }
@@ -273,19 +274,19 @@ const patchFieldValidators = {
           // e.g.: http://hoxtonowl.localhost:8000/wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
           // url.path = /wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
           if (!/^\/wp-content\/uploads\/patch\-files\/[a-z0-9\-]+\/.+$/i.test(url.path)) {
-            const err = newPatchFieldValidationError('github', 'URL does not seem to belong to a source file hosted on our servers.');
+            const err = new PatchFieldValidationError('github', 'URL does not seem to belong to a source file hosted on our servers.');
             err.index = i;
             throw err;
           }
         } else if (url.host.indexOf('github') !== -1) {
-            // e.g.: https://github.com/pingdynasty/OwlPatches/blob/master/PhaserPatch.hpp
-            if (!/^https?:\/\/(?:www\.)?github\.com\/.+\/.+\/blob\/.+\/.+$/i.test(val[i])) {
-              const err = newPatchFieldValidationError('github', 'URL does not seem to be a valid GitHub blob URL.');
-              err.index = i;
-              throw err;
-            }
+          // e.g.: https://github.com/pingdynasty/OwlPatches/blob/master/PhaserPatch.hpp
+          if (!/^https?:\/\/(?:www\.)?github\.com\/.+\/.+\/blob\/.+\/.+$/i.test(val[i])) {
+            const err = new PatchFieldValidationError('github', 'URL does not seem to be a valid GitHub blob URL.');
+            err.index = i;
+            throw err;
+          }
         } else {
-          const err = newPatchFieldValidationError('github', 'Source files can only be hosted on our servers or on GitHub.');
+          const err = new PatchFieldValidationError('github', 'Source files can only be hosted on our servers or on GitHub.');
           err.index = i;
           throw err;
         }
@@ -297,10 +298,10 @@ const patchFieldValidators = {
     required: false,
     validate(val) {
       if (val !== parseInt(val, 10)) {
-        throw newPatchFieldValidationError('cycles', 'Value must be an integer.');
+        throw new PatchFieldValidationError('cycles', 'Value must be an integer.');
       }
       if (val < 0) {
-        throw newPatchFieldValidationError('cycles');
+        throw new PatchFieldValidationError('cycles');
       }
     },
     sanitize(val) {
@@ -312,10 +313,10 @@ const patchFieldValidators = {
     required: false,
     validate(val) {
       if (val !== parseInt(val, 10)) {
-        throw newPatchFieldValidationError('bytes', 'Value must be an integer.');
+        throw new PatchFieldValidationError('bytes', 'Value must be an integer.');
       }
       if (val < 0) {
-        throw newPatchFieldValidationError('bytes');
+        throw new PatchFieldValidationError('bytes');
       }
     },
     sanitize(val) {
@@ -327,12 +328,12 @@ const patchFieldValidators = {
     required: false,
     validate(val) {
       if (!Array.isArray(val)) {
-        throw newPatchFieldValidationError('tags');
+        throw new PatchFieldValidationError('tags');
       }
 
       for (let i = 0, max = val.length; i < max; i++) {
         if (!val || typeof val[i] !== 'string') {
-          const err = newPatchFieldValidationError('tags');
+          const err = new PatchFieldValidationError('tags');
           err.index = i;
           throw err;
         }
@@ -350,7 +351,7 @@ const patchFieldValidators = {
     required: false,
     validate(val) {
       if (!/^\d+$/.test(val)) {
-        throw newPatchFieldValidationError('creationTimeUtc');
+        throw new PatchFieldValidationError('creationTimeUtc');
       }
     },
     sanitize(val) {
@@ -360,7 +361,8 @@ const patchFieldValidators = {
 
   published: {
     required: false,
-    validate(val) {}, // no validation needed
+    // no validation needed
+    validate(val) {}, // eslint-disable-line no-unused-vars
     sanitize(val) {
       // val will usually be '0', '1' (string), 0 or 1 (integer)
       return val == '0' ? false : true;
@@ -371,7 +373,7 @@ const patchFieldValidators = {
     required: false,
     validate(val) {
       if (!/^\d+$/.test(val) || val < 0) {
-        throw newPatchFieldValidationError('downloadCount');
+        throw new PatchFieldValidationError('downloadCount');
       }
     },
     sanitize(val) {

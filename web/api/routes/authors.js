@@ -3,6 +3,7 @@
 const router = require('express').Router();
 
 const AuthorModel = require('../models/author');
+const errorResponse = require('../lib/error-response');
 
 /**
  * Retrieves all authors.
@@ -21,13 +22,7 @@ router.get('/', (req, res) => {
       const response = { success: true, count: result.length, result };
       return res.status(200).json(response);
     })
-    .catch(error => {
-      process.stderr.write(error + '\n');
-      process.stderr.write(error.stack + '\n');
-      const message = error.message || JSON.stringify(error);
-      const status = error.status || 500;
-      return res.status(status).json({ success: false, message, status });
-    });
+    .catch(error => errorResponse(error, res));
 });
 
 module.exports = router;

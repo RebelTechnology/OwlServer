@@ -1,34 +1,35 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
-var url = require('url');
-var fs = require('fs');
-var path = require('path');
-var exec = require('child-process-promise').exec;
-var Q = require('q');
+const express = require('express');
+const router = express.Router();
+const fs = require('fs');
+const path = require('path');
+const exec = require('child-process-promise').exec;
 
-var apiSettings = require('../api-settings.js');
+const apiSettings = require('../api-settings.js');
+const PatchModel = require('../models/patch-model');
+const errorResponse = require('../lib/error-response');
 
 /**
  * Convenience function for determining the build format.
+ *
+ * @param {string} format
+ * @return {string}
  */
-var getBuildFormat = function (format) {
+const getBuildFormat = format => {
 
-    var buildFormat = 'sysx'; // default
-    if (format) {
-        buildFormat = format;
-    }
-    if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'sysex') {
-        var e = new Error('Invalid format.');
-        e.status = 500;
-        throw e;
-    }
-    if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
-        buildFormat = 'sysx';
-    }
+  var buildFormat = 'sysx'; // default
+  if (format) {
+    buildFormat = format;
+  }
+  if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'sysex') {
+    throw { public: true, success: false, message: 'Invalid format.', status: 500 };
+  }
+  if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
+    buildFormat = 'sysx';
+  }
 
-    return buildFormat;
+  return buildFormat;
 };
 
 /**
@@ -40,99 +41,80 @@ var getBuildFormat = function (format) {
  */
 router.get('/:id', function (req, res) {
 
-    var id = req.params.id,
-        buildFormat = 'sysx', // default
-        collection = req.db.get('patches'),
-        format,
-        download = true;
+  const id = req.params.id;
+  const query = req.query;
+  let format;
+  let download = true;
+  const patchModel = new PatchModel(req.db);
 
-    Q.fcall(function () {
-
-        // Determine patch format
-        var query = url.parse(req.url, true).query;
-        if (query.format) {
-            format = getBuildFormat(query.format);
-        }
-
-        if (query.download && query.download == 0 || query.download == 'false' || query.download == '') {
-            download = false;
-        }
-
-        /* ~~~~~~~~~~~~
-         *  Find patch
-         * ~~~~~~~~~~~~ */
-
-        return collection.findOne({ _id: id });
-
-    }).then(function (patch) {
-
-        var buildFile,
-            filename;
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check if SysEx is available
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        if (null === patch) {
-            var e = new Error('Patch not found.');
-            e.status = 404;
-            throw e;
-        }
-
-        if (format === 'sysx') {
-            buildFile = path.join(apiSettings.SYSEX_PATH, patch.seoName + '.syx');
-        } else if (format === 'js') {
-            buildFile = path.join(apiSettings.JS_PATH, patch.seoName + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
-        }
-        if (!fs.existsSync(buildFile)) {
-            var e = new Error('Build file not available for this patch (in ' + format + ' format).');
-            e.status = 404;
-            throw e;
-        }
-
-        /* ~~~~~~~~~~~~~~~
-         *  Download file
-         * ~~~~~~~~~~~~~~~ */
-
-        console.log(buildFile);
-        filename = path.basename(buildFile);
-        console.log(filename);
-        if (download) {
-            res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-        }
-        if(download && format === 'sysx') {
-            // increment download count for sysx files
-            console.log('incrementing patch download count');
-            patch.downloadCount = patch.downloadCount || 0;
-            patch.downloadCount++;
-            collection.updateById(patch._id, patch);
-        }
-        res.setHeader('Content-length', fs.statSync(buildFile)['size']);
-        if (format === 'sysx') {
-            res.setHeader('Content-type', 'application/octet-stream');
-        } else if (format === 'js') {
-            res.setHeader('Content-type', 'text/javascript');
-        }
-        var filestream = fs.createReadStream(buildFile);
-        return filestream.pipe(res);
-
-    }).catch(function (error) {
-
-      console.error(error);
-      console.error(error.stack);
-      const message = error.message || JSON.stringify(error);
-      const status = error.status || 500;
-      return res.status(status).json({ message, status });
-
-    }).done(function (response) {
-
-        if (response.constructor && 'ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
+  if (!/^[a-f\d]{24}$/i.test(id)) {
+    return errorResponse({
+      success: false,
+      public: true,
+      status: 400,
+      message: 'Invalid patch ID.'
     });
+  }
+
+  Promise.resolve()
+    .then(() => {
+
+      // Determine patch format
+      if (query.format) {
+        format = getBuildFormat(query.format);
+      }
+
+      // Determine whether the patch will be downloaded or streamed in-line
+      if (query.download && (query.download == 0 || query.download == 'false' || query.download == '')) {
+        download = false;
+      }
+
+      return patchModel.getById(id);
+    })
+    .then(patch => {
+
+      if (!patch) {
+        throw { success: false, status: 404, public: true, message: 'Patch not found.' };
+      }
+
+      // Check if SysEx is available
+
+      let buildFile;
+      let filename;
+
+      if (format === 'sysx') {
+        buildFile = path.join(apiSettings.SYSEX_PATH, patch.seoName + '.syx');
+      } else if (format === 'js') {
+        buildFile = path.join(apiSettings.JS_PATH, patch.seoName + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
+      }
+      if (!fs.existsSync(buildFile)) {
+        throw {
+          success: false,
+          status: 404,
+          public: true,
+          message: 'Build file not available for this patch (in ' + format + ' format).'
+        };
+      }
+
+      // Download file
+      filename = path.basename(buildFile);
+      if (download) {
+        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+      }
+      if(download && format === 'sysx') {
+        // increment download count for sysx files
+        patchModel.incrementDownloadCount(patch._id);
+      }
+      res.setHeader('Content-length', fs.statSync(buildFile)['size']);
+      if (format === 'sysx') {
+        res.setHeader('Content-type', 'application/octet-stream');
+      } else if (format === 'js') {
+        res.setHeader('Content-type', 'text/javascript');
+      }
+      const filestream = fs.createReadStream(buildFile);
+      return filestream.pipe(res);
+    })
+    .catch(error => errorResponse(error, res));
 });
 
 /**
@@ -140,143 +122,89 @@ router.get('/:id', function (req, res) {
  *
  * PUT /builds/{patchId}
  */
-router.put('/:id', function (req, res) {
+router.put('/:id', (req, res) => {
 
   let isWpAdmin = false;
   let wpUserId;
+  const patchModel = new PatchModel(req.db);
 
-  const collection = req.db.get('patches');
-  let patchAuthor = {};
-
-  var id = req.params.id;
+  const id = req.params.id;
   if (!/^[a-f\d]{24}$/i.test(id)) {
-    return res.status(500).json({
-      message: 'Invalid patch ID.',
-      error: { status: 500 }
+    return errorResponse({
+      success: false,
+      public: true,
+      status: 400,
+      message: 'Invalid patch ID.'
     });
   }
 
-  var format = 'sysx'; // default
+  let format = 'sysx'; // default
   if (req.body.format) {
     format = getBuildFormat(req.body.format);
   }
 
-  Q.fcall(() => {
+  Promise.resolve()
+    .then(() => {
 
-    // Is user authenticated?
-    if (!res.locals.authenticated) {
-      throw { message: 'Access denied.', status: 401 };
-    }
-
-    const wpUserInfo = res.locals.wpUserInfo;
-    isWpAdmin = wpUserInfo.admin;
-    wpUserId = wpUserInfo.id;
-    console.log('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.');
-    console.log('WP user ID is ' + wpUserId + '');
-
-    // If not an admin, we set the current WP user as patch author,
-    // disregarding any authorship info s/he sent. If an admin,
-    // we blindy trust the authorship information. Not ideal, but
-    // at least keeps code leaner.
-    if (!isWpAdmin) {
-        // patchAuthor.type = 'wordpress';
-        if (patchAuthor.name) {
-            delete patchAuthor.name;
-        }
-        patchAuthor.wordpressId = wpUserId;
-    }
-
-    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     *  Retrieve patch from database
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-    return collection.findById(id);
-
-  })
-    .then(function (patch) {
-
-        if (null === patch) {
-            var e = new Error('Patch not found.');
-            e.status = 404;
-            throw e;
-        }
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check if user can compile patch
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        if (!isWpAdmin) {
-            if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
-                var e = new Error('You are not authorized to compile this patch.');
-                e.status = 401;
-                throw e;
-            }
-        }
-
-        /* ~~~~~~~~~~~~~~~
-         *  Compile patch
-         * ~~~~~~~~~~~~~~~ */
-
-        var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH;
-
-        if (format === 'js') {
-            cmd += ' --web';
-        }
-
-        if(patch.compilationType === 'gen'){
-            cmd += ' --gen';
-        }
-
-        cmd += ' ' + id;
-        console.log('Running command "' + cmd + '"...');
-
-        return exec(cmd).then(function (result) {
-
-            var response = {
-                stdout:  result.stdout,
-                stderr:  result.stderr,
-                success: true,
-                status:  200
-            };
-
-            console.log('Command run successfully.');
-
-            return response;
-
-        }).fail(function (result) {
-
-            var response = {
-                stdout:  result.stdout,
-                stderr:  result.stderr,
-                success: false,
-                status:  200
-            };
-
-            console.log('Command failed.');
-
-            return response;
-
-        });
-
-    })
-    .catch(error => {
-      console.error(error);
-      console.error(error.stack);
-      const status = error.status || 500;
-      return res.status(status).json({
-        message: error.message || JSON.stringify(error),
-        stdout: error.stdout,
-        stderr: error.stderr,
-        success: false,
-        status: status
-      });
-    })
-    .done(function (response) {
-      if (response.constructor && 'ServerResponse' === response.constructor.name) {
-        return response;
+      // Is user authenticated?
+      if (!res.locals.authenticated) {
+        throw { success: false, public: true, message: 'Access denied.', status: 401 };
       }
-      return res.status(200).json(response);
-    });
+
+      const userInfo = res.locals.userInfo;
+      wpUserId = userInfo.id;
+      process.stdout.write('WP user ID is ' + wpUserId + '\n');
+      isWpAdmin = userInfo.admin;
+      process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
+
+      return patchModel.getById(id);
+    })
+    .then(patch => {
+      if (!patch) {
+        throw { message: 'Patch not found.', status: 404, public: true, success: false };
+      }
+
+      // Check if user can compile patch
+      if (!isWpAdmin) {
+        if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
+          throw { success: false, status: 401, public: true, message: 'You are not authorized to compile this patch.' };
+        }
+      }
+
+      // Compile patch
+      let cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH;
+      if (format === 'js') {
+        cmd += ' --web';
+      }
+      if(patch.compilationType === 'gen'){
+        cmd += ' --gen';
+      }
+      cmd += ' ' + id;
+      process.stdout.write('Running command "' + cmd + '"...\n');
+      return exec(cmd)
+        .then(result => {
+          const response = {
+            stdout: result.stdout,
+            stderr: result.stderr,
+            success: true,
+            status: 200,
+          };
+          process.stdout.write('Success!\n');
+          return res.status(200).json(response);
+        })
+        .fail(result => {
+          const response = {
+            stdout: result.stdout,
+            stderr: result.stderr,
+            success: false,
+            status: 200,
+          };
+          process.stderr.write('Failure!\n');
+          return res.status(500).json(response);
+        });
+    })
+    .catch(error => errorResponse(error, res));
 });
+
 
 module.exports = router;

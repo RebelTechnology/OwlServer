@@ -3,13 +3,13 @@
 const router = require('express').Router();
 const fs = require('fs');
 const path = require('path');
-const Q = require('q');
 
 const Patch = require('../lib/patch');
 const PatchModel = require('../models/patch');
 const { getUserInfoBatch } = require('../lib/wordpress-bridge.js');
 const apiSettings = require('../api-settings.js');
 const authTypes = require('../middleware/auth/auth-types');
+const errorResponse = require('../lib/error-response');
 
 /**
  * Returns the WordPress user's "display name" for the given WordPress user ID.
@@ -73,10 +73,7 @@ const getPatchBuildInfo = patch => {
 const processPatch = result => {
 
   if (!result) {
-    const err = new Error('Patch not found.');
-    err.status = 404;
-    err.success = false;
-    throw err;
+    throw { message: 'Patch not found.', status: 404, public: true };
   }
 
   let patch = result;
@@ -102,20 +99,12 @@ const processPatch = result => {
  * GET /patch/{id}
  */
 router.get('/:id', (req, res) => {
-
   const patchModel = new PatchModel(req.db);
-
   patchModel
     .getById(req.params.id)
     .then(processPatch)
     .then(patch => res.status(200).json({ success: true, result: patch }))
-    .catch(error => {
-      process.stderr.write(error + '\n');
-      process.stderr.write(error.stack + '\n');
-      const message = error.message || JSON.stringify(error);
-      const status = error.status || 500;
-      return res.status(status).json({ success: false, message, status });
-    });
+    .catch(error => errorResponse(error, res));
 });
 
 /**
@@ -131,18 +120,11 @@ router.get('/', (req, res) => {
   }
 
   const patchModel = new PatchModel(req.db);
-
   patchModel
     .getBySeoName(req.query.seoName)
     .then(processPatch)
     .then(patch => res.status(200).json({ success: true, result: patch }))
-    .catch(error => {
-      process.stderr.write(error + '\n');
-      process.stderr.write(error.stack + '\n');
-      const message = error.message || JSON.stringify(error);
-      const status = error.status || 500;
-      return res.status(status).json({ success: false, message, status });
-    });
+    .catch(error => errorResponse(error, res));
 });
 
 /**
@@ -165,12 +147,12 @@ router.put('/:id', (req, res) => {
 
       // Is user authenticated?
       if (!res.locals.authenticated) {
-        throw { message: 'Access denied (1).', status: 401 };
+        throw { message: 'Access denied (1).', status: 401, public: true };
       }
 
       const userInfo = res.locals.userInfo;
       if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot delete patches!
-        throw { message: 'Access denied (2).', status: 401 };
+        throw { message: 'Access denied (2).', status: 401, public: true };
       }
 
       isWpAdmin = userInfo.wpAdmin;
@@ -187,17 +169,13 @@ router.put('/:id', (req, res) => {
 
       updatedPatch.generateSeoName();
       return updatedPatch.validate(); // will throw an error if patch is not valid
-
     })
     .then(() => patchModel.patchNameTaken(updatedPatch.name, updatedPatch.seoName, updatedPatch._id))
     .then(nameAlreadyTaken => {
       if (nameAlreadyTaken) {
-        var e = new Error('Patch name already taken.');
-        e.status = 400;
-        e.type = 'not_valid';
-        e.field = 'name';
-        throw e;
+        throw { message: 'Patch name already taken.', status: 400, type: 'not_valid', field: 'name', public: true };
       }
+
       // Retrieve patch before updating it
       return patchModel.getById(updatedPatch._id); // FIXME - Use findOneAndUpdate() for atomic update instead
     })
@@ -210,12 +188,8 @@ router.put('/:id', (req, res) => {
         throw err;
       }
 
-      if (!isWpAdmin) {
-        if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
-          const err = new Error('You are not authorized to edit this patch.');
-          err.status = 401;
-          throw err;
-        }
+      if (!isWpAdmin && (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId)) {
+        throw { message: 'You are not authorized to edit this patch.', status: 401, public: true };
       }
 
       updatedPatch.sanitize();
@@ -245,18 +219,7 @@ router.put('/:id', (req, res) => {
       };
       return res.status(200).json(response);
     })
-    .catch(error => {
-      process.stderr.write(error + '\n');
-      process.stderr.write(error.stack + '\n');
-      const message = error.message || JSON.stringify(error);
-      let status = 500;
-      if (error.status) {
-        status = error.status;
-      } else if ([ 'PatchValidationError', 'PatchFieldValidationError' ].includes(error.constructor.name)) {
-        status = 400;
-      }
-      return res.status(status).json({ success: false, message, status });
-    });
+    .catch(error => errorResponse(error, res));
 });
 
 /**
@@ -269,71 +232,57 @@ router.delete('/:id', (req, res) => {
   let isWpAdmin = false;
   let wpUserId;
 
-  const collection = req.db.get('patches');
+  const patchModel = new PatchModel(req.db);
   const id = req.params.id;
-
-  Q.fcall(() => {
-
-    // Is user authenticated?
-    if (!res.locals.authenticated) {
-      throw { message: 'Access denied (1).', status: 401 };
-    }
-
-    const userInfo = res.locals.userInfo;
-    if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot delete patches!
-      throw { message: 'Access denied (2).', status: 401 };
-    }
-
-    isWpAdmin = userInfo.wpAdmin;
-    wpUserId = userInfo.wpUserId;
-    process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
-    process.stdout.write('WP user ID = ' + wpUserId + '\n');
-
-    process.stdout.write('Finding patch ' + id + '...\n');
-    return collection.findOne({ _id: id });
-  })
-  .then(patch => {
-    if (!patch) {
-      const err = new Error('Patch not found.');
-      err.status = 404;
-      throw err;
-    }
-
-    // Check if user can delete patch
-    if (!isWpAdmin && (patch.author.wordpressId !== wpUserId)) {
-      const err = new Error('You are not authorized to delete this patch.');
-      err.status = 401;
-      throw err;
-    }
-
-    process.stdout.write('Removing patch ' + id + '...\n');
-    return collection.remove({ _id: id }); // Actually delete patch
-
-  })
-  .then(deletedCount => {
-    if (1 !== deletedCount) { // Check that patch was actually deleted
-      var e = new Error('Unexpected error while trying to delete patch.');
-      e.status = 500;
-      throw e;
-    }
-    return { message: 'Patch deleted successfully.' };
-  })
-  .catch(error => {
-    process.stderr.write(error + '\n');
-    process.stderr.write(error.stack + '\n');
-    const status = error.status || 500;
-    return res.status(status).json({
-      message: error.message || JSON.stringify(error),
-      status: status,
+  if (!/^[a-f\d]{24}$/i.test(id)) {
+    return errorResponse({
       success: false,
+      public: true,
+      status: 400,
+      message: 'Invalid patch ID.'
     });
-  })
-  .done(response => {
-    if ('ServerResponse' === response.constructor.name) {
-      return response;
-    }
-    return res.status(200).json(response);
-  });
+  }
+
+  Promise.resolve()
+    .then(() => {
+
+      // Is user authenticated?
+      if (!res.locals.authenticated) {
+        throw { message: 'Access denied (1).', status: 401, public: true };
+      }
+
+      const userInfo = res.locals.userInfo;
+      if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot delete patches!
+        throw { message: 'Access denied (2).', status: 401, public: true };
+      }
+
+      isWpAdmin = userInfo.wpAdmin;
+      wpUserId = userInfo.wpUserId;
+      process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
+      process.stdout.write('WP user ID = ' + wpUserId + '\n');
+
+      // Retrieve patch before deleting it
+      return patchModel.getById(id); // FIXME - Use findOneAndDelete() for atomic delete instead
+    })
+    .then(patch => {
+
+      if (!patch) {
+        throw { message: 'Patch not found.', status: 404, public: true };
+      }
+
+      // Check if user can delete patch
+      if (!isWpAdmin && (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId)) {
+        throw { message: 'You are not authorized to delete this patch.', status: 401, public: true };
+      }
+
+      process.stdout.write('Deleting...\n'); // FIXME
+      return patchModel.delete(id); // Actually delete patch
+    })
+    .then(() => {
+      process.stdout.write('Patch deleted!\n'); // FIXME
+      return res.status(200).json({ success: true, message: 'Patch deleted successfully.' });
+    })
+    .catch(error => errorResponse(error, res));
 });
 
 module.exports = router;
