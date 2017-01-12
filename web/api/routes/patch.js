@@ -127,7 +127,7 @@ router.get('/', (req, res) => {
 
   if (!req.query.seoName || typeof req.query.seoName !== 'string') {
     const status = 500;
-    return res.status(status).json({ message: 'Invalid seoName.', status });
+    return res.status(status).json({ success: false, message: 'Invalid seoName.', status });
   }
 
   const patchModel = new PatchModel(req.db);
@@ -242,6 +242,7 @@ router.put('/:id', (req, res) => {
         message: 'Patch updated.',
         _id: updatedPatch._id,
         seoName: updatedPatch.seoName,
+        success: true,
       };
       return res.status(200).json(response);
     })

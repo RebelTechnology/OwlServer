@@ -17,21 +17,21 @@ router.post('/', (req, res) => {
   const { nonce, apiKeyHash } = req.body;
 
   if ('string' !== typeof nonce) {
-    res.status(400).json({ message: 'Missing or invalid nonce.', status: 400 });
+    res.status(400).json({ success: false, message: 'Missing or invalid nonce.', status: 400 });
     return;
   }
   if ('string' !== typeof apiKeyHash) {
-    res.status(400).json({ message: 'Missing or invalid password hash.', status: 400 });
+    res.status(400).json({ success: false, message: 'Missing or invalid password hash.', status: 400 });
     return;
   }
 
   if (authenticate(nonce, apiKeyHash)) {
     const token = jwt.sign({ iss: 'Rebel Technology', sub: 'OWL API' }, process.env.JWT_SECRET);
-    res.status(200).json({ message: 'Authenticated.', token });
+    res.status(200).json({ success: true, message: 'Authenticated.', token });
     return;
   }
 
-  res.status(401).json({ message: 'Unauthorized.', status: 401 });
+  res.status(401).json({ success: false, message: 'Unauthorized.', status: 401 });
 
 });
 
