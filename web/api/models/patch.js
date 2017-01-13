@@ -5,16 +5,16 @@ const escapeStringRegexp = require('escape-string-regexp');
 const Patch = require('../lib/patch');
 
 const summaryFields = {
-  _id: 1,
-  name: 1,
-  'author.name': 1,
-  'author.url': 1,
+  '_id':                1,
+  'name':               1,
+  'author.name':        1,
+  'author.url':         1,
   'author.wordpressId': 1,
-  tags: 1,
-  seoName: 1,
-  creationTimeUtc: 1,
-  published: 1,
-  description: 1
+  'tags':               1,
+  'seoName':            1,
+  'creationTimeUtc':    1,
+  'published':          1,
+  'description':        1
 };
 
 /**
@@ -41,11 +41,11 @@ class PatchModel {
    */
   find(filters = {}) {
     const queryFilter = { $match: {}};
-    if (filters['author.name']) {
-      queryFilter.$match['author.name'] =filters['author.name'];
+    if (filters['author.name'] && typeof filters['author.name'] === 'string') {
+      queryFilter.$match['author.name'] = filters['author.name'];
     }
-    if (filters['author.wordpressId']) {
-      queryFilter.$match['author.wordpressId'] =filters['author.wordpressId'];
+    if (filters['author.wordpressId'] && typeof filters['author.wordpressId'] === 'string') {
+      queryFilter.$match['author.wordpressId'] = filters['author.wordpressId'];
     }
     const projection = Object.assign({}, summaryFields, { lowercase: { $toLower: '$name' }});
     return this._collection.aggregate([

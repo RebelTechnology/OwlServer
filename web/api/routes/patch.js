@@ -3,6 +3,7 @@
 const router = require('express').Router();
 const fs = require('fs');
 const path = require('path');
+const request = require('request');
 
 const Patch = require('../lib/patch');
 const PatchModel = require('../models/patch');
@@ -142,9 +143,6 @@ router.put('/:id', (req, res) => {
   Object.assign(updatedPatch, req.body.patch);
   const patchAuthor = {};
 
-  console.log('Got this patch:');
-  console.log(updatedPatch);
-
   Promise.resolve()
     .then(() => {
 
@@ -186,9 +184,7 @@ router.put('/:id', (req, res) => {
 
       // Save patch
       if (!patch) {
-        const err = new Error('Patch not found!');
-        err.status = 400;
-        throw err;
+        throw { message: 'Patch not found!', status: 400, public: true };
       }
 
       if (!isWpAdmin && (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId)) {
@@ -284,6 +280,96 @@ router.delete('/:id', (req, res) => {
     .then(() => {
       process.stdout.write('Patch deleted!\n'); // FIXME
       return res.status(200).json({ success: true, message: 'Patch deleted successfully.' });
+    })
+    .catch(error => errorResponse(error, res));
+});
+
+/**
+ * Uploads one or more source files.
+ *
+ * POST /patch/{id}/sources
+ *
+ * Request payload format:
+ * {
+ *   files: [
+ *     {
+ *       name: 'Gain.hpp',
+ *       data: 'base64 encoded file content'
+ *     },
+ *     ...
+ *   ]
+ * }
+ */
+router.post('/:id/sources', (req, res) => {
+
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    throw { message: 'Access denied (1).', status: 401, public: true };
+  }
+
+  // Only API users can upload sources. WordPress users will do it through the website.
+  if (authTypes.AUTH_TYPE_TOKEN !== res.locals.userInfo.type) {
+    throw { message: 'Access denied (2).', status: 401, public: true };
+  }
+
+  // Validate patch ID
+  const id = req.params.id;
+  if (!/^[a-f\d]{24}$/i.test(id)) {
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' });
+  }
+
+  // Validate files
+  const query = req.query;
+  if (!query.files || !Array.isArray(query.files)) {
+    return errorResponse({ public: true, status: 400, message: 'Invalid request.' });
+  }
+  for (let i = 0; i < query.files.length; i++) {
+    if (!query.files[i].name || typeof query.files[i].name !== 'string') {
+      return errorResponse({ public: true, status: 400, message: 'Invalid file name.' });
+    }
+    if (!query.files[i].data || typeof query.files[i].data !== 'string') {
+      return errorResponse({ public: true, status: 400, message: 'Invalid file data.' });
+    }
+  }
+
+  const patchModel = new PatchModel(req.db);
+  patchModel.getById(id)
+    .then(patch => {
+      if (!patch) {
+        throw { message: 'Patch not found.', status: 400, public: true };
+      }
+
+      if (!patch.author.name || patch.author.name !== 'API user') { // FIXME - Factor into a separate constant
+        throw { message: 'Access denied (3).', status: 401, public: true };
+      }
+
+      const requestOptions = {
+        url: 'https://staging.hoxtonowl.com/wp-admin/admin-ajax.php', // FIXME
+        rejectUnauthorized: false, // disable in production!
+        formData: {
+          patchId: id,
+          action: 'owl-patch-file-upload',
+          secret: process.env.PATCH_UPLOAD_SECRET,
+        }
+      };
+
+      query.files.forEach((file, i) => {
+        // Apparently 'files[x]' is the format that PHP likes when it comes to
+        // upload multiple files, so we abide by it.
+        requestOptions[`files[${i}]`] = {
+          value: String(new Buffer(file.data, 'base64')),
+          options: { filename: file.name }
+        };
+      });
+
+      return new Promise((resolve, reject) => {
+        request.post(requestOptions, (err, httpResponse, body) => {
+          if (err) {
+            reject({ message: 'File upload failed.', status: 500, public: true });
+          }
+          resolve(body);
+        });
+      });
     })
     .catch(error => errorResponse(error, res));
 });

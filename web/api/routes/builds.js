@@ -1,7 +1,6 @@
 'use strict';
 
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const fs = require('fs');
 const path = require('path');
 const exec = require('child-process-promise').exec;
@@ -60,9 +59,7 @@ router.get('/:id', function (req, res) {
     .then(() => {
 
       // Determine patch format
-      if (query.format) {
-        format = getBuildFormat(query.format);
-      }
+      format = getBuildFormat(query.format);
 
       // Determine whether the patch will be downloaded or streamed in-line
       if (query.download && (query.download == 0 || query.download == 'false' || query.download == '')) {
