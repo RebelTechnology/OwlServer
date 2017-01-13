@@ -77,7 +77,9 @@ class Patch {
       this.compilationType = 'cpp';
     }
     this.published = this.published ? true : false;
-    this.github = [];
+    if (!this.github) {
+      this.github = [];
+    }
     if (!this.downloadCount) {
       this.downloadCount = 0;
     }

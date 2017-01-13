@@ -116,7 +116,7 @@ router.get('/', (req, res) => {
 
   if (!req.query.seoName || typeof req.query.seoName !== 'string') {
     const status = 500;
-    return res.status(status).json({ success: false, message: 'Invalid seoName.', status });
+    return res.status(status).json({ message: 'Invalid seoName.', status });
   }
 
   const patchModel = new PatchModel(req.db);
@@ -141,6 +141,9 @@ router.put('/:id', (req, res) => {
   const updatedPatch = new Patch();
   Object.assign(updatedPatch, req.body.patch);
   const patchAuthor = {};
+
+  console.log('Got this patch:');
+  console.log(updatedPatch);
 
   Promise.resolve()
     .then(() => {
@@ -237,7 +240,6 @@ router.delete('/:id', (req, res) => {
   const id = req.params.id;
   if (!/^[a-f\d]{24}$/i.test(id)) {
     return errorResponse({
-      success: false,
       public: true,
       status: 400,
       message: 'Invalid patch ID.'

@@ -1,17 +1,13 @@
 'use strict';
 
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
 const router  = require('express').Router();
-const scmp = require('scmp');
 
+const { authenticate, issueToken } = require('../lib/authentication');
 const errorResponse = require('../lib/error-response');
 
-const authenticate = (nonce, givenHash) => {
-  const expectedHash = crypto.createHash('sha256').update(nonce + process.env.API_KEY).digest('hex');
-  return scmp(Buffer.from(expectedHash, 'hex'), Buffer.from(givenHash, 'hex'));
-};
-
+/**
+ * POST /session
+ */
 router.post('/', (req, res) => {
 
   const { nonce, apiKeyHash } = req.body;
@@ -24,7 +20,7 @@ router.post('/', (req, res) => {
   }
 
   if (authenticate(nonce, apiKeyHash)) {
-    const token = jwt.sign({ iss: 'Rebel Technology', sub: 'OWL API' }, process.env.JWT_SECRET);
+    const token = issueToken();
     res.status(200).json({ success: true, message: 'Authenticated.', token });
     return;
   }
