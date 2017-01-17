@@ -1,7 +1,7 @@
 'use strict';
 
 const { validateAuthCookie, getUserInfo } = require('../../lib/wordpress-bridge.js');
-const authTypes = require('./auth-types');
+const { authTypes } = require('./constants');
 const errorResponse = require('../../lib/error-response');
 
 /**

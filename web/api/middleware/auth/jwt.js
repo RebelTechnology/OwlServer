@@ -2,7 +2,7 @@
 
 const jwt = require('jsonwebtoken');
 
-const authTypes = require('./auth-types');
+const { authTypes, API_USER_NAME } = require('./constants');
 const errorResponse = require('../../lib/error-response');
 
 const TOKEN_MAX_AGE = 1209600; // = 60 * 60 * 24 * 7 * 2 seconds = 2 weeks
@@ -60,7 +60,7 @@ const jwtAuth = (req, res, next) => {
   res.locals.authenticated = true;
   res.locals.userInfo = {
     type: authTypes.AUTH_TYPE_TOKEN,
-    name: 'API user', // meh...
+    name: API_USER_NAME,
   };
 
   // At this point `res.locals` will look like:

@@ -4,7 +4,7 @@ const router = require('express').Router();
 
 const Patch = require('../lib/patch');
 const PatchModel = require('../models/patch');
-const authTypes = require('../middleware/auth/auth-types');
+const { authTypes } = require('../middleware/auth/constants');
 const errorResponse = require('../lib/error-response');
 
 /**
@@ -44,6 +44,9 @@ router.post('/', (req, res) => {
   Object.assign(newPatch, req.body.patch);
   const patchAuthor = {};
 
+  console.log('***');
+  console.log(newPatch);
+
   Promise.resolve()
     .then(() => {
 
@@ -69,7 +72,9 @@ router.post('/', (req, res) => {
       }
 
       newPatch.author = patchAuthor;
-      if (!newPatch.name) newPatch.generateRandomName();
+      if (!newPatch.name) {
+        newPatch.generateRandomName();
+      }
       newPatch.generateSeoName();
       return newPatch.validate(); // will throw an error if patch is not valid
     })

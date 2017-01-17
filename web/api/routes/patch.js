@@ -3,14 +3,14 @@
 const router = require('express').Router();
 const fs = require('fs');
 const path = require('path');
-const request = require('request');
 
 const Patch = require('../lib/patch');
 const PatchModel = require('../models/patch');
 const { getUserInfoBatch } = require('../lib/wordpress-bridge.js');
 const apiSettings = require('../api-settings.js');
-const authTypes = require('../middleware/auth/auth-types');
+const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
 const errorResponse = require('../lib/error-response');
+const wordpressBridge = require('../lib/wordpress-bridge');
 
 /**
  * Returns the WordPress user's "display name" for the given WordPress user ID.
@@ -339,37 +339,11 @@ router.post('/:id/sources', (req, res) => {
         throw { message: 'Patch not found.', status: 400, public: true };
       }
 
-      if (!patch.author.name || patch.author.name !== 'API user') { // FIXME - Factor into a separate constant
+      if (!patch.author.name || patch.author.name !== API_USER_NAME) {
         throw { message: 'Access denied (3).', status: 401, public: true };
       }
 
-      const requestOptions = {
-        url: 'https://staging.hoxtonowl.com/wp-admin/admin-ajax.php', // FIXME
-        rejectUnauthorized: false, // disable in production!
-        formData: {
-          patchId: id,
-          action: 'owl-patch-file-upload',
-          secret: process.env.PATCH_UPLOAD_SECRET,
-        }
-      };
-
-      query.files.forEach((file, i) => {
-        // Apparently 'files[x]' is the format that PHP likes when it comes to
-        // upload multiple files, so we abide by it.
-        requestOptions[`files[${i}]`] = {
-          value: String(new Buffer(file.data, 'base64')),
-          options: { filename: file.name }
-        };
-      });
-
-      return new Promise((resolve, reject) => {
-        request.post(requestOptions, (err, httpResponse, body) => {
-          if (err) {
-            reject({ message: 'File upload failed.', status: 500, public: true });
-          }
-          resolve(body);
-        });
-      });
+      return wordpressBridge.uploadSources(id, query.files);
     })
     .catch(error => errorResponse(error, res));
 });

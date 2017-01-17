@@ -143,7 +143,18 @@ class ApiClient {
    * @return {Promise}
    */
   newPatch(patch) {
-    return this._request('POST', '/patches', patch);
+    return this._request('POST', '/patches', { patch });
+  }
+
+  /**
+   * Uploads one or more source files for the specified patch.
+   *
+   * @param {Patch} patchId
+   * @param {Array<Object<string,string>>} The files to upload.
+   * @return {Promise}
+   */
+  uploadSourceFiles(patch) {
+    return this._request('POST', '/patch/{id}/sources');
   }
 
   /**

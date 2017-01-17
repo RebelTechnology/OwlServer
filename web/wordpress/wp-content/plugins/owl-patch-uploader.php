@@ -15,8 +15,8 @@ define('DOING_AJAX', true);
 
 define('TMP_DIR_PREFIX', 'tmp-'); // must meet regex /[a-z0-9\-]+/i
 
-// This files defines a secret that is used by the OWL API to upload files
-// without the need to authenticate itself as a WordPress user.
+// This files defines a secret that is used by the OWL API to connect to this WP
+// plugin without the need to authenticate itself as a WordPress user.
 require_once 'owl-patch-uploader-secret.php';
 
 /**
@@ -346,7 +346,7 @@ function owl_patchFileUpload()
         if (isset($_REQUEST['secret'])) {
           checkUserIsAuthorizedToEditPatch($patch, $_REQUEST['secret']);
         } else {
-          checkUserIsAuthorizedToEditPatch($patch);
+          checkUserIsAuthorizedToEditPatch($patch); // will throw error if no WP user is logged in
         }
 
     }
@@ -674,6 +674,8 @@ add_action('wp_ajax_owl-patch-file-upload', 'owl_patchFileUpload');
 add_action('wp_ajax_owl-patch-file-cleanup', 'owl_patchFileCleanUp');
 add_action('wp_ajax_owl-patch-file-delete', 'owl_patchFileDelete');
 
+// unprivileged version of `owl_patchFileUpload`. correct secret needed for this
+// call to be successful.
 add_action('wp_ajax_nopriv_owl-patch-file-upload', 'owl_patchFileUpload');
 
 // EOF
