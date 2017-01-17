@@ -44,9 +44,6 @@ router.post('/', (req, res) => {
   Object.assign(newPatch, req.body.patch);
   const patchAuthor = {};
 
-  console.log('***');
-  console.log(newPatch);
-
   Promise.resolve()
     .then(() => {
 

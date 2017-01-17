@@ -311,6 +311,7 @@ function getDirMod()
  */
 function owl_patchFileUpload()
 {
+  error_log('hello!');
     /*
      * Create base directory (if needed)
      */

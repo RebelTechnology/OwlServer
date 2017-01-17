@@ -4,6 +4,8 @@ const http = require('http');
 const https = require('https');
 const crypto = require('crypto');
 const url = require('url');
+const path = require('path');
+const fs = require('fs');
 
 /**
  * HoxtonOWL API client.
@@ -149,12 +151,22 @@ class ApiClient {
   /**
    * Uploads one or more source files for the specified patch.
    *
-   * @param {Patch} patchId
-   * @param {Array<Object<string,string>>} The files to upload.
+   * @param {string} patchId
+   * @param {Array<string>} paths - The files to upload.
    * @return {Promise}
    */
-  uploadSourceFiles(patch) {
-    return this._request('POST', '/patch/{id}/sources');
+  uploadSourceFiles(patchId, paths) {
+    const files = [];
+    if (!Array.isArray(paths) || !paths.length) {
+      throw new Error('`paths` argument must be a non-empty array.');
+    }
+    for (let filePath of paths) {
+      const fileInfo = {};
+      fileInfo.name = path.basename(filePath);
+      fileInfo.data = new Buffer(fs.readFileSync(filePath, 'utf8')).toString('base64');
+      files.push(fileInfo);
+    }
+    return this._request('POST', `/patch/${patchId}/sources`, { patchId, files });
   }
 
   /**
@@ -201,7 +213,18 @@ class ApiClient {
         // console.log('headers:', res.headers);
         res.setEncoding('utf8');
         res.on('data', chunk => data += chunk);
-        res.on('end', () => resolve({ res, data: data ? JSON.parse(data) : data }));
+        res.on('end', () => {
+          let decodedData;
+          if (data) {
+            try {
+              console.log(data);
+              decodedData = JSON.parse(data);
+            } catch (e) {
+              reject(e);
+            }
+          }
+          resolve({ res, data: data ? decodedData : null });
+        });
       });
       req.on('error', err => reject(err));
       if (body) {

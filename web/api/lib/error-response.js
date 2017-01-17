@@ -18,11 +18,19 @@ const errorResponse = (err, res) => {
     status = 400;
   }
 
-  process.stderr.write(err.stack + '\n');
+  if (err.stack) {
+    process.stderr.write(err.stack + '\n');
+  }
   const additionalErrorProperties = {};
+  if (err.message) {
+    process.stderr.write(`Error: ${err.message}\n`);
+  }
   for (let prop in err) {
+    if (prop === 'message') {
+      continue;
+    }
     additionalErrorProperties[prop] = err[prop];
-    process.stderr.write(`prop = ${prop}\n`);
+    process.stderr.write(`└─ ${prop}: ${err[prop]}\n`);
   }
 
   let data = {

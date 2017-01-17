@@ -79,31 +79,33 @@ const getUserInfoBatch = userIds => {
  *                                               string property, containing respectively the name
  *                                               of each file to upload and a base64 encoded repre-
  *                                               sentation of its content.
- * @return {[type]} [description]
+ * @return {Promise}
  */
 const uploadSources = (patchId, files) => {
 
   const requestOptions = {
-    url: `https://${apiSettings.WORDPRESS_XML_RPC_ENDPOINT}/wp-admin/admin-ajax.php`,
-    rejectUnauthorized: !!process.env.NODE_ENV, // if set to `false`, will allow self-signed SSL certificates
+    rejectUnauthorized: process.env.NODE_ENV === 'production', // if `false`, will allow self-signed SSL certificates
     formData: {
-      patchId: id,
+      patchId: patchId,
       action: 'owl-patch-file-upload',
       secret: process.env.PATCH_UPLOAD_SECRET,
     }
   };
 
-  query.files.forEach((file, i) => {
+  files.forEach((file, i) => {
     // Apparently 'files[x]' is the format that PHP likes when it comes to
     // upload multiple files, so we abide by it.
     requestOptions[`files[${i}]`] = {
-      value: String(new Buffer(file.data, 'base64')),
+      value: file.data,
       options: { filename: file.name },
     };
   });
 
   return new Promise((resolve, reject) => {
-    request.post(requestOptions, (err, httpResponse, body) => {
+    const url = `https://${apiSettings.WORDPRESS_XML_RPC_ENDPOINT}/wp-admin/admin-ajax.php`;
+    console.log(url);
+    console.log(requestOptions);
+    request.post(url, requestOptions, (err, httpResponse, body) => {
       if (err) {
         reject({ message: 'File upload failed.', status: 500, public: true });
       }

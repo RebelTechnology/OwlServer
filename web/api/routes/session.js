@@ -16,7 +16,7 @@ router.post('/', (req, res) => {
     return errorResponse({ message: 'Missing or invalid nonce.', status: 400, public: true }, res);
   }
   if ('string' !== typeof apiKeyHash) {
-    return errorResponse({ message: 'Missing or invalid password hash.', status: 400, public: true });
+    return errorResponse({ message: 'Missing or invalid password hash.', status: 400, public: true }, res);
   }
 
   if (authenticate(nonce, apiKeyHash)) {
@@ -25,7 +25,7 @@ router.post('/', (req, res) => {
     return;
   }
 
-  return errorResponse({ message: 'Unauthorized', status: 401, public: true });
+  return errorResponse({ message: 'Unauthorized', status: 401, public: true }, res);
 });
 
 module.exports = router;

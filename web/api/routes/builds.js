@@ -48,11 +48,7 @@ router.get('/:id', function (req, res) {
   const patchModel = new PatchModel(req.db);
 
   if (!/^[a-f\d]{24}$/i.test(id)) {
-    return errorResponse({
-      public: true,
-      status: 400,
-      message: 'Invalid patch ID.'
-    });
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
   Promise.resolve()
@@ -126,11 +122,7 @@ router.put('/:id', (req, res) => {
 
   const id = req.params.id;
   if (!/^[a-f\d]{24}$/i.test(id)) {
-    return errorResponse({
-      public: true,
-      status: 400,
-      message: 'Invalid patch ID.'
-    });
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
   let format = 'sysx'; // default

@@ -235,11 +235,7 @@ router.delete('/:id', (req, res) => {
   const patchModel = new PatchModel(req.db);
   const id = req.params.id;
   if (!/^[a-f\d]{24}$/i.test(id)) {
-    return errorResponse({
-      public: true,
-      status: 400,
-      message: 'Invalid patch ID.'
-    });
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
   Promise.resolve()
@@ -315,20 +311,20 @@ router.post('/:id/sources', (req, res) => {
   // Validate patch ID
   const id = req.params.id;
   if (!/^[a-f\d]{24}$/i.test(id)) {
-    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' });
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
   // Validate files
-  const query = req.query;
-  if (!query.files || !Array.isArray(query.files)) {
-    return errorResponse({ public: true, status: 400, message: 'Invalid request.' });
+  const { files } = req.body;
+  if (!files || !Array.isArray(files) || !files.length) {
+    return errorResponse({ public: true, status: 400, message: 'No files specified.' }, res);
   }
-  for (let i = 0; i < query.files.length; i++) {
-    if (!query.files[i].name || typeof query.files[i].name !== 'string') {
-      return errorResponse({ public: true, status: 400, message: 'Invalid file name.' });
+  for (let i = 0; i < files.length; i++) {
+    if (!files[i].name || typeof files[i].name !== 'string') {
+      return errorResponse({ public: true, status: 400, message: 'Invalid file name.' }, res);
     }
-    if (!query.files[i].data || typeof query.files[i].data !== 'string') {
-      return errorResponse({ public: true, status: 400, message: 'Invalid file data.' });
+    if (!files[i].data || typeof files[i].data !== 'string') {
+      return errorResponse({ public: true, status: 400, message: 'Invalid file data.' }, res);
     }
   }
 
@@ -343,7 +339,7 @@ router.post('/:id/sources', (req, res) => {
         throw { message: 'Access denied (3).', status: 401, public: true };
       }
 
-      return wordpressBridge.uploadSources(id, query.files);
+      return wordpressBridge.uploadSources(id, files);
     })
     .catch(error => errorResponse(error, res));
 });
