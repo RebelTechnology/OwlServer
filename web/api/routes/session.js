@@ -19,6 +19,7 @@ router.post('/', (req, res) => {
     return errorResponse({ message: 'Missing or invalid password hash.', status: 400, public: true }, res);
   }
 
+  process.stderr.write(`nonce: ${nonce}\n`); // FIXME
   if (authenticate(nonce, apiKeyHash)) {
     const token = issueToken();
     res.status(200).json({ success: true, message: 'Authenticated.', token });

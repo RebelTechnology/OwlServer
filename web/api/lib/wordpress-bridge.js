@@ -84,6 +84,7 @@ const getUserInfoBatch = userIds => {
 const uploadSources = (patchId, files) => {
 
   const requestOptions = {
+    url: `https://${apiSettings.WORDPRESS_XML_RPC_ENDPOINT}/wp-admin/admin-ajax.php`,
     rejectUnauthorized: process.env.NODE_ENV === 'production', // if `false`, will allow self-signed SSL certificates
     formData: {
       patchId: patchId,
@@ -95,21 +96,26 @@ const uploadSources = (patchId, files) => {
   files.forEach((file, i) => {
     // Apparently 'files[x]' is the format that PHP likes when it comes to
     // upload multiple files, so we abide by it.
-    requestOptions[`files[${i}]`] = {
+    requestOptions.formData[`files[${i}]`] = {
       value: file.data,
       options: { filename: file.name },
     };
   });
 
   return new Promise((resolve, reject) => {
-    const url = `https://${apiSettings.WORDPRESS_XML_RPC_ENDPOINT}/wp-admin/admin-ajax.php`;
-    console.log(url);
-    console.log(requestOptions);
-    request.post(url, requestOptions, (err, httpResponse, body) => {
+    request.post(requestOptions, (err, httpResponse, body) => {
       if (err) {
-        reject({ message: 'File upload failed.', status: 500, public: true });
+        const err = new Error('File upload failed.');
+        err.public = true;
+        reject(err);
       }
-      resolve(body);
+      let decodedBody;
+      try {
+        decodedBody = JSON.parse(body);
+      } catch (e) {
+        reject(new Error());
+      }
+      resolve(decodedBody);
     });
   });
 };

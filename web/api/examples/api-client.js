@@ -217,7 +217,6 @@ class ApiClient {
           let decodedData;
           if (data) {
             try {
-              console.log(data);
               decodedData = JSON.parse(data);
             } catch (e) {
               reject(e);

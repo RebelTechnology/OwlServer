@@ -390,8 +390,7 @@ function owl_patchFileUpload()
 
     if (!isset($_FILES) || !is_array($_FILES) || !isset($_FILES['files']) ||
         !isset($_FILES['files']['name']) || !is_array($_FILES['files']['name'])) {
-
-        errorOut('Unexpected error (7).' . var_export($_FILES));
+        errorOut('Unexpected error (7).');
     }
 
     $numFiles = count($_FILES['files']['name']);

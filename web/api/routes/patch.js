@@ -1,16 +1,14 @@
 'use strict';
 
 const router = require('express').Router();
-const fs = require('fs');
-const path = require('path');
 
 const Patch = require('../lib/patch');
 const PatchModel = require('../models/patch');
 const { getUserInfoBatch } = require('../lib/wordpress-bridge.js');
-const apiSettings = require('../api-settings.js');
 const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
 const errorResponse = require('../lib/error-response');
 const wordpressBridge = require('../lib/wordpress-bridge');
+const patchBuild = require('../lib/patch-build');
 
 /**
  * Returns the WordPress user's "display name" for the given WordPress user ID.
@@ -29,39 +27,6 @@ const getUserWpDisplayName = wordpressId => {
         return result[wordpressId].display_name;
       }
     });
-};
-
-/**
- * Returns information about available builds.
- *
- * FIXME - This function relies on the API being able to access the same filesystem
- *         as the website.
- *
- * @param {Patch} patch
- * @return {Object}
- */
-const getPatchBuildInfo = patch => {
-
-  const result = {
-    sysExAvailable: false,
-    jsAvailable: false,
-  };
-
-  // Get patch SysEx build
-  const sysexFile = path.join(apiSettings.SYSEX_PATH, patch['seoName'] + '.syx');
-  if (fs.existsSync(sysexFile)) {
-    result['sysExAvailable'] = true;
-    result['sysExLastUpdated'] = fs.statSync(sysexFile).mtime;
-  }
-
-  // Get patch JS build
-  const jsFile = path.join(apiSettings.JS_PATH, patch['seoName'] + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
-  if (fs.existsSync(jsFile)) {
-    result['jsAvailable'] = true;
-    result['jsLastUpdated'] = fs.statSync(jsFile).mtime;
-  }
-
-  return result;
 };
 
 /**
@@ -89,7 +54,8 @@ const processPatch = result => {
       if (wordpressDisplayName) {
         patch.author.name = wordpressDisplayName;
       }
-      Object.assign(patch, getPatchBuildInfo(patch)); // Get available builds
+      // Get available builds
+      Object.assign(patch, patchBuild.getInfo(patch));
       return patch;
     });
 };
@@ -234,7 +200,7 @@ router.delete('/:id', (req, res) => {
 
   const patchModel = new PatchModel(req.db);
   const id = req.params.id;
-  if (!/^[a-f\d]{24}$/i.test(id)) {
+  if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
     return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
@@ -310,7 +276,7 @@ router.post('/:id/sources', (req, res) => {
 
   // Validate patch ID
   const id = req.params.id;
-  if (!/^[a-f\d]{24}$/i.test(id)) {
+  if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
     return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
@@ -340,6 +306,43 @@ router.post('/:id/sources', (req, res) => {
       }
 
       return wordpressBridge.uploadSources(id, files);
+    })
+    .then(result => {
+      if (!result) {
+        throw new Error();
+      }
+
+      if (result.err) {
+        throw new Error('Error while uploading patch source(s).');
+      }
+
+      // Check that every single upload succeeded...
+      if (!Array.isArray(result.files)) {
+        throw new Error();
+      }
+      const successfulUploads = [];
+      const failedUploads = [];
+      for (let file of result.files) {
+        if (file.err) {
+          failedUploads.push(file.name);
+          continue;
+        } else {
+          successfulUploads.push(file.name);
+        }
+      }
+
+      const response = { success: !failedUploads.length };
+      if (successfulUploads.length && !failedUploads.length) {
+        response.message = 'Success.';
+      } else if (!successfulUploads.length && failedUploads.length) {
+        response.message = 'Error uploading source file(s).';
+      } else if (successfulUploads.length && failedUploads.length) {
+        response.message = 'Some files could not be uploaded.';
+      }
+      response.successfulUploads = successfulUploads;
+      response.failedUploads = failedUploads;
+
+      return res.status(response.success ? 200 : 400).json(response);
     })
     .catch(error => errorResponse(error, res));
 });

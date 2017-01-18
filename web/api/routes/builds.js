@@ -1,12 +1,11 @@
 'use strict';
 
 const router = require('express').Router();
-const fs = require('fs');
-const path = require('path');
 const exec = require('child-process-promise').exec;
 
-const apiSettings = require('../api-settings.js');
+const apiSettings = require('../api-settings');
 const PatchModel = require('../models/patch');
+const { download: downloadBuild } = require('../lib/patch-build');
 const errorResponse = require('../lib/error-response');
 
 /**
@@ -44,67 +43,27 @@ router.get('/:id', function (req, res) {
   const id = req.params.id;
   const query = req.query;
   let format;
-  let download = true;
+  let stream = false;
   const patchModel = new PatchModel(req.db);
 
-  if (!/^[a-f\d]{24}$/i.test(id)) {
+  if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
     return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
-  Promise.resolve()
-    .then(() => {
+  // Determine whether the patch will be downloaded or streamed in-line
+  if (query.download && (query.download == 0 || query.download == 'false' || query.download == '')) {
+    stream = true;
+  }
 
-      // Determine patch format
-      format = getBuildFormat(query.format);
+  // Determine patch format
+  format = getBuildFormat(query.format);
 
-      // Determine whether the patch will be downloaded or streamed in-line
-      if (query.download && (query.download == 0 || query.download == 'false' || query.download == '')) {
-        download = false;
-      }
-
-      return patchModel.getById(id);
-    })
+  patchModel.getById(id)
     .then(patch => {
-
       if (!patch) {
         throw { status: 404, public: true, message: 'Patch not found.' };
       }
-
-      // Check if SysEx is available
-
-      let buildFile;
-      let filename;
-
-      if (format === 'sysx') {
-        buildFile = path.join(apiSettings.SYSEX_PATH, patch.seoName + '.syx');
-      } else if (format === 'js') {
-        buildFile = path.join(apiSettings.JS_PATH, patch.seoName + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
-      }
-      if (!fs.existsSync(buildFile)) { // FIXME - Move this somewhere else
-        throw {
-          status: 404,
-          public: true,
-          message: 'Build file not available for this patch (in ' + format + ' format).'
-        };
-      }
-
-      // Download file
-      filename = path.basename(buildFile);
-      if (download) {
-        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-      }
-      if(download && format === 'sysx') {
-        // increment download count for sysx files
-        patchModel.incrementDownloadCount(patch._id);
-      }
-      res.setHeader('Content-length', fs.statSync(buildFile)['size']); // FIXME - Move this somewhere else
-      if (format === 'sysx') {
-        res.setHeader('Content-type', 'application/octet-stream');
-      } else if (format === 'js') {
-        res.setHeader('Content-type', 'text/javascript');
-      }
-      const filestream = fs.createReadStream(buildFile);
-      return filestream.pipe(res);
+      return downloadBuild(patch, patchModel, stream, format, res);
     })
     .catch(error => errorResponse(error, res));
 });
@@ -121,7 +80,7 @@ router.put('/:id', (req, res) => {
   const patchModel = new PatchModel(req.db);
 
   const id = req.params.id;
-  if (!/^[a-f\d]{24}$/i.test(id)) {
+  if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
     return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
