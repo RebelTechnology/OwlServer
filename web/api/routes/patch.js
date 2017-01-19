@@ -264,6 +264,9 @@ router.delete('/:id', (req, res) => {
  */
 router.post('/:id/sources', (req, res) => {
 
+  const successfulUploads = [];
+  const failedUploads = [];
+
   // Is user authenticated?
   if (!res.locals.authenticated) {
     throw { message: 'Access denied (1).', status: 401, public: true };
@@ -295,8 +298,10 @@ router.post('/:id/sources', (req, res) => {
   }
 
   const patchModel = new PatchModel(req.db);
+  let patch;
   patchModel.getById(id)
-    .then(patch => {
+    .then(result => {
+      patch = result;
       if (!patch) {
         throw { message: 'Patch not found.', status: 400, public: true };
       }
@@ -320,8 +325,7 @@ router.post('/:id/sources', (req, res) => {
       if (!Array.isArray(result.files)) {
         throw new Error();
       }
-      const successfulUploads = [];
-      const failedUploads = [];
+
       for (let file of result.files) {
         if (file.err) {
           failedUploads.push(file.name);
@@ -331,6 +335,14 @@ router.post('/:id/sources', (req, res) => {
         }
       }
 
+      const sourceUrls = successfulUploads.map(uploadedFile => {
+        // Example:
+        // https://staging.hoxtonowl.com/wp-content/uploads/patch-files/563b9a3031062254525b5831/TestTonePatch.hpp
+        return `https://${process.env.WORDPRESS_HOSTNAME}/${process.env.PATCH_SOURCE_URL_FRAGMENT}/${id}/${uploadedFile}`;
+      });
+      return patchModel.addSources(id, sourceUrls);
+    })
+    .then(() => {
       const response = { success: !failedUploads.length };
       if (successfulUploads.length && !failedUploads.length) {
         response.message = 'Success.';

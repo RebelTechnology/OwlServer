@@ -273,7 +273,7 @@ const patchFieldValidators = {
         if (url.host.indexOf('hoxtonowl') !== -1) {
           // e.g.: http://hoxtonowl.localhost:8000/wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
           // url.path = /wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
-          if (!/^\/wp-content\/uploads\/patch\-files\/[a-z0-9\-]+\/.+$/i.test(url.path)) {
+          if (!/^\/wp-content\/uploads\/patch\-files\/[a-z0-9\-]+\/.+$/i.test(url.path)) { // FIXME - Use process.env.PATCH_SOURCE_URL_FRAGMENT instead
             const err = new PatchFieldValidationError('github', 'URL does not seem to belong to a source file hosted on our servers.');
             err.index = i;
             throw err;

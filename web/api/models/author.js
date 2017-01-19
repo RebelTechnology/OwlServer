@@ -13,7 +13,7 @@ class Author {
    * @param {Object} db
    */
   constructor(db) {
-    this._collection = db.get('patches');
+    this._collection = db.get(process.env.MONGO_COLLECTION);
   }
 
   /**

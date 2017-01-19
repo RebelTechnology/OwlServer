@@ -28,7 +28,7 @@ class PatchModel {
    * @param {Object} db
    */
   constructor(db) {
-    this._collection = db.get('patches');
+    this._collection = db.get(process.env.MONGO_COLLECTION);
   }
 
   /**
@@ -59,11 +59,11 @@ class PatchModel {
   /**
    * Retrieves the patch with the specified patch ID.
    *
-   * @param {string} id
+   * @param {string} _id
    * @return {Promise<Patch>}
    */
-  getById(id) {
-    return this._getOne({ _id: id });
+  getById(_id) {
+    return this._getOne({ _id });
   }
 
   /**
@@ -112,7 +112,6 @@ class PatchModel {
    * @return {Promise<?Patch>}
    */
   _getOne(query) {
-
     return this._collection.findOne(query)
       .then(result => {
         if (!result) { // Patch not found
@@ -142,7 +141,27 @@ class PatchModel {
    * @return {Promise}
    */
   update(_id, patch) {
-    return this._collection.update({ _id }, patch);
+    return this._collection.update({ _id }, patch, { multi: false });
+  }
+
+  /**
+   * Adds a new source file to the specified patch.
+   *
+   * This method will not add duplicates.
+   *
+   * @param {string} _id
+   * @param {Array<string>} sources
+   * @return {Promise}
+   */
+  addSources(_id, sources) {
+    if (!Array.isArray(sources)) {
+      return Promise.reject(new Error('`sources` must be an array.'));
+    }
+    if (!sources.some(source => typeof source === 'string')) {
+      return Promise.reject(new Error('All elements of `sources` must be strings.'));
+    }
+    const update = { $addToSet: { github: { $each: sources }}};
+    return this._collection.update({ _id }, update, { multi: false });
   }
 
   /**
@@ -152,7 +171,7 @@ class PatchModel {
    * @return {Promise}
    */
   incrementDownloadCount(_id) {
-    return this._collection.update({ _id }, { $inc: { downloadCount: 1 }});
+    return this._collection.update({ _id }, { $inc: { downloadCount: 1 }}, { multi: false });
   }
 
   /**

@@ -2,26 +2,22 @@
 
 require('dotenv').config();
 
-var express = require('express');
-var cors = require('cors');
-var path = require('path');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
-var monk = require('monk');
-var apiSettings = require('./api-settings');
-var db = monk(apiSettings.mongoConnectionString);
-
-if (!process.env.API_KEY) {
-  process.stderr.write('Error: Make sure that `.env` file exists and that it contains the API_KEY setting in it.\n');
-  process.exit(1);
-}
-
-if (!process.env.JWT_SECRET) {
-  process.stderr.write('Error: Make sure that `.env` file exists and that it contains the JWT_SECRET setting in it.');
-  process.exit(1);
-}
+// Connect to database
+const monk = require('monk');
+const db = monk(process.env.MONGO_CONNECTION_STRING);
+db.then(() => process.stdout.write('Connected correctly to MongoDB.\n'))
+  .catch(err => {
+    process.stderr.write(err + '\n');
+    process.stderr.write('Could not connect to MongoDB.\n');
+    process.exit(1);
+  });
 
 // Load middleware
 const auth = require('./middleware/auth');

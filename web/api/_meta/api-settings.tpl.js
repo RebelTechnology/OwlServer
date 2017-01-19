@@ -7,15 +7,15 @@
  * @author Sam Artuso <sam@highoctanedev.co.uk>
  */
 
-API_PORT = 3000;
+const API_PORT = 3000;
 
-MONGO_HOST       = 'localhost';
-MONGO_PORT       = 27017;
-MONGO_USE_AUTH   = false;
-MONGO_USER       = '';
-MONGO_PASS       = '';
-MONGO_DATABASE   = 'owl_staging';
-MONGO_COLLECTION = 'patches';
+const MONGO_HOST       = 'localhost';
+const MONGO_PORT       = 27017;
+const MONGO_USE_AUTH   = false;
+const MONGO_USER       = '';
+const MONGO_PASS       = '';
+const MONGO_DATABASE   = 'owl_staging';
+const MONGO_COLLECTION = 'patches';
 
 module.exports.WORDPRESS_XML_RPC_ENDPOINT = 'hoxtonowl.localhost:8000';
 module.exports.WORDPRESS_XML_RPC_USERNAME = 'owlapi';
@@ -32,17 +32,13 @@ module.exports.JS_PATH = '/var/www/hoxtonowl.com/subdomains/staging/patch-builde
 module.exports.JS_BUILD_TYPE = 'min'; // If we're building minified JS patches, this should be
                                       // set to 'min'.
 
-if (global.Q) {
-  Q.longStackSupport = true; // dev mode only
-}
-
 //////////////////////////////
 // Please do not edit below //
 //////////////////////////////
 
 var mongoConnectionString = 'mongodb://';
 if (MONGO_USE_AUTH) {
-    mongoConnectionString += MONGO_USER + ':' + MONGO_PASS + '@';
+  mongoConnectionString += MONGO_USER + ':' + MONGO_PASS + '@';
 }
 mongoConnectionString += MONGO_HOST + ':' + MONGO_PORT + '/' + MONGO_DATABASE;
 

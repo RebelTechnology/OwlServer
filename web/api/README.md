@@ -4,16 +4,12 @@ This project exposes some data related to the [OWL][1] project over a RESTful AP
 * Node.js >= 6.6.*
 
 ## How to run
-1. Copy file `_meta/api-settings.tpl.js` to root directory and rename it to `api-settings.js`:
-
-        cp \_meta/api-settings.tpl.js api-settings.js
-2. You're likey to want to change variables `API_PORT` and/or `MONGO_DATABASE` in this new file. We are using a port and a MongoDB database for each environment (staging, production).
-3. Copy file `_meta/example.env` to root directory and rename it to `.env` and
-change the `API_KEY`, `JWT_SECRET`, `PATCH_UPLOAD_SECRET` and `NODE_ENV` settings.
-4. Install node.js modules:
+1. Copy file `_meta/example.env` to root directory, rename it to `.env` and
+   edit the settings as needed.
+2. Install node.js modules:
 
         npm install
-5. Enjoy!
+3. Enjoy!
 
         ./bin/www
 
@@ -44,6 +40,21 @@ found.
 #### \*DELETE /patch/:id
 Deletes a patch.  Returns `404 Not found` if the specified patch could not be
 found.
+
+#### \*POST /patch/:id/sources
+Uploads one or more source files.
+
+Request payload format:
+
+    {
+      files: [
+        {
+          name: 'Gain.hpp',
+          data: 'base64 encoded file content'
+        },
+        ...
+      ]
+    }
 
 ### Authors
 

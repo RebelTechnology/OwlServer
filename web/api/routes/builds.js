@@ -3,7 +3,6 @@
 const router = require('express').Router();
 const exec = require('child-process-promise').exec;
 
-const apiSettings = require('../api-settings');
 const PatchModel = require('../models/patch');
 const { download: downloadBuild } = require('../lib/patch-build');
 const errorResponse = require('../lib/error-response');
@@ -117,7 +116,7 @@ router.put('/:id', (req, res) => {
       }
 
       // Compile patch
-      let cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH;
+      let cmd = 'php ' + process.env.PATCH_BUILDER_PATH;
       if (format === 'js') {
         cmd += ' --web';
       }

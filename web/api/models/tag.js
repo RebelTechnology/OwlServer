@@ -11,7 +11,7 @@ class Tag {
    * @param {Object} db
    */
   constructor(db) {
-    this._collection = db.get('patches');
+    this._collection = db.get(process.env.MONGO_COLLECTION);
   }
 
   /**
@@ -35,10 +35,7 @@ class Tag {
         { $sort: { insensitive: 1 }},
         { $project: { _id: 1 }}
     ])
-    .then(result => {
-      // console.log(result);
-      return result.map(current => current._id);
-    });
+    .then(result => result.map(current => current._id));
   }
 }
 

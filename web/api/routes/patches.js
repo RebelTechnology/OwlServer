@@ -22,7 +22,7 @@ router.get('/', (req, res) => {
   const patchModel = new PatchModel(req.db);
   return patchModel.find(req.query)
     .then(result => {
-      var response = { count: result.length, result };
+      var response = { count: result.length, result, success: true };
       return res.status(200).json(response);
     })
     .catch(error => errorResponse(error, res));
@@ -100,6 +100,7 @@ router.post('/', (req, res) => {
       message: 'New patch saved.',
       _id: patch._id,
       seoName: patch.seoName,
+      success: true,
     });
   })
   .catch(error => errorResponse(error, res));

@@ -5,12 +5,10 @@
 const wordpress = require('wordpress');
 const request = require('request');
 
-const apiSettings = require('../api-settings');
-
 const client = wordpress.createClient({
-  url: apiSettings.WORDPRESS_XML_RPC_ENDPOINT,
-  username: apiSettings.WORDPRESS_XML_RPC_USERNAME,
-  password: apiSettings.WORDPRESS_XML_RPC_PASSWORD,
+  url: process.env.WORDPRESS_HOSTNAME,
+  username: process.env.WORDPRESS_XML_RPC_USERNAME,
+  password: process.env.WORDPRESS_XML_RPC_PASSWORD,
 });
 
 /**
@@ -84,7 +82,7 @@ const getUserInfoBatch = userIds => {
 const uploadSources = (patchId, files) => {
 
   const requestOptions = {
-    url: `https://${apiSettings.WORDPRESS_XML_RPC_ENDPOINT}/wp-admin/admin-ajax.php`,
+    url: `https://${process.env.WORDPRESS_HOSTNAME}/wp-admin/admin-ajax.php`,
     rejectUnauthorized: process.env.NODE_ENV === 'production', // if `false`, will allow self-signed SSL certificates
     formData: {
       patchId: patchId,
@@ -97,7 +95,7 @@ const uploadSources = (patchId, files) => {
     // Apparently 'files[x]' is the format that PHP likes when it comes to
     // upload multiple files, so we abide by it.
     requestOptions.formData[`files[${i}]`] = {
-      value: file.data,
+      value: Buffer.from(file.data, 'base64'),
       options: { filename: file.name },
     };
   });
