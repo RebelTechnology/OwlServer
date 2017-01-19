@@ -4,6 +4,7 @@ const router = require('express').Router();
 const exec = require('child-process-promise').exec;
 
 const PatchModel = require('../models/patch');
+const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
 const { download: downloadBuild } = require('../lib/patch-build');
 const errorResponse = require('../lib/error-response');
 
@@ -74,45 +75,51 @@ router.get('/:id', function (req, res) {
  */
 router.put('/:id', (req, res) => {
 
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ public: true, message: 'Access denied.', status: 401 }, res);
+  }
+
+  // Get user details
   let isWpAdmin = false;
   let wpUserId;
-  const patchModel = new PatchModel(req.db);
+  const userInfo = res.locals.userInfo;
+  if (userInfo.type === authTypes.AUTH_TYPE_WORDPRESS) {
+    wpUserId = userInfo.wpUserId;
+    process.stdout.write('WP user ID is ' + wpUserId + '\n');
+    isWpAdmin = userInfo.wpAdmin;
+    process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
+  }
 
+  // Validate patch ID
   const id = req.params.id;
   if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
     return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
+  // Build format
   let format = 'sysx'; // default
   if (req.body.format) {
     format = getBuildFormat(req.body.format);
   }
 
-  Promise.resolve()
-    .then(() => {
-
-      // Is user authenticated?
-      if (!res.locals.authenticated) {
-        throw { public: true, message: 'Access denied.', status: 401 };
-      }
-
-      // Get user details
-      const userInfo = res.locals.userInfo;
-      wpUserId = userInfo.id;
-      process.stdout.write('WP user ID is ' + wpUserId + '\n');
-      isWpAdmin = userInfo.admin;
-      process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
-
-      return patchModel.getById(id);
-    })
+  const patchModel = new PatchModel(req.db);
+  patchModel.getById(id)
     .then(patch => {
+
       if (!patch) {
         throw { message: 'Patch not found.', status: 404, public: true };
       }
 
       // Check if user can compile patch
-      if (!isWpAdmin && (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId)) {
-        throw { status: 401, public: true, message: 'You are not authorized to compile this patch.' };
+      if (userInfo.type === authTypes.AUTH_TYPE_WORDPRESS) {
+        if (!isWpAdmin && (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId)) {
+          throw { status: 401, public: true, message: 'You are not authorized to compile this patch.' };
+        }
+      } else if (userInfo.type === authTypes.AUTH_TYPE_TOKEN) {
+        if (patch.author.name !== API_USER_NAME) {
+          throw { status: 401, public: true, message: 'You are not authorized to compile this patch.' };
+        }
       }
 
       // Compile patch
