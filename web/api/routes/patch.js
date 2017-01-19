@@ -101,42 +101,28 @@ router.get('/', (req, res) => {
  */
 router.put('/:id', (req, res) => {
 
-  let isWpAdmin = false;
-  let wpUserId;
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ message: 'Access denied (1).', status: 401, public: true }, res);
+  }
+
+  const userInfo = res.locals.userInfo;
+  if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot edit patches!
+    return errorResponse({ message: 'Access denied (2).', status: 401, public: true }, res);
+  }
+
+  let isWpAdmin = userInfo.wpAdmin;
+  let wpUserId = userInfo.wpUserId;
+  process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
+  process.stdout.write('WP user ID is ' + wpUserId + '\n');
 
   const patchModel = new PatchModel(req.db);
   const updatedPatch = new Patch();
   Object.assign(updatedPatch, req.body.patch);
-  const patchAuthor = {};
 
-  Promise.resolve()
-    .then(() => {
+  updatedPatch.generateSeoName();
 
-      // Is user authenticated?
-      if (!res.locals.authenticated) {
-        throw { message: 'Access denied (1).', status: 401, public: true };
-      }
-
-      const userInfo = res.locals.userInfo;
-      if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot delete patches!
-        throw { message: 'Access denied (2).', status: 401, public: true };
-      }
-
-      isWpAdmin = userInfo.wpAdmin;
-      wpUserId = userInfo.wpUserId;
-      process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
-      process.stdout.write('WP user ID is ' + wpUserId + '\n');
-
-      // If not a WP admin, we set the current WP user as patch author,
-      // disregarding any authorship info s/he sent. If a WP admin, we blindy
-      // trust the authorship information.
-      if (!isWpAdmin) {
-        patchAuthor.wordpressId = wpUserId;
-      }
-
-      updatedPatch.generateSeoName();
-      return updatedPatch.validate(); // will throw an error if patch is not valid
-    })
+  updatedPatch.validate() // will throw an error if patch is not valid
     .then(() => patchModel.patchNameTaken(updatedPatch.name, updatedPatch.seoName, updatedPatch._id))
     .then(nameAlreadyTaken => {
       if (nameAlreadyTaken) {
@@ -148,7 +134,6 @@ router.put('/:id', (req, res) => {
     })
     .then(patch => {
 
-      // Save patch
       if (!patch) {
         throw { message: 'Patch not found!', status: 400, public: true };
       }
@@ -158,8 +143,12 @@ router.put('/:id', (req, res) => {
       }
 
       updatedPatch.sanitize();
+
+      // If not a WP admin, we set the current WP user as patch author,
+      // disregarding any authorship info s/he sent. If a WP admin, we blindy
+      // trust the authorship information.
       if (!isWpAdmin) {
-        updatedPatch.author = patchAuthor;
+        updatedPatch.author = { wordpressId: wpUserId };
       }
 
       if (!isWpAdmin) {
@@ -174,8 +163,6 @@ router.put('/:id', (req, res) => {
       return patchModel.update(updatedPatch._id, updatedPatch);
     })
     .then(() => {
-
-      // Confirms that the patch was actually inserted
       process.stdout.write('Patch ' + updatedPatch._id + ' updated.\n');
       const response = {
         message: 'Patch updated.',
@@ -195,8 +182,20 @@ router.put('/:id', (req, res) => {
  */
 router.delete('/:id', (req, res) => {
 
-  let isWpAdmin = false;
-  let wpUserId;
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ message: 'Access denied (1).', status: 401, public: true }, res);
+  }
+
+  const userInfo = res.locals.userInfo;
+  if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot delete patches!
+    throw { message: 'Access denied (2).', status: 401, public: true };
+  }
+
+  let isWpAdmin = userInfo.wpAdmin;
+  let wpUserId = userInfo.wpUserId;
+  process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
+  process.stdout.write('WP user ID = ' + wpUserId + '\n');
 
   const patchModel = new PatchModel(req.db);
   const id = req.params.id;
@@ -204,27 +203,8 @@ router.delete('/:id', (req, res) => {
     return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
   }
 
-  Promise.resolve()
-    .then(() => {
-
-      // Is user authenticated?
-      if (!res.locals.authenticated) {
-        throw { message: 'Access denied (1).', status: 401, public: true };
-      }
-
-      const userInfo = res.locals.userInfo;
-      if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot delete patches!
-        throw { message: 'Access denied (2).', status: 401, public: true };
-      }
-
-      isWpAdmin = userInfo.wpAdmin;
-      wpUserId = userInfo.wpUserId;
-      process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
-      process.stdout.write('WP user ID = ' + wpUserId + '\n');
-
-      // Retrieve patch before deleting it
-      return patchModel.getById(id); // FIXME - Use findOneAndDelete() for atomic delete instead
-    })
+  // Retrieve patch before deleting it
+  patchModel.getById(id) // FIXME - Use findOneAndDelete() for atomic delete instead
     .then(patch => {
 
       if (!patch) {
@@ -269,12 +249,12 @@ router.post('/:id/sources', (req, res) => {
 
   // Is user authenticated?
   if (!res.locals.authenticated) {
-    throw { message: 'Access denied (1).', status: 401, public: true };
+    return errorResponse({ message: 'Access denied (1).', status: 401, public: true }, res);
   }
 
   // Only API users can upload sources. WordPress users will do it through the website.
   if (authTypes.AUTH_TYPE_TOKEN !== res.locals.userInfo.type) {
-    throw { message: 'Access denied (2).', status: 401, public: true };
+    return errorResponse({ message: 'Access denied (2).', status: 401, public: true }, res);
   }
 
   // Validate patch ID
