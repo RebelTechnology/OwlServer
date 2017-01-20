@@ -41,6 +41,7 @@ function usage() {
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
     echo '  --keep-tmp-files    Do not delete temporary source and build directories once the build has finished.' . PHP_EOL;
+    echo '  --docker            Uses the OwlDocker Docker image.' . PHP_EOL;
 }
 
 /**
@@ -70,30 +71,27 @@ function outputError($msg) {
  * @return string         The path of the temporary directory.
  */
 function tempdir($prefix = null) {
+    $tmpdir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'owl';
+    if (!file_exists($tmpdir)) {
+        $result = mkdir("$tmpdir/owl");
+        if (!$result) {
+            outputError("Unable to create temporary directory $tmpdir.");
+            exit(1);
+        }
+    }
     $template = "{$prefix}XXXXXX";
-    $tmpdir = '--tmpdir=' . sys_get_temp_dir();
-    return exec("mktemp -d $tmpdir $template");
+    return exec("mktemp -d --tmpdir=$tmpdir $template");
 }
 
 /**
  * Downloads a file from GitHub.
  *
  * @param  string $githubFile The GitHub file to download.
- * @param  string $dstPath    The path where to download the file,
+ * @param  string $dstPath    The path where to download the file.
  * @return string|boolean     The name of the downloaded file, or false if the
  *                            the download failed.
  */
 function downloadGithubFile($githubFile, $dstPath) {
-
-    if (!filter_var($githubFile, FILTER_VALIDATE_URL)) {
-        outputError('Invalid URL (1).');
-        return false;
-    }
-
-    if (substr($githubFile, 0, 19) !== 'https://github.com/') {
-        outputError('Invalid URL (2).');
-        return false;
-    }
 
     $bits = explode('/', $githubFile);
     if (count($bits) < 8) {
@@ -152,20 +150,15 @@ function downloadGithubFile($githubFile, $dstPath) {
 } // function downloadGithubFile
 
 /**
- * Returns information about a source file.
+ * Downloads a source file.
  *
- * @todo FIXME This function is duplicated in `owl-patch-uploader.php`.
- *
- * @param  string  $url
- *     The file URL.
- * @return array
- *     An associative array whose keys are:
- *     * type (string) - Either 'github' or 'url'.
- *     * dir  (string) - The directory where the file is hosted, relative to the WP upload directory.
- *     * name (string) - The file name.
+ * @param  string $url      The URL of the file to download.
+ * @param  string $dstPath  The path where to download the file to.
+ * @return string|boolean   The name of the downloaded file, or `false` if the
+ *                          download failed.
  */
-function getSourceFileInfo($url)
-{
+function downloadSourceFile($url, $dstPath) {
+
     if (!is_string($url)) {
         errorOut('Bad source file URL (1).');
     }
@@ -175,18 +168,34 @@ function getSourceFileInfo($url)
         errorOut('Bad source file URL (2).');
     }
 
-    $result = [ 'type' => 'url' ];
-    if($r['host'] == 'github.com' || $r['host'] == 'www.github.com') {
-        $result['type'] = 'github';
+    if ($r['host'] === 'github.com' || $r['host'] === 'www.github.com') {
+
+        return downloadGithubFile($url, $dstPath);
+
+    } elseif ($r['host'] === 'staging.hoxtonowl.com' || $r['host'] === 'hoxtonowl.com' || $r['host'] === 'www.hoxtonowl.com') {
+
+        $data = file_get_contents($url);
+        if (false === $data) {
+          outputError("Could not download file $url (1).");
+          return false;
+        }
+
+        $pieces = explode('/', $url);
+        $filename = array_pop($pieces);
+
+        $result = file_put_contents($dstPath . '/' . $filename, $data);
+        if (false === $data) {
+          outputError("Could not download file $url (2).");
+          return false;
+        }
+
+        return $filename;
+
     } else {
-        $pieces = explode('/', $r['path']);
-        $result['dir'] = $pieces[count($pieces) - 2];
-        $result['name'] = $pieces[count($pieces) - 1];
+        errorOut('Bad source file URL (3).');
+        return false;
     }
-
-    return $result;
-
-} // function getSourceFileInfo
+} // function downloadSelfHostedSourceFile
 
 /* ~~~~~~~~~~~~~~~~~~~~
  *  Script entry-point
@@ -204,6 +213,7 @@ $longopts  = [
     'show-build-cmd',
     'patch-files:',
     'keep-tmp-files',
+    'docker',
     'name:',
     'web',
     'sysex',
@@ -230,6 +240,11 @@ if (isset($options['only-dload-files']) && false === $options['only-dload-files'
 $showBuildCmd = false;
 if (isset($options['show-build-cmd']) && false === $options['show-build-cmd']) {
     $showBuildCmd = true;
+}
+
+$useDocker = false;
+if (isset($options['docker']) && false === $options['docker']) {
+    $useDocker = true;
 }
 
 $buildCmd = 'make sysx';
@@ -336,29 +351,13 @@ if ($onlyShowFiles) {
 
 $sourceFiles = [];
 foreach ($patch['github'] as $githubFile) {
-
+    $r = downloadSourceFile($githubFile, $patchSourceDir);
     $sourceFileInfo = getSourceFileInfo($githubFile);
-    if ('url' === $sourceFileInfo['type']) {
-
-        $srcDir = realpath(dirname(__FILE__) . '/../httpdocs/wp-content/uploads/patch-files/');
-        $srcFile = $srcDir . '/' . $patchId . '/' . $sourceFileInfo['name'];
-        $dstFile = $patchSourceDir . '/' . $sourceFileInfo['name'];
-        if (!@copy($srcFile, $dstFile)) {
-            outputError('Unable to copy patch source file "' . $sourceFileInfo['name'] . '".');
-            exit(1);
-        }
-
-        $sourceFiles[] = $sourceFileInfo['name'];
-
-    } else {
-
-        $r = downloadGithubFile($githubFile, $patchSourceDir);
-        if (!$r) {
-            outputError('Download of ' . $githubFile . ' failed.');
-            exit(1);
-        }
-        $sourceFiles[] = $r;
+    if (!$r) {
+        outputError('Download of ' . $githubFile . ' failed.');
+        exit(1);
     }
+    $sourceFiles[] = $r;
 }
 
 if ($onlyDloadFiles) {
@@ -369,10 +368,15 @@ if ($onlyDloadFiles) {
 
 /*
  * Work out crazy command needed to compile patch
- *
  */
 
-if($buildCmd == 'make sysx') {
+if ($useDocker) {
+  $cmd = 'docker exec owl-compiler make ';
+  // in this case the env vars are already set inside the container
+} else {
+  $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
+}
+if ($buildCmd == 'make sysx') {
 
     // First source file only
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
@@ -380,9 +384,7 @@ if($buildCmd == 'make sysx') {
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
-    $cmd  = 'make ';
     // Specify where to find Emscripten's config file
-    $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
     $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
     $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
     $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
@@ -408,20 +410,18 @@ if($buildCmd == 'make sysx') {
 
     if (!(isset($options['sysex']) && false === $options['sysex'])
          && MAKE_TARGET_SYSX == $makeTarget) {
-      $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
     }
+    $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
 
 
-}else if($buildCmd == 'make gen') {
+} elseif ($buildCmd == 'make gen') {
 
     // First source file only
     $sourceFile = $sourceFiles[0];
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
-    $cmd  = 'make ';
     // Specify where to find Emscripten's config file
-    $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
     $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
     $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
     $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
