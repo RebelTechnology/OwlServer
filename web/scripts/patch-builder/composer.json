@@ -9,6 +9,7 @@
     ],
     "require": {
         "symfony/process": "2.7.*@dev",
-        "lijinma/php-cli-color": "~1.0"
+        "lijinma/php-cli-color": "~1.0",
+        "mongodb/mongodb": "1.0.4"
     }
 }

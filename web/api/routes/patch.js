@@ -1,198 +1,97 @@
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
+'use strict';
 
-var express = require('express');
-var router  = express.Router();
-var fs      = require('fs');
-var path    = require('path');
-var Q       = require('q');
+const router = require('express').Router();
 
-var patchModel      = require('../models/patch');
-var wordpressBridge = require('../lib/wordpress-bridge.js');
-var apiSettings     = require('../api-settings.js');
+const Patch = require('../lib/patch');
+const PatchModel = require('../models/patch');
+const { getUserInfoBatch } = require('../lib/wordpress-bridge.js');
+const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
+const errorResponse = require('../lib/error-response');
+const wordpressBridge = require('../lib/wordpress-bridge');
+const patchBuild = require('../lib/patch-build');
 
 /**
- * Adds the WP user "display name" to the patch's author info, if necessary.
+ * Returns the WordPress user's "display name" for the given WordPress user ID.
+ *
+ * @todo FIXME Move this function somewhere else.
+ *
+ * @param {number} wordpressId
+ * @return {Promise<string>}
  */
-var getUserWpDisplayName = function (patch) {
+const getUserWpDisplayName = wordpressId => {
 
-    var getUserInfoBatch = Q.denodeify(wordpressBridge.getUserInfoBatch);
-
-    if (null === patch) {
-        var e = new Error('Patch not found.');
-        e.status = 404;
-        throw e;
-    }
-
-    /*
-     * Get WordPress user's "display name"
-     */
-
-    if ('wordpressId' in patch.author) {
-
-        // FIXME - This should not be a batch call
-        // This should call instead 'getUserInfo()'
-
-        return getUserInfoBatch([ parseInt(patch.author.wordpressId) ]).then(function (result) {
-
-            if (patch.author.wordpressId in result) {
-                patch.author.name = result[patch.author.wordpressId].display_name;
-            }
-
-            return patch;
-
-        });
-    }
-
-    return patch;
-
-};
-
-/**
- * Completes patch info with extra information.
- */
-var finishPatch = function (patch) {
-
-    /*
-     * Get patch SysEx
-     */
-
-    patch['sysExAvailable'] = false;
-    var sysexFile = path.join(apiSettings.SYSEX_PATH, patch['seoName'] + '.syx');
-    if (fs.existsSync(sysexFile)) {
-        patch['sysExAvailable'] = true;
-        patch['sysExLastUpdated'] = fs.statSync(sysexFile).mtime;
-    }
-
-    /*
-     * Get patch JS
-     */
-
-    patch['jsAvailable'] = false;
-    var jsFile = path.join(apiSettings.JS_PATH, patch['seoName'] + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
-    if (fs.existsSync(jsFile)) {
-        patch['jsAvailable'] = true;
-        patch['jsLastUpdated'] = fs.statSync(jsFile).mtime;
-    }
-
-    /*
-     * Return patch
-     */
-
-    return response = { result: patch };
-
-};
-
-
-/**
- * gets wordpress cookie if exists or returns false
- */
-var getWordpressCookie = function(cookies) {
-    var wpCookie = false;
-    Object.keys(cookies).some(function(key){
-        if(key.lastIndexOf('wordpress_logged_in_') === 0){
-            wpCookie = cookies[key];
-            return true;
-        }
-        return false;
+  // FIXME - This should not be a batch call - This should call instead 'getUserInfo()'
+  return getUserInfoBatch([ parseInt(wordpressId) ])
+    .then(result => {
+      if (wordpressId in result) {
+        return result[wordpressId].display_name;
+      }
     });
-    return wpCookie;
 };
 
+/**
+ * Convenience function to process patch data as retrieved from the database and
+ * add some extra fields to it.
+ *
+ * @param  {Object} result
+ * @return {Promise<Patch>}
+ */
+const processPatch = result => {
+
+  if (!result) {
+    throw { message: 'Patch not found.', status: 404, public: true };
+  }
+
+  let patch = result;
+
+  // Get WordPress user's display name
+  let p = Promise.resolve();
+  if (patch.author.wordpressId) {
+    p = p.then(() => getUserWpDisplayName(patch.author.wordpressId));
+  }
+  return p
+    .then(wordpressDisplayName => {
+      if (wordpressDisplayName) {
+        patch.author.name = wordpressDisplayName;
+      }
+      // Get available builds
+      Object.assign(patch, patchBuild.getInfo(patch));
+      return patch;
+    });
+};
 
 /**
  * Retrieves a single patch.
  *
  * GET /patch/{id}
- *
- * FIXME: Private patches should be returned only to their owners.
  */
-router.get('/:id', function (req, res) {
-
-    var id = req.params.id;
-    var collection = req.db.get('patches');
-
-    Q.fcall(function () {
-
-        /*
-         * Get patch by ID
-         */
-
-        return collection.findOne({ _id: id });
-
-    }).then(getUserWpDisplayName)
-    .then(finishPatch)
-    .catch(function (error) {
-
-        console.log(error);
-
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            status: status
-        });
-
-    }).done(function (response) {
-
-        if ('ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
-    });
+router.get('/:id', (req, res) => {
+  const patchModel = new PatchModel(req.db);
+  patchModel
+    .getById(req.params.id)
+    .then(processPatch)
+    .then(patch => res.status(200).json({ success: true, result: patch }))
+    .catch(error => errorResponse(error, res));
 });
 
 /**
- * Retrieves a patch by some field.
+ * Retrieves a patch by its SEO name.
  *
- * GET /patch/?field=value&...
- *
- * FIXME: Private patches should be returned only to their owners.
+ * GET /patch/?seoName=value
  */
-router.get('/', function (req, res) {
+router.get('/', (req, res) => {
 
-    var query = {};
-    var collection = req.db.get('patches');
+  if (!req.query.seoName || typeof req.query.seoName !== 'string') {
+    const status = 500;
+    return res.status(status).json({ message: 'Invalid seoName.', status });
+  }
 
-    if (typeof req.query.seoName === 'string' ) {
-        query.seoName = req.query.seoName;
-    }
-
-    Q.fcall(function () {
-
-        if (0 === Object.keys(query).length) {
-            var e = new Error('You must specify at least 1 search parameter.');
-            e.status = 400;
-            throw e;
-        }
-
-        /*
-         * Find patch
-         */
-
-        return collection.findOne(query);
-
-    }).then(getUserWpDisplayName)
-    .then(finishPatch)
-    .catch(function (error) {
-
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            status: status
-        });
-
-    }).done(function (response) {
-
-        if ('ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
-    });
+  const patchModel = new PatchModel(req.db);
+  patchModel
+    .getBySeoName(req.query.seoName)
+    .then(processPatch)
+    .then(patch => res.status(200).json({ success: true, result: patch }))
+    .catch(error => errorResponse(error, res));
 });
 
 /**
@@ -200,193 +99,80 @@ router.get('/', function (req, res) {
  *
  * PUT /patch/{id}
  */
-router.put('/:id', function (req, res) {
+router.put('/:id', (req, res) => {
 
-    var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
-    var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ message: 'Access denied (1).', status: 401, public: true }, res);
+  }
 
-    var credentials = req.body.credentials;
-    var wpCookie;
-    var username;
-    var isAdmin = false;
-    var wpUserId;
+  const userInfo = res.locals.userInfo;
+  if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot edit patches!
+    return errorResponse({ message: 'Access denied (2).', status: 401, public: true }, res);
+  }
 
-    var collection = req.db.get('patches');
-    var updatedPatch = req.body.patch;
-    var patchAuthor = {};
+  let isWpAdmin = userInfo.wpAdmin;
+  let wpUserId = userInfo.wpUserId;
+  process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
+  process.stdout.write('WP user ID is ' + wpUserId + '\n');
 
-    // to avoid unnecessary requests if wordpress cookie is available
-    if(req.cookies){
-        var wpCookieFromRequest = getWordpressCookie(req.cookies);
-        if(wpCookieFromRequest){
-            console.log('wp_cookie found in request');
-            credentials = {
-                type:'wordpress',
-                cookie: wpCookieFromRequest
-            }
+  const patchModel = new PatchModel(req.db);
+  const updatedPatch = new Patch();
+  Object.assign(updatedPatch, req.body.patch);
+
+  updatedPatch.generateSeoName();
+
+  updatedPatch.validate() // will throw an error if patch is not valid
+    .then(() => patchModel.patchNameTaken(updatedPatch.name, updatedPatch.seoName, updatedPatch._id))
+    .then(nameAlreadyTaken => {
+      if (nameAlreadyTaken) {
+        throw { message: 'Patch name already taken.', status: 400, type: 'not_valid', field: 'name', public: true };
+      }
+
+      // Retrieve patch before updating it
+      return patchModel.getById(updatedPatch._id); // FIXME - Use findOneAndUpdate() for atomic update instead
+    })
+    .then(patch => {
+
+      if (!patch) {
+        throw { message: 'Patch not found!', status: 400, public: true };
+      }
+
+      if (!isWpAdmin && (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId)) {
+        throw { message: 'You are not authorized to edit this patch.', status: 401, public: true };
+      }
+
+      updatedPatch.sanitize();
+
+      // If not a WP admin, we set the current WP user as patch author,
+      // disregarding any authorship info s/he sent. If a WP admin, we blindy
+      // trust the authorship information.
+      if (!isWpAdmin) {
+        updatedPatch.author = { wordpressId: wpUserId };
+      }
+
+      if (!isWpAdmin) {
+        updatedPatch.creationTimeUtc = patch.creationTimeUtc;
+      } else {
+        if (!updatedPatch.creationTimeUtc) {
+          updatedPatch.creationTimeUtc = patch.creationTimeUtc;
         }
-    }
+      }
 
-    Q.fcall(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~~
-         *  Check credentials
-         * ~~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Checking credentials...');
-
-        if (!credentials) {
-            var e = new Error('Access denied (1).');
-            e.status = 401;
-            throw e;
-        }
-
-        if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            var e = new Error('Access denied (2).');
-            e.status = 401;
-            throw e;
-        }
-
-        wpCookie = credentials.cookie;
-
-        return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
-
-    }).then(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~
-         *  Get WP user info
-         * ~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Getting WP user info...');
-        username = wpCookie.split('|')[0];
-        return getUserInfo(username);
-
-    }).then(function (wpUserInfo) {
-
-        /* ~~~~~~~~~~~~~~~~
-         *  Validate patch
-         * ~~~~~~~~~~~~~~~~ */
-
-        isAdmin = wpUserInfo.admin;
-        wpUserId = wpUserInfo.id;
-        console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
-        console.log('WP user ID is ' + wpUserId + '');
-
-        // If not an admin, we set the current WP user as patch author,
-        // disregarding any authorship info s/he sent. If an admin,
-        // we blindy trust the authorship information. Not ideal, but
-        // at least keeps code leaner.
-        if (!isAdmin) {
-            // patchAuthor.type = 'wordpress';
-            // patchAuthor.name = username;
-            patchAuthor.wordpressId = wpUserId;
-        }
-
-        updatedPatch.seoName = patchModel.generateSeoName(updatedPatch);
-        return patchModel.validate(updatedPatch); // will throw an error if patch is not valid
-
-    }).then(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Make sure that no other patches are named the same
-         *  (in a case insensitive fashion)
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        var regExpEscape = function (str) {
-            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-        };
-
-        var nameRegexp = new RegExp('^' + regExpEscape(updatedPatch.name) + '$', 'i');
-        var seoNameRegexp = new RegExp('^' + regExpEscape(updatedPatch.seoName) + '$', 'i');
-        return collection.findOne({
-            $and: [
-                { _id: { $ne: collection.id(updatedPatch._id) } },
-                { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] }
-            ]
-        });
-
-    }).then(function (doc) {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Retrieve patch before updating it
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        if (null !== doc) {
-            var e = new Error('This name is already taken.');
-            e.status = 400;
-            e.type = 'not_valid';
-            e.field = 'name';
-            throw e;
-        }
-
-        return collection.findById(updatedPatch._id);
-
-    }).then(function (patch) {
-
-        /* ~~~~~~~~~~~~
-         *  Save patch
-         * ~~~~~~~~~~~~ */
-
-        if (null === patch) {
-            var e = new Error('Patch not found!');
-            e.status = 400;
-            throw e;
-        }
-
-        if (!isAdmin) {
-            if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
-                var e = new Error('You are not authorized to edit this patch.');
-                e.status = 401;
-                throw e;
-            }
-        }
-
-        updatedPatch = patchModel.sanitize(updatedPatch);
-        if (!isAdmin) {
-            updatedPatch.author = patchAuthor;
-        }
-
-        if (!isAdmin) {
-            updatedPatch.creationTimeUtc = patch.creationTimeUtc;
-        } else {
-            if (!updatedPatch.creationTimeUtc) {
-                updatedPatch.creationTimeUtc = patch.creationTimeUtc;
-            }
-        }
-
-        console.log('Patch to be updated: \n' + JSON.stringify(updatedPatch, null, 4));
-        return collection.updateById(updatedPatch._id, updatedPatch);
-
-    }).then(function (patch) {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Confirms that the patch was actually inserted
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Patch ' + updatedPatch._id + ' updated.');
-        return {
-            message: 'Patch updated.',
-            _id:     updatedPatch._id,
-            seoName: updatedPatch.seoName
-        };
-
-    }).catch(function (error) {
-
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            status: status
-        });
-
-    }).done(function (response) {
-
-        if ('ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
-    });
+      process.stdout.write('Patch to be updated: \n' + JSON.stringify(updatedPatch, null, 4) + '\n');
+      return patchModel.update(updatedPatch._id, updatedPatch);
+    })
+    .then(() => {
+      process.stdout.write('Patch ' + updatedPatch._id + ' updated.\n');
+      const response = {
+        message: 'Patch updated.',
+        _id: updatedPatch._id,
+        seoName: updatedPatch.seoName,
+        success: true,
+      };
+      return res.status(200).json(response);
+    })
+    .catch(error => errorResponse(error, res));
 });
 
 /**
@@ -394,147 +180,163 @@ router.put('/:id', function (req, res) {
  *
  * DELETE /patch/{id}
  */
-router.delete('/:id', function (req, res) {
+router.delete('/:id', (req, res) => {
 
-    var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
-    var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ message: 'Access denied (1).', status: 401, public: true }, res);
+  }
 
-    var id = req.params.id;
-    var credentials = req.body;
-    var wpCookie;
-    var collection = req.db.get('patches');
-    var username;
-    var isAdmin = false;
-    var wpUserId;
+  const userInfo = res.locals.userInfo;
+  if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot delete patches!
+    throw { message: 'Access denied (2).', status: 401, public: true };
+  }
 
-    // to avoid unnecessary requests if wordpress cookie is available
-    if(req.cookies){
-        var wpCookieFromRequest = getWordpressCookie(req.cookies);
-        if(wpCookieFromRequest){
-            console.log('wp_cookie found in request');
-            credentials = {
-                type:'wordpress',
-                cookie: wpCookieFromRequest
-            }
-        }
+  let isWpAdmin = userInfo.wpAdmin;
+  let wpUserId = userInfo.wpUserId;
+  process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
+  process.stdout.write('WP user ID = ' + wpUserId + '\n');
+
+  const patchModel = new PatchModel(req.db);
+  const id = req.params.id;
+  if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
+  }
+
+  // Retrieve patch before deleting it
+  patchModel.getById(id) // FIXME - Use findOneAndDelete() for atomic delete instead
+    .then(patch => {
+
+      if (!patch) {
+        throw { message: 'Patch not found.', status: 404, public: true };
+      }
+
+      // Check if user can delete patch
+      if (!isWpAdmin && (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId)) {
+        throw { message: 'You are not authorized to delete this patch.', status: 401, public: true };
+      }
+
+      process.stdout.write('Deleting...\n'); // FIXME
+      return patchModel.delete(id); // Actually delete patch
+    })
+    .then(() => {
+      process.stdout.write('Patch deleted!\n'); // FIXME
+      return res.status(200).json({ success: true, message: 'Patch deleted successfully.' });
+    })
+    .catch(error => errorResponse(error, res));
+});
+
+/**
+ * Uploads one or more source files.
+ *
+ * POST /patch/{id}/sources
+ *
+ * Request payload format:
+ * {
+ *   files: [
+ *     {
+ *       name: 'Gain.hpp',
+ *       data: 'base64 encoded file content'
+ *     },
+ *     ...
+ *   ]
+ * }
+ */
+router.post('/:id/sources', (req, res) => {
+
+  const successfulUploads = [];
+  const failedUploads = [];
+
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ message: 'Access denied (1).', status: 401, public: true }, res);
+  }
+
+  // Only API users can upload sources. WordPress users will do it through the website.
+  if (authTypes.AUTH_TYPE_TOKEN !== res.locals.userInfo.type) {
+    return errorResponse({ message: 'Access denied (2).', status: 401, public: true }, res);
+  }
+
+  // Validate patch ID
+  const id = req.params.id;
+  if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
+  }
+
+  // Validate files
+  const { files } = req.body;
+  if (!files || !Array.isArray(files) || !files.length) {
+    return errorResponse({ public: true, status: 400, message: 'No files specified.' }, res);
+  }
+  for (let i = 0; i < files.length; i++) {
+    if (!files[i].name || typeof files[i].name !== 'string') {
+      return errorResponse({ public: true, status: 400, message: 'Invalid file name.' }, res);
     }
+    if (!files[i].data || typeof files[i].data !== 'string') {
+      return errorResponse({ public: true, status: 400, message: 'Invalid file data.' }, res);
+    }
+  }
 
-    Q.fcall(function () {
+  const patchModel = new PatchModel(req.db);
+  let patch;
+  patchModel.getById(id)
+    .then(result => {
+      patch = result;
+      if (!patch) {
+        throw { message: 'Patch not found.', status: 400, public: true };
+      }
 
-        /* ~~~~~~~~~~~~~~~~~~~
-         *  Check credentials
-         * ~~~~~~~~~~~~~~~~~~~ */
+      if (!patch.author.name || patch.author.name !== API_USER_NAME) {
+        throw { message: 'Access denied (3).', status: 401, public: true };
+      }
 
-        console.log('Checking credentials...');
+      return wordpressBridge.uploadSources(id, files);
+    })
+    .then(result => {
+      if (!result) {
+        throw new Error();
+      }
 
-        if (!credentials) {
-            var e = new Error('Access denied (1).');
-            e.status = 401;
-            throw e;
+      if (result.err) {
+        throw new Error('Error while uploading patch source(s).');
+      }
+
+      // Check that every single upload succeeded...
+      if (!Array.isArray(result.files)) {
+        throw new Error();
+      }
+
+      for (let file of result.files) {
+        if (file.err) {
+          failedUploads.push(file.name);
+          continue;
+        } else {
+          successfulUploads.push(file.name);
         }
+      }
 
-        if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            var e = new Error('Access denied (2).');
-            e.status = 401;
-            throw e;
-        }
+      const sourceUrls = successfulUploads.map(uploadedFile => {
+        // Example:
+        // https://staging.hoxtonowl.com/wp-content/uploads/patch-files/563b9a3031062254525b5831/TestTonePatch.hpp
+        return `https://${process.env.WORDPRESS_HOSTNAME}/${process.env.PATCH_SOURCE_URL_FRAGMENT}/${id}/${uploadedFile}`;
+      });
+      return patchModel.addSources(id, sourceUrls);
+    })
+    .then(() => {
+      const response = { success: !failedUploads.length };
+      if (successfulUploads.length && !failedUploads.length) {
+        response.message = 'Success.';
+      } else if (!successfulUploads.length && failedUploads.length) {
+        response.message = 'Error uploading source file(s).';
+      } else if (successfulUploads.length && failedUploads.length) {
+        response.message = 'Some files could not be uploaded.';
+      }
+      response.successfulUploads = successfulUploads;
+      response.failedUploads = failedUploads;
 
-        wpCookie = credentials.cookie;
-
-        return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
-
-    }).then(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check if user is WordPress admin
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Checking if WP admin...');
-        username = wpCookie.split('|')[0];
-        console.log('WP username: ' + username);
-
-        return getUserInfo(username);
-
-    }).then(function (wpUserInfo) {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~
-         *  Find specified patch
-         * ~~~~~~~~~~~~~~~~~~~~~~ */
-
-        isAdmin = wpUserInfo.admin;
-        wpUserId = wpUserInfo.id;
-        console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
-        console.log('WP user ID = ' + wpUserId);
-
-        console.log('Finding patch ' + id + '...');
-        return collection.findOne({ _id: id });
-
-    }).then(function (patch) {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check if user can delete patch
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        // This code must be here because we need the value of patch.author.name
-        if (!isAdmin && (patch.author.wordpressId !== wpUserId)) {
-
-            console.log(patch.author);
-            var e = new Error('You are not authorized to delete this patch.');
-            e.status = 401;
-            throw e;
-        }
-
-        return patch; // just bubble up the patch we found previously to the next step
-
-    }).then(function (patch) {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~
-         *  Actually delete patch
-         * ~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        if (null === patch) {
-            var e = new Error('Patch not found.');
-            e.status = 404;
-            throw e;
-        }
-
-        console.log('Removing patch ' + id + '...');
-        return collection.remove({ _id: id });
-
-    }).then(function (deletedCount) {
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check that patch was actually deleted
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        console.log('deleteCount = ' + JSON.stringify(deletedCount));
-        if (1 !== deletedCount) {
-            var e = new Error('Unexpected error while trying to delete patch.');
-            e.status = 500;
-            throw e;
-        }
-
-         return {
-             message: 'Patch deleted successfully.'
-         };
-
-    }).catch(function (error) {
-
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            status: status
-        });
-
-    }).done(function (response) {
-
-        if ('ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
-    });
+      return res.status(response.success ? 200 : 400).json(response);
+    })
+    .catch(error => errorResponse(error, res));
 });
 
 module.exports = router;

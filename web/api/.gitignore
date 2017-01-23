@@ -2,3 +2,4 @@
 node_modules
 api-settings.js
 *.log
+.env

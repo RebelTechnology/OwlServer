@@ -12,6 +12,7 @@
 !/robots.txt
 !/wp-content/plugins/owl-api-bridge.php
 !/wp-content/plugins/owl-patch-uploader.php
+!/wp-content/plugins/owl-patch-uploader-secret.example.php
 
 # To add dirs back in, you need to specify a dir at a time,
 # Then specify "everything inside this dir" (**):

@@ -1,53 +1,34 @@
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
+'use strict';
 
-var express = require('express');
-var router  = express.Router();
-var url     = require('url');
-var fs      = require('fs');
-var path    = require('path');
-var exec    = require('child-process-promise').exec;
-var Q       = require('q');
+const router = require('express').Router();
+const exec = require('child-process-promise').exec;
 
-var wordpressBridge = require('../lib/wordpress-bridge.js');
-var apiSettings     = require('../api-settings.js');
+const PatchModel = require('../models/patch');
+const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
+const { download: downloadBuild } = require('../lib/patch-build');
+const errorResponse = require('../lib/error-response');
 
 /**
- * Convenience function for determining the build format.
+ * Convenience function for validating and normalizing the build format.
+ *
+ * @param {string} format
+ * @return {string}
  */
-var getBuildFormat = function (format) {
+const getBuildFormat = format => {
 
-    var buildFormat = 'sysx'; // default
-    if (format) {
-        buildFormat = format;
-    }
-    if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'sysex') {
-        var e = new Error('Invalid format.');
-        e.status = 500;
-        throw e;
-    }
-    if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
-        buildFormat = 'sysx';
-    }
+  let buildFormat = 'sysx'; // default build format
+  if (format) {
+    buildFormat = format;
+  }
+  // validate
+  if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'sysex') {
+    throw { public: true, message: 'Invalid format.', status: 500 };
+  }
+  if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
+    buildFormat = 'sysx'; // normalize
+  }
 
-    return buildFormat;
-};
-
-
-/**
- * Convenience function gets wordpress cookie if exists or returns false
- */
-var getWordpressCookie = function(cookies) {
-    var wpCookie = false;
-    Object.keys(cookies).some(function(key){
-        if(key.lastIndexOf('wordpress_logged_in_') === 0){
-            wpCookie = cookies[key];
-            return true;
-        }
-        return false;
-    });
-    return wpCookie;
+  return buildFormat;
 };
 
 /**
@@ -59,99 +40,32 @@ var getWordpressCookie = function(cookies) {
  */
 router.get('/:id', function (req, res) {
 
-    var id = req.params.id,
-        buildFormat = 'sysx', // default
-        collection = req.db.get('patches'),
-        format,
-        download = true;
+  const id = req.params.id;
+  const query = req.query;
+  let format;
+  let stream = false;
+  const patchModel = new PatchModel(req.db);
 
-    Q.fcall(function () {
+  if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
+  }
 
-        // Determine patch format
-        var query = url.parse(req.url, true).query;
-        if (query.format) {
-            format = getBuildFormat(query.format);
-        }
+  // Determine whether the patch will be downloaded or streamed in-line
+  if (query.download && (query.download == 0 || query.download == 'false' || query.download == '')) {
+    stream = true;
+  }
 
-        if (query.download && query.download == 0 || query.download == 'false' || query.download == '') {
-            download = false;
-        }
+  // Determine patch format
+  format = getBuildFormat(query.format);
 
-        /* ~~~~~~~~~~~~
-         *  Find patch
-         * ~~~~~~~~~~~~ */
-
-        return collection.findOne({ _id: id });
-
-    }).then(function (patch) {
-
-        var buildFile,
-            filename;
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check if SysEx is available
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        if (null === patch) {
-            var e = new Error('Patch not found.');
-            e.status = 404;
-            throw e;
-        }
-
-        if (format === 'sysx') {
-            buildFile = path.join(apiSettings.SYSEX_PATH, patch.seoName + '.syx');
-        } else if (format === 'js') {
-            buildFile = path.join(apiSettings.JS_PATH, patch.seoName + (apiSettings.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
-        }
-        if (!fs.existsSync(buildFile)) {
-            var e = new Error('Build file not available for this patch (in ' + format + ' format).');
-            e.status = 404;
-            throw e;
-        }
-
-        /* ~~~~~~~~~~~~~~~
-         *  Download file
-         * ~~~~~~~~~~~~~~~ */
-
-        console.log(buildFile);
-        filename = path.basename(buildFile);
-        console.log(filename);
-        if (download) {
-            res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-        }
-        if(download && format === 'sysx') {
-            // increment download count for sysx files
-            console.log('incrementing patch download count');
-            patch.downloadCount = patch.downloadCount || 0;
-            patch.downloadCount++;
-            collection.updateById(patch._id, patch);
-        }
-        res.setHeader('Content-length', fs.statSync(buildFile)['size']);
-        if (format === 'sysx') {
-            res.setHeader('Content-type', 'application/octet-stream');
-        } else if (format === 'js') {
-            res.setHeader('Content-type', 'text/javascript');
-        }
-        var filestream = fs.createReadStream(buildFile);
-        return filestream.pipe(res);
-
-    }).catch(function (error) {
-
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            status: status
-        });
-
-    }).done(function (response) {
-
-        if (response.constructor && 'ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
-    });
+  patchModel.getById(id)
+    .then(patch => {
+      if (!patch) {
+        throw { status: 404, public: true, message: 'Patch not found.' };
+      }
+      return downloadBuild(patch, patchModel, stream, format, res);
+    })
+    .catch(error => errorResponse(error, res));
 });
 
 /**
@@ -159,189 +73,92 @@ router.get('/:id', function (req, res) {
  *
  * PUT /builds/{patchId}
  */
-router.put('/:id', function (req, res) {
+router.put('/:id', (req, res) => {
 
-    var validateAuthCookie = Q.denodeify(wordpressBridge.validateAuthCookie);
-    var getUserInfo = Q.denodeify(wordpressBridge.getUserInfo);
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ public: true, message: 'Access denied.', status: 401 }, res);
+  }
 
-    var credentials = req.body.credentials;
-    var wpCookie;
-    var username;
-    var isAdmin = false;
-    var wpUserId;
-    var collection = req.db.get('patches');
-    var updatedPatch = req.body.patch;
-    var patchAuthor = {};
+  // Get user details
+  let isWpAdmin = false;
+  let wpUserId;
+  const userInfo = res.locals.userInfo;
+  if (userInfo.type === authTypes.AUTH_TYPE_WORDPRESS) {
+    wpUserId = userInfo.wpUserId;
+    process.stdout.write('WP user ID is ' + wpUserId + '\n');
+    isWpAdmin = userInfo.wpAdmin;
+    process.stdout.write('User is' + (isWpAdmin ? '' : ' *NOT*') + ' a WP admin.\n');
+  }
 
-    // to avoid unnecessary requests if wordpress cookie is available
-    if(req.cookies){
-        var wpCookieFromRequest = getWordpressCookie(req.cookies);
-        if(wpCookieFromRequest){
-            console.log('wp_cookie found in request');
-            credentials = {
-                type:'wordpress',
-                cookie: wpCookieFromRequest
-            }
+  // Validate patch ID
+  const id = req.params.id;
+  if (!/^[a-f\d]{24}$/i.test(id)) { // FIXME - This code should not be here
+    return errorResponse({ public: true, status: 400, message: 'Invalid patch ID.' }, res);
+  }
+
+  // Build format
+  let format = 'sysx'; // default
+  if (req.body.format) {
+    format = getBuildFormat(req.body.format);
+  }
+
+  const patchModel = new PatchModel(req.db);
+  patchModel.getById(id)
+    .then(patch => {
+
+      if (!patch) {
+        throw { message: 'Patch not found.', status: 404, public: true };
+      }
+
+      // Check if user can compile patch
+      if (userInfo.type === authTypes.AUTH_TYPE_WORDPRESS) {
+        if (!isWpAdmin && (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId)) {
+          throw { status: 401, public: true, message: 'You are not authorized to compile this patch.' };
         }
-    }
-
-    var id = req.params.id;
-    if (!/^[a-f\d]{24}$/i.test(id)) {
-        return res.status(500).json({
-           message: 'Invalid ID.',
-           error: { status: 500 }
-        });
-    }
-
-    var format = 'sysx'; // default
-    if (req.body.format) {
-        format = getBuildFormat(req.body.format);
-    }
-
-    Q.fcall(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~~
-         *  Check credentials
-         * ~~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Checking credentials...');
-
-        if (!credentials) {
-            var e = new Error('Access denied (1).');
-            e.status = 401;
-            throw e;
+      } else if (userInfo.type === authTypes.AUTH_TYPE_TOKEN) {
+        if (patch.author.name !== API_USER_NAME) {
+          throw { status: 401, public: true, message: 'You are not authorized to compile this patch.' };
         }
+      }
 
-        if (!credentials.type || 'wordpress' !== credentials.type || !credentials.cookie) {
-            var e = new Error('Access denied (2).');
-            e.status = 401;
-            throw e;
-        }
-
-        wpCookie = credentials.cookie;
-
-        return validateAuthCookie(credentials.cookie); // Q will throw an error if cookie is not valid
-
-    }).then(function () {
-
-        /* ~~~~~~~~~~~~~~~~~~
-         *  Get WP user info
-         * ~~~~~~~~~~~~~~~~~~ */
-
-        console.log('Getting WP user info...');
-        username = wpCookie.split('|')[0];
-        return getUserInfo(username);
-
-    }).then(function (wpUserInfo) {
-
-        isAdmin = wpUserInfo.admin;
-        wpUserId = wpUserInfo.id;
-        console.log('User is' + (isAdmin ? '' : ' *NOT*') + ' a WP admin.');
-        console.log('WP user ID is ' + wpUserId + '');
-
-        // If not an admin, we set the current WP user as patch author,
-        // disregarding any authorship info s/he sent. If an admin,
-        // we blindy trust the authorship information. Not ideal, but
-        // at least keeps code leaner.
-        if (!isAdmin) {
-            // patchAuthor.type = 'wordpress';
-            // patchAuthor.name = username;
-            if (patchAuthor.name) {
-                delete patchAuthor.name;
-            }
-            patchAuthor.wordpressId = wpUserId;
-        }
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Retrieve patch from database
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        return collection.findById(id);
-
-    }).then(function (patch) {
-
-        if (null === patch) {
-            var e = new Error('Patch not found.');
-            e.status = 404;
-            throw e;
-        }
-
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         *  Check if user can compile patch
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-        if (!isAdmin) {
-            if (!patch.author.wordpressId || patch.author.wordpressId !== wpUserId) {
-                var e = new Error('You are not authorized to compile this patch.');
-                e.status = 401;
-                throw e;
-            }
-        }
-
-        /* ~~~~~~~~~~~~~~~
-         *  Compile patch
-         * ~~~~~~~~~~~~~~~ */
-
-        var cmd = 'php ' + apiSettings.PATCH_BUILDER_PATH;
-        
-        if (format === 'js') {
-            cmd += ' --web';
-        }
-        
-        if(patch.compilationType === 'gen'){
-            cmd += ' --gen';
-        }
-
-        cmd += ' ' + id;
-        console.log('Running command "' + cmd + '"...');
-
-        return exec(cmd).then(function (result) {
-
-            var response = {
-                stdout:  result.stdout,
-                stderr:  result.stderr,
-                success: true,
-                status:  200
-            };
-            
-            console.log('Command run successfully.');
-            
-            return response;
-
-        }).fail(function (result) {
-
-            var response = {
-                stdout:  result.stdout,
-                stderr:  result.stderr,
-                success: false,
-                status:  200
-            };
-            
-            console.log('Command failed.');
-            
-            return response;
-
-        });
-
-    }).catch(function (error) {
-        var status = error.status || 500;
-        return res.status(status).json({
-            message: error.toString(),
-            stdout: error.stdout,
-            stderr: error.stderr,
+      // Compile patch
+      let cmd = 'php ' + process.env.PATCH_BUILDER_PATH;
+      if (format === 'js') {
+        cmd += ' --web';
+      }
+      if(patch.compilationType === 'gen'){
+        cmd += ' --gen';
+      }
+      cmd += ' ' + id;
+      process.stdout.write('Running command "' + cmd + '"...\n');
+      return exec(cmd)
+        .then(result => {
+          const response = {
+            message: 'Compilation succeeded.',
+            stdout: result.stdout,
+            stderr: result.stderr,
+            success: true,
+            status: 200,
+          };
+          process.stdout.write('Success!\n');
+          return res.status(200).json(response);
+        })
+        .fail(result => {
+          const status = 200; // Status is '200 OK' because the compilation failed but the API call did not.
+          const response = {
+            message: 'Compilation failed.',
+            stdout: result.stdout,
+            stderr: result.stderr,
             success: false,
-            status: status
+            status,
+          };
+          process.stderr.write('Failure!\n');
+          return res.status(status).json(response);
         });
-
-    }).done(function (response) {
-
-        if (response.constructor && 'ServerResponse' === response.constructor.name) {
-            return response;
-        }
-
-        return res.status(200).json(response);
-
-    });
+    })
+    .catch(error => errorResponse(error, res));
 });
+
 
 module.exports = router;
