@@ -1,6 +1,6 @@
 
 	<footer style="clear: both;">
 		<div id="footer-bar">
-			<p>Copyright Hoxton Owl 2014</p>
+			<p>Copyright &copy; <?= date('Y') ?> Hoxton OWL</p>
 		</div>
 	</footer>
