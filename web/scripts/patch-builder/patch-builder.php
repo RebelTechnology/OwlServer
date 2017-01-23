@@ -79,8 +79,15 @@ function tempdir($prefix = null) {
             exit(1);
         }
     }
-    $template = "{$prefix}XXXXXX";
-    return exec("mktemp -d --tmpdir=$tmpdir $template");
+    $template = ($prefix ? $prefix : '') . 'XXXXXX'; // see `man 1 mktemp` about X's
+    $dummy = [];
+    $exitStatus = 0;
+    $r = exec('mktemp -d --tmpdir=' . escapeshellarg($tmpdir) . ' ' . escapeshellarg($template), $dummy, $exitStatus);
+    if ($exitStatus !== 0) {
+      outputError("Unable to create temporary directory $tmpdir/$template.");
+      exit(1);
+    }
+    return $r;
 }
 
 /**
@@ -286,21 +293,40 @@ $mongoConnectionString .= MONGO_HOST . ':' . MONGO_PORT;
 $mongoDb = MONGO_DATABASE;
 $collection = MONGO_COLLECTION;
 
-try {
-    $mongoClient = new MongoClient($mongoConnectionString);
-    $db = $mongoClient->$mongoDb;
-    $patches = $db->$collection;
-} catch (Exception $e) {
-    outputError('Unable to connect to MongoDb.');
-    exit(1);
-}
+if (extension_loaded('mongo')) {
 
-if (isset($patchName)) {
-    // Patch name was provided in command line
-    $patch = $patches->findOne([ 'name' => $patchName ]);
+  try {
+      $mongoClient = new MongoClient($mongoConnectionString);
+      $db = $mongoClient->$mongoDb;
+      $patches = $db->$collection;
+  } catch (Exception $e) {
+      outputError('Unable to connect to MongoDb.');
+      exit(1);
+  }
+
+  if (isset($patchName)) {
+      // Patch name was provided in command line
+      $patch = $patches->findOne([ 'name' => $patchName ]);
+  } else {
+      // Patch ID was provided in command line
+      $patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
+  }
+
+} elseif (extension_loaded('mongodb')) {
+
+  try {
+    $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
+    $collection = $mongoClient->$mongoDb->$collection;
+  } catch (Exception $e) {
+      outputError('Unable to connect to MongoDb.');
+      exit(1);
+  }
+
+  $patch = get_object_vars($collection->findOne( [ 'name' => $patchName ] ));
+
 } else {
-    // Patch ID was provided in command line
-    $patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
+  outputError('No MongoDB extension available.');
+  exit(1);
 }
 
 // Sanitize some values later used as command line arguments:
@@ -352,7 +378,6 @@ if ($onlyShowFiles) {
 $sourceFiles = [];
 foreach ($patch['github'] as $githubFile) {
     $r = downloadSourceFile($githubFile, $patchSourceDir);
-    $sourceFileInfo = getSourceFileInfo($githubFile);
     if (!$r) {
         outputError('Download of ' . $githubFile . ' failed.');
         exit(1);
@@ -371,7 +396,7 @@ if ($onlyDloadFiles) {
  */
 
 if ($useDocker) {
-  $cmd = 'docker exec owl-compiler make ';
+  $cmd = 'docker exec ' . DOCKER_CONTAINER_NAME . ' make -C /opt/OwlProgram.online ';
   // in this case the env vars are already set inside the container
 } else {
   $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
@@ -492,7 +517,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     }
 
     $dstDir = __DIR__ . '/build/';
-    $r = rename($syxFilePath, $dstDir . $patch['seoName'] . '.syx');
+    $r = copy($syxFilePath, $dstDir . $patch['seoName'] . '.syx');
     if (!$r) {
         outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
         exit(1);
@@ -501,7 +526,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     $jsFilePath = $patchBuildDir . '/web/patch.min.js';
     if (file_exists($jsFilePath) && is_file($jsFilePath) && is_readable($jsFilePath)) {
       $dstDir = __DIR__ . '/build-js/';
-      $r = rename($jsFilePath, $dstDir . $patch['seoName'] . '.min.js');
+      $r = copy($jsFilePath, $dstDir . $patch['seoName'] . '.min.js');
     }
 
 
@@ -518,7 +543,7 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     }
 
     $dstDir = __DIR__ . '/build-js/';
-    $r = rename($jsFilePath, $dstDir . $patch['seoName'] . $ext);
+    $r = copy($jsFilePath, $dstDir . $patch['seoName'] . $ext);
     if (!$r) {
         outputError('Unable to move ' . $jsFilePath . ' to ' . $dstDir . '.');
         exit(1);
