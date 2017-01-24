@@ -17,7 +17,6 @@ define('PATCH_SRC_DIR_PREFIX',   'owl-src-');
 define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
 define('OWL_SRC_DIR',            '/opt/OwlProgram.online/');
 define('COMPILE_TIMEOUT',        80); // time-out in seconds
-define('HEAVY_TOKEN',            'FNPHpsCYj0Jxa8Fwh5cDV1MU1M8OHghK');
 
 $stdout = fopen('php://stdout', 'w+');
 $stderr = fopen('php://stderr', 'w+');
@@ -41,6 +40,7 @@ function usage() {
     echo '  --only-dload-files  Download files from GitHub but do not compile the patch.' . PHP_EOL;
     echo '  --show-build-cmd    Shows command used to build patch and exit.' . PHP_EOL;
     echo '  --keep-tmp-files    Do not delete temporary source and build directories once the build has finished.' . PHP_EOL;
+    echo '  --docker            Uses the OwlDocker Docker image.' . PHP_EOL;
 }
 
 /**
@@ -70,30 +70,34 @@ function outputError($msg) {
  * @return string         The path of the temporary directory.
  */
 function tempdir($prefix = null) {
-    $template = "{$prefix}XXXXXX";
-    $tmpdir = '--tmpdir=' . sys_get_temp_dir();
-    return exec("mktemp -d $tmpdir $template");
+    $tmpdir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'owl';
+    if (!file_exists($tmpdir)) {
+        $result = mkdir("$tmpdir/owl");
+        if (!$result) {
+            outputError("Unable to create temporary directory $tmpdir.");
+            exit(1);
+        }
+    }
+    $template = ($prefix ? $prefix : '') . 'XXXXXX'; // see `man 1 mktemp` about X's
+    $dummy = [];
+    $exitStatus = 0;
+    $r = exec('mktemp -d --tmpdir=' . escapeshellarg($tmpdir) . ' ' . escapeshellarg($template), $dummy, $exitStatus);
+    if ($exitStatus !== 0) {
+      outputError("Unable to create temporary directory $tmpdir/$template.");
+      exit(1);
+    }
+    return $r;
 }
 
 /**
  * Downloads a file from GitHub.
  *
  * @param  string $githubFile The GitHub file to download.
- * @param  string $dstPath    The path where to download the file,
+ * @param  string $dstPath    The path where to download the file.
  * @return string|boolean     The name of the downloaded file, or false if the
  *                            the download failed.
  */
 function downloadGithubFile($githubFile, $dstPath) {
-
-    if (!filter_var($githubFile, FILTER_VALIDATE_URL)) {
-        outputError('Invalid URL (1).');
-        return false;
-    }
-
-    if (substr($githubFile, 0, 19) !== 'https://github.com/') {
-        outputError('Invalid URL (2).');
-        return false;
-    }
 
     $bits = explode('/', $githubFile);
     if (count($bits) < 8) {
@@ -152,20 +156,15 @@ function downloadGithubFile($githubFile, $dstPath) {
 } // function downloadGithubFile
 
 /**
- * Returns information about a source file.
+ * Downloads a source file.
  *
- * @todo FIXME This function is duplicated in `owl-patch-uploader.php`.
- *
- * @param  string  $url
- *     The file URL.
- * @return array
- *     An associative array whose keys are:
- *     * type (string) - Either 'github' or 'url'.
- *     * dir  (string) - The directory where the file is hosted, relative to the WP upload directory.
- *     * name (string) - The file name.
+ * @param  string $url      The URL of the file to download.
+ * @param  string $dstPath  The path where to download the file to.
+ * @return string|boolean   The name of the downloaded file, or `false` if the
+ *                          download failed.
  */
-function getSourceFileInfo($url)
-{
+function downloadSourceFile($url, $dstPath) {
+
     if (!is_string($url)) {
         errorOut('Bad source file URL (1).');
     }
@@ -175,18 +174,34 @@ function getSourceFileInfo($url)
         errorOut('Bad source file URL (2).');
     }
 
-    $result = [ 'type' => 'url' ];
-    if($r['host'] == 'github.com' || $r['host'] == 'www.github.com') {
-        $result['type'] = 'github';
+    if ($r['host'] === 'github.com' || $r['host'] === 'www.github.com') {
+
+        return downloadGithubFile($url, $dstPath);
+
+    } elseif ($r['host'] === 'staging.hoxtonowl.com' || $r['host'] === 'hoxtonowl.com' || $r['host'] === 'www.hoxtonowl.com') {
+
+        $data = file_get_contents($url);
+        if (false === $data) {
+          outputError("Could not download file $url (1).");
+          return false;
+        }
+
+        $pieces = explode('/', $url);
+        $filename = array_pop($pieces);
+
+        $result = file_put_contents($dstPath . '/' . $filename, $data);
+        if (false === $data) {
+          outputError("Could not download file $url (2).");
+          return false;
+        }
+
+        return $filename;
+
     } else {
-        $pieces = explode('/', $r['path']);
-        $result['dir'] = $pieces[count($pieces) - 2];
-        $result['name'] = $pieces[count($pieces) - 1];
+        errorOut('Bad source file URL (3).');
+        return false;
     }
-
-    return $result;
-
-} // function getSourceFileInfo
+} // function downloadSelfHostedSourceFile
 
 /* ~~~~~~~~~~~~~~~~~~~~
  *  Script entry-point
@@ -204,6 +219,7 @@ $longopts  = [
     'show-build-cmd',
     'patch-files:',
     'keep-tmp-files',
+    'docker',
     'name:',
     'web',
     'sysex',
@@ -230,6 +246,11 @@ if (isset($options['only-dload-files']) && false === $options['only-dload-files'
 $showBuildCmd = false;
 if (isset($options['show-build-cmd']) && false === $options['show-build-cmd']) {
     $showBuildCmd = true;
+}
+
+$useDocker = false;
+if (isset($options['docker']) && false === $options['docker']) {
+    $useDocker = true;
 }
 
 $buildCmd = 'make sysx';
@@ -271,21 +292,40 @@ $mongoConnectionString .= MONGO_HOST . ':' . MONGO_PORT;
 $mongoDb = MONGO_DATABASE;
 $collection = MONGO_COLLECTION;
 
-try {
-    $mongoClient = new MongoClient($mongoConnectionString);
-    $db = $mongoClient->$mongoDb;
-    $patches = $db->$collection;
-} catch (Exception $e) {
-    outputError('Unable to connect to MongoDb.');
-    exit(1);
-}
+if (extension_loaded('mongo')) {
 
-if (isset($patchName)) {
-    // Patch name was provided in command line
-    $patch = $patches->findOne([ 'name' => $patchName ]);
+  try {
+      $mongoClient = new MongoClient($mongoConnectionString);
+      $db = $mongoClient->$mongoDb;
+      $patches = $db->$collection;
+  } catch (Exception $e) {
+      outputError('Unable to connect to MongoDb.');
+      exit(1);
+  }
+
+  if (isset($patchName)) {
+      // Patch name was provided in command line
+      $patch = $patches->findOne([ 'name' => $patchName ]);
+  } else {
+      // Patch ID was provided in command line
+      $patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
+  }
+
+} elseif (extension_loaded('mongodb')) {
+
+  try {
+    $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
+    $collection = $mongoClient->$mongoDb->$collection;
+  } catch (Exception $e) {
+      outputError('Unable to connect to MongoDb.');
+      exit(1);
+  }
+
+  $patch = get_object_vars($collection->findOne( [ 'name' => $patchName ] ));
+
 } else {
-    // Patch ID was provided in command line
-    $patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
+  outputError('No MongoDB extension available.');
+  exit(1);
 }
 
 // Sanitize some values later used as command line arguments:
@@ -336,29 +376,12 @@ if ($onlyShowFiles) {
 
 $sourceFiles = [];
 foreach ($patch['github'] as $githubFile) {
-
-    $sourceFileInfo = getSourceFileInfo($githubFile);
-    if ('url' === $sourceFileInfo['type']) {
-
-        $srcDir = realpath(dirname(__FILE__) . '/../httpdocs/wp-content/uploads/patch-files/');
-        $srcFile = $srcDir . '/' . $patchId . '/' . $sourceFileInfo['name'];
-        $dstFile = $patchSourceDir . '/' . $sourceFileInfo['name'];
-        if (!@copy($srcFile, $dstFile)) {
-            outputError('Unable to copy patch source file "' . $sourceFileInfo['name'] . '".');
-            exit(1);
-        }
-
-        $sourceFiles[] = $sourceFileInfo['name'];
-
-    } else {
-
-        $r = downloadGithubFile($githubFile, $patchSourceDir);
-        if (!$r) {
-            outputError('Download of ' . $githubFile . ' failed.');
-            exit(1);
-        }
-        $sourceFiles[] = $r;
+    $r = downloadSourceFile($githubFile, $patchSourceDir);
+    if (!$r) {
+        outputError('Download of ' . $githubFile . ' failed.');
+        exit(1);
     }
+    $sourceFiles[] = $r;
 }
 
 if ($onlyDloadFiles) {
@@ -369,10 +392,15 @@ if ($onlyDloadFiles) {
 
 /*
  * Work out crazy command needed to compile patch
- *
  */
 
-if($buildCmd == 'make sysx') {
+if ($useDocker) {
+  $cmd = 'docker exec ' . DOCKER_CONTAINER_NAME . ' make -C /opt/OwlProgram.online ';
+  // in this case the env vars are already set inside the container
+} else {
+  $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
+}
+if ($buildCmd == 'make sysx') {
 
     // First source file only
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
@@ -380,9 +408,7 @@ if($buildCmd == 'make sysx') {
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
-    $cmd  = 'make ';
     // Specify where to find Emscripten's config file
-    $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
     $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
     $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
     $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
@@ -408,20 +434,18 @@ if($buildCmd == 'make sysx') {
 
     if (!(isset($options['sysex']) && false === $options['sysex'])
          && MAKE_TARGET_SYSX == $makeTarget) {
-      $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
     }
+    $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
 
 
-}else if($buildCmd == 'make gen') {
+} elseif ($buildCmd == 'make gen') {
 
     // First source file only
     $sourceFile = $sourceFiles[0];
     $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
     $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
 
-    $cmd  = 'make ';
     // Specify where to find Emscripten's config file
-    $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
     $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
     $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
     $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
@@ -487,23 +511,36 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
 
     $syxFilePath = $patchBuildDir . '/patch.syx';
     if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
-        outputError('Unable to access ' . $syxFilePath . '.');
+        outputError('Unable to access `' . $syxFilePath . '`.');
         exit(1);
     }
 
     $dstDir = __DIR__ . '/build/';
-    $r = rename($syxFilePath, $dstDir . $patch['seoName'] . '.syx');
+    $dstFile = $dstDir . $patch['seoName'] . '.syx';
+    $r = copy($syxFilePath, $dstFile);
     if (!$r) {
-        outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
+        outputError('Unable to copy `' . $syxFilePath . '` to `' . $dstFile . '`.');
         exit(1);
+    }
+    $r = chmod($dstFile, 0666);
+    if (!$r) {
+        outputError('Unable to set permissions on `' . $dstFile . '`.');
     }
 
     $jsFilePath = $patchBuildDir . '/web/patch.min.js';
+    $dstDir = __DIR__ . '/build-js/';
+    $dstFile = $dstDir . $patch['seoName'] . '.min.js';
     if (file_exists($jsFilePath) && is_file($jsFilePath) && is_readable($jsFilePath)) {
-      $dstDir = __DIR__ . '/build-js/';
-      $r = rename($jsFilePath, $dstDir . $patch['seoName'] . '.min.js');
+        $r = copy($jsFilePath, $dstFile);
+        if (!$r) {
+            outputError('Unable to copy `' . $jsFilePath . '` to `' . $dstFile . '`.');
+            exit(1);
+        }
+        $r = chmod($dstFile, 0666);
+        if (!$r) {
+            outputError('Unable to set permissions on `' . $dstFile . '`.');
+        }
     }
-
 
 } elseif (MAKE_TARGET_WEB == $makeTarget || MAKE_TARGET_MINIFY == $makeTarget) {
 
@@ -514,14 +551,19 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     $ext = MAKE_TARGET_WEB == $makeTarget ? '.js' : '.min.js';
     $jsFilePath = $patchBuildDir . '/web/patch' . $ext;
     if (!file_exists($jsFilePath) || !is_file($jsFilePath) || !is_readable($jsFilePath)) {
-        outputError('Unable to access ' . $jsFilePath . '.');
+        outputError('Unable to access `' . $jsFilePath . '`.');
     }
 
     $dstDir = __DIR__ . '/build-js/';
-    $r = rename($jsFilePath, $dstDir . $patch['seoName'] . $ext);
+    $dstFile = $dstDir . $patch['seoName'] . $ext;
+    $r = copy($jsFilePath, $dstFile);
     if (!$r) {
-        outputError('Unable to move ' . $jsFilePath . ' to ' . $dstDir . '.');
+        outputError('Unable to copy `' . $jsFilePath . '` to `' . $dstFile . '`.');
         exit(1);
+    }
+    $r = chmod($dstFile, 0666);
+    if (!$r) {
+        outputError('Unable to set permissions on `' . $dstFile . '`.');
     }
 }
 
