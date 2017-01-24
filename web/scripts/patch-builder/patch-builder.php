@@ -17,7 +17,6 @@ define('PATCH_SRC_DIR_PREFIX',   'owl-src-');
 define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
 define('OWL_SRC_DIR',            '/opt/OwlProgram.online/');
 define('COMPILE_TIMEOUT',        80); // time-out in seconds
-define('HEAVY_TOKEN',            'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJzdGFydERhdGUiOiAiMjAxNi0xMi0xNVQxNjozMTo1NS4yNTU2NjUiLCAibmFtZSI6ICJvd2wifQ==.M_2pvMyhPTrG6sTMzeb9WowhBSCbOQfVYWUlmXRiNms=');
 
 $stdout = fopen('php://stdout', 'w+');
 $stderr = fopen('php://stderr', 'w+');
