@@ -511,23 +511,36 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
 
     $syxFilePath = $patchBuildDir . '/patch.syx';
     if (!file_exists($syxFilePath) || !is_file($syxFilePath) || !is_readable($syxFilePath)) {
-        outputError('Unable to access ' . $syxFilePath . '.');
+        outputError('Unable to access `' . $syxFilePath . '`.');
         exit(1);
     }
 
     $dstDir = __DIR__ . '/build/';
-    $r = copy($syxFilePath, $dstDir . $patch['seoName'] . '.syx');
+    $dstFile = $dstDir . $patch['seoName'] . '.syx';
+    $r = copy($syxFilePath, $dstFile);
     if (!$r) {
-        outputError('Unable to move ' . $syxFilePath . ' to ' . $dstDir . '.');
+        outputError('Unable to copy `' . $syxFilePath . '` to `' . $dstFile . '`.');
         exit(1);
+    }
+    $r = chmod($dstFile, 0666);
+    if (!$r) {
+        outputError('Unable to set permissions on `' . $dstFile . '`.');
     }
 
     $jsFilePath = $patchBuildDir . '/web/patch.min.js';
+    $dstDir = __DIR__ . '/build-js/';
+    $dstFile = $dstDir . $patch['seoName'] . '.min.js';
     if (file_exists($jsFilePath) && is_file($jsFilePath) && is_readable($jsFilePath)) {
-      $dstDir = __DIR__ . '/build-js/';
-      $r = copy($jsFilePath, $dstDir . $patch['seoName'] . '.min.js');
+        $r = copy($jsFilePath, $dstFile);
+        if (!$r) {
+            outputError('Unable to copy `' . $jsFilePath . '` to `' . $dstFile . '`.');
+            exit(1);
+        }
+        $r = chmod($dstFile, 0666);
+        if (!$r) {
+            outputError('Unable to set permissions on `' . $dstFile . '`.');
+        }
     }
-
 
 } elseif (MAKE_TARGET_WEB == $makeTarget || MAKE_TARGET_MINIFY == $makeTarget) {
 
@@ -538,14 +551,19 @@ if (MAKE_TARGET_SYSX == $makeTarget) {
     $ext = MAKE_TARGET_WEB == $makeTarget ? '.js' : '.min.js';
     $jsFilePath = $patchBuildDir . '/web/patch' . $ext;
     if (!file_exists($jsFilePath) || !is_file($jsFilePath) || !is_readable($jsFilePath)) {
-        outputError('Unable to access ' . $jsFilePath . '.');
+        outputError('Unable to access `' . $jsFilePath . '`.');
     }
 
     $dstDir = __DIR__ . '/build-js/';
-    $r = copy($jsFilePath, $dstDir . $patch['seoName'] . $ext);
+    $dstFile = $dstDir . $patch['seoName'] . $ext;
+    $r = copy($jsFilePath, $dstFile);
     if (!$r) {
-        outputError('Unable to move ' . $jsFilePath . ' to ' . $dstDir . '.');
+        outputError('Unable to copy `' . $jsFilePath . '` to `' . $dstFile . '`.');
         exit(1);
+    }
+    $r = chmod($dstFile, 0666);
+    if (!$r) {
+        outputError('Unable to set permissions on `' . $dstFile . '`.');
     }
 }
 
