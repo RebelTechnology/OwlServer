@@ -1,6 +1,4 @@
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
+'use strict';
 
 const wordpress = require('wordpress');
 const request = require('request');
