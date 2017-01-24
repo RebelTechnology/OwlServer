@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "44d4ab84c295be355c515342a7964688",
+    "content-hash": "2a5879032b713c40b1606d7bc76b4191",
     "packages": [
         {
             "name": "lijinma/php-cli-color",
@@ -42,7 +42,62 @@
             ],
             "description": "Make colorful CLI output easy",
             "homepage": "https://github.com/lijinma/php-cli-color",
-            "time": "2014-12-23 07:14:16"
+            "time": "2014-12-23T07:14:16+00:00"
+        },
+        {
+            "name": "mongodb/mongodb",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mongodb/mongo-php-library.git",
+                "reference": "302de20d8302183e1c70b335d81798cec5bcebd4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mongodb/mongo-php-library/zipball/302de20d8302183e1c70b335d81798cec5bcebd4",
+                "reference": "302de20d8302183e1c70b335d81798cec5bcebd4",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mongodb": "^1.1.0",
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MongoDB\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Mikola",
+                    "email": "jmikola@gmail.com"
+                },
+                {
+                    "name": "Hannes Magnusson",
+                    "email": "bjori@mongodb.com"
+                },
+                {
+                    "name": "Derick Rethans",
+                    "email": "github@derickrethans.nl"
+                }
+            ],
+            "description": "MongoDB driver library",
+            "homepage": "https://jira.mongodb.org/browse/PHPLIB",
+            "keywords": [
+                "database",
+                "driver",
+                "mongodb",
+                "persistence"
+            ],
+            "time": "2016-12-05T20:02:14+00:00"
         },
         {
             "name": "symfony/process",
@@ -50,12 +105,12 @@
             "target-dir": "Symfony/Component/Process",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Process.git",
+                "url": "https://github.com/symfony/process.git",
                 "reference": "e68470654c6ad2c402f3df90a4461966dfd38bec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Process/zipball/48aeb0e48600321c272955132d7606ab0a49adb3",
+                "url": "https://api.github.com/repos/symfony/process/zipball/e68470654c6ad2c402f3df90a4461966dfd38bec",
                 "reference": "e68470654c6ad2c402f3df90a4461966dfd38bec",
                 "shasum": ""
             },
