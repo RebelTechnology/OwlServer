@@ -10,3 +10,5 @@ define('MONGO_USER',       '');
 define('MONGO_PASS',       '');
 define('MONGO_DATABASE',   'owl_staging');
 define('MONGO_COLLECTION', 'patches');
+
+define('HEAVY_TOKEN',      'heavy_token');
