@@ -86,7 +86,7 @@ function getApiBaseUrl()
         }
     }
 
-    return 'http://192.168.50.1:3000'; // Uncomment this line to run API locally
+    //return 'http://192.168.50.1:3000'; // Uncomment this line to run API locally
     return $apiBaseUrl;
 
 } // function getApiBaseUrl

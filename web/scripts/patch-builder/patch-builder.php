@@ -253,7 +253,7 @@ $useDocker = false;
 if (isset($options['docker']) && false === $options['docker']) {
     $useDocker = true;
 }
-$useDocker = true; // Uncomment this line to run API locally
+//$useDocker = true; // Uncomment this line to run API locally
 
 $buildCmd = 'make sysx';
 
