@@ -144,11 +144,12 @@ class PatchCode extends Component {
     }
     
     const tabNavItems = fileUrls.map((fileUrl, i )=> {
+      const fileName = this.getFileName(fileUrl);
       return (
         <li onClick={(e) => this.handleTabClick(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
-          <span>{this.getFileName(fileUrl)}</span>
+          <span>{fileName}</span>
           { i === activeTab ? (
-            <a onClick={(e)=> e.stopPropagation()} target="_blank" className="file-download-link" href={this.getDownloadUrl(fileUrl)}></a>
+            <a onClick={(e)=> e.stopPropagation()} target="_blank" download={fileName} className="file-download-link" href={this.getDownloadUrl(fileUrl)}></a>
           ) : null }
         </li>
       )

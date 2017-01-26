@@ -9,6 +9,7 @@ This project exposes some data related to the [OWL][1] project over a RESTful AP
 2. Install node.js modules:
 
         npm install
+
 3. Enjoy!
 
         ./bin/www
