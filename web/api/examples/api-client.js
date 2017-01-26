@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const url = require('url');
 const path = require('path');
 const fs = require('fs');
+const debug = require('debug')('http');
 
 /**
  * HoxtonOWL API client.
@@ -34,7 +35,7 @@ class ApiClient {
       host: urlParts.host,
       hostname: urlParts.hostname,
       port: urlParts.port || (urlParts.protocol === 'https:' ? 443 : 80),
-      path: urlParts.path,
+      path: urlParts.path !== '/' ? urlParts.path : '',
     };
 
     /**
@@ -170,6 +171,55 @@ class ApiClient {
   }
 
   /**
+   * Builds a patch.
+   *
+   * @param {string} patchId
+   * @return {Promise}
+   */
+  buildPatch(patchId) {
+    return this._request('PUT', `/builds/${patchId}`);
+  }
+
+  /**
+   * Downloads a patch.
+   *
+   * @param {string} patchId
+   * @param {string} format
+   * @param {fs.WriteStream} writeStream
+   */
+  downloadPatch(patchId, format, writeStream) {
+    return new Promise((resolve, reject) => {
+      const transport = { http, https };
+      const requestOptions = Object.assign({}, this.baseUrl);
+      requestOptions.path +=  `/builds/${patchId}?format=${format}`;
+      if (this.protocol === 'https') {
+        requestOptions['rejectUnauthorized'] = false; // Allows self-signed SSL certificates
+      }
+      debug('request: %O', requestOptions);
+      transport[this.protocol].get(requestOptions, res => {
+        let rawData = '';
+        res.on('data', chunk => rawData += chunk);
+        res.on('end', () => {
+          if (res.statusCode !== 200) {
+            let parsedData;
+            try {
+              parsedData = JSON.parse(rawData);
+            } catch (err) {
+              reject(err);
+            }
+            reject(parsedData);
+          } else {
+            resolve(new Promise(resolve2 => {
+              writeStream.write(rawData, () => resolve2({ data: { success: true, message: 'File downloaded successfully' }}));
+            }));
+          }
+        });
+        res.on('error', err => reject(err));
+      });
+    });
+  }
+
+  /**
    * Makes an HTTP(S) request to the HoxtonOWL API.
    *
    * @private
@@ -206,11 +256,13 @@ class ApiClient {
 
     // Make request
     const transport = { http, https };
+    debug('request: %O', requestOptions);
+    if (body) {
+      debug('body: %O', body);
+    }
     return new Promise((resolve, reject) => {
       let data = '';
       const req = transport[this.protocol].request(requestOptions, res => {
-        // console.log('statusCode:', res.statusCode);
-        // console.log('headers:', res.headers);
         res.setEncoding('utf8');
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
@@ -221,6 +273,9 @@ class ApiClient {
             } catch (e) {
               reject(e);
             }
+          }
+          if (data) {
+            debug('response: %O', decodedData);
           }
           resolve({ res, data: data ? decodedData : null });
         });

@@ -86,6 +86,7 @@ function getApiBaseUrl()
         }
     }
 
+    return 'http://192.168.50.1:3000'; // Uncomment this line to run API locally
     return $apiBaseUrl;
 
 } // function getApiBaseUrl
@@ -147,7 +148,7 @@ function updatePatch($patch)
 
     $payload = [
         'credentials' => [
-            'type' => 'wordpress',
+            'type' => 'wp',
             'cookie' => owl_getAuthCookie(true),
         ],
         'patch' => $patch,
@@ -514,6 +515,9 @@ function owl_patchFileCleanUp()
     // directories
     $baseDirPath = getBaseDirPath();
     $dstDir = $baseDirPath . '/' . $patchId;
+    if (!file_exists($dstDir)) { // We create the directory in case the patch was created without uploading any files
+        @mkdir($dstDir);
+    }
     if (!isset($patch['github'])) {
         $patch['github'] = [];
     }

@@ -122,7 +122,7 @@ router.put('/:id', (req, res) => {
 
   updatedPatch.generateSeoName();
 
-  updatedPatch.validate() // will throw an error if patch is not valid
+  Promise.resolve(updatedPatch.validate()) // will throw an error if patch is not valid
     .then(() => patchModel.patchNameTaken(updatedPatch.name, updatedPatch.seoName, updatedPatch._id))
     .then(nameAlreadyTaken => {
       if (nameAlreadyTaken) {

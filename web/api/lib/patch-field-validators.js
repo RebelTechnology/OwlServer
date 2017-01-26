@@ -54,7 +54,7 @@ const patchFieldValidators = {
   compilationType: {
     required: false,
     validate(val) {
-      const validTypes = [ 'cpp', 'faust', 'pd' ,'gen' ];
+      const validTypes = [ 'cpp', 'faust', 'pd', 'gen' ];
       if (typeof val !== 'string' || !validTypes.includes(val.toLowerCase())) {
         throw new PatchFieldValidationError('compilationType');
       }
@@ -74,11 +74,11 @@ const patchFieldValidators = {
 
       // Either name or wordpressId, exclusive (i.e. not both)
       if (!('name' in val) && !('wordpressId' in val)) {
-        throw new PatchFieldValidationError('author', 'Illegal author schema.');
+        throw new PatchFieldValidationError('author', 'Illegal author schema (1).');
       }
-      if (('name' in val) && ('wordpressId' in val)) {
-        throw new PatchFieldValidationError('author', 'Illegal author schema.');
-      }
+      //if (('name' in val) && ('wordpressId' in val)) {
+      //  throw new PatchFieldValidationError('author', 'Illegal author schema (2).');
+      //}
 
       // Validate name
       if ('name' in val) {

@@ -56,7 +56,11 @@ router.get('/:id', function (req, res) {
   }
 
   // Determine patch format
-  format = getBuildFormat(query.format);
+  try {
+    format = getBuildFormat(query.format);
+  } catch (error) {
+    return errorResponse(error, res);
+  }
 
   patchModel.getById(id)
     .then(patch => {
@@ -100,7 +104,11 @@ router.put('/:id', (req, res) => {
   // Build format
   let format = 'sysx'; // default
   if (req.body.format) {
-    format = getBuildFormat(req.body.format);
+    try {
+      format = getBuildFormat(req.body.format);
+    } catch (error) {
+      return errorResponse(error, res);
+    }
   }
 
   const patchModel = new PatchModel(req.db);
@@ -127,7 +135,7 @@ router.put('/:id', (req, res) => {
       if (format === 'js') {
         cmd += ' --web';
       }
-      if(patch.compilationType === 'gen'){
+      if (patch.compilationType === 'gen') {
         cmd += ' --gen';
       }
       cmd += ' ' + id;

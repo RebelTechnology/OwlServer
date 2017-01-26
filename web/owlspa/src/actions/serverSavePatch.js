@@ -30,6 +30,8 @@ const serverSavePatch = (patch, options = {}) => {
         method = 'PUT';
     }
 
+    console.log('---');
+    console.log(patch);
     return fetch( API_END_POINT + path, {
       headers: {
         'Accept': 'application/json',
@@ -40,7 +42,7 @@ const serverSavePatch = (patch, options = {}) => {
       body: JSON.stringify({ patch })
     })
       .then(response => {
-        return response.json().then(json => {       
+        return response.json().then(json => {
           if(json.type === 'not_valid' && json.field){
             if(json.field === 'github'){
               dispatch({
@@ -63,16 +65,16 @@ const serverSavePatch = (patch, options = {}) => {
             } else {
               throw new Error('Error saving patch');
             }
-          } 
+          }
           return json;
         });
       })
       .then( json => {
-        
+
         if(json._id){
           dispatch({type: PATCH_SAVED});
           if(method === 'POST'){
-            dispatch(cleanUpTmpPatchFiles(json._id)).then(() => {            
+            dispatch(cleanUpTmpPatchFiles(json._id)).then(() => {
               if(options.compile){
                 dispatch(compilePatch({
                   seoName: json.seoName,
@@ -88,7 +90,7 @@ const serverSavePatch = (patch, options = {}) => {
         } else {
           throw new Error('Error saving patch: patch ID missing');
         }
-        
+
       }).catch((err) => {
         dispatch(newDialog({
           header: 'Error Saving Patch',
@@ -97,7 +99,7 @@ const serverSavePatch = (patch, options = {}) => {
             header :'Error',
             isError: true,
             contents: err.message
-          }] 
+          }]
         }));
         dispatch({
           type: ERROR_SAVING_PATCH

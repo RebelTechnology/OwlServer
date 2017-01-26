@@ -19,6 +19,8 @@ const cleanUpTmpPatchFiles = (patchId) => {
       if (response.status >= 400) {
         throw new Error('error cleaning up temporary patch files, server status: ' + response.status);
       }
+      console.log('+++');
+      console.log(response);
       return response.json();
     }).then(json => {
       if (json.err){

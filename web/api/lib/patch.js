@@ -87,6 +87,10 @@ class Patch {
     // - seoName
     // - creationTimeUtc
 
+    if (this.author && this.author.wordpressId && this.author.name) {
+      delete this.author.name;
+    }
+
     // Delete unrecognized fields
     var keys = Object.keys(patchFieldValidators);
     for (let key in this) {

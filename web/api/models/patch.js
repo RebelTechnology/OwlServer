@@ -1,5 +1,6 @@
 'use strict';
 
+const monk = require('monk');
 const escapeStringRegexp = require('escape-string-regexp');
 
 const Patch = require('../lib/patch');
@@ -94,7 +95,7 @@ class PatchModel {
     if (ignorePatchId) {
       query = {
         $and: [
-          { _id: { $ne: this._collection.id(ignorePatchId)}},
+          { _id: { $ne: monk.id(ignorePatchId)}},
           { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp }]},
         ]
       };

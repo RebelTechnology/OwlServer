@@ -1,7 +1,7 @@
 <?php
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
+
+const ENVIRONMENT_DEVELOPMENT = 'development';
+const ENVIRONMENT_PRODUCTION = 'production';
 
 const PATCH_TYPE_CPLUSPLUS = 'C++';
 const PATCH_TYPE_FAUST     = 'faust';

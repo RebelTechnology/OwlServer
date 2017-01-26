@@ -1,8 +1,5 @@
 #!/usr/bin/env php
 <?php
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
 
 use Symfony\Component\Process\Process;
 use Lijinma\Color;

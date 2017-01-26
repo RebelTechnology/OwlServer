@@ -1,24 +1,67 @@
+/* eslint no-console: 0 */
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 
 const ApiClient = require('../api-client');
 
-const client = new ApiClient('https://staging.hoxtonowl.com/api', 'secret');
+// const API_ENDPOINT = 'https://staging.hoxtonowl.com/api';
+const API_ENDPOINT = 'http://localhost:3000';
+
+const client = new ApiClient(API_ENDPOINT, 'secret');
+const testPatch = {};
+let newPatchId;
 client
   .authenticate()
-  // .then(() => client.getPatch('55ad6128125320db07310166'))
-  // .then(() => client.getPatchBySeoName('Contest_Bias'))
-  .then(() => client.newPatch({ name: 'test' }))
-  .then(result => {
-    console.log(result.data);
-    if (!result.data.success) {
-      return result;
+
+  // Create new patch
+  .then(() => client.newPatch(testPatch))
+
+  // Upload source file
+  .then(({ data }) => {
+    console.log(data);
+    if (!data.success) {
+      throw data;
     }
-    console.log('Now uploading source file...'); // FIXME
-    return client.uploadSourceFiles(result.data._id, [ path.join(__dirname, './TestTonePatch.hpp') ]);
+    console.log('Now uploading source file...');
+    newPatchId = data._id;
+    return client.uploadSourceFiles(newPatchId, [ path.join(__dirname, './TestTonePatch.hpp') ]);
   })
-  .then(result => process.stdout.write('= ' + JSON.stringify(result.data) + '\n'))
+
+  // Build patch
+  .then(({ data }) => {
+    console.log(data);
+    if (!data.success) {
+      throw data;
+    }
+    console.log('Now building patch...');
+    return client.buildPatch(newPatchId);
+  })
+
+  // Download SysEx build
+  .then(({data}) => {
+    if (!data.success) {
+      throw data; // this object contains a lot of useful debug info (stdout, stderr..)!
+    }
+    console.log('Patch compiled successfully!');
+
+    console.log('Downloading Sysex build...');
+    const file = fs.createWriteStream('/tmp/patch.syx');
+    return client.downloadPatch(newPatchId, 'sysx', file);
+  })
+
+  // Download JS build
+  .then(() => {
+    console.log('Downloading JS build...');
+    const file = fs.createWriteStream('/tmp/patch.js');
+    return client.downloadPatch(newPatchId, 'js', file);
+  })
+
+  // Show result
+  .then(({ data }) => process.stdout.write('= ' + JSON.stringify(data) + '\n'))
+
+  // Handle errors
   .catch(err => {
     console.error(err);
     process.stderr.write('! ' + err.stack + '\n');

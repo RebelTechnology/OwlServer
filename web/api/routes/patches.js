@@ -40,6 +40,10 @@ router.post('/', (req, res) => {
     return errorResponse({ message: 'Access denied.', status: 401, public: true }, res);
   }
 
+  const patchModel = new PatchModel(req.db);
+  const newPatch = new Patch();
+  Object.assign(newPatch, req.body.patch);
+
   // Get user details
   let isWpAdmin = false;
   let wpUserId;
@@ -65,10 +69,6 @@ router.post('/', (req, res) => {
     newPatch.generateRandomName();
   }
   newPatch.generateSeoName();
-
-  const patchModel = new PatchModel(req.db);
-  const newPatch = new Patch();
-  Object.assign(newPatch, req.body.patch);
 
   Promise.resolve(newPatch.validate()) // will throw an error if patch is not valid
     .then(() => patchModel.patchNameTaken(newPatch.name, newPatch.seoName))
@@ -96,6 +96,7 @@ router.post('/', (req, res) => {
         message: 'New patch saved.',
         _id: patch._id,
         seoName: patch.seoName,
+        url: `https://${process.env.WORDPRESS_HOSTNAME}/patch-library/patch/${patch.seoName}`,
         success: true,
       });
     })
