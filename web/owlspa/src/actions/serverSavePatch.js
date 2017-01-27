@@ -30,8 +30,6 @@ const serverSavePatch = (patch, options = {}) => {
         method = 'PUT';
     }
 
-    console.log('---');
-    console.log(patch);
     return fetch( API_END_POINT + path, {
       headers: {
         'Accept': 'application/json',
