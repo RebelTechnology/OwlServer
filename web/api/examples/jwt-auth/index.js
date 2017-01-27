@@ -6,8 +6,8 @@ const fs = require('fs');
 
 const ApiClient = require('../api-client');
 
-// const API_ENDPOINT = 'https://staging.hoxtonowl.com/api';
-const API_ENDPOINT = 'http://localhost:3000';
+const API_ENDPOINT = 'https://staging.hoxtonowl.com/api'; // Comment out this line to run API locally
+//const API_ENDPOINT = 'http://localhost:3000'; // Uncomment this line to run API locally
 
 const client = new ApiClient(API_ENDPOINT, 'secret');
 const testPatch = {};
