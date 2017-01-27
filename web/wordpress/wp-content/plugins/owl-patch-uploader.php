@@ -15,6 +15,10 @@ define('DOING_AJAX', true);
 
 define('TMP_DIR_PREFIX', 'tmp-'); // must meet regex /[a-z0-9\-]+/i
 
+// This files defines a secret that is used by the OWL API to connect to this WP
+// plugin without the need to authenticate itself as a WordPress user.
+require_once 'owl-patch-uploader-secret.php';
+
 /**
  * Sends JSON error response and terminates script.
  *
@@ -82,6 +86,7 @@ function getApiBaseUrl()
         }
     }
 
+    //return 'http://192.168.50.1:3000'; // Uncomment this line to run API locally
     return $apiBaseUrl;
 
 } // function getApiBaseUrl
@@ -143,7 +148,7 @@ function updatePatch($patch)
 
     $payload = [
         'credentials' => [
-            'type' => 'wordpress',
+            'type' => 'wp',
             'cookie' => owl_getAuthCookie(true),
         ],
         'patch' => $patch,
@@ -235,9 +240,20 @@ function getSourceFileInfo($url)
  *
  * @param array $patch
  *     The patch.
+ * @param string $secret
+ *     Allows the OWL API to bypass WordPress authentication and authenticate
+ *     using a secret instead.
  */
-function checkUserIsAuthorizedToEditPatch($patch)
+function checkUserIsAuthorizedToEditPatch($patch, $secret = null)
 {
+    if(is_string($secret)) {
+      if (hash_equals($secret, PATCH_UPLOAD_SECRET)) {
+        return;
+      } else {
+        errorOut('Sorry, wrong secret!');
+      }
+    }
+
     $wpUserId = get_current_user_id();
     if (!$wpUserId) {
         errorOut('No WordPress user logged in.');
@@ -303,7 +319,7 @@ function owl_patchFileUpload()
     if (!file_exists($baseDirPath)) {
 
         if (!is_dir($baseDirPath)) {
-        
+
             $r = mkdir($baseDirPath, getDirMod(), true);
             if (!$r) {
                 errorOut('Unable to create target dir.');
@@ -328,7 +344,11 @@ function owl_patchFileUpload()
         $patch = getPatch($patchId);
 
         // Check that the patch actually belongs to the currently logged-in user
-        checkUserIsAuthorizedToEditPatch($patchId);
+        if (isset($_REQUEST['secret'])) {
+          checkUserIsAuthorizedToEditPatch($patch, $_REQUEST['secret']);
+        } else {
+          checkUserIsAuthorizedToEditPatch($patch); // will throw error if no WP user is logged in
+        }
 
     }
 
@@ -370,7 +390,6 @@ function owl_patchFileUpload()
 
     if (!isset($_FILES) || !is_array($_FILES) || !isset($_FILES['files']) ||
         !isset($_FILES['files']['name']) || !is_array($_FILES['files']['name'])) {
-
         errorOut('Unexpected error (7).');
     }
 
@@ -495,6 +514,9 @@ function owl_patchFileCleanUp()
     // directories
     $baseDirPath = getBaseDirPath();
     $dstDir = $baseDirPath . '/' . $patchId;
+    if (!file_exists($dstDir)) { // We create the directory in case the patch was created without uploading any files
+        @mkdir($dstDir);
+    }
     if (!isset($patch['github'])) {
         $patch['github'] = [];
     }
@@ -654,5 +676,9 @@ function owl_patchFileDelete()
 add_action('wp_ajax_owl-patch-file-upload', 'owl_patchFileUpload');
 add_action('wp_ajax_owl-patch-file-cleanup', 'owl_patchFileCleanUp');
 add_action('wp_ajax_owl-patch-file-delete', 'owl_patchFileDelete');
+
+// unprivileged version of `owl_patchFileUpload`. correct secret needed for this
+// call to be successful.
+add_action('wp_ajax_nopriv_owl-patch-file-upload', 'owl_patchFileUpload');
 
 // EOF

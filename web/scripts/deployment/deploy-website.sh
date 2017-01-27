@@ -1,6 +1,4 @@
 #!/bin/bash
-#
-# Written by Sam Artuso <sam@highoctanedev.co.uk>
 
 # Settings
 CLONE_DIR='OwlServer'
@@ -8,17 +6,17 @@ REPO_URL="https://github.com/pingdynasty/$CLONE_DIR.git"
 
 # Make sure only root can run this script
 if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root" 1>&2
-    exit 1
+  echo "This script must be run as root" 1>&2
+  exit 1
 fi
 
 # Work out directory where this script is, no matter where it is called from,
 # and with which method (source, bash -c, symlinks, etc.):
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do
-    DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-    SOURCE="$(readlink "$SOURCE")"
-    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
@@ -26,29 +24,26 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 HOSTNAME=`hostname`
 if [ "$HOSTNAME" = "ulrike" -o "$HOSTNAME" = "bella" ]
 then
-    TARGET_ENV='staging'
-    GIT_BRANCH='dev'
-    SITE_URL='http://staging.hoxtonowl.com'
+  TARGET_ENV='staging'
+  GIT_BRANCH='dev'
+  SITE_URL='http://staging.hoxtonowl.com'
 elif [ "$HOSTNAME" = "nestor" ]
 then
-    TARGET_ENV='production'
-    GIT_BRANCH='master'
-    SITE_URL='http://www.hoxtonowl.com'
+  TARGET_ENV='production'
+  GIT_BRANCH='master'
+  SITE_URL='http://www.hoxtonowl.com'
 else
-    echo "Unknown hostname $HOSTNAME. Cannot determine target environment."
-    echo "Aborting."
-    exit 1
+  echo "Unknown hostname $HOSTNAME. Cannot determine target environment."
+  echo "Aborting."
+  exit 1
 fi
 echo "This is $HOSTNAME, assuming $TARGET_ENV environment."
-
-# # Delete previous clone
-# rm -rf $DIR/$CLONE_DIR
 
 # Clone or update repository
 if [ ! -d $DIR/$CLONE_DIR ]
 then
-    echo "Cloning $CLONE_DIR repository..."
-    git clone --quiet $REPO_URL $DIR/$CLONE_DIR
+  echo "Cloning $CLONE_DIR repository..."
+  git clone --quiet $REPO_URL $DIR/$CLONE_DIR
 fi
 echo "Checking out '$GIT_BRANCH' branch..."
 cd $DIR/$CLONE_DIR
@@ -70,6 +65,7 @@ rsync -rav $DIR/$CLONE_DIR/web/wordpress/wp-content/themes/hoxton-owl-2014 $DIR/
 cp -a $DIR/$CLONE_DIR/web/wordpress/robots.txt $DIR/../httpdocs/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-api-bridge.php $DIR/../httpdocs/wp-content/plugins/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-patch-uploader.php $DIR/../httpdocs/wp-content/plugins/
+cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/owl-patch-uploader-secret-example.php $DIR/../httpdocs/wp-content/plugins/
 cp $DIR/$CLONE_DIR/web/wordpress/wp-content/plugins/README.owl.md $DIR/../httpdocs/wp-content/plugins/
 
 # Update Mediawiki
@@ -106,7 +102,7 @@ chmod -R a+r $DIR/../patch-builder
 chmod a+x $DIR/../patch-builder
 if [ "$TARGET_ENV" = "production" ]
 then
-    chmod -R o+w $DIR/../httpdocs/piwik/tmp
+  chmod -R o+w $DIR/../httpdocs/piwik/tmp
 fi
 
 chown -R root:root $DIR/../deployment
@@ -115,7 +111,3 @@ chmod 744 $DIR/../deployment/deploy-website.sh
 
 chown -R www-data:www-data $DIR/../logs
 chmod 664 $DIR/../logs/*
-
-# Delete temp repo clone
-# echo "Deleting temp repo clone..."
-# rm -rf $DIR/$CLONE_DIR
