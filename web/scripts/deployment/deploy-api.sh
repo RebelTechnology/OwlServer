@@ -81,6 +81,6 @@ chmod 744 $DIR/deploy-api.sh
 
 # Restart service
 echo "Restarting service..."
-systemctl restart owl-api
+service owl-api restart
 
 echo "Done."
