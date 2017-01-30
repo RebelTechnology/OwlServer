@@ -1,8 +1,5 @@
 #!/usr/bin/env php
 <?php
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
 
 // `make sysx` example:
 // make BUILD='/tmp/owl-patch-xxx' PATCHSOURCE='/tmp/owl-patch-xxx' PATCHFILE='OverdrivePatch.hpp' PATCHNAME='Overdrive' PATCHCLASS='OverdrivePatch' PATCHIN=2 PATCHOUT=2 sysex
@@ -10,8 +7,8 @@
 use Symfony\Component\Process\Process;
 
 require_once 'vendor/autoload.php';
-require_once __DIR__ . '/settings.php';
 require_once __DIR__ . '/common.php';
+require_once __DIR__ . '/settings.php';
 
 define('PATCH_SRC_DIR_PREFIX',   'owl-src-');
 define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
@@ -72,7 +69,7 @@ function outputError($msg) {
 function tempdir($prefix = null) {
     $tmpdir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'owl';
     if (!file_exists($tmpdir)) {
-        $result = mkdir("$tmpdir/owl");
+        $result = mkdir($tmpdir);
         if (!$result) {
             outputError("Unable to create temporary directory $tmpdir.");
             exit(1);
@@ -180,7 +177,11 @@ function downloadSourceFile($url, $dstPath) {
 
     } elseif ($r['host'] === 'staging.hoxtonowl.com' || $r['host'] === 'hoxtonowl.com' || $r['host'] === 'www.hoxtonowl.com') {
 
-        $data = file_get_contents($url);
+        $arrContextOptions = [];
+        if (ENVIRONMENT !== ENVIRONMENT_PRODUCTION) { // accept self-signed SSL certificates
+            $arrContextOptions['ssl'] = [ 'verify_peer' => false, 'verify_peer_name' => false ];
+        }
+        $data = file_get_contents($url, false, stream_context_create($arrContextOptions));
         if (false === $data) {
           outputError("Could not download file $url (1).");
           return false;
@@ -252,6 +253,7 @@ $useDocker = false;
 if (isset($options['docker']) && false === $options['docker']) {
     $useDocker = true;
 }
+//$useDocker = true; // Uncomment this line to run API locally
 
 $buildCmd = 'make sysx';
 
@@ -292,40 +294,63 @@ $mongoConnectionString .= MONGO_HOST . ':' . MONGO_PORT;
 $mongoDb = MONGO_DATABASE;
 $collection = MONGO_COLLECTION;
 
-if (extension_loaded('mongo')) {
+if (extension_loaded('mongo')) { // Old, deprecated Mongo PHP driver
 
-  try {
-      $mongoClient = new MongoClient($mongoConnectionString);
-      $db = $mongoClient->$mongoDb;
-      $patches = $db->$collection;
-  } catch (Exception $e) {
-      outputError('Unable to connect to MongoDb.');
-      exit(1);
-  }
+    try {
+        $mongoClient = new MongoClient($mongoConnectionString);
+        $db = $mongoClient->$mongoDb;
+        $patches = $db->$collection;
+    } catch (Exception $e) {
+        outputError('Unable to connect to MongoDb.');
+        exit(1);
+    }
 
-  if (isset($patchName)) {
-      // Patch name was provided in command line
-      $patch = $patches->findOne([ 'name' => $patchName ]);
-  } else {
-      // Patch ID was provided in command line
-      $patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
-  }
+    if (isset($patchName)) {
+        // Patch name was provided in command line
+        $patch = $patches->findOne([ 'name' => $patchName ]);
+    } else {
+        // Patch ID was provided in command line
+        $patch = $patches->findOne([ '_id' => new MongoId($patchId) ]);
+    }
 
-} elseif (extension_loaded('mongodb')) {
+    if (null === $patch) {
+        outputError('Patch not found.');
+        exit(1);
+    }
 
-  try {
-    $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
-    $collection = $mongoClient->$mongoDb->$collection;
-  } catch (Exception $e) {
-      outputError('Unable to connect to MongoDb.');
-      exit(1);
-  }
+} elseif (extension_loaded('mongodb')) { // New, future-proof Mongo PHP driver
 
-  $patch = get_object_vars($collection->findOne( [ 'name' => $patchName ] ));
+    try {
+      $mongoClient = new MongoDB\Client($mongoConnectionString);
+      $collection = $mongoClient->$mongoDb->$collection;
+    } catch (Exception $e) {
+        outputError('Unable to connect to MongoDb.');
+        exit(1);
+    }
+
+    $mongoQueryOptions = [
+        'typeMap' => [
+            'root' => 'array',
+            'document' => 'array',
+            'array' => 'array'
+        ],
+    ];
+    if (isset($patchName)) {
+        // Patch name was provided in command line
+        $patch = $collection->findOne([ 'name' => $patchName ], $mongoQueryOptions);
+    } else {
+        // Patch ID was provided in command line
+        $patch = $collection->findOne([ '_id' => new MongoDB\BSON\ObjectID($patchId) ], $mongoQueryOptions);
+    }
+
+    if (null === $patch) {
+        outputError('Patch not found.');
+        exit(1);
+    }
 
 } else {
-  outputError('No MongoDB extension available.');
-  exit(1);
+    outputError('No MongoDB extension available.');
+    exit(1);
 }
 
 // Sanitize some values later used as command line arguments:
@@ -335,15 +360,6 @@ if (isset($patch['inputs'])) {
 
 if (isset($patch['outputs'])) {
     $patch['outputs'] = intval($patch['outputs']);
-}
-
-if (null === $patch) {
-    outputError('Patch not found.');
-    exit(1);
-}
-
-if (!isset($patchId)) { // patch name was provided in command line
-    $patchId = $patch['_id'];
 }
 
 /*

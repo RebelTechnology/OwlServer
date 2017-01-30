@@ -1,507 +1,189 @@
-/**
- * @author Sam Artuso <sam@highoctanedev.co.uk>
- */
-
-var urlParser = require('url');
-
-var patchModel = {
-
-    fields: {
-
-        _id: {
-            required: false,
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: '_id', error: { status: 400 }};
-
-                if (typeof val !== 'string' || !(/^[0-9a-f]{24}$/i.test(val))) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-            }
-        },
-
-        name: {
-            required: true,
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'name', error: { status: 400 }};
-
-                if (typeof val !== 'string') {
-                    err.message = 'Value not valid.';
-                    throw err;
-                };
-
-                if(val.length < 1 || val.length > 255) {
-                    err.message = 'This field should be at least 1 and at most 255 characters long.';
-                    throw err;
-                }
-            },
-            sanitize: function(val) { return val.trim(); }
-        },
-
-        seoName: {
-            required: false,
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'seoName', error: { status: 400 }};
-
-                if (typeof val !== 'string' || !(/^[a-z0-9\_]+$/i.test(val))) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-
-                if(val.length < 1 || val.length > 255) {
-                    err.message = 'This field should be at least 1 and at most 255 characters long.';
-                    throw err;
-                }
-            }
-        },
-
-        compilationType: {
-            required: false,
-            validate: function (val) {
-                
-                var err = { type: 'not_valid', field: 'compilationType', error: { status: 400 }};
-                var validTypes = ['cpp', 'faust', 'pd' ,'gen'];
-
-                if (typeof val !== 'string' || validTypes.indexOf((val).toLowerCase()) === -1) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-            },
-            sanitize: function (val) {
-                return String(val);
-            }
-        },
-
-        author: {
-            required: false,
-            validate: function (val) {
-
-                var err = { type: 'not_valid', field: 'author', error: { status: 400 }};
-
-                if (typeof val !== 'object') {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-
-                // Either name or wordpressId, exclusive (i.e. not both)
-                if (!('name' in val) && !('wordpressId' in val)) {
-                    err.message = 'Invalid author schema.';
-                    throw err;
-                }
-                if (('name' in val) && ('wordpressId' in val)) {
-                    err.message = 'Invalid author schema.';
-                }
-
-                // Validate name
-                if ('name' in val) {
-                    if (val.name.length < 1 || val.name.length > 255) {
-                        err.message = 'Invalid author name.';
-                        throw err;
-                    }
-                }
-
-                // Validate WordPress user ID
-                if ('wordpressId' in val) {
-                    if (val.wordpressId <= 0) {
-                        err.message = 'Invalid WordPress user ID.';
-                        throw err;
-                    }
-                }
-
-            },
-            sanitize: function (val) {
-
-                // remove illegal keys
-                for (var key in val) {
-                    if ('wordpressId' !== key && 'name' !== key) {
-                        delete val[key];
-                    }
-                }
-
-                // sanitize WP user ID
-                if ('wordpressId' in val) {
-                    val.wordpressId = parseInt(val.wordpressId);
-                }
-
-                return val;
-            }
-        },
-
-        description: {
-            required: false, // ...but required, if published == true
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'description', error: { status: 400 }};
-
-                if (typeof val !== 'string') {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-
-                if(val.length < 1 || val.length > 1023) {
-                    err.message = 'This field should be at least 1 and at most 1023 characters long.';
-                    throw err;
-                }
-            },
-            sanitize: function(val) { return val.trim(); }
-        },
-
-        instructions: {
-            required: false, // ...but required, if published == true
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'instructions', error: { status: 400 }};
-
-                if (typeof val !== 'string') {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-
-                if(val.length > 1023) {
-                    err.message = 'This field should be at most 1023 characters long.';
-                    throw err;
-                }
-            },
-            sanitize: function(val) { return val.trim(); }
-        },
-
-        parameters: {
-            required: false,
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'parameters', error: { status: 400 }};
-
-                if (typeof val !== 'object') {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-                for (var key in val) {
-                    if (key !== 'a' && key !== 'b' && key !== 'c' && key !== 'd' && key !== 'e') {
-                        err.message = 'Value not valid.';
-                        throw err;
-                    }
-                    if (typeof val[key] !== 'string' || val[key].length < 1 || val[key] > 255) {
-                        err.message = 'This field should be at least 1 and at most 255 characters long.';
-                        err.parameter = key;
-                        throw err;
-                    }
-                }
-            },
-            sanitize: function(val) {
-                for (var key in val) {
-                    if (key !== 'a' && key !== 'b' && key !== 'c' && key !== 'd' && key !== 'e') {
-                        delete val[key];
-                    }
-                    val[key] = val[key].trim();
-                }
-                return val;
-            }
-        },
-
-        inputs: {
-            required: true,
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'inputs', error: { status: 400 }};
-
-                if (val != 0 && val != 1 && val != 2) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-            },
-            sanitize: function(val) {
-                return parseInt(val);
-            }
-        },
-
-        outputs: {
-            required: true,
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'outputs', error: { status: 400 }};
-
-                if (val != 0 && val != 1 && val != 2) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-            },
-            sanitize: function(val) {
-                return parseInt(val);
-            }
-        },
-
-        soundcloud: {
-            required: false,
-            validate: function(val) {
-
-                if ('undefined' === typeof val) {
-                    return;
-                }
-
-                var err = { type: 'not_valid', field: 'soundcloud', error: { status: 400 }};
-
-                if (Object.prototype.toString.call(val) !== '[object Array]') {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-
-                for (var i = 0, max = val.length; i < max; i++) {
-                    if (typeof val[i] !== 'string') {
-                        err.message = 'Value not valid.';
-                        throw err;
-                    }
-                    // https://soundcloud.com/hoxtonowl/johan-larsby-conny-distortion
-                    if (!/^https?:\/\/(?:www\.)?soundcloud\.com\/.+\/.+$/i.test(val[i])) {
-                        err.message = 'URL does not seem a valid SoundCloud track.';
-                        err.index = i;
-                        throw err;
-                    }
-                }
-            }
-        },
-
-        github: {
-            required: false,
-            validate: function(val) {
-
-                if ('undefined' === typeof val) {
-                    return;
-                }
-
-                var err = { type: 'not_valid', field: 'github', error: { status: 400 }};
-
-                if (Object.prototype.toString.call(val) !== '[object Array]') {
-                    err.message = 'Value not valid (1).';
-                    throw err;
-                }
-
-                var url;
-                var validHosts = [
-                    'hoxtonowl.localhost:8000',
-                    'staging.hoxtonowl.com',
-                    'hoxtonowl.com',
-                    'www.hoxtonowl.com',
-                    'github.com',
-                    'www.github.com'
-                ];
-                for (var i = 0, max = val.length; i < max; i++) {
-
-                    if (typeof val[i] !== 'string') {
-                        err.message = 'Invalid URL (1).';
-                        throw err;
-                    }
-
-                    url = urlParser.parse(val[i]);
-
-                    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-                        err.message = 'Invalid URL (2).';
-                        err.index = i;
-                        throw err;
-                    }
-
-                    if (validHosts.indexOf(url.host) === -1) {
-                        err.message = 'Source files can only be hosted on our servers or on GitHub.';
-                        err.index = i;
-                        throw err;
-                    }
-
-                    if (url.host.indexOf('hoxtonowl') !== -1) {
-                        // e.g.: http://hoxtonowl.localhost:8000/wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
-                        // url.path = /wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
-                        if (!/^\/wp-content\/uploads\/patch\-files\/[a-z0-9\-]+\/.+$/i.test(url.path)) {
-                            err.message = 'URL does not seem to belong to a source file hosted on our servers.';
-                            err.index = i;
-                            throw err;
-                        }
-                    } else if (url.host.indexOf('github') !== -1) {
-                        // e.g.: https://github.com/pingdynasty/OwlPatches/blob/master/PhaserPatch.hpp
-                        if (!/^https?:\/\/(?:www\.)?github\.com\/.+\/.+\/blob\/.+\/.+$/i.test(val[i])) {
-                            err.message = 'URL does not seem to be a valid GitHub blob URL.';
-                            err.index = i;
-                            throw err;
-                        }
-                    } else {
-                        err.message = 'Source files can only be hosted on our servers or on GitHub.';
-                        err.index = i;
-                        throw err;
-                    }
-                }
-            }
-        },
-
-        cycles: {
-            required: false, 
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'cycles', error: { status: 400 }};
-
-                if (val < 0) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-            },
-            sanitize: function(val) {
-                return Math.round(val);
-            }
-        },
-
-        bytes: {
-            required: false, 
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'bytes', error: { status: 400 }};
-
-                if (val < 0) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-            },
-            sanitize: function(val) {
-                return Math.round(val);
-            }
-        },
-
-        tags: {
-            required: false,
-            validate: function(val) {
-
-                var err = { type: 'not_valid', field: 'tags', error: { status: 400 }};
-
-                if (Object.prototype.toString.call(val) !== '[object Array]') {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-
-                for (var i = 0, max = val.length; i < max; i++) {
-                    if (typeof val[i] !== 'string') {
-                        err.message = 'Value not valid.';
-                        throw err;
-                    }
-                    if ('' === val) {
-                        err.message = 'Value not valid.';
-                        throw err;
-                    }
-                }
-            },
-            sanitize: function(val) {
-                for (var i = 0, max = val.length; i < max; i++) {
-                    val[i] = val[i].trim();
-                }
-                return val;
-            }
-        },
-
-        creationTimeUtc: {
-            required: false,
-            validate: function (val) {
-
-                var err = { type: 'not_valid', field: 'creationTimeUtc', error: { status: 400 }};
-
-                if (!/^\d+$/.test(val)) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-
-            },
-            sanitize: function (val) {
-                return parseInt(val);
-            }
-        },
-
-        published: {
-            required: false,
-            validate: function (val) {
-                // no validation needed
-            },
-            sanitize: function (val) {
-                // val will usually be '0', '1' (string), 0 or 1 (integer)
-                return val == '0' ? false : true;
-            }
-        },
-
-        downloadCount: {
-            required: false,
-            validate: function (val) {
-                
-                var err = { type: 'not_valid', field: 'downloadCount', error: { status: 400 }};
-
-                if (!/^\d+$/.test(val)) {
-                    err.message = 'Value not valid.';
-                    throw err;
-                }
-            },
-            sanitize: function (val) {
-                return parseInt(val);
-            }
-        }
-    },
-
-    validate: function(patch) {
-
-        for (var key in patchModel.fields) {
-
-            var err = { type: 'not_valid', error: { status: 400 }};
-
-            // Check if patch is an object
-            if (typeof patch !== 'object') {
-                err.message = 'Invalid data.';
-                throw err;
-            }
-
-            if (typeof patch[key] === 'undefined') {
-
-                // Check for required fields
-                if (patchModel.fields[key].required === true) {
-                    patchModel.throwErrorForMissingRequiredField(key);
-                }
-
-                // instructions and description are required if patch is published
-                if (patch.published == true && (key === 'instructions' || key === 'description')) {
-                    patchModel.throwErrorForMissingRequiredField(key);
-                }
-
-            } else {
-                // Validate single fields
-                patchModel.fields[key].validate(patch[key]);
-                if (patchModel.fields[key].sanitize) {
-                    // if a sanitization function exist, call it and then revalidate
-                    // just in case...
-                    patch[key] = patchModel.fields[key].sanitize(patch[key]);
-                    patchModel.fields[key].validate(patch[key]);
-                }
-            }
-        }
-    },
-
-    sanitize: function(patch) {
-
-        var keys = Object.keys(patchModel.fields);
-
-        for (key in patch) {
-            if (keys.indexOf(key) === -1) {
-                delete patch[key];
-            }
-        }
-
-        return patch;
-    },
-
-    generateSeoName: function(patch) {
-        return patch.name.replace(/[^a-z0-9]+/gi, '_');
-    },
-
-    throwErrorForMissingRequiredField: function(field){
-        console.log('Error missing required field: ', field);
-        err.message = 'This field is required.';
-        err.type = 'field_required';
-        err.field = field;
-        throw err;
-    }
+'use strict';
+
+const monk = require('monk');
+const escapeStringRegexp = require('escape-string-regexp');
+
+const Patch = require('../lib/patch');
+
+const summaryFields = {
+  '_id':                1,
+  'name':               1,
+  'author.name':        1,
+  'author.url':         1,
+  'author.wordpressId': 1,
+  'tags':               1,
+  'seoName':            1,
+  'creationTimeUtc':    1,
+  'published':          1,
+  'description':        1
 };
 
-module.exports = patchModel;
+/**
+ * Patch model.
+ */
+class PatchModel {
 
-// EOF
+  /**
+   * Class constructor.
+   *
+   * @param {Object} db
+   */
+  constructor(db) {
+    this._collection = db.get(process.env.MONGO_COLLECTION);
+  }
+
+  /**
+   * Returns all patches that match the given query.
+   *
+   * @param {Object} filters - A key/value map for filtering patches. At present
+   *                           these fields are supported: 'author.name' and
+   *                           'author.wordpressId'
+   * @return {Promise<Array<Patch>>}
+   */
+  find(filters = {}) {
+    const queryFilter = { $match: {}};
+    if (filters['author.name'] && typeof filters['author.name'] === 'string') {
+      queryFilter.$match['author.name'] = filters['author.name'];
+    }
+    if (filters['author.wordpressId'] && typeof filters['author.wordpressId'] === 'string') {
+      queryFilter.$match['author.wordpressId'] = filters['author.wordpressId'];
+    }
+    const projection = Object.assign({}, summaryFields, { lowercase: { $toLower: '$name' }});
+    return this._collection.aggregate([
+      queryFilter,
+      { $project: projection },
+      { $sort: { lowercase: 1 }},
+      { $project: summaryFields }
+    ]);
+  }
+
+  /**
+   * Retrieves the patch with the specified patch ID.
+   *
+   * @param {string} _id
+   * @return {Promise<Patch>}
+   */
+  getById(_id) {
+    return this._getOne({ _id });
+  }
+
+  /**
+   * Retrieves the patch with the specified SEO name.
+   *
+   * @param {string} seoName
+   * @return {Promise<Patch>}
+   */
+  getBySeoName(seoName) {
+    return this._getOne({ seoName });
+  }
+
+  /**
+   * Returns whether the specified name has already been taken.
+   *
+   * A specific patch ID to ignore can be optionally specified.
+   *
+   * @param {string} name
+   * @param {string} seoName
+   * @param {?string} ignorePatchId
+   * @return {Promise<boolean>}
+   */
+  patchNameTaken(name, seoName, ignorePatchId) {
+
+    const nameRegexp = new RegExp('^' + escapeStringRegexp(name) + '$', 'i');
+    const seoNameRegexp = new RegExp('^' + escapeStringRegexp(seoName) + '$', 'i');
+    let query;
+    if (ignorePatchId) {
+      query = {
+        $and: [
+          { _id: { $ne: monk.id(ignorePatchId)}},
+          { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp }]},
+        ]
+      };
+    } else {
+      query = { $or: [ { name: nameRegexp }, { seoName: seoNameRegexp } ] };
+    }
+    return this._collection.findOne(query).then(doc => !!doc);
+  }
+
+  /**
+   * Retrieves a single patch from the database.
+   *
+   * @private
+   * @param {Object} query
+   * @return {Promise<?Patch>}
+   */
+  _getOne(query) {
+    return this._collection.findOne(query)
+      .then(result => {
+        if (!result) { // Patch not found
+          return null;
+        }
+        const patch = new Patch();
+        Object.assign(patch, result);
+        return patch;
+      });
+  }
+
+  /**
+   * Creates a new patch.
+   *
+   * @param {Patch} patch
+   * @return {Promise}
+   */
+  insert(patch) {
+    return this._collection.insert(patch);
+  }
+
+  /**
+   * Updates the specified patch.
+   *
+   * @param {string} _id
+   * @param {Patch} patch
+   * @return {Promise}
+   */
+  update(_id, patch) {
+    return this._collection.update({ _id }, patch, { multi: false });
+  }
+
+  /**
+   * Adds a new source file to the specified patch.
+   *
+   * This method will not add duplicates.
+   *
+   * @param {string} _id
+   * @param {Array<string>} sources
+   * @return {Promise}
+   */
+  addSources(_id, sources) {
+    if (!Array.isArray(sources)) {
+      return Promise.reject(new Error('`sources` must be an array.'));
+    }
+    if (!sources.some(source => typeof source === 'string')) {
+      return Promise.reject(new Error('All elements of `sources` must be strings.'));
+    }
+    const update = { $addToSet: { github: { $each: sources }}};
+    return this._collection.update({ _id }, update, { multi: false });
+  }
+
+  /**
+   * Increments the download count of the specified patch.
+   *
+   * @param {string} _id
+   * @return {Promise}
+   */
+  incrementDownloadCount(_id) {
+    return this._collection.update({ _id }, { $inc: { downloadCount: 1 }}, { multi: false });
+  }
+
+  /**
+   * Deletes a patch.
+   *
+   * @param {string} _id
+   * @return {Promise}
+   */
+  delete(_id) {
+    return this._collection.remove({ _id });
+  }
+}
+
+module.exports = PatchModel;

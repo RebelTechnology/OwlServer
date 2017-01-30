@@ -1,11 +1,21 @@
 #!/usr/bin/env node
-var debug = require('debug')('owl-api');
-var app = require('../app');
-var apiSettings = require('../api-settings');
 
-app.set('port', apiSettings.port || 3000);
+const debug = require('debug')('owl-api');
+const app = require('../app');
 
-var server = app.listen(app.get('port'), function() {
+// Check some environment variables
+if (!process.env.API_KEY) {
+  process.stderr.write('Error: Make sure that `.env` file exists and that it contains the API_KEY setting in it.\n');
+  process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+  process.stderr.write('Error: Make sure that `.env` file exists and that it contains the JWT_SECRET setting in it.');
+  process.exit(1);
+}
+
+app.set('port', process.env.API_PORT || 3000);
+
+const server = app.listen(app.get('port'), () => {
   debug('Express server listening on port ' + server.address().port);
 });
-

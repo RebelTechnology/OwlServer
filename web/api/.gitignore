@@ -1,5 +1,4 @@
 # OWL API
-node_modules
-api-settings.js
-*.log
-.env
+/node_modules
+/*.log
+/.env
