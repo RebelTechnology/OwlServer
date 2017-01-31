@@ -10,7 +10,7 @@ const API_ENDPOINT = 'https://staging.hoxtonowl.com/api'; // Comment out this li
 //const API_ENDPOINT = 'http://localhost:3000'; // Uncomment this line to run API locally
 
 const client = new ApiClient(API_ENDPOINT, 'secret');
-const testPatch = {};
+const testPatch = {}; // see ../fully-fledged-patch.js to see all possible fields
 let newPatchId;
 client
   .authenticate()
