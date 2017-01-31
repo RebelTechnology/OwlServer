@@ -107,6 +107,7 @@ class PatchListPage extends Component {
           tags={patch.tags}
           seoName={patch.seoName}
           canEdit={this.currentUserCanEdit(patch)}
+          loggedIn={currentUser.loggedIn}
           onDeletePatchClick={(e) => this.handleOnDeletePatchClick(e, patch)}
         />
       );

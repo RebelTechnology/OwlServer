@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Tag, AuthorLink } from 'components';
+import { Tag, AuthorLink, IconButton } from 'components';
 
 class PatchTile extends Component {
   
@@ -12,8 +12,13 @@ class PatchTile extends Component {
     this.context.router.push('/patches/authors/'+ authorName);
   }
 
+  handleRecommendPatch(e, patchSeoName){
+    e.stopPropagation();
+    console.log('recommend', patchSeoName);
+  }
+
   render(){
-    const { id, name, published, authorName, description, tags, seoName, canEdit, onDeletePatchClick } = this.props;
+    const { id, name, published, authorName, description, tags, seoName, canEdit, loggedIn, onDeletePatchClick } = this.props;
     return (
       <div className="patch-tile" onClick={ (e) => this.handlePatchClick(e, seoName) } >
         <div className="patch-title-controls">
@@ -28,7 +33,12 @@ class PatchTile extends Component {
               <div className="patch-buttons">
                 <a href={'/edit-patch/' + seoName} className="patch-button patch-button-edit"></a>
                 <span onClick={onDeletePatchClick} className="patch-button patch-button-delete"></span>
-              </div>) : null
+              </div>) : (
+                <div className="patch-buttons">
+                  { loggedIn && <IconButton name="recommend" color="#555" onClick={ (e) => this.handleRecommendPatch(e, seoName) }></IconButton>}
+                </div>
+              )
+
             }    
           </div> 
           <AuthorLink author={authorName} />
@@ -54,6 +64,7 @@ PatchTile.propTypes = {
   description: PropTypes.string,
   tags: PropTypes.array,
   canEdit: PropTypes.bool,
+  loggedIn: PropTypes.bool,
   onDeletePatchClick: PropTypes.func
 }
 

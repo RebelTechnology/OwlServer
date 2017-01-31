@@ -6,7 +6,7 @@ import styles from './IconButton.css';
 class IconButton extends Component {
 
   render(){
-    const { onClick, disabled, size, color, name } = this.props;
+    const { onClick, disabled, size, color, name, children } = this.props;
     return (
       <button 
         styleName="icon-button"
