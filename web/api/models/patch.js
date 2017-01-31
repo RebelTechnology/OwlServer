@@ -15,7 +15,8 @@ const summaryFields = {
   'seoName':            1,
   'creationTimeUtc':    1,
   'published':          1,
-  'description':        1
+  'description':        1,
+  'downloadCount':      1
 };
 
 /**

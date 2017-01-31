@@ -1,0 +1,14 @@
+.nav-link {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  width: 80px;
+  height: 80px;
+  margin: 0 15px 15px 0;
+  background: no-repeat center 0 none;
+  color: #fff;
+  opacity: 0.5;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 100;
+  font-size: 14px;
+}

@@ -1,26 +1,37 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDom from 'react-dom';
 import { Link } from 'react-router';
-import classNames from 'classnames';
+import CSSModules from 'react-css-modules';
+import styles from './NavLink.css';
+import { Icon } from 'components';
 
 class NavLink extends Component {
-  isActiveLink({ target, location }){
+  isActiveLink(){
+    const { target, location } = this.props;
     return location.pathname.indexOf(target) > -1;
   }
   render(){
-    const styleClasses = classNames('secondary-nav-item', this.props.className, {active:  this.isActiveLink(this.props)});
+    const { target, children, icon } = this.props;
     return (
-      <Link to={this.props.target} className={styleClasses} >
-        {this.props.children}
+      <Link 
+        to={target} 
+        styleName="nav-link"
+        style={{
+          opacity: this.isActiveLink() ? 1 : 0.5
+        }}
+      >
+        <Icon size={40} color={true ? '#fff' : '#fff'} textPosition="bottom" name={icon} />
+        {children}
       </Link>
     );
   }
 }
 
 NavLink.propTypes = {
+  icon: PropTypes.string.isRequired,
   children: PropTypes.node,
   target: PropTypes.string.isRequired,
   className: PropTypes.string
 };
 
-export default NavLink;
+export default  CSSModules(NavLink, styles);

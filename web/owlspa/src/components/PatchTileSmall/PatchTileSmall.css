@@ -17,7 +17,8 @@
 }
 
 .patch-title {
-    display: inline;
+    display: block;
+    float: left;
     line-height: 30px;
     padding: 10px;
     color: #fff;

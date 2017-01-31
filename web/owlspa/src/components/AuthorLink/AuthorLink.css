@@ -1,5 +1,7 @@
 .patch-author {
   margin-top: 10px;
+  float: left;
+  clear: both;
 }
 
 .author-name {

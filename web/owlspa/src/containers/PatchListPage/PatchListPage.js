@@ -53,6 +53,14 @@ class PatchListPage extends Component {
     switch(patchListFilter.topFilter){
       case 'latest':
         return patches.filter(patch => patch.published).sort((a,b) => b.creationTimeUtc - a.creationTimeUtc);
+      case 'popular':
+        return patches.filter(patch => patch.published)
+          .sort((a,b) => b.creationTimeUtc - a.creationTimeUtc)
+          .sort((a,b) => {
+            b.downloadCount = b.downloadCount || 0;
+            a.downloadCount = a.downloadCount || 0;
+            return b.downloadCount - a.downloadCount;
+          });
       case 'all':
         return patches.filter(patch => patch.published).sort((a,b) => (a.name).localeCompare(b.name));
       case 'authors':

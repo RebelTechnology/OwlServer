@@ -1,7 +1,6 @@
 'use strict';
 
 const router = require('express').Router();
-
 const Patch = require('../lib/patch');
 const PatchModel = require('../models/patch');
 const { authTypes } = require('../middleware/auth/constants');
