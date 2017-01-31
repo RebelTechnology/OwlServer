@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Tag, AuthorLink } from 'components';
 
-class Patch extends Component {
+class PatchTile extends Component {
   
   handlePatchClick(e, seoName){
     this.context.router.push('/patch/'+ seoName);
@@ -46,7 +46,7 @@ class Patch extends Component {
   }
 }
 
-Patch.propTypes = {
+PatchTile.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string,
   published: PropTypes.bool,
@@ -57,8 +57,8 @@ Patch.propTypes = {
   onDeletePatchClick: PropTypes.func
 }
 
-Patch.contextTypes = {
+PatchTile.contextTypes = {
   router: PropTypes.object.isRequired
 }
 
-export default Patch;
+export default PatchTile;

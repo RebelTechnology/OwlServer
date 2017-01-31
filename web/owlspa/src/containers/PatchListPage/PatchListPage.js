@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch } from 'actions';
-import { Patch , SubFilter } from 'containers';
+import { PatchTile , SubFilter } from 'containers';
 import { PatchCounter, CreatePatchTile } from 'components';
 
 class PatchListPage extends Component {
@@ -97,7 +97,7 @@ class PatchListPage extends Component {
     const filteredPatches = this.getFilteredSortedPatches(patches.items, patchListFilter, currentUser);
     const patchesToBeRendered = filteredPatches.map( patch => {
       return (
-        <Patch 
+        <PatchTile 
           key={patch._id}
           id={patch._id}
           name={patch.name}

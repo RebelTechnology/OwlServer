@@ -3,7 +3,7 @@ export CreatePatchPage from './CreatePatchPage/CreatePatchPage';
 export Dialog from './Dialog/Dialog'; 
 export NavBar from './NavBar/NavBar';
 export OwlControl from './OwlControl/OwlControl';
-export Patch from './Patch/Patch';
+export PatchTile from './PatchTile/PatchTile';
 export PatchListPage from './PatchListPage/PatchListPage';
 export PatchDetailsPage from './PatchDetailsPage/PatchDetailsPage';
 export PatchPreview from './PatchPreview/PatchPreview';
