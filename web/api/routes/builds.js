@@ -7,6 +7,7 @@ const PatchModel = require('../models/patch');
 const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
 const { download: downloadBuild } = require('../lib/patch-build');
 const errorResponse = require('../lib/error-response');
+const config = require('../lib/config');
 
 /**
  * Convenience function for validating and normalizing the build format.
@@ -131,7 +132,7 @@ router.put('/:id', (req, res) => {
       }
 
       // Compile patch
-      let cmd = 'php ' + process.env.PATCH_BUILDER_PATH;
+      let cmd = 'php ' + config.patchBuilder.path;
       if (format === 'js') {
         cmd += ' --web';
       }

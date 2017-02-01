@@ -3,6 +3,8 @@
 const path = require('path');
 const fs = require('fs');
 
+const config = require('./config');
+
 /**
  * Returns information about available builds.
  *
@@ -17,14 +19,14 @@ const getInfo = patch => {
   };
 
   // Get patch SysEx build
-  const sysexFile = path.join(process.env.SYSEX_PATH, patch['seoName'] + '.syx');
+  const sysexFile = path.join(config.patchBuilder.sysexPath, patch['seoName'] + '.syx');
   if (fs.existsSync(sysexFile)) {
     result['sysExAvailable'] = true;
     result['sysExLastUpdated'] = fs.statSync(sysexFile).mtime;
   }
 
   // Get patch JS build
-  const jsFile = path.join(process.env.JS_PATH, patch['seoName'] + (process.env.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
+  const jsFile = path.join(config.patchBuilder.jsPath, patch['seoName'] + (config.patchBuilder.jsBuildType === 'min' ? '.min' : '') + '.js');
   if (fs.existsSync(jsFile)) {
     result['jsAvailable'] = true;
     result['jsLastUpdated'] = fs.statSync(jsFile).mtime;
@@ -50,9 +52,9 @@ const download = (patch, patchModel, stream, format, res) => {
   let filename;
 
   if (format === 'sysx') {
-    buildFile = path.join(process.env.SYSEX_PATH, patch.seoName + '.syx');
+    buildFile = path.join(config.patchBuilder.sysexPath, patch.seoName + '.syx');
   } else if (format === 'js') {
-    buildFile = path.join(process.env.JS_PATH, patch.seoName + (process.env.JS_BUILD_TYPE === 'min' ? '.min' : '') + '.js');
+    buildFile = path.join(config.patchBuilder.jsPath, patch.seoName + (config.patchBuilder.jsBuildType === 'min' ? '.min' : '') + '.js');
   }
   if (!fs.existsSync(buildFile)) { // FIXME - Move this somewhere else
     throw {

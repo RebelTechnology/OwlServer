@@ -4,6 +4,7 @@ const monk = require('monk');
 const escapeStringRegexp = require('escape-string-regexp');
 
 const Patch = require('../lib/patch');
+const config = require('../lib/config');
 
 const summaryFields = {
   '_id':                1,
@@ -30,7 +31,7 @@ class PatchModel {
    * @param {Object} db
    */
   constructor(db) {
-    this._collection = db.get(process.env.MONGO_COLLECTION);
+    this._collection = db.get(config.mongo.collection);
   }
 
   /**

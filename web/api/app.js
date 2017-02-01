@@ -8,9 +8,11 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+const config = require('./lib/config');
+
 // Connect to database
 const monk = require('monk');
-const db = monk(process.env.MONGO_CONNECTION_STRING);
+const db = monk(config.mongo.connectionString);
 db.then(() => process.stdout.write('Connected correctly to MongoDB.\n'))
   .catch(err => {
     process.stderr.write(err + '\n');
