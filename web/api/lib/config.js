@@ -1,5 +1,7 @@
 'use strict';
 
+const joi = require('joi');
+
 [
   'NODE_ENV',
   'API_PORT',
@@ -49,5 +51,40 @@ const config = {
     jsBuildType: process.env.JS_BUILD_TYPE,
   }
 };
+
+const configSchema = joi.object().keys({
+  env: joi.string().valid([ 'staging', 'production' ]).required(),
+  api: joi.object().keys({
+    port: joi.number().min(1024).max(65535).required(),
+    key: joi.string().required(),
+    jwtSecret: joi.string().required(),
+  }).required(),
+  mongo: joi.object().keys({
+    connectionString: joi.string().required(),
+    collection: joi.string().required(),
+  }),
+  wordpress: joi.object().keys({
+    hostname: joi.string().required(),
+    patchUploadSecret: joi.string().required(),
+    xmlRpc: joi.object().keys({
+      username: joi.string().required(),
+      password: joi.string().required(),
+    }),
+    patchSourceUrlFragment: joi.string().required(),
+  }),
+  patchBuilder: joi.object().keys({
+    path: joi.string().required(),
+    sysexPath: joi.string().required(),
+    jsPath: joi.string().required(),
+    jsBuildType: joi.string().valid([ 'min', 'js' ]).required(),
+  }).required(),
+});
+
+// Validate configuration
+joi.validate(config, configSchema, err => {
+  if (err) {
+    throw err;
+  }
+});
 
 module.exports = config;
