@@ -197,20 +197,33 @@ class ApiClient {
       }
       debug('request: %O', requestOptions);
       transport[this.protocol].get(requestOptions, res => {
-        let rawData = '';
-        res.on('data', chunk => rawData += chunk);
+        
+        /**
+         * @type {Array<Buffer>}
+         */
+        const chunks = [];
+
+        /**
+         * Called whenever a new chunk of binary data is received.
+         *
+         * @param {Buffer} chunk
+         */
+        const onData = chunk => chunks.push(chunk);
+
+        res.on('data', onData);
         res.on('end', () => {
+          const blob = Buffer.concat(chunks);
           if (res.statusCode !== 200) {
             let parsedData;
             try {
-              parsedData = JSON.parse(rawData);
+              parsedData = JSON.parse(blob.toString('utf8'));
             } catch (err) {
               reject(err);
             }
             reject(parsedData);
           } else {
             resolve(new Promise(resolve2 => {
-              writeStream.write(rawData, () => resolve2({ data: { success: true, message: 'File downloaded successfully' }}));
+              writeStream.write(blob, () => resolve2({ data: { success: true, message: 'File downloaded successfully' }}));
             }));
           }
         });
