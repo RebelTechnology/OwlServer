@@ -61,6 +61,11 @@ router.post('/', (req, res) => {
     }
   } else if (userInfo.type === authTypes.AUTH_TYPE_TOKEN) { // token authentication
     patchAuthor.name = userInfo.name;
+
+    // Fields that external users are not allowed to set
+    delete newPatch.creationTimeUtc;
+    delete newPatch.published;
+    delete newPatch.downloadCount;
   }
 
   newPatch.author = patchAuthor;

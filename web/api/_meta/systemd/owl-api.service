@@ -6,6 +6,7 @@ StandardError=syslog
 SyslogIdentifier=owl-api
 User=nobody
 Group=nogroup
+WorkingDirectory=/srv/owl/api
 
 [Install]
 WantedBy=multi-user.target
