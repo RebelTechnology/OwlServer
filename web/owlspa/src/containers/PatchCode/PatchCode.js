@@ -20,10 +20,6 @@ class PatchCode extends Component {
     };
   }
 
-  componentWillMount(){
-    this.checkForNewPatchCodeFiles(this.props);
-  }
-
   checkForNewPatchCodeFiles(props){
     const { fileUrls, patch, patchCodeFiles } = props;
     if(fileUrls && fileUrls.length && !patchCodeFiles[patch._id]){
@@ -222,6 +218,11 @@ class PatchCode extends Component {
       </div>
     );
   }
+
+  componentDidMount(){
+    this.checkForNewPatchCodeFiles(this.props);
+  }
+
 }
 
 PatchCode.propTypes = {

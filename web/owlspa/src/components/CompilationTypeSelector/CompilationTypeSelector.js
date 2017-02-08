@@ -2,12 +2,6 @@ import React, { Component, PropTypes } from 'react';
 
 class CompilationTypeSelector extends Component {
 
-  componentWillMount(){
-    if(this.props.mainSourceFile && this.props.mainSourceFile.name){
-      this.checkAndUpdateCompilatonType(this.props.mainSourceFile.name);
-    }
-  }
-
   getFileExtention(fileName){
     const dotIndex = fileName.lastIndexOf('.');
     if( dotIndex === -1){
@@ -68,6 +62,13 @@ class CompilationTypeSelector extends Component {
       </fieldset>
     );
   }
+
+  componentDidMount(){
+    if(this.props.mainSourceFile && this.props.mainSourceFile.name){
+      this.checkAndUpdateCompilatonType(this.props.mainSourceFile.name);
+    }
+  }
+  
 }
 
 CompilationTypeSelector.propTypes = {

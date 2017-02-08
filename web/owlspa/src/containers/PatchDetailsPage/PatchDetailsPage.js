@@ -12,12 +12,6 @@ import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } fr
 import { PatchPreview, PatchCode } from 'containers';
 
 class PatchDetailsPage extends Component {
-  componentWillMount(){
-    const { fetchPatchDetails , patchDetails, routeParams:{patchSeoName} } = this.props;
-    if(patchSeoName && !this.patchIsCached(patchSeoName)){
-      this.props.fetchPatchDetails(patchSeoName);
-    }
-  }
 
   patchIsCached(patchSeoName){
     const patchDetails = this.props.patchDetails.patches[patchSeoName];
@@ -134,6 +128,14 @@ class PatchDetailsPage extends Component {
       </div>
     );
   }
+
+  componentDidMount(){
+    const { fetchPatchDetails , patchDetails, routeParams:{patchSeoName} } = this.props;
+    if(patchSeoName && !this.patchIsCached(patchSeoName)){
+      this.props.fetchPatchDetails(patchSeoName);
+    }
+  }
+
 }
 
 const mapStateToProps = ({ patchDetails, patchDetailsEditMode, currentUser }) => {

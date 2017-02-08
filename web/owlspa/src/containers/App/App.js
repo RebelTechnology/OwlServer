@@ -4,22 +4,26 @@ import { fetchCurrentUser } from 'actions';
 import { connect } from 'react-redux';
 
 class App extends Component {
-  componentWillMount(){
-    this.props.fetchCurrentUser();
-  }
+
   render(){ 
+    const { location, routeParams, children } = this.props;
     return (
       <div>
         <Dialog />
-        <NavBar location={this.props.location} routeParams={this.props.routeParams} />
-        {this.props.children}
+        <NavBar location={location} routeParams={routeParams} />
+        { children }
       </div>
     );
   }
+
+  componentDidMount(){
+    this.props.fetchCurrentUser();
+  }
+
 }
 
 App.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node
 };
 
 export default connect(null, { fetchCurrentUser })(App);
