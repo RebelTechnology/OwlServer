@@ -4,12 +4,6 @@ import { connectToOwl, loadPatchOnToOwl, startPollingOwlStatus, stopPollingOwlSt
 
 class OwlControl extends Component {
 
-  componentWillMount(){
-    if(this.props.owlState.isConnected){
-      this.props.startPollingOwlStatus();
-    }
-  }
-
   connectToOwl(){
     this.props.connectToOwl();
   }
@@ -45,6 +39,12 @@ class OwlControl extends Component {
         </div>
       </div>
     );
+  }
+
+  componentDidMount(){
+    if(this.props.owlState.isConnected){
+      this.props.startPollingOwlStatus();
+    }
   }
 
   componentWillUnmount(){

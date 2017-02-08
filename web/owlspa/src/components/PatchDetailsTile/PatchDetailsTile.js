@@ -17,7 +17,7 @@ class PatchDetailsTile extends Component {
             </div>
           )
         }
-        <h2>{title}</h2>
+        <h2 style={{ marginBottom:'10px' }}>{title}</h2>
         { editMode ? (
             <textarea 
               style={{backgroundColor: isSaving ? '#bbb' : 'intial'}} 

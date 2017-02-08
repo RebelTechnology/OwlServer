@@ -21,10 +21,6 @@ import {
 
 class CreatePatchPage extends Component {
 
-  componentWillMount(){
-    this.props.updatePatchName('untitled-' + this.generateUUID());
-  }
-
   generateUUID(){
     let time = new Date().getTime();
     if(window.performance && typeof window.performance.now === "function"){
@@ -262,6 +258,10 @@ class CreatePatchPage extends Component {
         </div>
       </div>
     );
+  }
+
+  componentDidMount(){
+    this.props.updatePatchName('untitled-' + this.generateUUID());
   }
 
   componentWillUnmount(){
