@@ -5,6 +5,7 @@ const Patch = require('../lib/patch');
 const PatchModel = require('../models/patch');
 const { authTypes } = require('../middleware/auth/constants');
 const errorResponse = require('../lib/error-response');
+const config = require('../lib/config');
 
 /**
  * Retrieves all patches.
@@ -100,7 +101,7 @@ router.post('/', (req, res) => {
         message: 'New patch saved.',
         _id: patch._id,
         seoName: patch.seoName,
-        url: `https://${process.env.WORDPRESS_HOSTNAME}/patch-library/patch/${patch.seoName}`,
+        url: `https://${config.wordpress.hostname}/patch-library/patch/${patch.seoName}`,
         success: true,
       });
     })

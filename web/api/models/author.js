@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../lib/config');
 const { getUserInfoBatch } = require('../lib/wordpress-bridge.js');
 
 /**
@@ -13,7 +14,7 @@ class Author {
    * @param {Object} db
    */
   constructor(db) {
-    this._collection = db.get(process.env.MONGO_COLLECTION);
+    this._collection = db.get(config.mongo.collection);
   }
 
   /**

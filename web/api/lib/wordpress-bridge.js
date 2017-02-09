@@ -3,10 +3,12 @@
 const wordpress = require('wordpress');
 const request = require('request');
 
+const config = require('./config');
+
 const client = wordpress.createClient({
-  url: process.env.WORDPRESS_HOSTNAME,
-  username: process.env.WORDPRESS_XML_RPC_USERNAME,
-  password: process.env.WORDPRESS_XML_RPC_PASSWORD,
+  url: config.wordpress.hostname,
+  username: config.wordpress.xmlRpc.username,
+  password: config.wordpress.xmlRpc.password,
 });
 
 /**
@@ -80,12 +82,12 @@ const getUserInfoBatch = userIds => {
 const uploadSources = (patchId, files) => {
 
   const requestOptions = {
-    url: `https://${process.env.WORDPRESS_HOSTNAME}/wp-admin/admin-ajax.php`,
-    rejectUnauthorized: process.env.NODE_ENV === 'production', // if `false`, will allow self-signed SSL certificates
+    url: `https://${config.wordpress.hostname}/wp-admin/admin-ajax.php`,
+    rejectUnauthorized: config.env === 'production', // if `false`, will allow self-signed SSL certificates
     formData: {
       patchId: patchId,
       action: 'owl-patch-file-upload',
-      secret: process.env.PATCH_UPLOAD_SECRET,
+      secret: config.wordpress.patchUploadSecret,
     }
   };
 
