@@ -5,10 +5,6 @@ import { PatchTile , SubFilter } from 'containers';
 import { PatchCounter, CreatePatchTile } from 'components';
 
 class PatchListPage extends Component {
-  componentWillMount(){
-    this.props.fetchPatchesAuthorsTags();
-    this.props.setPatchListTopFilter(this.props.routeParams.topFilter);
-  }
   
   componentWillReceiveProps(nextProps){
     if(nextProps.routeParams.topFilter !== this.props.routeParams.topFilter){
@@ -126,6 +122,12 @@ class PatchListPage extends Component {
       </div>
     );
   }
+
+  componentDidMount(){
+    this.props.fetchPatchesAuthorsTags();
+    this.props.setPatchListTopFilter(this.props.routeParams.topFilter);
+  }
+
 }
 
 PatchListPage.PropTypes = {

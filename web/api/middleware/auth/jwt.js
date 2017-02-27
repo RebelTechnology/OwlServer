@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const { authTypes, API_USER_NAME } = require('./constants');
 const errorResponse = require('../../lib/error-response');
+const config = require('../../lib/config');
 
 const TOKEN_MAX_AGE = 1209600; // = 60 * 60 * 24 * 7 * 2 seconds = 2 weeks
 
@@ -36,7 +37,7 @@ const jwtAuth = (req, res, next) => {
   // Verify token
   let tokenPayload;
   try {
-    tokenPayload = jwt.verify(token, process.env.JWT_SECRET);
+    tokenPayload = jwt.verify(token, config.api.jwtSecret); // FIXME: move token verification to lib/authentication.js
   } catch (err) {
     process.stderr.write('Token signature verification failed.\n');
     process.stderr.write(err.stack + '\n');
@@ -45,6 +46,7 @@ const jwtAuth = (req, res, next) => {
   }
 
   // Check if token expired
+   // FIXME: move token expiration check to lib/authentication.js
   try {
     if (!tokenPayload.iat) {
       throw { public: true, message: 'auth: Cannot determined when token was issued.', status: 500 };

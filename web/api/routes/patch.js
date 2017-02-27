@@ -9,6 +9,7 @@ const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
 const errorResponse = require('../lib/error-response');
 const wordpressBridge = require('../lib/wordpress-bridge');
 const patchBuild = require('../lib/patch-build');
+const config = require('../lib/config');
 
 /**
  * Returns the WordPress user's "display name" for the given WordPress user ID.
@@ -318,7 +319,7 @@ router.post('/:id/sources', (req, res) => {
       const sourceUrls = successfulUploads.map(uploadedFile => {
         // Example:
         // https://staging.hoxtonowl.com/wp-content/uploads/patch-files/563b9a3031062254525b5831/TestTonePatch.hpp
-        return `https://${process.env.WORDPRESS_HOSTNAME}/${process.env.PATCH_SOURCE_URL_FRAGMENT}/${id}/${uploadedFile}`;
+        return `https://${config.wordpress.hostname}/${config.wordpress.patchSourceUrlFragment}/${id}/${uploadedFile}`;
       });
       return patchModel.addSources(id, sourceUrls);
     })

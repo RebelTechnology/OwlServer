@@ -10,9 +10,6 @@ class Parameter extends Component {
       parameterValue: 0
     }
   }
-  componentWillMount(){
-    this.setParameterValue(this.props.initialValue)
-  }
 
   updateParamValue(e){
     const { previousY, parameterValue } = this.state;
@@ -112,6 +109,11 @@ class Parameter extends Component {
         </div>
     );
   }
+
+  componentDidMount(){
+    this.setParameterValue(this.props.initialValue)
+  }
+  
 }
 
 Parameter.propTypes = {

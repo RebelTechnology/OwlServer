@@ -6,12 +6,15 @@ import {
   resetPatchListSubFilter } from 'actions';
 
 class SubFilter extends Component {
+
   handleSubFilterClick(e,filter){
     this.props.togglePatchListSubFilter(filter);
   }
+
   handleAllSubFilterClick(e){
     this.props.resetPatchListSubFilter();
   }
+
   buildFilters({items}, subFilter){
     return items.map( item => {
       let filterName = item.name || item;
@@ -25,12 +28,7 @@ class SubFilter extends Component {
       );
     });
   }
-  componentWillMount(){
-    const { routeParams } = this.props; 
-    if(routeParams && routeParams.subFilter){
-      this.props.togglePatchListSubFilter(routeParams.subFilter);
-    }
-  }
+  
   componentWillReceiveProps(nextProps){
     const { routeParams } = this.props; 
     if(this.props.patchListFilter.topFilter !== nextProps.patchListFilter.topFilter){
@@ -59,9 +57,18 @@ class SubFilter extends Component {
       </div>
     );
   }
+
+  componentDidMount(){
+    const { routeParams } = this.props; 
+    if(routeParams && routeParams.subFilter){
+      this.props.togglePatchListSubFilter(routeParams.subFilter);
+    }
+  }
+
   componentWillUnmount(){
     this.props.resetPatchListSubFilter();
   }
+
 }
 
 function mapStateToProps({ patchListFilter, authors, tags }){
