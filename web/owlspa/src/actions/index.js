@@ -31,6 +31,8 @@ export resetWebAudioPatch from './resetWebAudioPatch';
 export resetWebAudioPatchParameters from './resetWebAudioPatchParameters';
 export serverSavePatch from './serverSavePatch';
 export serverSavePatchFiles from './serverSavePatchFiles';
+export serverAddPatchStar from './serverAddPatchStar';
+export serverRemovePatchStar from './serverRemovePatchStar';
 export serverUpdatePatch from './serverUpdatePatch';
 export serverUploadPatchFiles from './serverUploadPatchFiles';
 export setActiveDialogTab from './setActiveDialogTab';

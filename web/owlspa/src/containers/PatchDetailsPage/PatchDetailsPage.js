@@ -80,7 +80,8 @@ class PatchDetailsPage extends Component {
     setPatchStar({
       user: currentUser.display_name,
       starred: !starred,
-      patchSeoName: patch.seoName
+      patchSeoName: patch.seoName,
+      patchId: patch._id
     });
   }
 

@@ -9,7 +9,9 @@ import {
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
   PATCH_COMPILATION_FAILED,
-  SET_PATCH_STAR
+  SET_PATCH_STAR,
+  SERVER_ADD_PATCH_STAR_FAILED,
+  SERVER_REMOVE_PATCH_STAR_FAILED
 } from 'constants';
 
 const initialState = {
@@ -24,9 +26,7 @@ const getUpdatedStarList = (starList=[], { user, starred }) => {
   }
 
   if(!starred){
-    return starList.filter(star => {
-      return star.user !== user;
-    });
+    return starList.filter(star => star.user !== user);
   }
 
   return [
@@ -70,6 +70,31 @@ const patchDetails = (state = initialState, action) => {
           [action.patchSeoName]:{
             ...state.patches[action.patchSeoName],
             starList: getUpdatedStarList(state.patches[action.patchSeoName].starList, action)
+          }
+        }
+      }
+    case SERVER_ADD_PATCH_STAR_FAILED:
+      return {
+        ...state,
+        patches: {
+          ...state.patches,
+          [action.patchSeoName]:{
+            ...state.patches[action.patchSeoName],
+            starList: state.patches[action.patchSeoName].starList.filter(star => star.user !== action.user)
+          }
+        }
+      }
+    case SERVER_REMOVE_PATCH_STAR_FAILED:
+      return {
+        ...state,
+        patches: {
+          ...state.patches,
+          [action.patchSeoName]:{
+            ...state.patches[action.patchSeoName],
+            starList: [
+            ...state.patches[action.patchSeoName].starList,
+              action.star
+            ]
           }
         }
       }
