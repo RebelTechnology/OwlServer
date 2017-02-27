@@ -88,6 +88,8 @@ export const CLEAR_SOURCE_FILE_ERRORS = 'CLEAR_SOURCE_FILE_ERRORS';
 export const CLEAR_EDIT_PATCH_FORM = 'CLEAR_EDIT_PATCH_FORM';
 export const INVALID_FIELD_DATA = 'INVALID_FIELD_DATA';
 
+export const SET_PATCH_STAR = 'SET_PATCH_STAR';
+
 export const API_END_POINT = '//' + window.location.host + '/api';
 export const WORDPRESS_AJAX_END_POINT = '//' + window.location.host + '/wp-admin/admin-ajax.php';
 export const PATCH_UPLOAD_DIR = window.location.protocol + '//' + window.location.host + '/wp-content/uploads/patch-files/';

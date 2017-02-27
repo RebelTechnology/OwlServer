@@ -8,7 +8,8 @@ import {
   ERROR_SAVING_PATCH,
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
-  PATCH_COMPILATION_FAILED
+  PATCH_COMPILATION_FAILED,
+  SET_PATCH_STAR
 } from 'constants';
 
 const initialState = {
@@ -16,6 +17,23 @@ const initialState = {
   isFetching: false,
   patches: {}
 };
+
+const getUpdatedStarList = (starList=[], { user, starred }) => {
+  if (!user){
+    return starList;
+  }
+
+  if(!starred){
+    return starList.filter(star => {
+      return star.user !== user;
+    });
+  }
+
+  return [
+    ...starList,
+    { user }
+  ]
+}
 
 const patchDetails = (state = initialState, action) => {
   switch (action.type) {
@@ -41,6 +59,17 @@ const patchDetails = (state = initialState, action) => {
           [action.patchSeoName]:{
             ...state.patches[action.patchSeoName],
             ...action.patchDetails
+          }
+        }
+      }
+    case SET_PATCH_STAR:
+      return {
+        ...state,
+        patches: {
+          ...state.patches,
+          [action.patchSeoName]:{
+            ...state.patches[action.patchSeoName],
+            starList: getUpdatedStarList(state.patches[action.patchSeoName].starList, action)
           }
         }
       }

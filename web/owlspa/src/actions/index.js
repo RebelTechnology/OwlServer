@@ -37,6 +37,7 @@ export setActiveDialogTab from './setActiveDialogTab';
 export setMainSourceFile from './setMainSourceFile';
 export setPatchListTopFilter from './setPatchListTopFilter';
 export setPatchPlaying from './setPatchPlaying';
+export setPatchStar from './setPatchStar';
 export setWebAudioPatch from './setWebAudioPatch';
 export setWebAudioPatchParameter from './setWebAudioPatchParameter';
 export sourceFileChange from './sourceFileChange';

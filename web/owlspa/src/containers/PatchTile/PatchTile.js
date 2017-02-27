@@ -12,11 +12,6 @@ class PatchTile extends Component {
     this.context.router.push('/patches/authors/'+ authorName);
   }
 
-  handleRecommendPatch(e, patchSeoName){
-    e.stopPropagation();
-    console.log('recommend', patchSeoName);
-  }
-
   render(){
     const { id, name, published, authorName, description, tags, seoName, canEdit, loggedIn, onDeletePatchClick } = this.props;
     return (
@@ -33,11 +28,7 @@ class PatchTile extends Component {
               <div className="patch-buttons">
                 <a href={'/edit-patch/' + seoName} className="patch-button patch-button-edit"></a>
                 <span onClick={onDeletePatchClick} className="patch-button patch-button-delete"></span>
-              </div>) : (
-                <div className="patch-buttons">
-                  { loggedIn && <IconButton name="recommend" color="#555" onClick={ (e) => this.handleRecommendPatch(e, seoName) }></IconButton>}
-                </div>
-              )
+              </div>) : null
 
             }    
           </div> 

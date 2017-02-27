@@ -34,6 +34,12 @@
     top: 20px;
 }
 
+.star-counter-wrapper {
+    position: absolute;
+    right: 20px;
+    bottom: 16px;
+}
+
 @media only screen and (max-width: 1430px) {
     .patch-tile-small {
         width: 32%;
