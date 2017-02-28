@@ -45,18 +45,38 @@ class PatchListPage extends Component {
     });
   }
 
+  getPatchPopularity(patch){
+    const weighting = {
+      downloadCount: 4,
+      downloadToOwl: 2,
+      browserPlays: 1,
+      starCount: 20
+    };
+
+    let patchCopy = { ...patch };
+    patchCopy.starCount = (patchCopy.starList && patchCopy.starList.length) || 0;
+
+    return Object.keys(weighting).reduce((acc, key) => {
+      return acc + ((patchCopy[key] || 0 ) * weighting[key]);
+    }, 0);
+  }
+
+  sortByPopularity(a, b){
+    return this.getPatchPopularity(b) - this.getPatchPopularity(a)
+  }
+
+  sortByCreationTime(a, b){
+    return b.creationTimeUtc - a.creationTimeUtc;
+  }
+
   getFilteredSortedPatches(patches, patchListFilter, currentUser){
     switch(patchListFilter.topFilter){
       case 'latest':
-        return patches.filter(patch => patch.published).sort((a,b) => b.creationTimeUtc - a.creationTimeUtc);
+        return patches.filter(patch => patch.published).sort((a,b) => this.sortByCreationTime(a,b));
       case 'popular':
         return patches.filter(patch => patch.published)
-          .sort((a,b) => b.creationTimeUtc - a.creationTimeUtc)
-          .sort((a,b) => {
-            b.downloadCount = b.downloadCount || 0;
-            a.downloadCount = a.downloadCount || 0;
-            return b.downloadCount - a.downloadCount;
-          });
+          .sort((a,b) => this.sortByCreationTime(a,b))
+          .sort((a,b) => this.sortByPopularity(a,b));
       case 'all':
         return patches.filter(patch => patch.published).sort((a,b) => (a.name).localeCompare(b.name));
       case 'authors':
@@ -64,7 +84,7 @@ class PatchListPage extends Component {
       case 'tags':
         return this.filterPatchesByTag(patches, patchListFilter.subFilter);
       case 'my-patches':
-        return this.filterPatchesByCurrentUser(patches, currentUser).sort((a,b) => b.creationTimeUtc - a.creationTimeUtc);
+        return this.filterPatchesByCurrentUser(patches, currentUser).sort((a,b) => this.sortByCreationTime(a,b));
       default:
         return patches.filter(patch => patch.published);
     }
