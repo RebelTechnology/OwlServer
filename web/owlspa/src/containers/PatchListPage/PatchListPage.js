@@ -85,6 +85,8 @@ class PatchListPage extends Component {
         return this.filterPatchesByTag(patches, patchListFilter.subFilter);
       case 'my-patches':
         return this.filterPatchesByCurrentUser(patches, currentUser).sort((a,b) => this.sortByCreationTime(a,b));
+      case 'search':
+        return patches.filter(patch => patch.published);
       default:
         return patches.filter(patch => patch.published);
     }
@@ -134,8 +136,9 @@ class PatchListPage extends Component {
         {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter routeParams={routeParams} /> : null}
         <div className="wrapper flexbox">
           <div className="content-container">
+            { topFilter === 'search' && <div>SEARCH INPUT</div> }
             <PatchCounter patches={filteredPatches} myPatches={topFilter === 'my-patches'} />
-            { topFilter === 'my-patches' ? (<CreatePatchTile />) : null }
+            { topFilter === 'my-patches' && <CreatePatchTile /> }
             { patchesToBeRendered }
           </div>
         </div>

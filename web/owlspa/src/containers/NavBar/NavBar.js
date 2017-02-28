@@ -14,6 +14,7 @@ class NavBar extends Component {
           <NavLink icon="tags" location={location} target="patches/tags">Tags</NavLink>
           <NavLink icon="authors" location={location} target="patches/authors">Authors</NavLink>
           <NavLink icon="all" location={location} target="patches/all">All</NavLink>
+          <NavLink icon="search" location={location} target="patches/search">Search</NavLink>
           { currentUser.loggedIn && <NavLink icon="myPatches" location={location} target="patches/my-patches">My Patches</NavLink> }
         </div>
       </div>
