@@ -17,7 +17,8 @@ const summaryFields = {
   'creationTimeUtc':    1,
   'published':          1,
   'description':        1,
-  'downloadCount':      1
+  'downloadCount':      1,
+  'starList':           1
 };
 
 /**
