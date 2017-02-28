@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
-import { Tag, AuthorLink } from 'components';
+import { Tag, AuthorLink, IconButton } from 'components';
 
-class Patch extends Component {
+class PatchTile extends Component {
   
   handlePatchClick(e, seoName){
     this.context.router.push('/patch/'+ seoName);
@@ -13,7 +13,7 @@ class Patch extends Component {
   }
 
   render(){
-    const { id, name, published, authorName, description, tags, seoName, canEdit, onDeletePatchClick } = this.props;
+    const { id, name, published, authorName, description, tags, seoName, canEdit, loggedIn, onDeletePatchClick } = this.props;
     return (
       <div className="patch-tile" onClick={ (e) => this.handlePatchClick(e, seoName) } >
         <div className="patch-title-controls">
@@ -29,6 +29,7 @@ class Patch extends Component {
                 <a href={'/edit-patch/' + seoName} className="patch-button patch-button-edit"></a>
                 <span onClick={onDeletePatchClick} className="patch-button patch-button-delete"></span>
               </div>) : null
+
             }    
           </div> 
           <AuthorLink author={authorName} />
@@ -46,7 +47,7 @@ class Patch extends Component {
   }
 }
 
-Patch.propTypes = {
+PatchTile.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string,
   published: PropTypes.bool,
@@ -54,11 +55,12 @@ Patch.propTypes = {
   description: PropTypes.string,
   tags: PropTypes.array,
   canEdit: PropTypes.bool,
+  loggedIn: PropTypes.bool,
   onDeletePatchClick: PropTypes.func
 }
 
-Patch.contextTypes = {
+PatchTile.contextTypes = {
   router: PropTypes.object.isRequired
 }
 
-export default Patch;
+export default PatchTile;

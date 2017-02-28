@@ -227,6 +227,80 @@ router.delete('/:id', (req, res) => {
     .catch(error => errorResponse(error, res));
 });
 
+
+/**
+ * Add the authenticated user's star to the patch by Id
+ *
+ * POST /patch/{id}/star
+ *
+ */
+router.post('/:id/star', (req,res) => {
+
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ message: 'Access denied (1).', status: 401, public: true }, res);
+  }
+
+  const userInfo = res.locals.userInfo;
+  if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot star patches.
+    return errorResponse({ message: 'Access denied (2).', status: 401, public: true }, res);
+  }
+
+  const id = req.params.id;
+  const star = {
+    user : userInfo.display_name,
+    timeStamp : new Date().getTime()
+  };
+
+  const patchModel = new PatchModel(req.db);
+  patchModel.addStar(id, star)
+    .then(result => {
+
+      if (!result.ok) {
+        throw { message: 'Starring failed.', status: 400, public: true };
+      }
+
+      return res.status(200).json( {success: true, result: star});
+    })
+    .catch(error => errorResponse(error, res));
+});
+
+/**
+ * Remove the authenticated user's star from the specified patch by Id
+ *
+ * DELETE /patch/{id}/star
+ *
+ */
+router.delete('/:id/star', (req,res) => {
+
+  // Is user authenticated?
+  if (!res.locals.authenticated) {
+    return errorResponse({ message: 'Access denied (1).', status: 401, public: true }, res);
+  }
+
+  const userInfo = res.locals.userInfo;
+  if (authTypes.AUTH_TYPE_WORDPRESS !== userInfo.type) { // API users cannot star patches.
+    return errorResponse({ message: 'Access denied (2).', status: 401, public: true }, res);
+  }
+
+  const id = req.params.id;
+  const star = {
+    user : userInfo.display_name
+  };
+
+  const patchModel = new PatchModel(req.db);
+  patchModel.removeStar(id, star)
+    .then(result => {
+
+      if (!result.ok) {
+        throw { message: 'Removing star failed.', status: 400, public: true };
+      }
+
+      return res.status(200).json( {success: true});
+    })
+    .catch(error => errorResponse(error, res));
+});
+
 /**
  * Uploads one or more source files.
  *

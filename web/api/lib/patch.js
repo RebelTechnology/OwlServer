@@ -83,6 +83,9 @@ class Patch {
     if (!this.downloadCount) {
       this.downloadCount = 0;
     }
+    if (!this.starList) {
+      this.starList = [];
+    }
     // The below fields should all be generated somewhere else:
     // - seoName
     // - creationTimeUtc

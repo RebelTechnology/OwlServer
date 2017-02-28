@@ -168,6 +168,51 @@ class PatchModel {
   }
 
   /**
+   * Adds a new "star" to the specified patch (only one per user).
+   *
+   * @param {string} _id
+   * @param {Object} star
+   * @return {Promise}
+   */
+  addStar(_id, star) {
+    if (!/^[a-f\d]{24}$/i.test(_id)) {
+      return Promise.reject(new Error('Invalid patch ID.'));
+    }
+    if (typeof star !== 'object') {
+      return Promise.reject(new Error('`star` must be an object.'));
+    }
+    if (!star.user || typeof star.user !== 'string') {
+      return Promise.reject(new Error('`star` must contain a user display_name string.'));
+    }
+    if(!star.timeStamp || typeof star.timeStamp !== 'number'){
+      return Promise.reject(new Error('`star` must contain a timeStamp.'));
+    }
+    const { user, timeStamp } = star;
+    return this._collection.update({ _id, 'starList.user': {$ne : user } }, { $addToSet: { starList: { user, timeStamp } } }, false, true );
+  }
+
+  /**
+   * Removes a previously added "star" from the specified patch (only one per user).
+   *
+   * @param {string} _id
+   * @param {Object} star
+   * @return {Promise}
+   */
+  removeStar(_id, star) {
+    if (!/^[a-f\d]{24}$/i.test(_id)) {
+      return Promise.reject(new Error('Invalid patch ID.'));
+    }
+    if (typeof star !== 'object') {
+      return Promise.reject(new Error('`star` must be an object.'));
+    }
+    if (!star.user || typeof star.user !== 'string') {
+      return Promise.reject(new Error('`star` must contain a user display_name string.'));
+    }
+    const { user } = star;
+    return this._collection.update({ _id }, { $pull: { 'starList': { user } } }, { multi: false } );
+  }
+
+  /**
    * Increments the download count of the specified patch.
    *
    * @param {string} _id

@@ -8,13 +8,32 @@ import {
   ERROR_SAVING_PATCH,
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
-  PATCH_COMPILATION_FAILED
+  PATCH_COMPILATION_FAILED,
+  CLIENT_ADD_PATCH_STAR,
+  CLIENT_REMOVE_PATCH_STAR
 } from 'constants';
 
 const initialState = {
   isSaving: false,
   isFetching: false,
   patches: {}
+};
+
+const removeStarFromList = (starList=[], star) => {
+  if (!star || !star.user){
+    return starList;
+  }
+  return starList.filter(existingStar => existingStar.user !== star.user);
+};
+
+const addOrUpdateStarInList = (starList=[], star) => {
+  if (!star || !star.user){
+    return starList;
+  }
+  return [
+    ...removeStarFromList(starList, star),
+    star
+  ];
 };
 
 const patchDetails = (state = initialState, action) => {
@@ -41,6 +60,28 @@ const patchDetails = (state = initialState, action) => {
           [action.patchSeoName]:{
             ...state.patches[action.patchSeoName],
             ...action.patchDetails
+          }
+        }
+      }
+    case CLIENT_ADD_PATCH_STAR:
+      return {
+        ...state,
+        patches: {
+          ...state.patches,
+          [action.patchSeoName]:{
+            ...state.patches[action.patchSeoName],
+            starList: addOrUpdateStarInList(state.patches[action.patchSeoName].starList, action.star)
+          }
+        }
+      }
+    case CLIENT_REMOVE_PATCH_STAR:
+      return {
+        ...state,
+        patches: {
+          ...state.patches,
+          [action.patchSeoName]:{
+            ...state.patches[action.patchSeoName],
+            starList: removeStarFromList(state.patches[action.patchSeoName].starList, action.star)
           }
         }
       }

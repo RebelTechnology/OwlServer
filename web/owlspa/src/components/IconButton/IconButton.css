@@ -2,14 +2,16 @@
   display: inline-block;
   margin-left: 7px;
   border-radius: 4px;
-  padding: 2px 4px;
+  padding: 0 4px;
   border: none;
   background: linear-gradient(to bottom, #fff 0%,#bbb 100%);
   box-shadow: rgba(255, 255, 255, 0.2) 0px 0px 2px 2px;
+  outline: none;
+  color: #000;
 }
 
 .icon-button:hover, .icon-button:disabled {
-  background: linear-gradient(to bottom, #fff 0%,#bbb 100%);
-  box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 2px 2px;
+  background: linear-gradient(to bottom, #ccc 0%,#bbb 100%);
   transition: .3s;
+  color: #000;
 }

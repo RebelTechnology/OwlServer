@@ -6,7 +6,8 @@ import {
   compilePatch,
   serverUpdatePatchAndExitEditMode,
   setEditModeForPatchDetails,
-  editPatchDetails
+  editPatchDetails,
+  setPatchStarAndSendToSever
 } from 'actions';
 import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
@@ -28,6 +29,13 @@ class PatchDetailsPage extends Component {
       return author.name === user.display_name || author.wordpressId === user.ID;
     }
     return false;
+  }
+
+  getCurrentUserStarForThisPatch(patch, currentUser){
+    if (!patch || !patch.starList || !currentUser){
+      return false;
+    }
+    return patch.starList.find(star => star.user === currentUser.display_name);
   }
 
   handleCompileClick(e,patch){
@@ -66,12 +74,26 @@ class PatchDetailsPage extends Component {
     setEditModeForPatchDetails(patchSeoName, {instructions: true});
   }
 
+  handleStarClick(e, patch, starForThisPatch){
+    e.stopPropagation();
+    const { currentUser, setPatchStarAndSendToSever } = this.props;
+    const star = starForThisPatch || { user: currentUser.display_name };
+    setPatchStarAndSendToSever({
+      star,
+      add: !starForThisPatch,
+      patchSeoName: patch.seoName,
+      patchId: patch._id
+    });
+  }
+
   render(){ 
     const { patchDetails, currentUser , routeParams:{patchSeoName}, patchDetailsEditMode } = this.props;
     const patch = patchDetails.patches[patchSeoName];
     const canEdit = currentUser.isAdmin || this.currentUserCanEdit(patch);
     const descriptionEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].description;
     const instructionsEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].instructions;
+    const starForThisPatch = this.getCurrentUserStarForThisPatch(patch, currentUser);
+    const starred = !!starForThisPatch;
 
     if(!patch){
       return (
@@ -79,13 +101,21 @@ class PatchDetailsPage extends Component {
         </div>
       );
     }
+
     return (
       <div className="wrapper flexbox">
         <div className="content-container">
 
           <div id="one-third" className="patch-library">
 
-            <PatchTileSmall patch={patch} canEdit={canEdit} onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} />
+            <PatchTileSmall 
+              patch={patch} 
+              loggedIn={currentUser.loggedIn} 
+              canEdit={canEdit} 
+              onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} 
+              onStarClick={(e)=> this.handleStarClick(e,patch, starForThisPatch)}
+              starred={starred}
+            />
 
             <PatchDetailsTile 
               title="Description" 
@@ -95,7 +125,8 @@ class PatchDetailsPage extends Component {
               editMode={descriptionEditMode}
               onTextChange={val => this.handlePatchDecriptionChange(val)}
               handleEditClick={e => this.handleDescriptionEditClick(e)}
-              handleSaveClick={e => this.updatePatchDetails(e)} />
+              handleSaveClick={e => this.updatePatchDetails(e)} 
+            />
             
             { (patch.instructions || canEdit ) &&
               <PatchDetailsTile 
@@ -107,7 +138,8 @@ class PatchDetailsPage extends Component {
                 editMode={instructionsEditMode}
                 onTextChange={(val) => this.handlePatchInstructionsChange(val)} 
                 handleEditClick={e => this.handleInstructionsEditClick(e)}
-                handleSaveClick={e => this.updatePatchDetails(e)} />
+                handleSaveClick={e => this.updatePatchDetails(e)} 
+              />
             }
 
             <PatchStats canEdit={canEdit} patch={patch} />
@@ -150,6 +182,7 @@ export default connect(mapStateToProps, {
   fetchPatchDetails,
   deletePatch,
   compilePatch,
+  setPatchStarAndSendToSever,
   serverUpdatePatchAndExitEditMode,
   setEditModeForPatchDetails,
   editPatchDetails

@@ -10,5 +10,6 @@ export PatchPushButton from './PatchPushButton/PatchPushButton';
 export PatchSoundcloud from './PatchSoundcloud/PatchSoundcloud';
 export PatchStats from './PatchStats/PatchStats';
 export PatchTileSmall from './PatchTileSmall/PatchTileSmall';
+export StarCounter from './StarCounter/StarCounter';
 export SubFilterButton from './SubFilterButton/SubFilterButton';
 export Tag from './Tag/Tag';

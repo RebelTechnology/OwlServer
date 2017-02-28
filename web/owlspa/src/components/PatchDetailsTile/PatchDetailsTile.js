@@ -12,8 +12,8 @@ class PatchDetailsTile extends Component {
       <div styleName="patch-details-tile" style={style}>
         { canEdit && (
             <div styleName="patch-tile-controls">
-              { !editMode && <IconButton name={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ handleEditClick } /> }
-              { editMode && <IconButton name={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={ handleSaveClick } /> }
+              { !editMode && <IconButton title="edit" name={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ handleEditClick } /> }
+              { editMode && <IconButton title="save" name={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={ handleSaveClick } /> }
             </div>
           )
         }

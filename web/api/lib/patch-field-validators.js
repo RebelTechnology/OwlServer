@@ -380,6 +380,35 @@ const patchFieldValidators = {
       return parseInt(val, 10);
     }
   },
+
+  starList: {
+    required: false,
+    validate(val) {
+      if (!Array.isArray(val)) {
+        throw new PatchFieldValidationError('starList');
+      }
+      val.forEach(star => {
+        if(!star.user || typeof star.user !== 'string'){
+          throw new PatchFieldValidationError('starList', 'user property missing or wrong in starlist');
+        }
+      })
+    },
+    sanitize(val) {
+      return val.filter(star => {
+        return typeof star.user === 'string';
+      }).filter(star => {
+        if(star.timeStamp){
+          return typeof star.timeStamp === 'number';
+        }
+        return true;
+      }).map(star => {
+        return {
+          user: star.user,
+          timeStamp: star.timeStamp || 0
+        };
+      })
+    }
+  },
 };
 
 module.exports = patchFieldValidators;
