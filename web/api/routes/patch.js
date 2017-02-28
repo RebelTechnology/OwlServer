@@ -260,7 +260,7 @@ router.post('/:id/star', (req,res) => {
         throw { message: 'Starring failed.', status: 400, public: true };
       }
 
-      return res.status(200).json( {success: true});
+      return res.status(200).json( {success: true, result: star});
     })
     .catch(error => errorResponse(error, res));
 });

@@ -1,9 +1,8 @@
 import {
-  API_END_POINT,
-  SERVER_REMOVE_PATCH_STAR_FAILED
+  API_END_POINT
 } from 'constants';
 
-const serverRemovePatchStar = (patchId, user, patchSeoName, lastStarState) => {
+const serverRemovePatchStar = (patchId) => {
   return (dispatch) => {
     return fetch( API_END_POINT + '/patch/' + patchId + '/star', {
       headers: {
@@ -20,13 +19,6 @@ const serverRemovePatchStar = (patchId, user, patchSeoName, lastStarState) => {
       if (response.status >= 400) {
         throw new Error('bad server status: ' + response.status);
       } 
-    }).catch((err) => {
-      console.error('error adding star to patch');
-      dispatch({
-        type: SERVER_REMOVE_PATCH_STAR_FAILED,
-        patchSeoName,
-        star: lastStarState
-      });
     });
   }
 }

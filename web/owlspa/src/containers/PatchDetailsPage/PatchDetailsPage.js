@@ -7,7 +7,7 @@ import {
   serverUpdatePatchAndExitEditMode,
   setEditModeForPatchDetails,
   editPatchDetails,
-  setPatchStar
+  setPatchStarAndSendToSever
 } from 'actions';
 import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
@@ -31,11 +31,11 @@ class PatchDetailsPage extends Component {
     return false;
   }
 
-  currentUserHasStarred(patch, currentUser){
+  getCurrentUserStarForThisPatch(patch, currentUser){
     if (!patch || !patch.starList || !currentUser){
       return false;
     }
-    return patch.starList.some(star => star.user === currentUser.display_name);
+    return patch.starList.find(star => star.user === currentUser.display_name);
   }
 
   handleCompileClick(e,patch){
@@ -74,12 +74,13 @@ class PatchDetailsPage extends Component {
     setEditModeForPatchDetails(patchSeoName, {instructions: true});
   }
 
-  handleStarClick(e, patch, starred){
+  handleStarClick(e, patch, starForThisPatch){
     e.stopPropagation();
-    const { currentUser, setPatchStar } = this.props;
-    setPatchStar({
-      user: currentUser.display_name,
-      starred: !starred,
+    const { currentUser, setPatchStarAndSendToSever } = this.props;
+    const star = starForThisPatch || { user: currentUser.display_name };
+    setPatchStarAndSendToSever({
+      star,
+      add: !starForThisPatch,
       patchSeoName: patch.seoName,
       patchId: patch._id
     });
@@ -91,7 +92,8 @@ class PatchDetailsPage extends Component {
     const canEdit = currentUser.isAdmin || this.currentUserCanEdit(patch);
     const descriptionEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].description;
     const instructionsEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].instructions;
-    const starred = this.currentUserHasStarred(patch, currentUser);
+    const starForThisPatch = this.getCurrentUserStarForThisPatch(patch, currentUser);
+    const starred = !!starForThisPatch;
 
     if(!patch){
       return (
@@ -111,7 +113,7 @@ class PatchDetailsPage extends Component {
               loggedIn={currentUser.loggedIn} 
               canEdit={canEdit} 
               onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} 
-              onStarClick={(e)=> this.handleStarClick(e,patch, starred)}
+              onStarClick={(e)=> this.handleStarClick(e,patch, starForThisPatch)}
               starred={starred}
             />
 
@@ -180,7 +182,7 @@ export default connect(mapStateToProps, {
   fetchPatchDetails,
   deletePatch,
   compilePatch,
-  setPatchStar,
+  setPatchStarAndSendToSever,
   serverUpdatePatchAndExitEditMode,
   setEditModeForPatchDetails,
   editPatchDetails

@@ -9,9 +9,8 @@ import {
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
   PATCH_COMPILATION_FAILED,
-  SET_PATCH_STAR,
-  SERVER_ADD_PATCH_STAR_FAILED,
-  SERVER_REMOVE_PATCH_STAR_FAILED
+  CLIENT_ADD_PATCH_STAR,
+  CLIENT_REMOVE_PATCH_STAR
 } from 'constants';
 
 const initialState = {
@@ -20,20 +19,22 @@ const initialState = {
   patches: {}
 };
 
-const getUpdatedStarList = (starList=[], { user, starred }) => {
-  if (!user){
+const removeStarFromList = (starList=[], star) => {
+  if (!star || !star.user){
     return starList;
   }
+  return starList.filter(existingStar => existingStar.user !== star.user);
+};
 
-  if(!starred){
-    return starList.filter(star => star.user !== user);
+const addOrUpdateStarInList = (starList=[], star) => {
+  if (!star || !star.user){
+    return starList;
   }
-
   return [
-    ...starList,
-    { user }
-  ]
-}
+    ...removeStarFromList(starList, star),
+    star
+  ];
+};
 
 const patchDetails = (state = initialState, action) => {
   switch (action.type) {
@@ -62,39 +63,25 @@ const patchDetails = (state = initialState, action) => {
           }
         }
       }
-    case SET_PATCH_STAR:
+    case CLIENT_ADD_PATCH_STAR:
       return {
         ...state,
         patches: {
           ...state.patches,
           [action.patchSeoName]:{
             ...state.patches[action.patchSeoName],
-            starList: getUpdatedStarList(state.patches[action.patchSeoName].starList, action)
+            starList: addOrUpdateStarInList(state.patches[action.patchSeoName].starList, action.star)
           }
         }
       }
-    case SERVER_ADD_PATCH_STAR_FAILED:
+    case CLIENT_REMOVE_PATCH_STAR:
       return {
         ...state,
         patches: {
           ...state.patches,
           [action.patchSeoName]:{
             ...state.patches[action.patchSeoName],
-            starList: state.patches[action.patchSeoName].starList.filter(star => star.user !== action.user)
-          }
-        }
-      }
-    case SERVER_REMOVE_PATCH_STAR_FAILED:
-      return {
-        ...state,
-        patches: {
-          ...state.patches,
-          [action.patchSeoName]:{
-            ...state.patches[action.patchSeoName],
-            starList: [
-            ...state.patches[action.patchSeoName].starList,
-              action.star
-            ]
+            starList: removeStarFromList(state.patches[action.patchSeoName].starList, action.star)
           }
         }
       }
