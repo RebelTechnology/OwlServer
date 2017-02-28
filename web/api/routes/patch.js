@@ -248,7 +248,7 @@ router.post('/:id/star', (req,res) => {
 
   const id = req.params.id;
   const star = {
-    user : userInfo.display_name,
+    userId : userInfo.id,
     timeStamp : new Date().getTime()
   };
 
@@ -285,7 +285,7 @@ router.delete('/:id/star', (req,res) => {
 
   const id = req.params.id;
   const star = {
-    user : userInfo.display_name
+    userId : userInfo.id
   };
 
   const patchModel = new PatchModel(req.db);
