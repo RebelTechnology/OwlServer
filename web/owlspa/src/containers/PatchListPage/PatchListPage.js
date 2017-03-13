@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch } from 'actions';
+import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch, setPatchListSearchTerm } from 'actions';
 import { PatchTile , SubFilter } from 'containers';
-import { PatchCounter, CreatePatchTile } from 'components';
+import { PatchCounter, CreatePatchTile, SearchInput } from 'components';
 
 class PatchListPage extends Component {
   
@@ -98,6 +98,10 @@ class PatchListPage extends Component {
     this.props.deletePatch(patch);
   }
 
+  handleSearchInputChange(value){
+    this.props.setPatchListSearchTerm(value);
+  }
+
   currentUserCanEdit(patch){
     if(!patch){
       return false;
@@ -111,7 +115,7 @@ class PatchListPage extends Component {
   }
 
   render(){
-    const { patches, patchListFilter, patchListFilter:{topFilter}, routeParams, currentUser } = this.props;
+    const { patches, patchListFilter, patchListFilter: { topFilter, searchTerm }, routeParams, currentUser } = this.props;
     const filteredPatches = this.getFilteredSortedPatches(patches.items, patchListFilter, currentUser);
     const patchesToBeRendered = filteredPatches.map( patch => {
       return (
@@ -136,7 +140,7 @@ class PatchListPage extends Component {
         {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter routeParams={routeParams} /> : null}
         <div className="wrapper flexbox">
           <div className="content-container">
-            { topFilter === 'search' && <div>SEARCH INPUT</div> }
+            { topFilter === 'search' && <SearchInput value={searchTerm} onChange={value => this.handleSearchInputChange(value) } /> }
             <PatchCounter patches={filteredPatches} myPatches={topFilter === 'my-patches'} />
             { topFilter === 'my-patches' && <CreatePatchTile /> }
             { patchesToBeRendered }
@@ -168,6 +172,7 @@ function mapStateToProps({ patches, patchListFilter, currentUser }){
 
 export default connect(mapStateToProps, {
   setPatchListTopFilter,
+  setPatchListSearchTerm,
   fetchPatchesAuthorsTags,
   deletePatch
 })(PatchListPage);

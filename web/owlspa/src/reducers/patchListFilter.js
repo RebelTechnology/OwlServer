@@ -1,12 +1,14 @@
 import { 
   SET_PATCHLIST_TOP_FILTER,
   TOGGLE_FILTER_IN_SUB_FILTER,
-  RESET_PATCHLIST_SUB_FILTER
+  RESET_PATCHLIST_SUB_FILTER,
+  SET_PATCHLIST_SEARCH_TERM
 } from 'constants';
 
 const initialState = {
   topFilter: 'all',
-  subFilter: []
+  subFilter: [],
+  searchTerm:''
 };
 
 const addOrRemoveFromArray = (currArr, newItem) => {
@@ -22,17 +24,25 @@ const addOrRemoveFromArray = (currArr, newItem) => {
 const patchListFilter = (state = initialState, action) => {
   switch (action.type) {
     case SET_PATCHLIST_TOP_FILTER:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         topFilter: action.topFilter
-      });
+      };
     case TOGGLE_FILTER_IN_SUB_FILTER:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         subFilter: addOrRemoveFromArray(state.subFilter, action.subFilter)
-      });
+      };
     case RESET_PATCHLIST_SUB_FILTER:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         subFilter: action.subFilter ? [action.subFilter] : initialState.subFilter
-      });
+      };
+    case SET_PATCHLIST_SEARCH_TERM:
+      return {
+        ...state,
+        searchTerm: action.searchTerm
+      }
     default:
       return state
   }

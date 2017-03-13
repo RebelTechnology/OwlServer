@@ -39,6 +39,7 @@ export serverUpdatePatch from './serverUpdatePatch';
 export serverUploadPatchFiles from './serverUploadPatchFiles';
 export setActiveDialogTab from './setActiveDialogTab';
 export setMainSourceFile from './setMainSourceFile';
+export setPatchListSearchTerm from './setPatchListSearchTerm';
 export setPatchListTopFilter from './setPatchListTopFilter';
 export setPatchPlaying from './setPatchPlaying';
 export setPatchStarAndSendToSever from './setPatchStarAndSendToSever';
