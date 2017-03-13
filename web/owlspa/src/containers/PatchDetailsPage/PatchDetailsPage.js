@@ -35,7 +35,7 @@ class PatchDetailsPage extends Component {
     if (!patch || !patch.starList || !currentUser){
       return false;
     }
-    return patch.starList.find(star => star.user === currentUser.display_name);
+    return patch.starList.find(star => star.userId === currentUser.ID);
   }
 
   handleCompileClick(e,patch){
@@ -77,7 +77,7 @@ class PatchDetailsPage extends Component {
   handleStarClick(e, patch, starForThisPatch){
     e.stopPropagation();
     const { currentUser, setPatchStarAndSendToSever } = this.props;
-    const star = starForThisPatch || { user: currentUser.display_name };
+    const star = starForThisPatch || { userId: currentUser.ID };
     setPatchStarAndSendToSever({
       star,
       add: !starForThisPatch,

@@ -20,14 +20,14 @@ const initialState = {
 };
 
 const removeStarFromList = (starList=[], star) => {
-  if (!star || !star.user){
+  if (!star || !star.userId){
     return starList;
   }
-  return starList.filter(existingStar => existingStar.user !== star.user);
+  return starList.filter(existingStar => existingStar.userId !== star.userId);
 };
 
 const addOrUpdateStarInList = (starList=[], star) => {
-  if (!star || !star.user){
+  if (!star || !star.userId){
     return starList;
   }
   return [
