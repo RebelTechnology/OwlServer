@@ -182,14 +182,14 @@ class PatchModel {
     if (typeof star !== 'object') {
       return Promise.reject(new Error('`star` must be an object.'));
     }
-    if (!star.user || typeof star.user !== 'string') {
-      return Promise.reject(new Error('`star` must contain a user display_name string.'));
+    if (!star.userId || typeof star.userId !== 'number') {
+      return Promise.reject(new Error('`star` must contain a userId number.'));
     }
     if(!star.timeStamp || typeof star.timeStamp !== 'number'){
       return Promise.reject(new Error('`star` must contain a timeStamp.'));
     }
-    const { user, timeStamp } = star;
-    return this._collection.update({ _id, 'starList.user': {$ne : user } }, { $addToSet: { starList: { user, timeStamp } } }, false, true );
+    const { userId, timeStamp } = star;
+    return this._collection.update({ _id, 'starList.user': {$ne : userId } }, { $addToSet: { starList: { userId, timeStamp } } }, { multi: false });
   }
 
   /**
@@ -206,11 +206,11 @@ class PatchModel {
     if (typeof star !== 'object') {
       return Promise.reject(new Error('`star` must be an object.'));
     }
-    if (!star.user || typeof star.user !== 'string') {
-      return Promise.reject(new Error('`star` must contain a user display_name string.'));
+    if (!star.userId || typeof star.userId !== 'number') {
+      return Promise.reject(new Error('`star` must contain a userId number.'));
     }
-    const { user } = star;
-    return this._collection.update({ _id }, { $pull: { 'starList': { user } } }, { multi: false } );
+    const { userId } = star;
+    return this._collection.update({ _id }, { $pull: { 'starList': { userId } } }, { multi: false });
   }
 
   /**

@@ -388,14 +388,14 @@ const patchFieldValidators = {
         throw new PatchFieldValidationError('starList');
       }
       val.forEach(star => {
-        if(!star.user || typeof star.user !== 'string'){
-          throw new PatchFieldValidationError('starList', 'user property missing or wrong in starlist');
+        if(!star.userId || typeof star.userId !== 'number'){
+          throw new PatchFieldValidationError('starList', 'userId property missing or wrong in starlist');
         }
       })
     },
     sanitize(val) {
       return val.filter(star => {
-        return typeof star.user === 'string';
+        return typeof star.userId === 'number';
       }).filter(star => {
         if(star.timeStamp){
           return typeof star.timeStamp === 'number';
@@ -403,7 +403,7 @@ const patchFieldValidators = {
         return true;
       }).map(star => {
         return {
-          user: star.user,
+          userId: star.userId,
           timeStamp: star.timeStamp || 0
         };
       })
