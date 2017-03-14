@@ -7,7 +7,7 @@ export class SearchInput extends Component {
   render(){
     const { value, onChange } = this.props;
     return (
-      <input type="text" value={value} onChange={ e => onChange(e.target.value) }/>
+      <input styleName="search-input" type="text" value={value} onChange={ e => onChange(e.target.value) }/>
     );
   }
 }

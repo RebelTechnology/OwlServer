@@ -15,12 +15,11 @@ wp_enqueue_style('owl-patches-page_style_css', $resUri . 'style.css', array(), '
 wp_enqueue_style('jquery-ui-style', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.min.css');
 wp_enqueue_style('jquery-ui-style-structure', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css');
 wp_enqueue_style('jquery-ui-style-theme', get_template_directory_uri() . '/js/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css');
-wp_enqueue_style('owl-patches-page_patch_manger', $resUri . 'css/owlspa.css');
-wp_enqueue_script('owl-patches-page_patch_manager', $resUri . 'js/bundle.js', array(), '0.0.1', true);
 
+wp_enqueue_style('owl-patch-library', $resUri . 'css/owlspa.css', array('screen'), '0.0.2'); // screen is the name of the theme style.css handle
+wp_enqueue_script('owl-patch-library', $resUri . 'js/bundle.js', array(), '0.0.2', true);
 
 ?>
-
 <?php Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'parts/shared/header' ) ); ?>
 
 <div id="owl-spa"></div>

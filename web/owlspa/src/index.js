@@ -2,16 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import thunk from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
 import customHistory from './customHistory';
 import routes from './routes';
 import rootReducer from 'reducers';
 
-const store = createStore(
-  rootReducer,
-  applyMiddleware(thunk)
-);
+const store = createStore(rootReducer, composeWithDevTools(
+  applyMiddleware(thunk),
+));
 
 ReactDOM.render((
   <Provider store={store}>
