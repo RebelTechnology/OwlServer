@@ -1,20 +1,30 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { setPatchListSearchTerm } from 'actions';
 import CSSModules from 'react-css-modules';
 import styles from './SearchInput.css';
 
 export class SearchInput extends Component {
 
+  handleSearchInputChange(e){
+    e.preventDefault();
+    this.props.setPatchListSearchTerm(e.target.value);
+  }
+
   render(){
-    const { value, onChange } = this.props;
+    const { patchListSearch:{searchTerm} } = this.props;
     return (
-      <input styleName="search-input" type="text" value={value} onChange={ e => onChange(e.target.value) }/>
+      <div styleName="search-input">
+        <input autoFocus type="text" value={searchTerm || ''} onChange={ e => this.handleSearchInputChange(e) } />
+      </div>
     );
   }
 }
 
-SearchInput.propTypes = {
-  value: PropTypes.string,
-  onChange: PropTypes.func
+const mapStateToProps = ({ patchListSearch }) => {
+  return { 
+    patchListSearch
+  }
 }
 
-export default CSSModules(SearchInput, styles);
+export default connect(mapStateToProps, { setPatchListSearchTerm })(CSSModules(SearchInput, styles));

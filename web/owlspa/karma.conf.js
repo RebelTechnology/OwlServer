@@ -6,6 +6,7 @@ module.exports = function (config) {
     files: [
       'test/tests.bundle.js'
     ],
+    customContextFile:'./test/context.html',
     exclude: ['*.css'],  
     frameworks: [ 'chai', 'mocha' ],
     plugins: [

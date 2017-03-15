@@ -7,8 +7,7 @@ import {
 
 const initialState = {
   topFilter: 'all',
-  subFilter: [],
-  searchTerm:''
+  subFilter: []
 };
 
 const addOrRemoveFromArray = (currArr, newItem) => {
@@ -38,11 +37,6 @@ const patchListFilter = (state = initialState, action) => {
         ...state,
         subFilter: action.subFilter ? [action.subFilter] : initialState.subFilter
       };
-    case SET_PATCHLIST_SEARCH_TERM:
-      return {
-        ...state,
-        searchTerm: action.searchTerm
-      }
     default:
       return state
   }
