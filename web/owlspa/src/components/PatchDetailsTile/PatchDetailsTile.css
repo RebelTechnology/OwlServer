@@ -1,5 +1,6 @@
 .patch-details-tile {
   box-sizing: border-box;
+  display: block;
   position: relative;
   border: 1px solid white;
   border-radius: 5px;

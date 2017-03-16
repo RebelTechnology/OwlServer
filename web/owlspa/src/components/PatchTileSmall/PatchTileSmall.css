@@ -1,5 +1,6 @@
 .patch-tile-small {
     position: relative;
+    display: block;
     box-sizing: border-box;
     height: 120px;
     width: 100%;
