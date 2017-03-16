@@ -2,7 +2,7 @@ var webpackConfig = require('./webpack.prod.config');
 
 module.exports = function (config) {
   config.set({
-    browsers: [ 'PhantomJS' ],
+    browsers: [ 'jsdom' ],
     files: [
       'test/tests.bundle.js'
     ],
@@ -10,7 +10,7 @@ module.exports = function (config) {
     exclude: ['*.css'],  
     frameworks: [ 'chai', 'mocha' ],
     plugins: [
-      'karma-phantomjs-launcher',
+      'karma-jsdom-launcher',
       'karma-chai',
       'karma-mocha',
       'karma-mocha-reporter',
@@ -24,6 +24,9 @@ module.exports = function (config) {
     webpack: webpackConfig,
     webpackMiddleware: {
       noInfo: true,
+      stats: {
+        chunks: false,
+      }
     }
   });
 };

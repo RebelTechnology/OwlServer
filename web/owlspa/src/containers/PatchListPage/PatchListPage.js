@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch, setPatchListSearchTerm } from 'actions';
-import { PatchTile , SubFilter } from 'containers';
-import { PatchCounter, CreatePatchTile, SearchInput } from 'components';
+import { PatchTile , SubFilter, SearchInput } from 'containers';
+import { PatchCounter, CreatePatchTile } from 'components';
 import { getFilteredSortedPatches } from './selectors';
 
 class PatchListPage extends Component {

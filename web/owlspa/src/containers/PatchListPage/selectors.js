@@ -3,31 +3,26 @@ import { createSelector } from 'reselect';
 const getPatches = state => state.patches.items;
 const getTopFilter = state => state.patchListFilter.topFilter;
 const getCurrentUser = state => state.currentUser;
-const getSelectedAuthors = state => state.patchListFilter.subFilter;
-const getSelectedTags = state => state.patchListFilter.subFilter;
+const getSubFilter = state => state.patchListFilter.subFilter;
 const getSearchTerm =  state => state.patchListSearch.searchTerm;
 
-const getPatchesByAuthors = createSelector([ getPatches, getSelectedAuthors ],(patches, selectedAuthors) => {
-  return patches.filter(patch => patch.published)
-    .filter(patch => {
-      if(selectedAuthors.length === 0){
-        return true;
-      }
-      if(!patch.author || !patch.author.name){
-        return false;
-      }
-      return selectedAuthors.indexOf(patch.author.name) > -1
-    });
+const getPublicPatches = createSelector([ getPatches ], patches => {
+  return patches.filter(patch => patch.published);
 });
 
-const getPatchesByTags = createSelector([ getPatches, getSelectedTags ],(patches, selectedTags) => {
-  return patches.filter(patch => patch.published && patch.tags).filter(patch => {
-    if (selectedTags.length === 0){
+const getPatchesBySubFilter = createSelector([ getTopFilter, getPublicPatches, getSubFilter ],(topFilter, patches, subFilter) => {
+  return patches.filter(patch => {
+    if(subFilter.length === 0){
       return true;
     }
-    return patch.tags.some(tag => {
-      return selectedTags.indexOf(tag) > -1;
-    })
+    switch(topFilter){
+      case 'authors':
+        return !!patch.author && !!patch.author.name && subFilter.indexOf(patch.author.name) > -1;
+      case 'tags':
+        return !!patch.tags && patch.tags.some(tag => subFilter.indexOf(tag) > -1);
+      default:
+        return false;
+    }
   });
 });
 
@@ -38,6 +33,10 @@ const getPatchesByCurrentUser = createSelector([ getPatches, getCurrentUser ],(p
     }
     return patch.author.name === currentUser.display_name || patch.author.wordpressId === currentUser.ID;
   });
+});
+
+const getPatchesByCurrentUserSortByTime = createSelector([ getPatchesByCurrentUser ], patches => {
+  return patches.slice().sort(sortByCreationTime);
 });
 
 const getPatchPopularity = patch => {
@@ -68,8 +67,16 @@ const sortByAuthorName = (a, b) => {
   return (a.name).localeCompare(b.name);
 };
 
-const getPublicPatches = createSelector([ getPatches ], patches => {
-  return patches.filter(patch => patch.published);
+const getPublicPatchesSortByTime = createSelector([ getPublicPatches ], publicPatches => {
+  return publicPatches.slice().sort(sortByCreationTime);
+});
+
+const getPublicPatchesSortByPopularityAndTime = createSelector([ getPublicPatchesSortByTime ], patches => {
+  return patches.slice().sort(sortByPopularity);
+});
+
+const getPublicPatchesSortByAuthor = createSelector([ getPublicPatches ], publicPatches => {
+  return publicPatches.slice().sort(sortByAuthorName);
 });
 
 const stringContains = (stringA, stringB) => {
@@ -93,36 +100,38 @@ const getPatchesBySearchTerm = createSelector([ getPublicPatches, getSearchTerm 
 });
 
 export const getFilteredSortedPatches = createSelector([ 
-  getPublicPatches,
   getTopFilter,
-  getPatchesByAuthors,
-  getPatchesByTags,
-  getPatchesByCurrentUser,
-  getPatchesBySearchTerm
+  getPublicPatchesSortByTime,
+  getPublicPatchesSortByAuthor,
+  getPublicPatchesSortByPopularityAndTime,
+  getPatchesBySubFilter,
+  getPatchesByCurrentUserSortByTime,
+  getPatchesBySearchTerm,
 ], (
-  publicPatches,
   topFilter,
-  patchesByAuthors,
-  patchesByTags,
-  patchesByCurrentUser,
+  publicPatchesSortByTime,
+  publicPatchesSortByAuthor,
+  publicPatchesSortByPopularityAndTime,
+  patchesBySubFilter,
+  patchesByCurrentUserSortByTime,
   patchesBySearchTerm
 ) => {
   switch(topFilter){
     case 'latest':
-      return publicPatches.sort(sortByCreationTime);
+      return publicPatchesSortByTime;
     case 'popular':
-      return publicPatches.sort(sortByCreationTime).sort(sortByPopularity);
+      return publicPatchesSortByPopularityAndTime;
     case 'all':
-      return publicPatches.sort(sortByAuthorName);
+      return publicPatchesSortByAuthor;
     case 'authors':
-      return patchesByAuthors;
+      return patchesBySubFilter;
     case 'tags':
-      return patchesByTags;
+      return patchesBySubFilter;
     case 'my-patches':
-      return patchesByCurrentUser.sort(sortByCreationTime);
+      return patchesByCurrentUserSortByTime;
     case 'search':
       return patchesBySearchTerm;
     default:
-      return publicPatches;
+      return publicPatchesSortByTime;
   }
 });

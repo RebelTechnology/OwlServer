@@ -48,6 +48,7 @@ class Dialog extends Component {
     return (
       <Modal
         isOpen={dialog.isOpen}
+        contentLabel="Modal"
         onAfterOpen={this.afterOpenModal}
         onRequestClose={() => this.closeModal()}
         style={customStyles}>
