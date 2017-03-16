@@ -10,6 +10,7 @@ import patchDetailsEditMode from './patchDetailsEditMode';
 import patches from './patches';
 import patchJavaScript from './patchJavaScript';
 import patchListFilter from './patchListFilter';
+import patchListSearch from './patchListSearch';
 import patchPlaying from './patchPlaying';
 import tags from './tags';
 import thunk from 'redux-thunk';
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   owlState,
   patches,
   patchListFilter,
+  patchListSearch,
   patchDetails,
   patchDetailsEditMode,
   patchJavaScript,

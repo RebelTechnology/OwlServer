@@ -1,0 +1,14 @@
+.search-input input {
+  display: block;
+  margin: 0 auto 20px;
+  width: 270px;
+  padding: 4px 4px 4px 12px;
+  background-color: #fff;
+  font-family: 'system-ui';
+  font-size: 24px;
+  font-weight: normal;
+  color: #ed7800;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+}

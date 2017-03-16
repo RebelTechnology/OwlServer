@@ -1,4 +1,5 @@
 .patch-details-tile {
+  box-sizing: border-box;
   position: relative;
   border: 1px solid white;
   border-radius: 5px;
@@ -6,6 +7,7 @@
   cursor: default;
   font-family: 'Ubuntu', sans-serif;
   font-size: 14px;
+  line-height: 14px;
   margin-bottom: 10px;
   margin-top: 20px;
   padding: 20px;
@@ -15,6 +17,8 @@
 }
 
 .patch-details-tile p {
+  font-family: inherit;
+  display: block;
   color: #fff;
   line-height: 1.5;
   font-size: 14px;
@@ -22,6 +26,9 @@
 }
 
 .patch-details-tile textarea {
+  display: inline-block;
+  margin-top: 11px;
+  padding: 2px;
   line-height: 1.5;
   font-size: 14px;
   font-family: 'Ubuntu', sans-serif;
@@ -29,7 +36,7 @@
   height: 100px;
   resize: none;
   border: none;
-  margin-top: 11px;
+  background-color: #fff;
 }
 
 .patch-tile-controls {

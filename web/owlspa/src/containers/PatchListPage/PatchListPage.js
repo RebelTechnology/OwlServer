@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch } from 'actions';
-import { PatchTile , SubFilter } from 'containers';
+import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch, setPatchListSearchTerm } from 'actions';
+import { PatchTile , SubFilter, SearchInput } from 'containers';
 import { PatchCounter, CreatePatchTile } from 'components';
+import { getFilteredSortedPatches } from './selectors';
 
 class PatchListPage extends Component {
   
@@ -12,85 +13,7 @@ class PatchListPage extends Component {
     }
   }
 
-  filterPatchesByAuthor(patches, subFilter){
-    return patches.filter(patch => patch.published)
-      .filter(patch => {
-        if(subFilter.length === 0){
-          return true;
-        }
-        if(!patch.author || !patch.author.name){
-          return false;
-        }
-        return subFilter.indexOf(patch.author.name) > -1
-      });
-  }
-
-  filterPatchesByTag(patches, subFilter){
-    return patches.filter(patch => patch.published && patch.tags).filter(patch => {
-      if (subFilter.length === 0){
-        return true;
-      }
-      return patch.tags.some(tag => {
-        return subFilter.indexOf(tag) > -1;
-      })
-    });
-  }
-
-  filterPatchesByCurrentUser(patches, currentUser){
-    return patches.filter(patch => {
-      if(!patch.author){
-        return false;
-      }
-      return patch.author.name === currentUser.display_name || patch.author.wordpressId === currentUser.ID;
-    });
-  }
-
-  getPatchPopularity(patch){
-    const weighting = {
-      downloadCount: 4,
-      downloadToOwl: 2,
-      browserPlays: 1,
-      starCount: 20
-    };
-
-    let patchCopy = { ...patch };
-    patchCopy.starCount = (patchCopy.starList && patchCopy.starList.length) || 0;
-
-    return Object.keys(weighting).reduce((acc, key) => {
-      return acc + ((patchCopy[key] || 0 ) * weighting[key]);
-    }, 0);
-  }
-
-  sortByPopularity(a, b){
-    return this.getPatchPopularity(b) - this.getPatchPopularity(a)
-  }
-
-  sortByCreationTime(a, b){
-    return b.creationTimeUtc - a.creationTimeUtc;
-  }
-
-  getFilteredSortedPatches(patches, patchListFilter, currentUser){
-    switch(patchListFilter.topFilter){
-      case 'latest':
-        return patches.filter(patch => patch.published).sort((a,b) => this.sortByCreationTime(a,b));
-      case 'popular':
-        return patches.filter(patch => patch.published)
-          .sort((a,b) => this.sortByCreationTime(a,b))
-          .sort((a,b) => this.sortByPopularity(a,b));
-      case 'all':
-        return patches.filter(patch => patch.published).sort((a,b) => (a.name).localeCompare(b.name));
-      case 'authors':
-        return this.filterPatchesByAuthor(patches, patchListFilter.subFilter);
-      case 'tags':
-        return this.filterPatchesByTag(patches, patchListFilter.subFilter);
-      case 'my-patches':
-        return this.filterPatchesByCurrentUser(patches, currentUser).sort((a,b) => this.sortByCreationTime(a,b));
-      default:
-        return patches.filter(patch => patch.published);
-    }
-  }
-
-  handleOnDeletePatchClick(e, patch){
+  handleDeletePatchClick(e, patch){
     e.preventDefault();
     e.stopPropagation();
     this.props.deletePatch(patch);
@@ -109,9 +32,8 @@ class PatchListPage extends Component {
   }
 
   render(){
-    const { patches, patchListFilter, patchListFilter:{topFilter}, routeParams, currentUser } = this.props;
-    const filteredPatches = this.getFilteredSortedPatches(patches.items, patchListFilter, currentUser);
-    const patchesToBeRendered = filteredPatches.map( patch => {
+    const { filteredSortedPatches, patchListFilter: { topFilter }, routeParams, currentUser } = this.props;
+    const patchesToBeRendered = filteredSortedPatches.map( patch => {
       return (
         <PatchTile 
           key={patch._id}
@@ -124,7 +46,7 @@ class PatchListPage extends Component {
           seoName={patch.seoName}
           canEdit={this.currentUserCanEdit(patch)}
           loggedIn={currentUser.loggedIn}
-          onDeletePatchClick={(e) => this.handleOnDeletePatchClick(e, patch)}
+          onDeletePatchClick={(e) => this.handleDeletePatchClick(e, patch)}
         />
       );
     });
@@ -132,10 +54,11 @@ class PatchListPage extends Component {
     return (
       <div>
         {(topFilter === 'authors' || topFilter === 'tags') ? <SubFilter routeParams={routeParams} /> : null}
-        <div className="wrapper flexbox">
+        <div className="wrapper flexbox" style={{minHeight: 'calc(100vh - 137px)'}}>
           <div className="content-container">
-            <PatchCounter patches={filteredPatches} myPatches={topFilter === 'my-patches'} />
-            { topFilter === 'my-patches' ? (<CreatePatchTile />) : null }
+            { topFilter === 'search' && <SearchInput /> }
+            <PatchCounter patches={filteredSortedPatches} myPatches={topFilter === 'my-patches'} />
+            { topFilter === 'my-patches' && <CreatePatchTile /> }
             { patchesToBeRendered }
           </div>
         </div>
@@ -150,21 +73,18 @@ class PatchListPage extends Component {
 
 }
 
-PatchListPage.PropTypes = {
-  patches : PropTypes.array,
-  filter: PropTypes.string
-};
-
-function mapStateToProps({ patches, patchListFilter, currentUser }){
+const mapStateToProps = state => {
+  const { patchListFilter, currentUser } = state;
   return {
-    patches,
     patchListFilter,
-    currentUser
+    currentUser,
+    filteredSortedPatches: getFilteredSortedPatches(state)
   }
-}
+};
 
 export default connect(mapStateToProps, {
   setPatchListTopFilter,
+  setPatchListSearchTerm,
   fetchPatchesAuthorsTags,
   deletePatch
 })(PatchListPage);

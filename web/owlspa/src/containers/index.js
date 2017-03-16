@@ -10,4 +10,5 @@ export PatchPreview from './PatchPreview/PatchPreview';
 export Parameter from './Parameter/Parameter';
 export PatchCode from './PatchCode/PatchCode';
 export PatchParameters from './PatchParameters/PatchParameters';
+export SearchInput from './SearchInput/SearchInput';
 export SubFilter from './SubFilter/SubFilter';
