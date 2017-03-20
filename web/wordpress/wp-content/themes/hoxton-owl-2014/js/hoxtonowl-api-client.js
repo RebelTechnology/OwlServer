@@ -43,10 +43,12 @@ HoxtonOwl.ApiClient.prototype._query = function (path, method, data) {
 
     var settings = {
         type: method,
-        dataType: 'json'
+        dataType: 'json',
+        contentType: 'application/json'
     };
+
     if (data) {
-        settings.data = data;
+        settings.data = JSON.stringify(data);
     }
 
     return $.ajax(this.apiEndPoint + path, settings); // returns a promise-like object

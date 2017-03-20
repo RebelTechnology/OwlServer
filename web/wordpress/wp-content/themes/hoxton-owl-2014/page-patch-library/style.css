@@ -77,7 +77,6 @@ body { background: #f4f4f4; }
 }
 
 #secondary-nav-bar {
-    height: 80px;
     width: 100%;
     background: #5d5d5d;
     border-top: 1px solid #676565;
@@ -353,30 +352,8 @@ input.knob {
     width: 100%;
     margin: 0 auto;
     text-align: center;
-    padding-top: 10px;
 }
 
-.secondary-nav-item {
-    display: inline-block;
-    text-align: center;
-    width: 80px;
-    margin: 0 15px 15px 0;
-}
-
-.secondary-nav-item img {
-    display: block;
-    margin: 0 auto;
-    margin-bottom: 5px;
-    opacity: .3;
-}
-
-.secondary-nav-item.active p, .secondary-nav-item:hover p {
-    color: #fff;
-}
-
-.secondary-nav-item.active img, .secondary-nav-item:hover img {
-    opacity: 1;
-}
 
 /* Tag filter cloud */
 
@@ -640,16 +617,6 @@ h2, .parameter-label {
     text-transform: uppercase;
 }
 
-.secondary-nav-item p, .tag-filter-button {
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 100;
-    font-size: 14px;
-}
-
-h2, .secondary-nav-item p {
-    color: #cccccc;
-}
-
 .parameter-label {
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
@@ -768,19 +735,6 @@ div.patch-library h2.bolder {
     #logo {
         margin: 11px 10px 0 5px;
     }
-    #secondary-nav-bar {
-        height: 70px;
-    }
-    .secondary-nav-item {
-        width: 65px;
-    }
-    .secondary-nav-item p {
-        font-size: 12px;
-    }
-    .secondary-nav-item img {
-        width: 30px;
-        height: 30px;
-    }
     .patch-tile {
         width: 48%;
         margin: 0 8px 8px 0;
@@ -813,12 +767,6 @@ div.patch-library h2.bolder {
     .patch-tile {
         width: 100%;
         margin: 0 0 10px 0;
-    }
-    .secondary-nav-item {
-        width: 50px;
-    }
-    .secondary-nav-item img {
-        display: none;
     }
 }
 

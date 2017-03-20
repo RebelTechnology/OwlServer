@@ -127,6 +127,9 @@ HoxtonOwl.patchForm = {
         if ($('#frm-patch-creationTimeUtc').length) {
             $('#frm-patch-creationTimeUtc').val(new Date(patch.creationTimeUtc).toISOString());
         }
+
+        $('#frm-patch-downloadCount').val(patch.downloadCount);
+        $('#frm-patch-starList').val(JSON.stringify(patch.starList));
     },
 
     /**
@@ -305,6 +308,12 @@ HoxtonOwl.patchForm = {
             }
             patch.creationTimeUtc = creationTimeUtc;
         }
+
+        // downloadCount
+        patch.downloadCount = parseInt($('#frm-patch-downloadCount').val());
+
+        //starList
+        patch.starList = JSON.parse($('#frm-patch-starList').val());
 
         return patch;
 

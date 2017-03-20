@@ -33,6 +33,8 @@ Starkers_Utilities::get_template_parts( array( 'parts/shared/html-header', 'part
                 <form id="patch-add-edit-form">
                     <a name="form-top"></a>
                     <input type="hidden" name="id" id="frm-patch-id" value="">
+                    <input type="hidden" name="downloadCount" id="frm-patch-downloadCount" value="">
+                    <input type="hidden" name="starList" id="frm-patch-starList" value="">
                     <div class="row">
                         <label for="frm-patch-name" class="required">Name</label> <input class="form-control" type="text" id="frm-patch-name" name="name" required>
                         <div class="error-message"></div>

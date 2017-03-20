@@ -77,7 +77,6 @@ body { background: #f4f4f4; }
 }
 
 #secondary-nav-bar {
-    height: 80px;
     width: 100%;
     background: #5d5d5d;
     border-top: 1px solid #676565;
@@ -264,45 +263,6 @@ body { background: #f4f4f4; }
     width: 100%;
     margin: 0 auto;
     text-align: center;
-    padding-top: 10px;
-}
-
-.secondary-nav-item {
-    display: inline-block;
-    box-sizing: border-box;
-    text-align: center;
-    padding-top: 50px;
-    width: 80px;
-    height: 80px;
-    margin: 0 15px 15px 0;
-    background: no-repeat center 0 none;
-    color:#fff;
-    opacity: 0.5;
-}
-
-.secondary-nav-item.nav-item-latest {
-    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/latest-icon.png");
-}
-
-.secondary-nav-item.nav-item-tags {
-    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/tags-icon.png");
-}
-
-.secondary-nav-item.nav-item-authors {
-    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/authors-icon.png");
-}
-
-.secondary-nav-item.nav-item-all {
-    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/browse-all-icon.png");
-}
-
-.secondary-nav-item.nav-item-my-patches {
-    background-image: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/my-patches-icon.png");
-}
-
-
-.secondary-nav-item.active, .secondary-nav-item:hover {
-    opacity: 1;
 }
 
 /* Tag filter cloud */
@@ -319,6 +279,8 @@ body { background: #f4f4f4; }
     float: left;
     margin: 0 4px 4px 0;
     align: center;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .tag-filter-button:hover {
@@ -337,11 +299,8 @@ body { background: #f4f4f4; }
     color:#717171;
     position: relative;
     margin-right: 30px;
+    margin-bottom: 27px;
     cursor: ns-resize;
-}
-
-.patch-knob:last-child {
-    margin-right:0;
 }
 
 .patch-knob.active {
@@ -398,7 +357,7 @@ body { background: #f4f4f4; }
     position: relative;
     width: 100px;
     height: 65px;
-    margin: 42px auto 10px;
+    margin: 25px auto 25px;
     cursor: pointer;
 }
 
@@ -896,7 +855,7 @@ h2, .parameter-label {
     text-transform: uppercase;
 }
 
-.secondary-nav-item, .tag-filter-button {
+.tag-filter-button {
     font-family: 'Ubuntu', sans-serif;
     font-weight: 100;
     font-size: 14px;
@@ -1034,15 +993,6 @@ h2 {
     #logo {
         margin: 11px 10px 0 5px;
     }
-    #secondary-nav-bar {
-        height: 70px;
-    }
-    .secondary-nav-item {
-        width: 65px;
-        background-size: 50%;
-        padding-top: 38px;
-        font-size: 12px;
-    }
     .patch-tile {
         width: 48%;
         margin: 0 8px 8px 0;
@@ -1071,12 +1021,6 @@ h2 {
     .patch-tile {
         width: 100%;
         margin: 0 0 10px 0;
-    }
-    .secondary-nav-item {
-        width: 50px;
-        padding-top: 32px;
-        white-space: nowrap;
-        background-image: none;
     }
     .modal-dialog {
         width: 400px;

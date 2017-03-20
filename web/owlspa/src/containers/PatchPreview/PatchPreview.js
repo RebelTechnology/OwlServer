@@ -179,10 +179,12 @@ class PatchPreview extends Component {
 
     return (
       <div className="white-box2">
-        <PatchParameters 
-          patchIsActive={webAudioPatch.isPlaying} 
-          patch={patch} 
-        />
+        <div style={{paddingLeft:'30px'}}>
+          <PatchParameters 
+            patchIsActive={webAudioPatch.isPlaying} 
+            patch={patch} 
+          />
+        </div>
 
         <PatchPushButton
           isActive={webAudioPatch.isPlaying}
