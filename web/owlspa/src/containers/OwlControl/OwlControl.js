@@ -16,7 +16,7 @@ class OwlControl extends Component {
     const { owlState } = this.props;
     
     return (
-      <div className="owl-control">
+      <div className="owl-device-control">
         { owlState.isConnected ? ( 
           <button 
             onClick={() => this.loadPatchOnToOwl()}
@@ -31,7 +31,7 @@ class OwlControl extends Component {
               {owlState.isConnecting ? <i className="loading-spinner"></i> : null}
           </button>)
         }
-        <div className="owl-stats">
+        <div className="owl-device-stats">
           {owlState.loadedPatchName ? (<p><span>Loaded Patch:</span> {owlState.loadedPatchName}</p>) : null}
           {owlState.firmWareVersion ? (<p><span>Connected to:</span> {owlState.firmWareVersion}</p>) : null}
           {owlState.status ? (<p>{owlState.status}</p>) : null}

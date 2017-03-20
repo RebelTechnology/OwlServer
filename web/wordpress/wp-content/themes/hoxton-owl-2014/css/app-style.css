@@ -448,13 +448,13 @@ body { background: #f4f4f4; }
 }
 
 
-/** owl-control  **/
-.owl-control {
+/** owl-device-control  **/
+.owl-device-control {
     margin-left: 10px;
     overflow: hidden;
 }
 
-.owl-control .owl-stats {
+.owl-device-control .owl-device-stats {
     float: left;
     margin-left: 30px;
     margin-top: 13px;
@@ -462,18 +462,18 @@ body { background: #f4f4f4; }
     width: 320px;
 }
 
-.owl-control button {
+.owl-device-control button {
     float: left;
     padding: 20px;
     line-height: 0px;
     width: 165px;
 }
 
-.owl-control .owl-stats p {
+.owl-device-control .owl-device-stats p {
     line-height: 1em;
 }
 
-.owl-control .owl-stats span {
+.owl-device-control .owl-device-stats span {
     text-transform: uppercase;
     color:#e19758;
 }
