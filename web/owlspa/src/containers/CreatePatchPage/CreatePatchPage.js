@@ -108,6 +108,7 @@ class CreatePatchPage extends Component {
       },
       compilationType: compilationType,
       published: 0,
+      starList:[],
       github: sourceFiles.map(file => file.path)
     }, options);  
   }
