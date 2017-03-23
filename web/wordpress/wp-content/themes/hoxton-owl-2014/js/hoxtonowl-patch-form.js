@@ -44,6 +44,7 @@ HoxtonOwl.patchForm = {
         if (patch.name) $('#frm-patch-name').val(patch.name);
 
         // Author
+        $('#frm-patch-author').val(JSON.stringify(patch.author));
         var wordPressIdRadio = $('#frm-patch-author-type-wordpress');
         var patchAuthorNameRadio = $('#frm-patch-author-type-other');
         if (wordPressIdRadio.length && patchAuthorNameRadio.length) { // true only for admins
@@ -163,6 +164,7 @@ HoxtonOwl.patchForm = {
         var name = $.trim($('#frm-patch-name').val());
         var description = $.trim($('#frm-patch-description').val());
         var instructions = $.trim($('#frm-patch-instructions').val());
+        var author = JSON.parse($('#frm-patch-author').val());
 
         if ('' === name) {
             $('#frm-patch-name').
@@ -176,7 +178,7 @@ HoxtonOwl.patchForm = {
 
         if ($('#frm-patch-author-type-wordpress').length) { // true only for admins
 
-            var author = {};
+            
             if ($('#frm-patch-author-type-wordpress').prop('checked')) {
 
                 if (!$('#frm-patch-author-wordpressId').val()) {
@@ -235,6 +237,7 @@ HoxtonOwl.patchForm = {
 
         var patch = {
             name: name,
+            author: author,
             description: description,
             instructions: instructions,
             inputs: parseInt($('#frm-patch-inputs').val()),
@@ -242,10 +245,6 @@ HoxtonOwl.patchForm = {
             published: published ? 1 : 0,
             compilationType: $('#frm-patch-compilation-type-select').val()
         };
-
-        if (author) {
-            patch.author = author;
-        }
 
         if ($('#frm-patch-id').length) {
             var patchId = $('#frm-patch-id').val();
