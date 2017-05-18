@@ -101,7 +101,7 @@ router.post('/', (req, res) => {
         message: 'New patch saved.',
         _id: patch._id,
         seoName: patch.seoName,
-        url: `https://${config.wordpress.hostname}/patch-library/patch/${patch.seoName}`,
+        url: `${config.wordpress.baseUrl}/patch-library/patch/${patch.seoName}`,
         success: true,
       });
     })
