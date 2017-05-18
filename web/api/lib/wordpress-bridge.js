@@ -6,7 +6,7 @@ const request = require('request');
 const config = require('./config');
 
 const client = wordpress.createClient({
-  url: config.wordpress.hostname,
+  url: config.wordpress.baseUrl,
   username: config.wordpress.xmlRpc.username,
   password: config.wordpress.xmlRpc.password,
 });
@@ -82,7 +82,7 @@ const getUserInfoBatch = userIds => {
 const uploadSources = (patchId, files) => {
 
   const requestOptions = {
-    url: `https://${config.wordpress.hostname}/wp-admin/admin-ajax.php`,
+    url: `${config.wordpress.baseUrl}/wp-admin/admin-ajax.php`,
     rejectUnauthorized: config.env === 'production', // if `false`, will allow self-signed SSL certificates
     formData: {
       patchId: patchId,

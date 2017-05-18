@@ -10,7 +10,7 @@ const joi = require('joi');
   'JWT_SECRET',
   'API_KEY',
   'PATCH_UPLOAD_SECRET',
-  'WORDPRESS_HOSTNAME',
+  'WORDPRESS_BASE_URL',
   'WORDPRESS_XML_RPC_USERNAME',
   'WORDPRESS_XML_RPC_PASSWORD',
   'PATCH_SOURCE_URL_FRAGMENT',
@@ -36,7 +36,7 @@ const config = {
     collection: process.env.MONGO_COLLECTION,
   },
   wordpress: {
-    hostname: process.env.WORDPRESS_HOSTNAME,
+    baseUrl: process.env.WORDPRESS_BASE_URL,
     patchUploadSecret: process.env.PATCH_UPLOAD_SECRET,
     xmlRpc: {
       username: process.env.WORDPRESS_XML_RPC_USERNAME,
@@ -64,7 +64,7 @@ const configSchema = joi.object().keys({
     collection: joi.string().required(),
   }),
   wordpress: joi.object().keys({
-    hostname: joi.string().required(),
+    baseUrl: joi.string().required(),
     patchUploadSecret: joi.string().required(),
     xmlRpc: joi.object().keys({
       username: joi.string().required(),
