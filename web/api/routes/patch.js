@@ -393,7 +393,7 @@ router.post('/:id/sources', (req, res) => {
       const sourceUrls = successfulUploads.map(uploadedFile => {
         // Example:
         // https://staging.hoxtonowl.com/wp-content/uploads/patch-files/563b9a3031062254525b5831/TestTonePatch.hpp
-        return `https://${config.wordpress.hostname}/${config.wordpress.patchSourceUrlFragment}/${id}/${uploadedFile}`;
+        return `${config.wordpress.baseUrl}/${config.wordpress.patchSourceUrlFragment}/${id}/${uploadedFile}`;
       });
       return patchModel.addSources(id, sourceUrls);
     })
