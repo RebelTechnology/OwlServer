@@ -1,6 +1,7 @@
 export AuthorLink from './AuthorLink/AuthorLink';
 export CompilationTypeSelector from './CompilationTypeSelector/CompilationTypeSelector';
 export CreatePatchTile from './CreatePatchTile/CreatePatchTile';
+export GenPatchFileSVG from './GenPatchFileSVG/GenPatchFileSVG';
 export Icon from './Icon/Icon';
 export IconButton from './IconButton/IconButton';
 export NavLink from './NavLink/NavLink';
