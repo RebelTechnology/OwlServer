@@ -17,7 +17,9 @@ class PatchCode extends Component {
     this.state = {
       activeTab: 0,
       editModeActive: false,
-      editorNightMode: false
+      editorNightMode: false,
+      hasGenDspFile: false,
+      patchCodeFilesLoaded: false
     };
   }
 
@@ -25,6 +27,43 @@ class PatchCode extends Component {
     const { fileUrls, patch, patchCodeFiles } = props;
     if(fileUrls && fileUrls.length && !patchCodeFiles[patch._id]){
       this.props.fetchPatchCodeFiles(fileUrls, patch._id);
+    }
+  }
+
+  patchFilesConstainsGenDsp(files){
+    if(!files){
+      return false;
+    }
+    let index;
+    return files.some((file, i) => {
+      const isGen = /\.gendsp$/i.test(this.getFileName(file.fileUrl));
+      if(isGen){
+        index = i;
+      }
+      return isGen;
+    }) && {index};
+  }
+
+  patchCodeFilesHaveLoaded(files){
+    if(!files){
+      return false;
+    }
+    return files.every(file => {
+      return !file.isLoading
+    });
+  }
+
+  ifPatchCodeFilesContainsGenDspSetAsActiveTab({ patchCodeFiles, patch }){
+    const { patchCodeFilesLoaded } = this.state;
+    if(!patchCodeFiles || !patch || this.state.hasGenDspFile || !patchCodeFilesLoaded || this.state.hasGenDspFile){
+      return;
+    }
+    const hasGenDspFile = this.patchFilesConstainsGenDsp(patchCodeFiles[patch._id]);
+    if(hasGenDspFile){
+      this.setState({
+        hasGenDspFile: true,
+        activeTab: hasGenDspFile.index
+      });
     }
   }
 
@@ -75,7 +114,22 @@ class PatchCode extends Component {
     this.setState({ editorNightMode: !this.state.editorNightMode });
   }
 
-  componentWillReceiveProps(nextProps){
+  setFlagIfPatchCodeFilesHaveLoaded({ patchCodeFiles, patch }){
+    const { patchCodeFilesLoaded } = this.state;
+    if(!patch || !patchCodeFiles || patchCodeFilesLoaded){
+      return;
+    }
+    if(this.patchCodeFilesHaveLoaded(patchCodeFiles[patch._id])){
+      this.setState({
+        patchCodeFilesLoaded: true
+      });
+    }
+
+  }
+
+  componentWillUpdate(nextProps, nextState){
+    this.setFlagIfPatchCodeFilesHaveLoaded(nextProps);
+    this.ifPatchCodeFilesContainsGenDspSetAsActiveTab(nextProps);
     this.checkForNewPatchCodeFiles(nextProps);
   }
 
@@ -232,6 +286,8 @@ class PatchCode extends Component {
 
   componentDidMount(){
     this.checkForNewPatchCodeFiles(this.props);
+    this.setFlagIfPatchCodeFilesHaveLoaded(this.props);
+    this.ifPatchCodeFilesContainsGenDspSetAsActiveTab(this.props);
   }
 
 }
