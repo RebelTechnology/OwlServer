@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { fetchPatchCodeFiles, updatePatchCodeFile, serverSavePatchFiles } from 'actions'; 
 import classNames from 'classnames';
 import { parseUrl } from 'utils';
+import { GenPatchFileSVG } from 'components';
 import pdfu from 'pd-fileutils';
 import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -16,7 +17,9 @@ class PatchCode extends Component {
     this.state = {
       activeTab: 0,
       editModeActive: false,
-      editorNightMode: false
+      editorNightMode: false,
+      hasGenDspFile: false,
+      patchCodeFilesLoaded: false
     };
   }
 
@@ -24,6 +27,43 @@ class PatchCode extends Component {
     const { fileUrls, patch, patchCodeFiles } = props;
     if(fileUrls && fileUrls.length && !patchCodeFiles[patch._id]){
       this.props.fetchPatchCodeFiles(fileUrls, patch._id);
+    }
+  }
+
+  patchFilesConstainsGenDsp(files){
+    if(!files){
+      return false;
+    }
+    let index;
+    return files.some((file, i) => {
+      const isGen = /\.gendsp$/i.test(this.getFileName(file.fileUrl));
+      if(isGen){
+        index = i;
+      }
+      return isGen;
+    }) && {index};
+  }
+
+  patchCodeFilesHaveLoaded(files){
+    if(!files){
+      return false;
+    }
+    return files.every(file => {
+      return !file.isLoading
+    });
+  }
+
+  ifPatchCodeFilesContainsGenDspSetAsActiveTab({ patchCodeFiles, patch }){
+    const { patchCodeFilesLoaded } = this.state;
+    if(!patchCodeFiles || !patch || this.state.hasGenDspFile || !patchCodeFilesLoaded || this.state.hasGenDspFile){
+      return;
+    }
+    const hasGenDspFile = this.patchFilesConstainsGenDsp(patchCodeFiles[patch._id]);
+    if(hasGenDspFile){
+      this.setState({
+        hasGenDspFile: true,
+        activeTab: hasGenDspFile.index
+      });
     }
   }
 
@@ -74,7 +114,22 @@ class PatchCode extends Component {
     this.setState({ editorNightMode: !this.state.editorNightMode });
   }
 
-  componentWillReceiveProps(nextProps){
+  setFlagIfPatchCodeFilesHaveLoaded({ patchCodeFiles, patch }){
+    const { patchCodeFilesLoaded } = this.state;
+    if(!patch || !patchCodeFiles || patchCodeFilesLoaded){
+      return;
+    }
+    if(this.patchCodeFilesHaveLoaded(patchCodeFiles[patch._id])){
+      this.setState({
+        patchCodeFilesLoaded: true
+      });
+    }
+
+  }
+
+  componentWillUpdate(nextProps, nextState){
+    this.setFlagIfPatchCodeFilesHaveLoaded(nextProps);
+    this.ifPatchCodeFilesContainsGenDspSetAsActiveTab(nextProps);
     this.checkForNewPatchCodeFiles(nextProps);
   }
 
@@ -130,13 +185,20 @@ class PatchCode extends Component {
     const activeTabFileName = this.getFileName(fileUrls[activeTab]);
     const filesAreSaving = patchCodeFiles[patch._id].some(file => file.isSaving);
     const isPdFile = /\.pd$/i.test(activeTabFileName);
+    const isGenFile = /\.gendsp$/i.test(activeTabFileName);
     const unsavedFileChanges = this.getPatchCodeHasBeenEdited(patchCodeFiles[patch._id]);
     const isHoxtonFile = this.isHoxtonFile(fileUrls[activeTab]);
     const editorReadOnly = !canEdit || filesAreSaving || !isHoxtonFile || !editModeActive;
     let pdPatchSvg = null;
+    let genFileJson;
+    const showPatchCodeEditControls = !isPdFile && !isGenFile;
 
     if(isPdFile && typeof activeTabFileString === 'string' && activeTabFileString !== 'Loading...'){
       pdPatchSvg = <div dangerouslySetInnerHTML={{__html: this.getSvgString(activeTabFileString)}} />
+    }
+
+    if(isGenFile && activeTabFileString){
+      genFileJson = JSON.parse(activeTabFileString);
     }
     
     const tabNavItems = fileUrls.map((fileUrl, i )=> {
@@ -154,9 +216,9 @@ class PatchCode extends Component {
     return (
       <div className="white-box2" id="git-code">
           <h2 className="bolder">Patch code</h2>
-          {canEdit ? (
+          { canEdit && (
             <h6 className="patchcode-toolbar" style={{marginBottom:'10px'}}>
-              { !isPdFile ? (
+              { showPatchCodeEditControls && (
                 <button 
                   onClick={e => this.handleEditPatchCodeClick(e)}
                   disabled={filesAreSaving}
@@ -164,22 +226,22 @@ class PatchCode extends Component {
                   className="btn-large edit-patch-code">
                   { editModeActive ? 'EDITING' : 'EDIT'}
                 </button>
-              ) : null }
-              { !isPdFile ? (
+              )}
+              { showPatchCodeEditControls && (
                 <button 
                   onClick={e => this.handleSavePatchFiles(e)}
                   disabled={filesAreSaving || !unsavedFileChanges}
                   className="btn-large save-patch-code">
                   {filesAreSaving ? '. . . SAVING': 'SAVE'}
-                  {filesAreSaving ? <i className="loading-spinner"></i> : null}
+                  {filesAreSaving && <i className="loading-spinner"></i>}
                 </button>
-              ) : null }
+              )}
               <button 
                 onClick={e => this.handleSaveAndCompilePatchFiles(e, {unsavedFileChanges})}
                 disabled={filesAreSaving || patch.isCompiling}
                 className="btn-large save-and-compile-patch-code">
                 {unsavedFileChanges ? 'SAVE & COMPILE' : 'COMPILE' }
-                {filesAreSaving || patch.isCompiling ? <i className="loading-spinner"></i> : null}
+                { (filesAreSaving || patch.isCompiling) && <i className="loading-spinner"></i> }
               </button>
               <button 
                 onClick={e => this.editorToggelDayNightMode(e)}
@@ -187,16 +249,16 @@ class PatchCode extends Component {
                 {editorNightMode ? 'DAY': 'NIGHT'}
               </button>
             </h6>
-          ) : null}
+          )}
           
           <div id="github-files" className={ classNames({'edit-mode': editModeActive }) }>
             <ul className="tab-nav">
               {tabNavItems}
             </ul>
             <div className="tab-content" style={editorNightMode ? {backgroundColor: '#272822'} : {}}>
-              { isGitHubfile ? <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> : null}
+              { isGitHubfile && <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> }
               
-              { !isPdFile && (activeTabFileString === '' || activeTabFileString) ? ( 
+              { showPatchCodeEditControls && (activeTabFileString === '' || activeTabFileString) && ( 
                 <AceEditor
                   mode="c_cpp"
                   theme={ editorNightMode ? 'monokai' : 'github'}
@@ -209,10 +271,13 @@ class PatchCode extends Component {
                   className="ace-editor"
                   style={{zIndex:'0'}}
                   editorProps={{$blockScrolling:'Infinity'}}
-                />
-                ) : null
+                />)
               }
-              { isPdFile ? pdPatchSvg : null}
+
+              { isPdFile && pdPatchSvg }
+
+              { isGenFile && genFileJson && <GenPatchFileSVG data={genFileJson} /> }
+
             </div>
           </div>
       </div>
@@ -221,6 +286,8 @@ class PatchCode extends Component {
 
   componentDidMount(){
     this.checkForNewPatchCodeFiles(this.props);
+    this.setFlagIfPatchCodeFilesHaveLoaded(this.props);
+    this.ifPatchCodeFilesContainsGenDspSetAsActiveTab(this.props);
   }
 
 }
