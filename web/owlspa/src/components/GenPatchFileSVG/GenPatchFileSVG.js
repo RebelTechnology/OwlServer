@@ -201,19 +201,39 @@ class GenPatchFileSVG extends Component {
     });
   }
 
+  getSVGwidthFromFurthestXYPositionedBox(boxes){
+    const furthestDimnesions = { width: 0, height: 0 };
+    if(!boxes){
+      return furthestDimnesions;
+    }
+    return boxes.reduce(acc, ({box:{ patching_rect }}) => {
+      const x = patching_rect[0];
+      const y = patching_rect[1];
+      const width = patching_rect[2];
+      const height = patching_rect[3];
+      const xCorner = x + width;
+      const yCorner = y + height;
+      acc.width = acc.width < xCorner ? xCorner : acc.width;
+      acc.height = acc.height < yCorner ? yCorner : acc.height;
+      return acc;
+    }, furthestDimnesions);
+  }
+
+
   render(){
     const { data:{ patcher:{ rect, boxes, lines } } } = this.props;
     const newObjs = boxes.filter(box => box.box.maxclass === 'newobj');
     const codeBoxes = boxes.filter(box => box.box.maxclass === 'codebox');
     const comments = boxes.filter(box => box.box.maxclass === 'comment');
     const patchLines = lines.map(line => line.patchline);
-    const width = rect[2]; 
-    const height = rect[3];
+    const { width, height } = this.getSVGwidthFromFurthestXYPositionedBox(boxes);
+    console.log('width', width, 'height', height, 'rect[0]',rect[0], 'rect[1]',rect[1],'rect[2]',rect[2], 'rect[3]',rect[3]);
+
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg" 
-        width={width + rect[0]} // this might not be right
-        height={height + rect[1]} // this might not be right
+        width={width || rect[2]}
+        height={height || rect[3]}
         style={{overflow: 'visible'}} >
         
         { this.renderPatchLines(patchLines) }
