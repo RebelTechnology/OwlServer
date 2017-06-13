@@ -206,7 +206,7 @@ class GenPatchFileSVG extends Component {
     if(!boxes){
       return furthestDimnesions;
     }
-    return boxes.reduce(acc, ({box:{ patching_rect }}) => {
+    return boxes.reduce((acc, { box: { patching_rect } }) => {
       const x = patching_rect[0];
       const y = patching_rect[1];
       const width = patching_rect[2];
