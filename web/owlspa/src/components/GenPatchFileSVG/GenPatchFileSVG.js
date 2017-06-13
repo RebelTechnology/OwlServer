@@ -227,14 +227,13 @@ class GenPatchFileSVG extends Component {
     const comments = boxes.filter(box => box.box.maxclass === 'comment');
     const patchLines = lines.map(line => line.patchline);
     const { width, height } = this.getSVGwidthFromFurthestXYPositionedBox(boxes);
-    console.log('width', width, 'height', height, 'rect[0]',rect[0], 'rect[1]',rect[1],'rect[2]',rect[2], 'rect[3]',rect[3]);
 
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg" 
         width={width || rect[2]}
         height={height || rect[3]}
-        style={{overflow: 'visible'}} >
+        style={{overflow: 'visible', margin: '50px 0'}} >
         
         { this.renderPatchLines(patchLines) }
         { this.renderNewObjs(newObjs) }
