@@ -71,7 +71,8 @@ class Patch {
       this.outputs = 0;
     }
     if (!this.parameters) {
-      this.parameters = {};
+      // set default parameters
+      this.parameters = { a: 'A', b: 'B', c: 'C', d: 'D', e: 'Exp'};
     }
     if (!this.compilationType) {
       this.compilationType = 'cpp';
