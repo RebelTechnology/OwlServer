@@ -1,0 +1,883 @@
+/*
+Theme Name:     Hoxton Owl 2014
+Theme URI:      http://hoxtonowl.com/about/contact/
+Description:    Made for the OWL 2014 redesign
+Version:        0.1
+Author:         Jonny Kates
+Author URI:     http://jonnykates.com
+Tags:
+*/
+
+@import "css/app-style.css";
+
+html, body {
+    height: 100%;
+    font-family: Ubuntu, sans-serif;
+}
+
+.wrapper {
+    min-height: 100%;
+    margin-bottom: -60px; /* Height of footer */
+}
+
+.wrapper:after {
+    content: "";
+    display: block;
+    height: 60px;
+}
+
+#footer-bar {
+    height: 60px;
+    width: 100%;
+    background: #231f20;
+    border-top: 1px solid #000000;
+}
+
+/* Fixes sticky footer clear both */
+.clear {
+    height: 80px;
+}
+
+#footer-bar p {
+    color: #ccc;
+    font-size: 12px;
+    margin-top: 20px;
+    margin-right: 30px;
+    text-align: right;
+}
+
+.content-area {
+    float: left;
+    width: 80%;
+}
+
+.widget-area {
+    float: right;
+    width: 20%;
+    padding: 20px;
+    background: #e0e0e0;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    min-height: 1040px;
+}
+
+.widget-area div {
+    margin-bottom: 20px;
+}
+
+.widget-area ul {
+    list-style: square;
+    margin-left: 20px;
+}
+
+.white-box {
+    padding: 40px 40px 40px;
+    border-top-right-radius: 0px;
+    min-height: 1040px;
+}
+
+.white-box a, .widget-area a, #breadcrumb a {
+    color: #ed7800;
+}
+
+.white-box a:hover, .widget-area a:hover, #breadcrumb a:hover {
+    color: #e19758;
+    text-decoration: underline;
+}
+
+.white-box ul, .white-box li {
+  list-style: square outside;
+}
+
+.white-box ul {
+  margin-left: 20px;
+}
+
+.white-box > ol, .white-box > ol > li {
+  list-style: none;
+}
+
+#comments ol {
+    width: 75%;
+    border-top: 1px dotted #ccc;
+    border-bottom: 1px dotted #ccc;
+    padding-top: 20px;
+    margin-bottom: 20px;
+}
+
+#comment {
+    display: inherit;
+}
+
+h1, h2, h3 {
+    font-family: 'montserrat', sans-serif;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-weight: 700;
+    color: #fff;
+    font-size: 24px;
+    display: inline-flex;
+    background: #231f20;
+    padding: 10px;
+}
+
+h2 {
+    color: #ffffff;
+    font-size: 18px;
+    display: inline-flex;
+    background: #5d5d5d;
+    padding: 10px;
+    margin-top: 20px;
+    text-transform: initial;
+}
+
+h2.mw-specialpagesgroup {
+  margin-bottom: 35px;
+}
+
+h3 {
+    color: #5d5d5d;
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* -- commented by Sam to uniform wiki and website - hope it's fine!
+.widget-title {
+    font-size: 10px;
+    font-weight: 400;
+    color: #999999;
+}
+*/
+
+p {
+    line-height: 1.65;
+    margin: 0 0 15px 0;
+}
+
+.post-meta-line, .comment-meta-line {
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+
+table.mw-specialpages-table ul,
+.widget-area ul {
+    line-height: 1.4;
+}
+
+hr {
+    border: none;
+    width: 100%;
+    height: 1px;
+    background: #ccc;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+/* Breadcrumb */
+#breadcrumbs{
+    list-style:none;
+    margin:10px 0;
+    overflow:hidden;
+}
+
+#breadcrumbs li{
+    float:left;
+    margin-right:15px;
+}
+
+#breadcrumbs .separator{
+    color:#ccc;
+}
+
+/* Homepage */
+
+#homepage-hero {
+    width: 100%;
+    height: 500px;
+    background: #443f40;
+    background-image:url('images/pedal-shot.png');
+    background-repeat: no-repeat;
+    background-position: 30% 0%;
+    border-bottom: 2px solid #515050;
+    text-align: right;
+    padding-top: 60px;
+    margin-bottom: 30px;
+}
+
+#homepage-hero h1 {
+    font-weight: 100;
+    font-size: 48px;
+    margin-bottom: 5px;
+}
+
+#homepage-hero .clear {
+    height: 0px;
+}
+
+#homepage-hero p {
+    font-weight: 100;
+    font-size: 28px;
+    color: #fff;
+    display: inline-flex;
+    padding: 10px;
+    line-height: 1;
+    background: #ed7800;
+    margin-bottom: 5px;
+}
+
+ul.menu {
+  text-align: left;
+  display: inline;
+  margin: 0;
+  list-style: none;
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+}
+ul.menu li {
+  display: inline-block;
+  margin-right: -4px;
+  position: relative;
+  cursor: pointer;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -ms-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
+}
+ul.menu li:hover {
+  background: #555;
+  color: #fff;
+}
+ul.menu li ul {
+  padding: 0;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 150px;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transiton: opacity 0.2s;
+  -moz-transition: opacity 0.2s;
+  -ms-transition: opacity 0.2s;
+  -o-transition: opacity 0.2s;
+  -transition: opacity 0.2s;
+}
+ul.menu li ul li {
+  background: #555;
+  width: 100%;
+  display: block;
+  color: #fff;
+  text-shadow: 0 -1px 0 #000;
+}
+ul.menu li ul li:hover { background: #666; }
+ul.menu li:hover ul {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+li.current_page_item a {
+    background: #433f40 !important;
+    border-bottom: 5px solid #f47a20;
+}
+/* CSS rules added by Sam */
+input[type=text], input[type=url], input[type=password], input[type=search] {
+    border: 1px solid #d3d3d3;
+    border-radius: 5px;
+    font-size: 12px;
+    padding: 4px;
+    color: #5d5d5d;
+    /* height: 17px; */
+}
+
+input[type=submit], input[type=reset], input[type=button], button {
+    color: #fff;
+    font-family: "montserrat",sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    display: inline;
+    list-style-type: none;
+    text-align: center;
+    height: 24px;
+    text-transform: uppercase;
+    background: none repeat scroll 0 0 #e19758;
+    border: none;
+    position: relative;
+    top: -1px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    border-bottom: 2px solid #ed7800;
+    cursor: pointer;
+}
+
+input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, button:hover {
+    color: white;
+    background: #433540;
+}
+
+input[type=submit]:disabled, input[type=reset]:disabled, input[type=button]:disabled, button:disabled {
+    color: white;
+    background: #E1B48E;
+}
+
+input[type=submit]:disabled:hover, input[type=reset]:disabled:hover, input[type=button]:disabled:hover, button::disabled:hover {
+    color: white;
+    background: #E1B48E;
+}
+
+#subscription-toggle { /* forum visual fix */
+  float: right;
+}
+
+/* End of CSS rules added in by Sam */
+
+@media only screen and (max-width: 860px) {
+  .widget-area { display: none; }
+  .content-area { width: 100%; }
+}
+
+/* Reponsive menu items */
+@media only screen and (max-width: 490px) {
+  ul#primary-nav-items li {
+    width: 100%;
+    display: block;
+  }
+  ul#primary-nav-items li a {
+    height: 40px;
+    line-height: 40px;
+  }
+  li.current_page_item a {
+    /* Remove orange border for active page indicator (saves vertical space) */
+    border-bottom: none;
+  }
+  img#logo {
+    /* Hide the site logo */
+    display: none;
+  }
+}
+
+/* Select dropdowns for rig builder simple page */
+#rig-builder-attributes select {
+  width: 200px;
+  margin-left: 15px;
+}
+
+.rig-builder-tile {
+  height: 280px;
+  width: 364px;
+}
+
+.rig-builder-tile-container {
+  position:relative;
+  width: 384px;
+  height: 300px;
+  padding: 8px;
+  margin-top: 5px;
+  background: #e0e0e0;
+  border: 2px dotted #d3d3d3;
+  border-radius: 5px;
+}
+
+.active-channel-indicator {
+  font-size: 10px;
+}
+
+.active-channel-indicator.red {
+  color: red;
+}
+
+.active-channel-indicator.red:after {
+  content: "RED CHANNEL";
+}
+
+.active-channel-indicator.green {
+  color: rgb(0, 218, 0);
+}
+
+.active-channel-indicator.green:after {
+  content: "GREEN CHANNEL";
+}
+
+/* fix for WP Social Login plugin */
+
+.wp-social-login-widget img {
+  margin: 0;
+}
+
+div.bbp-submit-wrapper {
+  float: none !important;
+}
+
+div.wp-social-login-widget {
+  text-align: left;
+  margin-bottom: 0;
+}
+
+#wp-social-login-connect-with {
+  margin-bottom: 0;
+}
+
+#wp-social-login-connect-options img {
+  display: inline !important;
+}
+
+.wp-social-login-provider-list {
+  padding: 10px 0 !important;
+}
+
+#wp-social-login-connect-options {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.wp-social-login-widget-clearing {
+  margin: 0;
+}
+
+/* bbpress forum */
+
+form[class^="bbp"] input[type=text],
+form[class^="bbp"] input[type=password] {
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+}
+
+/* add/edit patch form */
+
+#patch-add-edit-form .row {
+  margin-top: 10px;
+}
+
+#patch-add-edit-form .btn-row {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding-left: 21%;
+}
+
+#patch-add-edit-form .btn-row button {
+  margin-right: 15px;
+}
+
+.btn-large {
+  width: 165px;
+  margin-right: 30px;
+  line-height: 0px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.btn-large:disabled {
+  background-color: #ccc; 
+  border-bottom: 2px solid #999;
+}
+
+.patchcode-toolbar .btn-large {
+  width: auto;
+  min-width: 100px;
+  margin-right: 15px;
+}
+
+#patch-add-edit-form .row:before, #patch-add-edit-form .row:after {
+  content: " ";
+  display: table;
+  clear: both;
+}
+
+#patch-add-edit-form textarea {
+  height: 100px;
+}
+
+#patch-add-edit-form input[type=number],
+#patch-add-edit-form select {
+  width: 100px;
+  width: 30% !important;
+  text-align: right;
+}
+
+#patch-add-edit-form select {
+  background-color: white;
+}
+
+#patch-add-edit-form fieldset {
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  padding: 5px 0 20px 0;
+  margin-top: 10px;
+}
+
+#patch-add-edit-form fieldset legend {
+  margin-left: 21%;
+  padding: 0 10px;
+  font-weight: bold;
+  color: #5d5d5d;
+}
+
+#patch-add-edit-form label {
+  width: 20%;
+  text-align: right;
+  float: left;
+  display: block;
+  margin-right: 10px;
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+#patch-add-edit-form label.percent {
+  width: auto;
+  padding: 5px;
+}
+
+#frm-patch-tags {
+  width: 30% !important;
+}
+
+#patch-add-edit-form .form-control {
+  width: 70%;
+  float: left;
+  display: block;
+}
+
+#patch-add-edit-form input.form-control,
+#patch-add-edit-form textarea.form-control,
+#patch-add-edit-form select.form-control {
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  font-family: Ubuntu, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 15px;
+  color: #5d5d5d;
+  padding: 4px;
+}
+
+#patch-add-edit-form label.required:after {
+  content: "*";
+}
+
+#patch-add-edit-form small {
+  font-size: 12px;
+  color: #5d5d5d;
+}
+
+#patch-add-edit-form .row.repeat input[type=text],
+#patch-add-edit-form .row.repeat input[type=url] {
+  width: 80%;
+}
+
+#patch-add-edit-form div.remove {
+  padding-left: 10px;
+  font-size: 12px;
+  display: inline !important;
+}
+
+#patch-add-edit-form fieldset .add {
+  padding-left: 21%;
+  padding-top: 10px;
+  display: block;
+  font-size: 12px;
+}
+
+#patch-add-edit-form .invalid {
+  border-color: #ed7800;
+  box-shadow: 0 0 8px rgba(237,120  ,0,.6);
+}
+
+#patch-add-edit-form div.error-message {
+  clear: both;
+  display: none;
+  float: left;
+  margin-left: 21%;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #ed7800;
+}
+
+#patch-add-edit-form div.error-message.no-margin {
+  margin-left: 0;
+}
+
+#patch-add-edit-form div.info-message {
+  clear: both;
+  float: left;
+  margin-left: 21%;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #5d5d5d  ;
+}
+
+#patch-add-edit-form label.frm-patch-author-radio {
+  float: left;
+  width: auto;
+  display: block;
+  text-align: left;
+  color: #5d5d5d;
+}
+
+#frm-patch-author-name {
+  float: left;
+  font-family: Ubuntu, sans-serif;
+  font-size: 16px;
+  color: #5d5d5d;
+}
+
+/* tabs */
+
+.tab-nav {
+  border-bottom: 1px solid #d3d3d3;
+  font-size: 11px;
+}
+
+.tab-nav li {
+  cursor: pointer;
+  color: grey;
+  background: #d3d3d3;
+  top: 1px;
+  position: relative;
+  display: inline-block;
+  margin: 1px 4px 0 0;
+  padding: 5px 20px;
+  border: 1px solid #d3d3d3;
+}
+
+.tab-nav li.active {
+  color: #000;
+  border-bottom: 1px solid #fff;
+  background: white;
+}
+
+.tab-content {
+  overflow: scroll;
+  position: relative;
+  padding: 40px 20px ;
+  min-height: 100px;
+  border: 1px solid #d3d3d3;
+  border-top: none;
+}
+
+.file-download-link {
+  background: url('/wp-content/themes/hoxton-owl-2014/page-patch-library/images/download.png') no-repeat center center;
+  height: 15px;
+  width: 20px;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.file-edit-link {
+  background: url('/wp-content/themes/hoxton-owl-2014/page-patch-library/images/pencil.svg') no-repeat center center;
+  background-size: 96%;
+  height: 15px;
+  width: 20px;
+  display: inline-block;
+  margin-left: 10px;
+  background-color: rgba(255,255,255,0);
+}
+
+.edit-mode .file-edit-link {
+  background-image: url('/wp-content/themes/hoxton-owl-2014/page-patch-library/images/pencil_orange.svg');
+}
+
+/* GitHub file tabs */
+#github-files pre.prettyprint {
+  border: none !important;
+}
+
+pre.prettyprint {
+    overflow: scroll;
+    font-family: "Droid Sans Mono", "Lucida Console", "Monaco", "Courier New", monospace;
+    font-size: 13px;
+}
+
+span.patch-title, span.author-name, div.tag, .tag-filter-button, .secondary-nav-item {
+    cursor: pointer;
+}
+
+div.patch-visibility {
+  color: white;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-top: 10px;
+  background: url("/wp-content/themes/hoxton-owl-2014/page-patch-library/images/lock.png") no-repeat 5px center;
+  padding-left: 21px;
+}
+
+div.patch-visibility img {
+  display: inline;
+  margin: 0 5px;
+}
+
+/* restyling of select2 elements */
+.select2-container--default .select2-selection--single {
+  border-radius: 5px !important;
+  border: 1px solid #d3d3d3 !important;
+}
+
+.select2-results {
+  color: #5d5d5d !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background: #ed7800 !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  border: 1px solid #d3d3d3 !important;
+}
+
+.select2 li {
+  list-style: none;
+}
+
+.select2-container--default .select2-selection--multiple,
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+  border: 1px solid #d3d3d3;
+}
+
+body.login {
+  padding: 0 !important;
+}
+
+.ui-widget-overlay {
+  opacity: .70 !important; /* Make sure to change both of these, as IE only sees the second one */
+  filter: Alpha(Opacity=70) !important;
+}
+
+#compile-dialog {
+  display: none;
+  width: 60%;
+}
+
+#compile-tabs {
+  height: 200px;
+}
+
+#compile-dialog-button-container {
+  text-align: right;
+  margin-top: 10px;
+}
+
+#compile-tabs textarea {
+  height: 130px;
+  font-family: 'Droid Sans Mono', monospace;
+  font-size: 12px;
+  border: none;
+  width: 99%;
+  padding: 3px;
+}
+
+#tabs-result, #tabs-stdout, #tabs-stderr {
+  padding: 0;
+}
+
+a.github-link {
+  display: block;
+  position: absolute;
+  top: 15px;
+  right: 30px;
+  text-decoration: underline;
+  color: #ed7800;
+}
+
+/* Fix for login, register and reset pass pages */
+
+body.login .wp-social-login-provider-list a,
+body.register-2 .wp-social-login-provider-list a {
+    display: block;
+    float: left;
+    margin-right: 10px;
+}
+
+body.login p.forgetmenot {
+    clear: both;
+    padding-top: 20px;
+}
+
+body.login div.sharedaddy,
+body.lostpassword div.sharedaddy,
+body.resetpass div.sharedaddy,
+body.register-2 div.sharedaddy {
+    display: none;
+}
+
+body.login ul.tml-action-links {
+    margin-top: 40px;
+}
+
+body.resetpass #pass1-text {
+    display: none;
+}
+
+body.login #user_login,
+body.register-2 #user_login,
+body.login #user_pass,
+body.register-2 #user_email {
+    display: block;
+}
+
+#theme-my-login p.message {
+    background-color: #fcf8e3;
+    padding: 10px;
+}
+
+#theme-my-login p.error {
+    background-color: #f2dede;
+    padding: 10px;
+}
+
+div.file-upload-container { /* simulate a button */
+    overflow: hidden;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background: #e19758 none repeat scroll 0 0;
+    border-color: -moz-use-text-color -moz-use-text-color #ed7800;
+    border-image: none;
+    border-style: none none solid;
+    border-width: medium medium 2px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline;
+    font-family: "montserrat",sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    height: 24px;
+    list-style-type: none;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    top: 3px;
+    padding: 3px 10px;
+}
+
+div.file-upload-container:hover {
+    color: white;
+    background: #433540;
+}
+
+div.file-upload-container input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
