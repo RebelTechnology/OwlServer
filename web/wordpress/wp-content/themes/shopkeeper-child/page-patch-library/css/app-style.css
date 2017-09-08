@@ -1,58 +1,11 @@
-/**
- * Eric Meyer's Reset CSS v2.0 (http://meyerweb.com/eric/tools/css/reset/)
- * http://cssreset.com
- */
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
-    /* Set borders to internal rather than external (personal preference) */
-    box-sizing:border-box;
-    -moz-box-sizing:border-box;
-    -webkit-box-sizing:border-box;
-}
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
-    display: block;
-}
-body {
-    line-height: 1;
-}
-ol, ul {
-    list-style: none;
-}
-blockquote, q {
-    quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-    content: '';
-    content: none;
-}
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-}
-
 /* Structural divs */
 
 body { background: #f4f4f4; }
+
+#page_wrapper.sticky_header .content-area {
+    margin-top: 0;
+    background: #f4f4f4;
+}
 
 .flexbox {
     display: flex;
@@ -61,6 +14,10 @@ body { background: #f4f4f4; }
 
 .flex-center {
     justify-content: center;
+}
+
+#site-footer {
+    background: #ddd;
 }
 
 #primary-nav-bar {
@@ -145,6 +102,80 @@ body { background: #f4f4f4; }
     width: 100%;
     margin-top: 20px;
     margin-bottom: 10px;
+}
+
+patch-stats, .patch-stats2 {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background: none;
+}
+
+.patch-stats2 {
+    border: 1px dotted #b7b7b7;
+    border-radius: 5px;
+    text-align: center;
+    padding: 10px;
+    line-height: 1.4;
+    margin-top: 10px;
+    display: none;
+}
+
+span.parameter-label {
+    font-size: 10px;
+    color: #909090;
+}
+
+.patch-stats .parameter-label {
+    width: 100px;
+    display: inline-block;
+    text-align: left;
+}
+
+.patch-stats .parameter-label:after {
+    content:" : ";
+    font-size: 15px;
+}
+
+.patch-stats .parameter-value {
+    padding: 0;
+    font-size: 11px;
+    color: #231f20;
+}
+
+.patch-stats2 span.parameter-value {
+    font-size: 12px;
+    color: #333;
+    margin-left: 10px;
+    font-family: "Montserrat", sans-serif;
+}
+
+.patch-stats2 span.parameter-value::after {
+    content: "//";
+    margin-left: 20px;
+    margin-right: 20px;
+    color: #b7b7b7;
+    font-size: 8px;
+}
+
+.patch-stats2 span.parameter-value:last-child::after {
+    content: "";
+    margin-right: 0;
+}
+
+.patch-stats table tr td {
+    border-top: 1px dotted #b7b7b7;
+    padding: 5px;
+}
+
+.patch-stats table tr td p {
+    padding: 0;
+    font-size: 10px;
+    color: #231f20;
+}
+
+.patch-stats table tr:last-of-type {
+    border-bottom: 1px dotted #b7b7b7;
 }
 
 .patch-stats a {
@@ -793,6 +824,7 @@ body { background: #f4f4f4; }
     font-family: 'ubuntu', sans-serif;
     font-size: 12px;
     text-decoration: none;
+    color: #000;
 }
 
 .tag:hover {
@@ -935,6 +967,432 @@ h2 {
     color: #fff;
 }
 
+/* add/edit patch form */
+
+#patch-add-edit-form .row {
+  margin-top: 10px;
+}
+
+#patch-add-edit-form .btn-row {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding-left: 21%;
+}
+
+#patch-add-edit-form .btn-row button {
+  margin-right: 15px;
+}
+
+#patch-add-edit-form fieldset button {
+    margin-bottom: 0;
+    padding: 18px;
+    line-height: 4px;
+}
+
+.btn-large {
+  width: 165px;
+  margin-right: 30px;
+  line-height: 0px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.btn-large:disabled {
+  background-color: #ccc; 
+  border-bottom: 2px solid #999;
+}
+
+.patchcode-toolbar .btn-large {
+  width: auto;
+  min-width: 100px;
+  margin-right: 15px;
+}
+
+#patch-add-edit-form .row:before, #patch-add-edit-form .row:after {
+  content: " ";
+  display: table;
+  clear: both;
+}
+
+#patch-add-edit-form textarea {
+  height: 100px;
+}
+
+#patch-add-edit-form input[type=number],
+#patch-add-edit-form select {
+  width: 100px;
+  width: 30% !important;
+  text-align: right;
+}
+
+#patch-add-edit-form select {
+  background-color: white;
+}
+
+#patch-add-edit-form fieldset {
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  padding: 5px 0 20px 0;
+  margin-top: 10px;
+}
+
+#patch-add-edit-form fieldset legend {
+  margin-left: 21%;
+  padding: 0 10px;
+  font-weight: bold;
+  color: #5d5d5d;
+}
+
+#patch-add-edit-form label {
+  width: 20%;
+  font-weight: normal;
+  text-transform: none;
+  text-align: right;
+  float: left;
+  display: block;
+  margin-right: 10px;
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+#patch-add-edit-form label.percent {
+  width: auto;
+  padding: 5px;
+}
+
+#frm-patch-tags {
+  width: 30% !important;
+}
+
+#patch-add-edit-form .form-control {
+  width: 70%;
+  float: left;
+  display: block;
+}
+
+#patch-add-edit-form input.form-control,
+#patch-add-edit-form textarea.form-control,
+#patch-add-edit-form select.form-control {
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  font-family: Ubuntu, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 15px;
+  color: #5d5d5d;
+  padding: 4px;
+}
+
+#patch-add-edit-form label.required:after {
+  content: "*";
+}
+
+#patch-add-edit-form small {
+  font-size: 12px;
+  color: #5d5d5d;
+}
+
+#patch-add-edit-form .row.repeat input[type=text],
+#patch-add-edit-form .row.repeat input[type=url] {
+  width: 80%;
+  float: left;
+}
+
+#patch-add-edit-form div.remove {
+  padding-left: 10px;
+  font-size: 12px;
+  display: inline !important;
+}
+
+#patch-add-edit-form fieldset .add {
+  padding-left: 21%;
+  padding-top: 10px;
+  display: block;
+  font-size: 12px;
+}
+
+#patch-add-edit-form .invalid {
+  border-color: #ed7800;
+  box-shadow: 0 0 8px rgba(237,120  ,0,.6);
+}
+
+#patch-add-edit-form div.error-message {
+  clear: both;
+  display: none;
+  float: left;
+  margin-left: 21%;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #ed7800;
+}
+
+#patch-add-edit-form div.error-message.no-margin {
+  margin-left: 0;
+}
+
+#patch-add-edit-form div.info-message {
+  clear: both;
+  float: left;
+  margin-left: 21%;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #5d5d5d  ;
+}
+
+#patch-add-edit-form label.frm-patch-author-radio {
+  float: left;
+  width: auto;
+  display: block;
+  text-align: left;
+  color: #5d5d5d;
+}
+
+#frm-patch-author-name {
+  float: left;
+  font-family: Ubuntu, sans-serif;
+  font-size: 16px;
+  color: #5d5d5d;
+}
+
+/* tabs */
+
+.tab-nav {
+  border-bottom: 1px solid #d3d3d3;
+  font-size: 11px;
+  margin: 0;
+}
+
+.tab-nav li {
+  cursor: pointer;
+  color: grey;
+  background: #d3d3d3;
+  top: 1px;
+  position: relative;
+  display: inline-block;
+  margin: 1px 4px 0 0;
+  padding: 5px 20px;
+  border: 1px solid #d3d3d3;
+}
+
+.tab-nav li.active {
+  color: #000;
+  border-bottom: 1px solid #fff;
+  background: white;
+}
+
+.tab-content {
+  overflow: scroll;
+  position: relative;
+  padding: 40px 20px ;
+  min-height: 100px;
+  border: 1px solid #d3d3d3;
+  border-top: none;
+}
+
+.file-download-link {
+  background: url('../images/download.png') no-repeat center center;
+  height: 15px;
+  width: 20px;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.file-edit-link {
+  background: url('../images/pencil.svg') no-repeat center center;
+  background-size: 96%;
+  height: 15px;
+  width: 20px;
+  display: inline-block;
+  margin-left: 10px;
+  background-color: rgba(255,255,255,0);
+}
+
+.edit-mode .file-edit-link {
+  background-image: url('../images/pencil_orange.svg');
+}
+
+/* GitHub file tabs */
+#github-files pre.prettyprint {
+  border: none !important;
+}
+
+pre.prettyprint {
+    overflow: scroll;
+    font-family: "Droid Sans Mono", "Lucida Console", "Monaco", "Courier New", monospace;
+    font-size: 13px;
+}
+
+span.patch-title, span.author-name, div.tag, .tag-filter-button, .secondary-nav-item {
+    cursor: pointer;
+}
+
+div.patch-visibility {
+  color: white;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-top: 10px;
+  background: url("../images/lock.png") no-repeat 5px center;
+  padding-left: 21px;
+}
+
+div.patch-visibility img {
+  display: inline;
+  margin: 0 5px;
+}
+
+.white-box {
+    padding: 40px 40px 40px;
+    border-top-right-radius: 0px;
+    min-height: 1040px;
+}
+
+.white-box a, .widget-area a, #breadcrumb a {
+    color: #ed7800;
+}
+
+.white-box a:hover, .widget-area a:hover, #breadcrumb a:hover {
+    color: #e19758;
+    text-decoration: underline;
+}
+
+.white-box ul, .white-box li {
+  list-style: square outside;
+}
+
+.white-box ul {
+  margin-left: 20px;
+}
+
+.white-box > ol, .white-box > ol > li {
+  list-style: none;
+}
+
+.white-box2 {
+    background: none repeat scroll 0 0 #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 5px;
+    height: auto;
+    margin-bottom: 20px;
+    padding: 20px;
+    width: 100%;
+}
+
+#compile-dialog {
+  display: none;
+  width: 60%;
+}
+
+#compile-tabs {
+  height: 200px;
+}
+
+#compile-dialog-button-container {
+  text-align: right;
+  margin-top: 10px;
+}
+
+#compile-tabs textarea {
+  height: 130px;
+  font-family: 'Droid Sans Mono', monospace;
+  font-size: 12px;
+  border: none;
+  width: 99%;
+  padding: 3px;
+}
+
+#tabs-result, #tabs-stdout, #tabs-stderr {
+  padding: 0;
+}
+
+a.github-link {
+  display: block;
+  position: absolute;
+  top: 15px;
+  right: 30px;
+  text-decoration: underline;
+  color: #ed7800;
+}
+
+div.file-upload-container { /* simulate a button */
+    overflow: hidden;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background: #e19758 none repeat scroll 0 0;
+    border-color: -moz-use-text-color -moz-use-text-color #ed7800;
+    border-image: none;
+    border-style: none none solid;
+    border-width: medium medium 2px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline;
+    font-family: "montserrat",sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    height: 24px;
+    list-style-type: none;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    top: 3px;
+    padding: 3px 10px;
+}
+
+div.file-upload-container:hover {
+    color: white;
+    background: #433540;
+}
+
+div.file-upload-container input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+
+/* general buttons */
+input[type=submit], input[type=reset], input[type=button], button {
+    color: #fff;
+    font-family: "montserrat",sans-serif;
+    font-size: 12px !important;
+    font-weight: 400;
+    display: inline;
+    list-style-type: none;
+    text-align: center;
+    height: 24px;
+    text-transform: uppercase;
+    background: none repeat scroll 0 0 #e19758;
+    border: none;
+    position: relative;
+    top: -1px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    border-bottom: 2px solid #ed7800;
+    cursor: pointer;
+}
+
+input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, button:hover {
+    color: white;
+    background: #433540;
+}
+
+input[type=submit]:disabled, input[type=reset]:disabled, input[type=button]:disabled, button:disabled {
+    color: white;
+    background: #E1B48E;
+}
+
+input[type=submit]:disabled:hover, input[type=reset]:disabled:hover, input[type=button]:disabled:hover, button::disabled:hover {
+    color: white;
+    background: #E1B48E;
+}
+
 /* Media queries */
 
 @media only screen and (max-width: 1430px) {
@@ -983,6 +1441,12 @@ h2 {
     .patch-stats .parameter-label {
         width:auto;
         margin-right: 8px;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    #page_wrapper.sticky_header .content-area {
+        padding-top: 0;
     }
 }
 
