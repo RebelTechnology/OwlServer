@@ -7,7 +7,7 @@ module.exports = {
     './src/index.js'
   ],
   output: {
-    path: path.join(__dirname, '../wordpress/wp-content/themes/hoxton-owl-2014/page-patch-library/js'),
+    path: path.join(__dirname, '../wordpress/wp-content/themes/shopkeeper-child/page-patch-library/js'),
     publicPath: '/',
     filename: 'bundle.js'
   },
