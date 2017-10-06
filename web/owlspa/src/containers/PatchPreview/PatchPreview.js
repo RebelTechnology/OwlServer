@@ -174,7 +174,7 @@ class PatchPreview extends Component {
   render(){
     const { patch, patchJavaScript, webAudioPatch, canEdit } = this.props;
     const { audioSelectValue } = this.state;
-    const audioSampleBasePath = '/wp-content/themes/hoxton-owl-2014/page-patch-library/audio/';
+    const audioSampleBasePath = '/wp-content/themes/shopkeeper-child/page-patch-library/audio/';
     const playAudioFile = audioSelectValue !== 'none' && audioSelectValue !== 'mic';
 
     return (

@@ -481,6 +481,8 @@ span.parameter-label {
 .modal-dialog .dialog-header {
     width: 100%;
     background: #000;
+    line-height: 23px;
+    padding: 10px;
     font-size: 18px;
     font-weight: normal;
     color: #fff;
@@ -489,6 +491,10 @@ span.parameter-label {
 
 .modal-dialog .dialog-header.error {
     background: #bd2929;
+}
+
+.modal-dialog .dialog-tabs {
+    margin: 0;
 }
 
 .modal-dialog .dialog-tabs li {
