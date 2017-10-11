@@ -241,14 +241,22 @@ const patchFieldValidators = {
       }
 
       let url;
-      const validHosts = [
+      const validRebelTechHosts = [
         'hoxtonowl.localhost:8000',
         'staging.hoxtonowl.com',
         'hoxtonowl.com',
         'www.hoxtonowl.com',
+        'dev.rebeltech.org',
+        'www.rebeltech.org'
+      ];
+
+      const validGitHubHosts = [
         'github.com',
         'www.github.com'
       ];
+
+      const validHosts = validRebelTechHosts.concat(validGitHubHosts);
+
       for (let i = 0, max = val.length; i < max; i++) {
         if (typeof val[i] !== 'string') {
           const err = new PatchFieldValidationError('github', 'Invalid URL (1).');
@@ -259,18 +267,18 @@ const patchFieldValidators = {
         url = urlParser.parse(val[i]);
 
         if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-          const err = new PatchFieldValidationError('github', 'Invalid URL (2).');
+          const err = new PatchFieldValidationError('github', 'Invalid URL protocol.');
           err.index = i;
           throw err;
         }
 
         if (validHosts.indexOf(url.host) === -1) {
-          const err = new PatchFieldValidationError('github', 'Source files can only be hosted on our servers or on GitHub.');
+          const err = new PatchFieldValidationError('github', 'Host Error, source files can only be hosted on our servers or on GitHub.');
           err.index = i;
           throw err;
         }
 
-        if (url.host.indexOf('hoxtonowl') !== -1) {
+        if (validRebelTechHosts.indexOf(url.host) > -1) {
           // e.g.: http://hoxtonowl.localhost:8000/wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
           // url.path = /wp-content/uploads/patch-files/tmp55f9a1bd53df71.81542285/Chorus2Patch.hpp
           if (!/^\/wp-content\/uploads\/patch\-files\/[a-z0-9\-]+\/.+$/i.test(url.path)) { // FIXME - Use process.env.PATCH_SOURCE_URL_FRAGMENT instead
@@ -278,7 +286,7 @@ const patchFieldValidators = {
             err.index = i;
             throw err;
           }
-        } else if (url.host.indexOf('github') !== -1) {
+        } else if (validGitHubHosts.indexOf(url.host) > -1) {
           // e.g.: https://github.com/pingdynasty/OwlPatches/blob/master/PhaserPatch.hpp
           if (!/^https?:\/\/(?:www\.)?github\.com\/.+\/.+\/blob\/.+\/.+$/i.test(val[i])) {
             const err = new PatchFieldValidationError('github', 'URL does not seem to be a valid GitHub blob URL.');
@@ -391,7 +399,7 @@ const patchFieldValidators = {
         if(!star.userId || typeof star.userId !== 'number'){
           throw new PatchFieldValidationError('starList', 'userId property missing or wrong in starlist');
         }
-      })
+      });
     },
     sanitize(val) {
       return val.filter(star => {
@@ -406,7 +414,7 @@ const patchFieldValidators = {
           userId: star.userId,
           timeStamp: star.timeStamp || 0
         };
-      })
+      });
     }
   },
 };
