@@ -36,6 +36,9 @@ class PatchCode extends Component {
     }
     let index;
     return files.some((file, i) => {
+      if(!file.fileUrl){
+        return false;
+      }
       const isGen = /\.gendsp$/i.test(this.getFileName(file.fileUrl));
       if(isGen){
         index = i;
@@ -133,12 +136,20 @@ class PatchCode extends Component {
     this.checkForNewPatchCodeFiles(nextProps);
   }
 
-  getActiveTabFileString(patchId, index){
+  getErrorIfErroredFetchingFile(patchId, activeTab){
     const { patchCodeFiles } = this.props;
-    if(!patchId || typeof index === 'undefined' || !patchCodeFiles[patchId] || !patchCodeFiles[patchId][index]){
+    if(!patchId || typeof activeTab === 'undefined' || !patchCodeFiles[patchId] || !patchCodeFiles[patchId][activeTab]){
       return null;
     }
-    return patchCodeFiles[patchId][index].fileString;
+    return patchCodeFiles[patchId][activeTab].errorFetching;
+  }
+
+  getActiveTabFileString(patchId, activeTab){
+    const { patchCodeFiles } = this.props;
+    if(!patchId || typeof activeTab === 'undefined' || !patchCodeFiles[patchId] || !patchCodeFiles[patchId][activeTab]){
+      return null;
+    }
+    return patchCodeFiles[patchId][activeTab].fileString;
   }
 
   getOnlyHoxtonHostedFiles(fileList){
@@ -180,8 +191,9 @@ class PatchCode extends Component {
       return null;
     }
 
-    const isGitHubfile = this.isGitHubfile(fileUrls[activeTab]);
+    const errorFetchingFile = this.getErrorIfErroredFetchingFile(patch._id, activeTab);
     const activeTabFileString = this.getActiveTabFileString(patch._id, activeTab);
+    const isGitHubfile = this.isGitHubfile(fileUrls[activeTab]);
     const activeTabFileName = this.getFileName(fileUrls[activeTab]);
     const filesAreSaving = patchCodeFiles[patch._id].some(file => file.isSaving);
     const isPdFile = /\.pd$/i.test(activeTabFileName);
@@ -256,6 +268,8 @@ class PatchCode extends Component {
               {tabNavItems}
             </ul>
             <div className="tab-content" style={editorNightMode ? {backgroundColor: '#272822'} : {}}>
+              { errorFetchingFile }
+
               { isGitHubfile && <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> }
               
               { showPatchCodeEditControls && (activeTabFileString === '' || activeTabFileString) && ( 

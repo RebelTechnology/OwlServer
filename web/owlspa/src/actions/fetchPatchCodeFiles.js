@@ -6,11 +6,16 @@ import {
   REQUEST_PATCH_CODE_FILE_FAILED
 } from 'constants';
 
+const rebelTechDomains = [
+  'hoxtonowl.com',
+  'rebeltech.org'
+];
+
 const isHoxtonOwlFile = (fileUrl) => {
   if(!fileUrl){
     return false;
   }
-  return parseUrl(fileUrl).authority.indexOf('hoxtonowl.com') > -1;
+  return rebelTechDomains.indexOf(parseUrl(fileUrl).authority) > -1;
 };
 
 const isGithubFile = (fileUrl) => {
