@@ -8,6 +8,8 @@ import {
 
 const rebelTechDomains = [
   'hoxtonowl.com',
+  'www.rebeltech.org',
+  'dev.rebeltech.org',
   'rebeltech.org'
 ];
 
