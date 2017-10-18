@@ -6,6 +6,7 @@ import {
   PATCH_SAVING,
   PATCH_SAVED,
   ERROR_SAVING_PATCH,
+  PATCH_SEO_NAME_CHANGED,
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
   PATCH_COMPILATION_FAILED,
@@ -15,8 +16,10 @@ import {
 
 const initialState = {
   isSaving: false,
+  savedSuccess: false,
   isFetching: false,
-  patches: {}
+  patches: {},
+  patchSeoNameChanged: null
 };
 
 const removeStarFromList = (starList=[], star) => {
@@ -35,6 +38,20 @@ const addOrUpdateStarInList = (starList=[], star) => {
     star
   ];
 };
+
+const updatePatchesWithNewPatchSeoName = (patches, oldSeoName, newSeoName, newPatchName) => {
+  const newPatches = {
+    ...patches,
+    [newSeoName]: {
+      ...patches[oldSeoName],
+      seoName: newSeoName,
+      name: newPatchName
+    }
+  };
+
+  delete newPatches[oldSeoName];
+  return newPatches;
+}
 
 const patchDetails = (state = initialState, action) => {
   switch (action.type) {
@@ -96,17 +113,26 @@ const patchDetails = (state = initialState, action) => {
     case PATCH_SAVING:
       return {
         ...state,
-        isSaving: true
+        savedSuccess: false,
+        isSaving: true,
+        patchSeoNameChanged: null
       }
     case PATCH_SAVED:
       return {
         ...state,
+        savedSuccess: true,
         isSaving: false
       }
     case ERROR_SAVING_PATCH:
       return {
         ...state,
         isSaving: false
+      }
+    case PATCH_SEO_NAME_CHANGED:
+      return {
+        ...state,
+        patchSeoNameChanged: action.newSeoName,
+        patches: updatePatchesWithNewPatchSeoName(state.patches, action.oldSeoName, action.newSeoName, action.newPatchName)
       }
     case REQUEST_COMPILE_PATCH:
       return {

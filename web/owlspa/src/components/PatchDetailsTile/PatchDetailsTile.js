@@ -20,7 +20,7 @@ class PatchDetailsTile extends Component {
         <h2 style={{ marginBottom:'10px' }}>{title}</h2>
         { editMode ? (
             <textarea 
-              style={{backgroundColor: isSaving ? '#bbb' : 'intial'}} 
+              style={{backgroundColor: isSaving ? '#bbb' : '#fff'}} 
               disabled={isSaving} 
               value={text} 
               onChange={ e => onTextChange(e.target.value) } 

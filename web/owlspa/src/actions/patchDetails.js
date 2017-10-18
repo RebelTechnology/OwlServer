@@ -20,12 +20,12 @@ export const exitEditModeForPatchDetails = (patchSeoName) => {
   };
 }
 
-export const serverUpdatePatchAndExitEditMode = (patch) => {
+export const serverUpdatePatchAndExitEditMode = patch => {
   return (dispatch) => {
-    dispatch(serverUpdatePatch(patch)).then((result) => {
-      if(result === 'patch updated'){
+    dispatch(serverUpdatePatch(patch)).then(result => {
+      if(result && result.patchUpdated){
         dispatch(exitEditModeForPatchDetails(patch.seoName))
-      }
-    })
+      } 
+    });
   }
 }
