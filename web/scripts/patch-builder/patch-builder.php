@@ -31,6 +31,7 @@ function usage() {
     echo '  --sysex             Build only the sysex target.' . PHP_EOL;
     echo '  --web               Build only the JavaScript target.' . PHP_EOL;
     echo '  --gen               Build GEN patch.' . PHP_EOL;
+    echo '  --maximilian        Build Maximilian patch.' . PHP_EOL;
     echo PHP_EOL;
     echo 'Debug options:' . PHP_EOL;
     echo '  --only-show-files   Only show files that would be downloaded from GitHub.' . PHP_EOL;
@@ -225,6 +226,7 @@ $longopts  = [
     'web',
     'sysex',
     'gen',
+    'maximilian',
 ];
 $options = getopt($shortopts, $longopts);
 
@@ -280,6 +282,10 @@ if (isset($options['web']) && false === $options['web']) {
 
 if (isset($options['gen']) && false === $options['gen']) {
    $buildCmd = 'make gen';
+}
+
+if (isset($options['maximilian']) && false === $options['maximilian']) {
+   $buildCmd = 'make maximilian';
 }
 
 /*
@@ -468,6 +474,26 @@ if ($buildCmd == 'make sysx') {
     $cmd .= 'PATCHIN=' .     $patch['inputs']  .' ';
     $cmd .= 'PATCHOUT='.     $patch['outputs'] .' ';
     $cmd .= 'GEN=' . escapeshellarg($className) . ' ';
+    $cmd .= $makeTarget;
+    if (!(isset($options['sysex']) && false === $options['sysex'])
+         && MAKE_TARGET_SYSX == $makeTarget) {
+      $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
+    }
+
+} elseif ($buildCmd == 'make maximilian') {
+
+    // First source file only
+    $sourceFile = $sourceFiles[0];
+    $className = substr($sourceFile, 0, strrpos($sourceFile, '.'));
+    $patchSourceFileExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
+
+    // Specify where to find Emscripten's config file
+    $cmd .= 'BUILD=' .  escapeshellarg($patchBuildDir)  . ' ';
+    $cmd .= 'PATCHSOURCE=' . escapeshellarg($patchSourceDir) . ' ';
+    $cmd .= 'PATCHNAME=' .   escapeshellarg($patch['name'])  . ' ';
+    $cmd .= 'PATCHIN=' .     $patch['inputs']  .' ';
+    $cmd .= 'PATCHOUT='.     $patch['outputs'] .' ';
+    $cmd .= 'MAXIMILIAN=' . escapeshellarg($className) . ' ';
     $cmd .= $makeTarget;
     if (!(isset($options['sysex']) && false === $options['sysex'])
          && MAKE_TARGET_SYSX == $makeTarget) {
