@@ -13,12 +13,6 @@ class PatchListPage extends Component {
     }
   }
 
-  handleDeletePatchClick(e, patch){
-    e.preventDefault();
-    e.stopPropagation();
-    this.props.deletePatch(patch);
-  }
-
   currentUserCanEdit(patch){
     if(!patch){
       return false;
@@ -44,9 +38,7 @@ class PatchListPage extends Component {
           description={patch.description}
           tags={patch.tags}
           seoName={patch.seoName}
-          canEdit={this.currentUserCanEdit(patch)}
           loggedIn={currentUser.loggedIn}
-          onDeletePatchClick={(e) => this.handleDeletePatchClick(e, patch)}
         />
       );
     });

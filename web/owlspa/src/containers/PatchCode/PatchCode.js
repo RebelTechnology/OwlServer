@@ -1,9 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { fetchPatchCodeFiles, updatePatchCodeFile, serverSavePatchFiles } from 'actions'; 
+import { 
+  fetchPatchSourceCodeFiles,
+  updatePatchSourceCodeFile,
+  serverSavePatchFiles 
+} from 'actions'; 
 import classNames from 'classnames';
 import { parseUrl } from 'utils';
-import { GenPatchFileSVG } from 'components';
+import { GenPatchFileSVG, Icon } from 'components';
+import customHistory from '../../customHistory';
 import pdfu from 'pd-fileutils';
 import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -19,15 +24,8 @@ class PatchCode extends Component {
       editModeActive: false,
       editorNightMode: false,
       hasGenDspFile: false,
-      patchCodeFilesLoaded: false
+      patchSourceCodeFilesLoaded: false
     };
-  }
-
-  checkForNewPatchCodeFiles(props){
-    const { fileUrls, patch, patchCodeFiles } = props;
-    if(fileUrls && fileUrls.length && !patchCodeFiles[patch._id]){
-      this.props.fetchPatchCodeFiles(fileUrls, patch._id);
-    }
   }
 
   patchFilesConstainsGenDsp(files){
@@ -47,7 +45,7 @@ class PatchCode extends Component {
     }) && {index};
   }
 
-  patchCodeFilesHaveLoaded(files){
+  patchSourceCodeFilesHaveLoaded(files){
     if(!files){
       return false;
     }
@@ -56,12 +54,12 @@ class PatchCode extends Component {
     });
   }
 
-  ifPatchCodeFilesContainsGenDspSetAsActiveTab({ patchCodeFiles, patch }){
-    const { patchCodeFilesLoaded } = this.state;
-    if(!patchCodeFiles || !patch || this.state.hasGenDspFile || !patchCodeFilesLoaded || this.state.hasGenDspFile){
+  ifPatchSourceCodeFilesContainsGenDspSetAsActiveTab({ patchSourceCodeFiles, patch }){
+    const { patchSourceCodeFilesLoaded } = this.state;
+    if(!patchSourceCodeFiles || !patch || this.state.hasGenDspFile || !patchSourceCodeFilesLoaded || this.state.hasGenDspFile){
       return;
     }
-    const hasGenDspFile = this.patchFilesConstainsGenDsp(patchCodeFiles[patch._id]);
+    const hasGenDspFile = this.patchFilesConstainsGenDsp(patchSourceCodeFiles[patch._id]);
     if(hasGenDspFile){
       this.setState({
         hasGenDspFile: true,
@@ -81,11 +79,19 @@ class PatchCode extends Component {
   }
 
   isGitHubfile(fileUrl){
+    if(!fileUrl){
+      return false;
+    }
+
     const domain = parseUrl(fileUrl).authority;
     return domain.indexOf('github.com') > -1;
   }
 
   isHoxtonFile(fileUrl){
+    if(!fileUrl){
+      return false;
+    }
+    
     const domain = parseUrl(fileUrl).authority;
     return domain.indexOf('hoxtonowl.com') > -1;
   }
@@ -117,39 +123,41 @@ class PatchCode extends Component {
     this.setState({ editorNightMode: !this.state.editorNightMode });
   }
 
-  setFlagIfPatchCodeFilesHaveLoaded({ patchCodeFiles, patch }){
-    const { patchCodeFilesLoaded } = this.state;
-    if(!patch || !patchCodeFiles || patchCodeFilesLoaded){
+  setFlagIfPatchSourceCodeFilesHaveLoaded({ patchSourceCodeFiles, patch }){
+    const { patchSourceCodeFilesLoaded } = this.state;
+    if(!patch || !patchSourceCodeFiles || patchSourceCodeFilesLoaded){
       return;
     }
-    if(this.patchCodeFilesHaveLoaded(patchCodeFiles[patch._id])){
+    if(this.patchSourceCodeFilesHaveLoaded(patchSourceCodeFiles[patch._id])){
       this.setState({
-        patchCodeFilesLoaded: true
+        patchSourceCodeFilesLoaded: true
       });
     }
 
   }
 
   componentWillUpdate(nextProps, nextState){
-    this.setFlagIfPatchCodeFilesHaveLoaded(nextProps);
-    this.ifPatchCodeFilesContainsGenDspSetAsActiveTab(nextProps);
-    this.checkForNewPatchCodeFiles(nextProps);
+    this.setFlagIfPatchSourceCodeFilesHaveLoaded(nextProps);
+    this.ifPatchSourceCodeFilesContainsGenDspSetAsActiveTab(nextProps);
+    if(nextProps.fileUrls && nextProps.patch && (nextProps.fileUrls !== this.props.fileUrls)){
+      this.props.fetchPatchSourceCodeFiles(nextProps.fileUrls, nextProps.patch._id);
+    }
   }
 
   getErrorIfErroredFetchingFile(patchId, activeTab){
-    const { patchCodeFiles } = this.props;
-    if(!patchId || typeof activeTab === 'undefined' || !patchCodeFiles[patchId] || !patchCodeFiles[patchId][activeTab]){
+    const { patchSourceCodeFiles } = this.props;
+    if(!patchId || typeof activeTab === 'undefined' || !patchSourceCodeFiles[patchId] || !patchSourceCodeFiles[patchId][activeTab]){
       return null;
     }
-    return patchCodeFiles[patchId][activeTab].errorFetching;
+    return patchSourceCodeFiles[patchId][activeTab].errorFetching;
   }
 
   getActiveTabFileString(patchId, activeTab){
-    const { patchCodeFiles } = this.props;
-    if(!patchId || typeof activeTab === 'undefined' || !patchCodeFiles[patchId] || !patchCodeFiles[patchId][activeTab]){
+    const { patchSourceCodeFiles } = this.props;
+    if(!patchId || typeof activeTab === 'undefined' || !patchSourceCodeFiles[patchId] || !patchSourceCodeFiles[patchId][activeTab]){
       return null;
     }
-    return patchCodeFiles[patchId][activeTab].fileString;
+    return patchSourceCodeFiles[patchId][activeTab].fileString;
   }
 
   getOnlyHoxtonHostedFiles(fileList){
@@ -159,24 +167,28 @@ class PatchCode extends Component {
   }
 
   handlePatchCodeFileChange(index, newFileString){
-    const { patch, updatePatchCodeFile } = this.props;
-    updatePatchCodeFile(patch._id, index, newFileString);
+    const { patch, updatePatchSourceCodeFile } = this.props;
+    updatePatchSourceCodeFile(patch._id, index, newFileString);
   }
 
   handleSavePatchFiles(e){
-    const { serverSavePatchFiles, patch, patchCodeFiles } = this.props;
-    const fileList = this.getOnlyHoxtonHostedFiles(patchCodeFiles[patch._id]);
+    const { serverSavePatchFiles, patch, patchSourceCodeFiles } = this.props;
+    const fileList = this.getOnlyHoxtonHostedFiles(patchSourceCodeFiles[patch._id]);
     serverSavePatchFiles(patch, fileList);
   }
 
   handleSaveAndCompilePatchFiles(e, options={}){
     if(options.unsavedFileChanges){
-      const { serverSavePatchFiles, patch, patchCodeFiles } = this.props;
-      const fileList = this.getOnlyHoxtonHostedFiles(patchCodeFiles[patch._id]);
+      const { serverSavePatchFiles, patch, patchSourceCodeFiles } = this.props;
+      const fileList = this.getOnlyHoxtonHostedFiles(patchSourceCodeFiles[patch._id]);
       serverSavePatchFiles(patch, fileList, {compile: true});
     } else {
       this.props.onCompileClick(e);
     }
+  }
+
+  handleAddFileClick(){
+    customHistory.push('/edit-patch/'+ this.props.patch.seoName);
   }
 
   getPatchCodeHasBeenEdited(files = []){
@@ -184,21 +196,21 @@ class PatchCode extends Component {
   }
 
   render(){
-    const { fileUrls, patchCodeFiles, patch, canEdit } = this.props;
+    const { fileUrls, patchSourceCodeFiles, patch, canEdit } = this.props;
     const { activeTab, editModeActive, editorNightMode } = this.state;
 
-    if(!fileUrls || fileUrls.length === 0 || !patchCodeFiles || !patchCodeFiles[patch._id]){
+    if(!fileUrls){
       return null;
     }
 
     const errorFetchingFile = this.getErrorIfErroredFetchingFile(patch._id, activeTab);
     const activeTabFileString = this.getActiveTabFileString(patch._id, activeTab);
     const isGitHubfile = this.isGitHubfile(fileUrls[activeTab]);
-    const activeTabFileName = this.getFileName(fileUrls[activeTab]);
-    const filesAreSaving = patchCodeFiles[patch._id].some(file => file.isSaving);
+    const activeTabFileName = fileUrls.length && this.getFileName(fileUrls[activeTab]);
+    const filesAreSaving = patchSourceCodeFiles[patch._id] && patchSourceCodeFiles[patch._id].some(file => file.isSaving);
     const isPdFile = /\.pd$/i.test(activeTabFileName);
     const isGenFile = /\.gendsp$/i.test(activeTabFileName);
-    const unsavedFileChanges = this.getPatchCodeHasBeenEdited(patchCodeFiles[patch._id]);
+    const unsavedFileChanges = patchSourceCodeFiles[patch._id] && this.getPatchCodeHasBeenEdited(patchSourceCodeFiles[patch._id]);
     const isHoxtonFile = this.isHoxtonFile(fileUrls[activeTab]);
     const editorReadOnly = !canEdit || filesAreSaving || !isHoxtonFile || !editModeActive;
     let pdPatchSvg = null;
@@ -218,9 +230,9 @@ class PatchCode extends Component {
       return (
         <li onClick={(e) => this.handleTabClick(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
           <span>{fileName}</span>
-          { i === activeTab ? (
+          { i === activeTab && (
             <a onClick={(e)=> e.stopPropagation()} target="_blank" download={fileName} className="file-download-link" href={this.getDownloadUrl(fileUrl)}></a>
-          ) : null }
+          )}
         </li>
       )
     });
@@ -266,6 +278,11 @@ class PatchCode extends Component {
           <div id="github-files" className={ classNames({'edit-mode': editModeActive }) }>
             <ul className="tab-nav">
               {tabNavItems}
+              {canEdit && (
+                <li onClick={ e => this.handleAddFileClick()}>
+                  <Icon name="plusSymbol" size={14} />
+                </li>
+              )}
             </ul>
             <div className="tab-content" style={editorNightMode ? {backgroundColor: '#272822'} : {}}>
               { errorFetchingFile }
@@ -299,9 +316,15 @@ class PatchCode extends Component {
   }
 
   componentDidMount(){
-    this.checkForNewPatchCodeFiles(this.props);
-    this.setFlagIfPatchCodeFilesHaveLoaded(this.props);
-    this.ifPatchCodeFilesContainsGenDspSetAsActiveTab(this.props);
+    const {
+      fileUrls,
+      patch
+    } = this.props;
+    if(patch && fileUrls){
+      this.props.fetchPatchSourceCodeFiles(fileUrls, patch._id);
+    }
+    this.setFlagIfPatchSourceCodeFilesHaveLoaded(this.props);
+    this.ifPatchSourceCodeFilesContainsGenDspSetAsActiveTab(this.props);
   }
 
 }
@@ -313,14 +336,14 @@ PatchCode.propTypes = {
   onCompileClick: PropTypes.func
 }
 
-const mapStateToProps = ({ patchCodeFiles }) => {
+const mapStateToProps = ({ patchSourceCodeFiles }) => {
   return {
-    patchCodeFiles
+    patchSourceCodeFiles
   }
 }
 
 export default connect(mapStateToProps, { 
-  fetchPatchCodeFiles,
-  updatePatchCodeFile,
+  fetchPatchSourceCodeFiles,
+  updatePatchSourceCodeFile,
   serverSavePatchFiles
 })(PatchCode);

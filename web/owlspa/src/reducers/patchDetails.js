@@ -1,7 +1,6 @@
 import { 
   REQUEST_PATCH_DETAILS,
   RECEIVE_PATCH_DETAILS,
-  EDIT_PATCH_DETAILS,
   PATCH_DELETED,
   PATCH_SAVING,
   PATCH_SAVED,
@@ -69,17 +68,6 @@ const patchDetails = (state = initialState, action) => {
           [action.patchDetails.seoName]:action.patchDetails
         }
       }
-    case EDIT_PATCH_DETAILS:
-      return {
-        ...state,
-        patches: {
-          ...state.patches,
-          [action.patchSeoName]:{
-            ...state.patches[action.patchSeoName],
-            ...action.patchDetails
-          }
-        }
-      }
     case CLIENT_ADD_PATCH_STAR:
       return {
         ...state,
@@ -121,7 +109,11 @@ const patchDetails = (state = initialState, action) => {
       return {
         ...state,
         savedSuccess: true,
-        isSaving: false
+        isSaving: false,
+        patches : {
+          ...state.patches,
+          [action.patch.seoName]: action.patch
+        }
       }
     case ERROR_SAVING_PATCH:
       return {

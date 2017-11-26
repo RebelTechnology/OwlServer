@@ -54,24 +54,26 @@ const serverUpdatePatch = (patch) => {
       })
       .then( json => {
         
-        if(json._id){
+        if(json.patch){
           dispatch({
-            type: PATCH_SAVED
+            type: PATCH_SAVED,
+            patch: json.patch
           });
-          if(patch.seoName !== json.seoName){
+          if(patch.seoName !== json.patch.seoName){
             dispatch({
               type: PATCH_SEO_NAME_CHANGED,
-              newSeoName: json.seoName,
+              newSeoName: json.patch.seoName,
               oldSeoName: patch.seoName,
               newPatchName: patch.name
             });
           }
           return { patchUpdated: true };
         } else {
-          throw new Error('Error updating patch: patch ID missing');
+          throw new Error('Error updating patch: patch missing');
         }
         
       }).catch((err) => {
+        console.error(err);
         dispatch(newDialog({
           header: 'Error Updating Patch',
           isError : true,

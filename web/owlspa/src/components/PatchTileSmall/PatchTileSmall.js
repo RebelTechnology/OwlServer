@@ -26,7 +26,19 @@ class PatchTileSmall extends Component {
   }
 
   handleSaveClick(e){
-    this.props.onUpdatePatchDetails(this.state.patchName);
+    this.props.onUpdatePatchName(this.state.patchName);
+  }
+
+  handleTogglePublished(){
+    const {
+      patch: {
+        published
+      }
+    } = this.props;
+    const confirmed = confirm('Are you sure you want to set this patch to ' + (published ? 'private' : 'published') + ' ?');
+    if(confirmed){
+      this.props.onSetPublished(!published);
+    }
   }
 
   componentWillReceiveProps(nextProps){
@@ -53,7 +65,7 @@ class PatchTileSmall extends Component {
       loggedIn,
       onStarClick,
       starred,
-      patchSeoNameFromRoute 
+      patchSeoNameFromRoute
     } = this.props;
     const { editMode, patchName } = this.state;
     if(!patch){
@@ -63,6 +75,12 @@ class PatchTileSmall extends Component {
     }
     const starCount = patch.starList ? patch.starList.length : 0;
     const author = patch.author;
+    
+    let patchVisibilityStyles = { cursor: 'pointer'};
+    if(patch.published){
+      patchVisibilityStyles.background = 'none';
+      patchVisibilityStyles.paddingLeft = 0;
+    }
 
     return (
       <div styleName="patch-tile-small">
@@ -82,6 +100,12 @@ class PatchTileSmall extends Component {
             { !editMode && <IconButton title="edit patch name" name={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ e => this.handleEditClick(e) } /> }
             { editMode && <IconButton title="save" name={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  e => this.handleSaveClick(e) } /> }
             <IconButton title="delete patch" name="delete" onClick={ onDeletePatchClick } /> 
+            <div 
+              className="patch-visibility" 
+              style={patchVisibilityStyles}
+              onClick={(e) => !isSaving && this.handleTogglePublished()}>
+              { patch.published ? 'PUBLISHED' : 'PRIVATE' }
+            </div>
           </div>)
         }   
         <div styleName="star-counter-wrapper">
@@ -97,12 +121,17 @@ PatchTileSmall.propTypes = {
   patch: PropTypes.object,
   canEdit : PropTypes.bool,
   onDeletePatchClick: PropTypes.func,
-  onUpdatePatchDetails: PropTypes.func,
+  onUpdatePatchName: PropTypes.func,
+  onSetPublished: PropTypes.func,
   onStarClick: PropTypes.func,
   loggedIn: PropTypes.bool,
   starred: PropTypes.bool,
   savedSuccess: PropTypes.bool,
   patchSeoNameFromRoute: PropTypes.string
+};
+
+PatchTileSmall.defaultProps = {
+  onSetPublished: () => {}
 };
 
 export default CSSModules(PatchTileSmall, styles);

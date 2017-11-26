@@ -680,6 +680,9 @@ span.parameter-label {
     padding: 10px;
     line-height: 30px;
     transition: .3s;
+    font-weight: 700;
+    color: #fff;
+    font-size: 18px;
 }
 
 .author-name {
@@ -912,12 +915,6 @@ h2 {
 
 .patch-tile, .patch-tile-small, .patch-description {
     font-family: 'Ubuntu', sans-serif;
-}
-
-.patch-title {
-    font-weight: 700;
-    color: #fff;
-    font-size: 18px;
 }
 
 .author-name {

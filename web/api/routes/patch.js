@@ -164,9 +164,14 @@ router.put('/:id', (req, res) => {
       return patchModel.update(updatedPatch._id, updatedPatch);
     })
     .then(() => {
+      return patchModel.getById(updatedPatch._id);
+    })
+    .then(processPatch)
+    .then(patch => {
       process.stdout.write('Patch ' + updatedPatch._id + ' updated.\n');
       const response = {
         message: 'Patch updated.',
+        patch: patch, // send updated patch back to the client so patch state is updated
         _id: updatedPatch._id,
         seoName: updatedPatch.seoName,
         success: true,

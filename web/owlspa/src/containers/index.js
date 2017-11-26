@@ -1,5 +1,5 @@
 export App from './App/App';
-export CreatePatchPage from './CreatePatchPage/CreatePatchPage';
+export CreateAndEditPatchPage from './CreateAndEditPatchPage/CreateAndEditPatchPage';
 export Dialog from './Dialog/Dialog'; 
 export NavBar from './NavBar/NavBar';
 export OwlControl from './OwlControl/OwlControl';

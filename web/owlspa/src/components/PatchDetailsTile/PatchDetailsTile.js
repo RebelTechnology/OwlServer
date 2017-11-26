@@ -5,15 +5,38 @@ import { IconButton } from 'components';
 
 class PatchDetailsTile extends Component {
 
+  constructor(props){
+    super(props);
+    
+    this.state = {
+      editMode: false
+    }
+  }
+
+  handleEditClick(){
+    this.setState({
+      editMode: true
+    });
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(!nextProps.isSaving && this.props.isSaving){
+      this.setState({
+        editMode: false
+      });
+    }
+  }
+
   render(){
-    const { canEdit, title, text, style, onTextChange, handleEditClick, handleSaveClick, editMode, isSaving } = this.props;
+    const { canEdit, title, style, isSaving, text } = this.props;
+    const { editMode } = this.state;
 
     return (
       <div styleName="patch-details-tile" style={style}>
         { canEdit && (
             <div styleName="patch-tile-controls">
-              { !editMode && <IconButton title="edit" name={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ handleEditClick } /> }
-              { editMode && <IconButton title="save" name={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={ handleSaveClick } /> }
+              { !editMode && <IconButton title="edit" name={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ e => this.handleEditClick() } /> }
+              { editMode && <IconButton title="save" name={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={ e => this.props.onSave() } /> }
             </div>
           )
         }
@@ -23,7 +46,7 @@ class PatchDetailsTile extends Component {
               style={{backgroundColor: isSaving ? '#bbb' : '#fff'}} 
               disabled={isSaving} 
               value={text} 
-              onChange={ e => onTextChange(e.target.value) } 
+              onChange={ e => this.props.onTextChange(e.target.value) } 
             />
           ) : (
             <p>{text}</p>
@@ -36,10 +59,8 @@ class PatchDetailsTile extends Component {
 
 PatchDetailsTile.defaultProps = {
   onTextChange: () => {},
-  handleSaveClick: () => {},
-  handleEditClick: () => {},
+  onSave: () => {},
   isSaving: false,
-  editMode: false,
   text: ''
 }
 
@@ -48,11 +69,9 @@ PatchDetailsTile.propTypes = {
   text: PropTypes.string,
   canEdit : PropTypes.bool,
   isSaving: PropTypes.bool,
-  editMode: PropTypes.bool,
   style: PropTypes.object,
   onTextChange: PropTypes.func,
-  handleSaveClick: PropTypes.func,
-  handleEditClick: PropTypes.func
+  onSave: PropTypes.func
 }
 
 export default CSSModules(PatchDetailsTile, styles);
