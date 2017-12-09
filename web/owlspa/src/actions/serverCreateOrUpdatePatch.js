@@ -15,13 +15,12 @@ const redirectToPatchDetails = patchSeoName => {
 }
 
 const replaceTempDir = (fileUrl, patchId) => {
-  if(fileUrl.indexOf('wp-content/uploads/patch-files/tmp-')=== -1){
+  const tempDirRegex = /\/tmp-.+\//;
+  if(!tempDirRegex.test(fileUrl)){
     return fileUrl;
   }
 
-  const urlParts = fileUrl.split('/');
-  urlParts.splice(-2, 1, patchId);
-  return urlParts.join('/');
+  return fileUrl.replace(tempDirRegex, '/' + patchId + '/');
 }
 
 const replaceTempDirInPatchSourceFileUrls = patch => {
@@ -91,26 +90,25 @@ const serverCreateOrUpdatePatch = (patch, options = {}) => {
           throw new Error('Error saving patch: updated patch missing');
         }
 
-        dispatch({
-          type: PATCH_SAVED,
-          patch: replaceTempDirInPatchSourceFileUrls(json.patch)
-        });
-
-        if(method === 'POST'){
-          return dispatch(cleanUpTmpPatchFiles(json.patch._id)).then(() => {
-            if(options.compile){
-              dispatch(compilePatch({
-                seoName: json.patch.seoName,
-                _id: json.patch._id
-              })).then(()=>{
-                return json.patch.seoName;
-              });
-            } else {
-              return json.patch.seoName;
-            }
+        return dispatch(cleanUpTmpPatchFiles(json.patch._id)).then(() => {
+          
+          dispatch({
+            type: PATCH_SAVED,
+            patch: replaceTempDirInPatchSourceFileUrls(json.patch)
           });
-        }
-        return json.patch.seoName;
+
+          if(options.compile){
+            dispatch(compilePatch({
+              seoName: json.patch.seoName,
+              _id: json.patch._id
+            })).then(()=>{
+              return json.patch.seoName;
+            });
+          } else {
+            return json.patch.seoName;
+          }
+        });
+        
       })
       .then(seoName => {
         redirectToPatchDetails(seoName);

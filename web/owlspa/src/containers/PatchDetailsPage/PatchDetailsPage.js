@@ -2,6 +2,7 @@ import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import { 
   fetchPatchDetails,
+  fetchTags,
   deletePatch,
   compilePatch,
   serverUpdatePatch,
@@ -142,7 +143,8 @@ class PatchDetailsPage extends Component {
     const { 
       patchDetails,
       currentUser ,
-      routeParams:{ patchSeoName } 
+      routeParams:{ patchSeoName },
+      tags
     } = this.props;
 
     const {
@@ -200,7 +202,7 @@ class PatchDetailsPage extends Component {
               />
             }
 
-            <PatchStats canEdit={canEdit} patch={patch} />
+            <PatchStats isSaving={patchDetails.isSaving} availableTagList={tags.items} canEdit={canEdit} patch={patch} />
             
           </div>
 
@@ -220,9 +222,13 @@ class PatchDetailsPage extends Component {
   }
 
   componentDidMount(){
-    const { fetchPatchDetails, routeParams:{patchSeoName} } = this.props;
+    const { fetchPatchDetails, routeParams:{patchSeoName}, tags } = this.props;
     if(patchSeoName && !this.patchIsCached(patchSeoName)){
       this.props.fetchPatchDetails(patchSeoName);
+    }
+
+    if(!tags.items || !tags.items.length){
+      this.props.fetchTags();
     }
   }
 
@@ -232,15 +238,17 @@ PatchDetailsPage.contextTypes = {
   router: PropTypes.object.isRequired
 };
 
-const mapStateToProps = ({ patchDetails, currentUser }) => {
+const mapStateToProps = ({ patchDetails, currentUser, tags }) => {
   return {
     patchDetails,
-    currentUser
+    currentUser,
+    tags
   }
 };
 
 export default connect(mapStateToProps, { 
   fetchPatchDetails,
+  fetchTags,
   deletePatch,
   compilePatch,
   setPatchStarAndSendToSever,
