@@ -125,8 +125,8 @@ const patchFieldValidators = {
         throw new PatchFieldValidationError('description');
       }
 
-      if(val.length < 1 || val.length > 1023) {
-        throw new PatchFieldValidationError('description', 'This field should be at least 1 and at most 1023 characters long.');
+      if(val.length > 1023) {
+        throw new PatchFieldValidationError('description', 'This field should be at most 1023 characters long.');
       }
     },
     sanitize(val) {
