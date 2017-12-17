@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
-import { Tag, IconButton } from 'components';
+import CSSModules from 'react-css-modules';
+import styles from './PatchStats.css';
+import { Tag } from 'components';
 
 class PatchStats extends Component {
   
@@ -9,7 +11,6 @@ class PatchStats extends Component {
       editTagMode: false,
       tagFilter: '',
       tags: props.patch && props.patch.tags ? props.patch.tags : [],
-      unsavedTags: false,
       showTagsDropDown: false
     };
   }
@@ -84,11 +85,30 @@ class PatchStats extends Component {
       tags
     } = this.state;
 
-    console.log('save tags: ', tags);
+    this.props.onSave({tags});
+  }
+
+  handleCancelTagsClick(){
+    const {
+      patch
+    } = this.props;
 
     this.setState({
-      editTagMode: false
+      editTagMode: false,
+      tags: patch && patch.tags ? patch.tags : []
     });
+  }
+
+  componentWillReceiveProps(nextProps){
+    const {
+      savedSuccess
+    } = this.props;
+
+    if(!savedSuccess && nextProps.savedSuccess){
+      this.setState({
+        editTagMode: false
+      });
+    }
   }
 
   render(){
@@ -96,7 +116,8 @@ class PatchStats extends Component {
       patch,
       canEdit,
       availableTagList,
-      isSaving
+      isSaving,
+      savedSuccess
     } = this.props;
     
     const {
@@ -167,70 +188,55 @@ class PatchStats extends Component {
           )}
         </div>
         { editTagMode && (
-          <div className="patch-stats-row" style={{position: 'relative', top: '10px'}}>
-            <div
-              style={{
-                width: '150px',
-                float: 'left',
-                marginRight: '10px',
-                fontSize: '16px',
-                fontWeight: 'normal',
-                textTransform: 'uppercase',
-                position: 'relative'
-              }}
-            >
-              <input  
-                style={{
-                  width: '100%',
-                  display: 'inline-block',
-                  fontWeight: 'normal',
-                  textTransform: 'uppercase',
-                  lineHeight: '32px',
-                  height: '32px'
-                }} 
+          <div className="patch-stats-row" style={{position: 'relative'}}>
+            <div styleName="tag-editor">
+              <input 
+                styleName="tag-editor-filter-input"
                 type="text" 
                 value={tagFilter} 
+                disabled={isSaving}
                 onClick={ e => this.handleTagFilterInputClick()}
                 onChange={(e) => this.handleTagFilterChange(e.target.value) } 
               />
-              <ul
-                style={{
-                  display: showTagsDropDown ? 'block': 'none',
-                  textAlign: 'left',
-                  width: '150px',
-                  position: 'absolute',
-                  zIndex: 100,
-                  listStyleType: 'none',
-                  background: '#ddd',
-                  paddingLeft: '10px',
-                  margin: 0,
-                  maxHeight: '180px',
-                  overflowY: 'scroll'
-                }}
-              >
-                { availableTagList && availableTagList.filter( tag => {
-                  return !tagFilter || tag.toUpperCase().indexOf(tagFilter.toUpperCase()) !== -1;
-                }).map( (tag, i) => {
-                  return (
-                    <li 
-                      key={i}
-                      onClick={() => this.handleAddTag(tag)} 
-                      style={{ 
-                        margin: 0,
-                        padding: '4px 0',
-                        cursor: 'pointer'
-                      }}>
-                    {tag}
-                    </li>
-                  );
-                })}
-              </ul>
+              { showTagsDropDown && (
+                <ul styleName="tag-dropdown">
+                  { availableTagList && availableTagList.filter( tag => {
+                    return !tagFilter || tag.toUpperCase().indexOf(tagFilter.toUpperCase()) !== -1;
+                  }).filter( tag => {
+                    return tags.indexOf(tag) === -1;
+                  }).map( (tag, i) => {
+                    return (
+                      <li 
+                        key={i}
+                        onClick={() => this.handleAddTag(tag)} 
+                      >
+                      {tag}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              
             </div>
             <button 
               className="btn-small" 
+              style={{
+                lineHeight: '6px',
+                margin: '2px'
+              }}
               disabled={isSaving} 
               onClick={ e => this.handleSaveTagsClick()} >
               { isSaving ? '...saving' : 'save'  }
+            </button>
+            <button 
+              className="btn-small" 
+              style={{
+                lineHeight: '6px',
+                margin: '2px'
+              }}
+              disabled={isSaving} 
+              onClick={ e => this.handleCancelTagsClick()} >
+              cancel
             </button>
           </div>
         )}
@@ -242,11 +248,15 @@ class PatchStats extends Component {
 PatchStats.propTypes = {
   patch: PropTypes.object,
   canEdit : PropTypes.bool,
-  availableTagList: PropTypes.array
+  availableTagList: PropTypes.array,
+  onSave : PropTypes.func,
+  isSaving: PropTypes.bool,
+  savedSuccess: PropTypes.bool
 };
 
 PatchStats.defaultProps = {
-  availableTagList: []
+  availableTagList: [],
+  onSave: () => {}
 };
 
-export default PatchStats;
+export default CSSModules(PatchStats, styles);

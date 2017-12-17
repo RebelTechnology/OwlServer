@@ -202,13 +202,27 @@ class PatchDetailsPage extends Component {
               />
             }
 
-            <PatchStats isSaving={patchDetails.isSaving} availableTagList={tags.items} canEdit={canEdit} patch={patch} />
+            <PatchStats 
+              isSaving={patchDetails.isSaving} 
+              availableTagList={tags.items} 
+              canEdit={canEdit} 
+              patch={patch} 
+              onSave={({tags}) => this.handleUpdatePatchDetails({tags})}
+              isSaving={patchDetails.isSaving}
+              savedSuccess={patchDetails.savedSuccess}
+            />
             
           </div>
 
           <div id="two-thirds" className="patch-library">
 
-            <PatchSoundcloud soundcloud={patch.soundcloud} />
+            <PatchSoundcloud 
+              soundcloud={patch.soundcloud} 
+              canEdit={canEdit}
+              isSaving={patchDetails.isSaving}
+              savedSuccess={patchDetails.savedSuccess}
+              onSave={soundcloud => this.handleUpdatePatchDetails({soundcloud})}
+            />
 
             <PatchPreview onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} />
 

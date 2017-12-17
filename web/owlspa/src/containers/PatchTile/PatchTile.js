@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Tag, AuthorLink, IconButton } from 'components';
+import { Tag, AuthorLink } from 'components';
 
 class PatchTile extends Component {
   

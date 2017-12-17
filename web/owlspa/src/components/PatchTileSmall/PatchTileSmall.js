@@ -97,9 +97,9 @@ class PatchTileSmall extends Component {
         </div>
         { canEdit && (
           <div styleName="patch-tile-controls">
-            { !editMode && <IconButton title="edit patch name" name={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ e => this.handleEditClick(e) } /> }
-            { editMode && <IconButton title="save" name={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  e => this.handleSaveClick(e) } /> }
-            <IconButton title="delete patch" name="delete" onClick={ onDeletePatchClick } /> 
+            { !editMode && <IconButton title="edit patch name" icon={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ e => this.handleEditClick(e) } /> }
+            { editMode && <IconButton title="save" icon={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  e => this.handleSaveClick(e) } /> }
+            <IconButton title="delete patch" icon="delete" onClick={ onDeletePatchClick } /> 
             <div 
               className="patch-visibility" 
               style={patchVisibilityStyles}
