@@ -134,6 +134,7 @@ class PatchStats extends Component {
     }
     return (
       <div className="patch-stats">
+      { /*
         <div className="patch-stats-row">
             <span className="parameter-label">Channels</span>
             <span className="parameter-value">{patch.inputs + ' in / ' + patch.outputs + ' out'}</span>
@@ -152,6 +153,7 @@ class PatchStats extends Component {
           </div>
           )
         }
+      */}
         { patch.sysExAvailable && (
           <div className="patch-stats-row">
               <span className="parameter-label">SysEx</span>

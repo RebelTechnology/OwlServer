@@ -15,9 +15,18 @@ class PatchDetailsPage extends Component {
 
   constructor(props){
     super(props);
+    const { routeParams, patchDetails } = props;
+    let description, instructions;
+    if(routeParams && patchDetails && patchDetails.patches && routeParams.patchSeoName){
+      const patch = patchDetails.patches[routeParams.patchSeoName];
+      if(patch){
+        description = patch.description;
+        instructions = patch.instructions;
+      }
+    }
     this.state = {
-      description: '',
-      instructions: '',
+      description: description || '',
+      instructions: instructions || '',
       published: false
     }
   }
@@ -131,7 +140,19 @@ class PatchDetailsPage extends Component {
       this.context.router.push('/patch/' + nextProps.patchDetails.patchSeoNameChanged);
     }
 
-    if(nextPatch && (nextPatch !== thisPatch)){
+    if(nextPatch && thisPatch){
+      if(nextPatch.description !== thisPatch.description){
+        this.setState({
+          description: nextPatch.description
+        });
+      }
+
+      if(nextPatch.instructions !== thisPatch.instructions){
+        this.setState({
+          instructions: nextPatch.instructions
+        });
+      }
+    } else if(nextPatch && !thisPatch){
       this.setState({
         instructions: nextPatch.instructions,
         description: nextPatch.description
