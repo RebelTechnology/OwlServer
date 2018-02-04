@@ -172,8 +172,18 @@ class PatchPreview extends Component {
   }
 
   render(){
-    const { patch, patchJavaScript, webAudioPatch, canEdit } = this.props;
-    const { audioSelectValue } = this.state;
+    const { 
+      patch,
+      patchJavaScript,
+      webAudioPatch,
+      canEdit,
+      isSaving
+    } = this.props;
+    
+    const { 
+      audioSelectValue
+    } = this.state;
+    
     const audioSampleBasePath = '/wp-content/themes/shopkeeper-child/page-patch-library/audio/';
     const playAudioFile = audioSelectValue !== 'none' && audioSelectValue !== 'mic';
 
@@ -182,6 +192,9 @@ class PatchPreview extends Component {
         <div style={{paddingLeft:'30px'}}>
           <PatchParameters 
             patchIsActive={webAudioPatch.isPlaying} 
+            canEdit={canEdit}
+            onSaveParamNames={params => this.props.onSave(params)}
+            isSaving={isSaving}
             patch={patch} 
           />
         </div>
@@ -265,9 +278,16 @@ class PatchPreview extends Component {
 
 PatchPreview.propTypes = {
   patch: PropTypes.object,
-  canEdit : PropTypes.bool,
+  canEdit: PropTypes.bool,
+  isSaving: PropTypes.bool,
+  onSave: PropTypes.func,
   onCompileClick: PropTypes.func
 }
+
+PatchPreview.defaultProps = {
+  onSave: () => {},
+  onCompileClick: () => {}
+};
 
 const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatch }) => {
   return { 

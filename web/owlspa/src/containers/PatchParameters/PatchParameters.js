@@ -1,38 +1,120 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Parameter } from 'containers';
+import { IconButton } from 'components';
 import { setWebAudioPatchParameter } from 'actions';
 
 class PatchParameters extends Component {
   
-  handleOnParameterChange = (parameter) => {
+  constructor(props){
+    super(props);
+    this.state = {
+      editMode: false,
+      parameters: props.patch && props.patch.parameters || {}
+    }
+  }
+
+  handleParameterValueChange(parameter){
     this.props.setWebAudioPatchParameter(parameter);
   }
 
+  handleEditClick(){
+    this.setState({
+      editMode: true
+    });
+  }
+
+  handleSaveClick(){
+    this.props.onSaveParamNames(this.state.parameters)
+  }
+
+  handleParamNameChange(key, name){
+    const {
+      parameters
+    } = this.state;
+
+    this.setState({
+      parameters: {
+        ...parameters,
+        [key]: name
+      }
+    })
+  }
+
+  parameterNamesHaveChanged(nextProps){
+    const {
+      patch
+    } = this.props;
+
+    if(patch !== nextProps.patch){
+      return true;
+    }
+
+    if(patch.parameters !== nextProps.patch.parameters){
+      return true;
+    }
+
+    return Object.keys(nextProps.patch.parameters).some(paramKey => {
+      return nextProps.patch.parameters[paramKey] !== patch.parameters[paramKey]
+    });
+
+  }
+
+  componentWillReceiveProps(nextProps){
+    
+    if(!nextProps.isSaving && this.props.isSaving){
+      this.setState({
+        editMode: false
+      });
+    }
+
+    if(this.parameterNamesHaveChanged(nextProps)){
+      this.setState({
+        parameters: nextProps.patch && nextProps.patch.parameters || {}
+      });
+    }
+  }
+
   render(){
-    const { patch, patchIsActive } = this.props;
+
+    const { 
+      patch,
+      patchIsActive,
+      isSaving
+    } = this.props;
+
+    const {
+      editMode,
+      parameters
+    } = this.state;
+
     if(!patch){
       return null;
     }
 
-    const parameters = patch.parameters ? Object.keys(patch.parameters).map((key, i) => {
+    const renderParameters = Object.keys(parameters).map((key, i) => {
       return ( 
         <Parameter 
           active={patchIsActive} 
-          onChange={this.handleOnParameterChange} 
+          onParamValueChange={(param) => this.handleParameterValueChange(param)} 
           key={key} 
           id={key}
           index={i}
-          name={patch.parameters[key]} 
+          isSaving={isSaving}
+          name={parameters[key]} 
+          editMode={editMode}
+          onParamNameChange={(key, name) => this.handleParamNameChange(key, name)}
           min={0}
           max={100}
           initialValue={35}
         />)
-    }) : null;
+    });
 
     return (
       <div className="flexbox flex-center">
-      { parameters }
+        { renderParameters }
+        { !editMode && <IconButton title="edit parameter names" icon={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ e => this.handleEditClick(e) } /> }
+        { editMode && <IconButton title="save" icon={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  e => this.handleSaveClick(e) } /> }
       </div>
     );
   }
@@ -41,7 +123,10 @@ class PatchParameters extends Component {
 
 PatchParameters.propTypes = {
   patch: PropTypes.object,
-  patchIsActive: PropTypes.bool
+  patchIsActive: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  isSaving: PropTypes.bool,
+  onSaveParamNames: PropTypes.func
 }
 
 export default connect(null, { setWebAudioPatchParameter })(PatchParameters);

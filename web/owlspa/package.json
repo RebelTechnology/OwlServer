@@ -6,8 +6,8 @@
   "scripts": {
     "test:prod": "karma start --single-run",
     "test:dev": "karma start",
-    "buildprod": "NODE_ENV=production webpack -p --config webpack.prod.config.js",
-    "builddev": "webpack --config webpack.dev.config.js",
+    "build:prod": "NODE_ENV=production webpack -p --config webpack.prod.config.js",
+    "build:dev": "webpack --config webpack.dev.config.js",
     "start": "webpack --config webpack.dev.config.js --watch"
   },
   "repository": {

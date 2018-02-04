@@ -245,7 +245,12 @@ class PatchDetailsPage extends Component {
               onSave={soundcloud => this.handleUpdatePatchDetails({soundcloud})}
             />
 
-            <PatchPreview onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} />
+            <PatchPreview 
+              onCompileClick={(e) => this.handleCompileClick(e,patch)} 
+              canEdit={canEdit} 
+              isSaving={patchDetails.isSaving}
+              onSave={(parameters => this.handleUpdatePatchDetails({parameters}))}
+              patch={patch} />
 
             <PatchCode onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} fileUrls={patch.github} />
 
