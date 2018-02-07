@@ -368,6 +368,7 @@ router.post('/:id/sources', (req, res) => {
       return wordpressBridge.uploadSources(id, files);
     })
     .then(result => {
+      process.stderr.write("file upload result: "+JSON.stringify(result));
       if (!result) {
         throw new Error();
       }
