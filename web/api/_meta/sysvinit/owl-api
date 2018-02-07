@@ -14,7 +14,7 @@
 ### END INIT INFO
 
 DIR='/srv/owl/api'
-USER='nobody'
+USER='daemon'
 CMD='node bin/www'
 
 NAME=`basename $0`
