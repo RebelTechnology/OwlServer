@@ -1,0 +1,47 @@
+/*
+Theme Name: Shopkeeper Child
+Theme URI: http://shopkeeper.getbowtied.com/
+Description: This is a child theme for Shopkeeper.
+Author: Get Bowtied
+Author URI: http: //www.getbowtied.com/
+Template: shopkeeper
+Version: 1.0
+*/
+
+@import url("../shopkeeper/style.css");
+
+/****************************************************************/
+/*************** ADD YOUR CUSTOM CSS IN THIS AREA ***************/
+/****************************************************************/
+
+
+/* fix for wide logo pushing out nav in tablet viewport size */
+@media only screen and (min-width: 40.063em) {
+  .site-branding {
+    max-width: 374px;
+    margin-top: -5px;
+  }
+}
+
+/* fix for properly hiding mobile menu button on desktop */
+@media only screen and (min-width: 1024px) {
+  .site-tools .offcanvas-menu-button {
+    display: none;
+  }
+
+  /*  stops menu flowing onto next line  */
+  .site-tools.offset {
+    margin-right: -15px;
+  }
+}
+
+
+
+
+
+
+
+
+/****************************************************************/
+/****************************************************************/
+/****************************************************************/

@@ -1,9 +1,7 @@
 .patch-author {
   box-sizing: border-box;
   font-family: Ubuntu, sans-serif; 
-  margin-top: 10px;
   float: left;
-  clear: both;
 }
 
 .author-name {

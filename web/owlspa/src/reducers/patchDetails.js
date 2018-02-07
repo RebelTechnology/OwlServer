@@ -1,11 +1,11 @@
 import { 
   REQUEST_PATCH_DETAILS,
   RECEIVE_PATCH_DETAILS,
-  EDIT_PATCH_DETAILS,
   PATCH_DELETED,
   PATCH_SAVING,
   PATCH_SAVED,
   ERROR_SAVING_PATCH,
+  PATCH_SEO_NAME_CHANGED,
   REQUEST_COMPILE_PATCH,
   RECEIVE_COMPILE_PATCH,
   PATCH_COMPILATION_FAILED,
@@ -15,8 +15,10 @@ import {
 
 const initialState = {
   isSaving: false,
+  savedSuccess: false,
   isFetching: false,
-  patches: {}
+  patches: {},
+  patchSeoNameChanged: null
 };
 
 const removeStarFromList = (starList=[], star) => {
@@ -36,6 +38,20 @@ const addOrUpdateStarInList = (starList=[], star) => {
   ];
 };
 
+const updatePatchesWithNewPatchSeoName = (patches, oldSeoName, newSeoName, newPatchName) => {
+  const newPatches = {
+    ...patches,
+    [newSeoName]: {
+      ...patches[oldSeoName],
+      seoName: newSeoName,
+      name: newPatchName
+    }
+  };
+
+  delete newPatches[oldSeoName];
+  return newPatches;
+}
+
 const patchDetails = (state = initialState, action) => {
   switch (action.type) {
     case REQUEST_PATCH_DETAILS:
@@ -50,17 +66,6 @@ const patchDetails = (state = initialState, action) => {
         patches: {
           ...state.patches,
           [action.patchDetails.seoName]:action.patchDetails
-        }
-      }
-    case EDIT_PATCH_DETAILS:
-      return {
-        ...state,
-        patches: {
-          ...state.patches,
-          [action.patchSeoName]:{
-            ...state.patches[action.patchSeoName],
-            ...action.patchDetails
-          }
         }
       }
     case CLIENT_ADD_PATCH_STAR:
@@ -96,17 +101,30 @@ const patchDetails = (state = initialState, action) => {
     case PATCH_SAVING:
       return {
         ...state,
-        isSaving: true
+        savedSuccess: false,
+        isSaving: true,
+        patchSeoNameChanged: null
       }
     case PATCH_SAVED:
       return {
         ...state,
-        isSaving: false
+        savedSuccess: true,
+        isSaving: false,
+        patches : {
+          ...state.patches,
+          [action.patch.seoName]: action.patch
+        }
       }
     case ERROR_SAVING_PATCH:
       return {
         ...state,
         isSaving: false
+      }
+    case PATCH_SEO_NAME_CHANGED:
+      return {
+        ...state,
+        patchSeoNameChanged: action.newSeoName,
+        patches: updatePatchesWithNewPatchSeoName(state.patches, action.oldSeoName, action.newSeoName, action.newPatchName)
       }
     case REQUEST_COMPILE_PATCH:
       return {

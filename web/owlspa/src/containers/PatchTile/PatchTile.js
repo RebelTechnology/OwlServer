@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Tag, AuthorLink, IconButton } from 'components';
+import { Tag, AuthorLink } from 'components';
 
 class PatchTile extends Component {
   
@@ -13,24 +13,28 @@ class PatchTile extends Component {
   }
 
   render(){
-    const { id, name, published, authorName, description, tags, seoName, canEdit, loggedIn, onDeletePatchClick } = this.props;
+    const { 
+      id,
+      name,
+      published,
+      authorName,
+      description,
+      tags,
+      seoName,
+      loggedIn,
+      onDeletePatchClick
+    } = this.props;
+    
     return (
       <div className="patch-tile" onClick={ (e) => this.handlePatchClick(e, seoName) } >
         <div className="patch-title-controls">
-          <div>
+          <div style={{marginBottom: '10px'}}>
             <span className="patch-title">{ name }</span>
-            { !published ?
-              (<div className="patch-visibility">
+            { !published && (
+              <div className="patch-visibility">
                 PRIVATE
-              </div>): null
-            }
-            { canEdit ? (
-              <div className="patch-buttons">
-                <a href={'/edit-patch/' + seoName} className="patch-button patch-button-edit"></a>
-                <span onClick={onDeletePatchClick} className="patch-button patch-button-delete"></span>
-              </div>) : null
-
-            }    
+              </div>
+            )}    
           </div> 
           <AuthorLink author={authorName} />
           <span className="patch-description-list-view">{ description }</span>     
@@ -54,9 +58,7 @@ PatchTile.propTypes = {
   authorName: PropTypes.string,
   description: PropTypes.string,
   tags: PropTypes.array,
-  canEdit: PropTypes.bool,
-  loggedIn: PropTypes.bool,
-  onDeletePatchClick: PropTypes.func
+  loggedIn: PropTypes.bool
 }
 
 PatchTile.contextTypes = {

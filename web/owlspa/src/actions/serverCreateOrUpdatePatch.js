@@ -10,24 +10,42 @@ import {
 } from 'constants';
 import newDialog from './newDialog';
 
-const redirectToPatchDetails = (patchSeoName) => {
+const redirectToPatchDetails = patchSeoName => {
   customHistory.push('/patch/'+ patchSeoName);
 }
 
-const serverSavePatch = (patch, options = {}) => {
+const replaceTempDir = (fileUrl, patchId) => {
+  const tempDirRegex = /\/tmp-.+\//;
+  if(!tempDirRegex.test(fileUrl)){
+    return fileUrl;
+  }
+
+  return fileUrl.replace(tempDirRegex, '/' + patchId + '/');
+}
+
+const replaceTempDirInPatchSourceFileUrls = patch => {
+  if(!patch || !patch.github || !patch.github.length){
+    return patch;
+  }
+
+  return {
+    ...patch,
+    github: patch.github.map(fileUrl => replaceTempDir(fileUrl, patch._id))
+  }
+}
+
+const serverCreateOrUpdatePatch = (patch, options = {}) => {
   return (dispatch) => {
     dispatch({
       type: PATCH_SAVING
     });
 
-    let path, method;
+    let path = '/patches/';
+    let method = 'POST';
 
-   if(!patch._id){
-        path = '/patches/';
-        method = 'POST';
-    } else {
-        path = '/patch/' + patch._id;
-        method = 'PUT';
+    if(patch._id){
+      path = '/patch/' + patch._id;
+      method = 'PUT';
     }
 
     return fetch( API_END_POINT + path, {
@@ -68,28 +86,35 @@ const serverSavePatch = (patch, options = {}) => {
         });
       })
       .then( json => {
-
-        if(json._id){
-          dispatch({type: PATCH_SAVED});
-          if(method === 'POST'){
-            dispatch(cleanUpTmpPatchFiles(json._id)).then(() => {
-              if(options.compile){
-                dispatch(compilePatch({
-                  seoName: json.seoName,
-                  _id: json._id
-                })).then(()=>{
-                  redirectToPatchDetails(json.seoName);
-                });
-              } else {
-                redirectToPatchDetails(json.seoName);
-              }
-            });
-          }
-        } else {
-          throw new Error('Error saving patch: patch ID missing');
+        if(!json.patch){
+          throw new Error('Error saving patch: updated patch missing');
         }
 
-      }).catch((err) => {
+        return dispatch(cleanUpTmpPatchFiles(json.patch._id)).then(() => {
+          
+          dispatch({
+            type: PATCH_SAVED,
+            patch: replaceTempDirInPatchSourceFileUrls(json.patch)
+          });
+
+          if(options.compile){
+            dispatch(compilePatch({
+              seoName: json.patch.seoName,
+              _id: json.patch._id
+            })).then(()=>{
+              return json.patch.seoName;
+            });
+          } else {
+            return json.patch.seoName;
+          }
+        });
+        
+      })
+      .then(seoName => {
+        redirectToPatchDetails(seoName);
+      })
+      .catch((err) => {
+        console.error(err);
         dispatch(newDialog({
           header: 'Error Saving Patch',
           isError : true,
@@ -106,4 +131,4 @@ const serverSavePatch = (patch, options = {}) => {
   }
 }
 
-export default serverSavePatch;
+export default serverCreateOrUpdatePatch;

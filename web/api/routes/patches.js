@@ -99,6 +99,7 @@ router.post('/', (req, res) => {
       process.stdout.write('New patch saved, id = ' + patch._id + '\n');
       return res.status(200).json({
         message: 'New patch saved.',
+        patch: patch,
         _id: patch._id,
         seoName: patch.seoName,
         url: `${config.wordpress.baseUrl}/patch-library/patch/${patch.seoName}`,

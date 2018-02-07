@@ -2,17 +2,34 @@ import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import { 
   fetchPatchDetails,
+  fetchTags,
   deletePatch,
   compilePatch,
-  serverUpdatePatchAndExitEditMode,
-  setEditModeForPatchDetails,
-  editPatchDetails,
+  serverUpdatePatch,
   setPatchStarAndSendToSever
 } from 'actions';
 import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
 
 class PatchDetailsPage extends Component {
+
+  constructor(props){
+    super(props);
+    const { routeParams, patchDetails } = props;
+    let description, instructions;
+    if(routeParams && patchDetails && patchDetails.patches && routeParams.patchSeoName){
+      const patch = patchDetails.patches[routeParams.patchSeoName];
+      if(patch){
+        description = patch.description;
+        instructions = patch.instructions;
+      }
+    }
+    this.state = {
+      description: description || '',
+      instructions: instructions || '',
+      published: false
+    }
+  }
 
   patchIsCached(patchSeoName){
     const patchDetails = this.props.patchDetails.patches[patchSeoName];
@@ -48,30 +65,46 @@ class PatchDetailsPage extends Component {
     this.props.deletePatch(patch, {redirect: 'my-patches'});
   }
 
-  handlePatchDecriptionChange(description){
-    const {editPatchDetails, routeParams:{patchSeoName}, patchDetails} = this.props;
-    editPatchDetails(patchSeoName, {description});
+  handlePatchDetailsDescriptionChange(description){
+    this.setState({
+      description
+    });
   }
 
-  handlePatchInstructionsChange(instructions){
-    const {editPatchDetails, routeParams:{patchSeoName}, patchDetails} = this.props;
-    editPatchDetails(patchSeoName, {instructions});
+  handlePatchDetailsInstructionsChange(instructions){
+    this.setState({
+      instructions
+    });
   }
 
-  updatePatchDetails(){
-    const { routeParams:{patchSeoName}, patchDetails, serverUpdatePatchAndExitEditMode } = this.props;
+  updatePatchName(name){
+    const { routeParams:{patchSeoName}, patchDetails, serverUpdatePatch } = this.props;
     const patch = patchDetails.patches[patchSeoName];
-    serverUpdatePatchAndExitEditMode(patch);
+    const updatedPatch = {
+      ...patch,
+      name
+    };
+    serverUpdatePatch(updatedPatch);
   }
 
-  handleDescriptionEditClick(){
-    const {setEditModeForPatchDetails, routeParams:{patchSeoName}} = this.props;
-    setEditModeForPatchDetails(patchSeoName, {description: true});
+  handleSetPublished(published){
+    this.handleUpdatePatchDetails({published});
   }
 
-  handleInstructionsEditClick(){
-    const {setEditModeForPatchDetails, routeParams:{patchSeoName}} = this.props;
-    setEditModeForPatchDetails(patchSeoName, {instructions: true});
+  handleUpdatePatchDetails(properties){
+    const { routeParams:{patchSeoName}, patchDetails } = this.props;
+    const patch = patchDetails.patches[patchSeoName];
+    const {
+      instructions,
+      description
+    } = this.state;
+
+    this.props.serverUpdatePatch({
+      ...patch,
+      instructions,
+      description,
+      ...properties
+    });
   }
 
   handleStarClick(e, patch, starForThisPatch){
@@ -86,20 +119,67 @@ class PatchDetailsPage extends Component {
     });
   }
 
+  componentWillReceiveProps(nextProps){
+    const {
+      patchDetails,
+      patchDetails : {
+        patchSeoNameChanged
+      },
+      routeParams:{ patchSeoName }
+    } = this.props;
+
+    const {
+      patchDetails: nextPatchDetails,
+      routeParams: { patchSeoName: nextPatchSeoName }
+    } = nextProps;
+
+    const thisPatch = patchDetails.patches[patchSeoName];
+    const nextPatch = nextPatchDetails.patches[nextPatchSeoName];
+
+    if(nextProps.patchDetails.patchSeoNameChanged && !patchSeoNameChanged){
+      this.context.router.push('/patch/' + nextProps.patchDetails.patchSeoNameChanged);
+    }
+
+    if(nextPatch && thisPatch){
+      if(nextPatch.description !== thisPatch.description){
+        this.setState({
+          description: nextPatch.description
+        });
+      }
+
+      if(nextPatch.instructions !== thisPatch.instructions){
+        this.setState({
+          instructions: nextPatch.instructions
+        });
+      }
+    } else if(nextPatch && !thisPatch){
+      this.setState({
+        instructions: nextPatch.instructions,
+        description: nextPatch.description
+      });
+    }
+  }
+
   render(){ 
-    const { patchDetails, currentUser , routeParams:{patchSeoName}, patchDetailsEditMode } = this.props;
+    const { 
+      patchDetails,
+      currentUser ,
+      routeParams:{ patchSeoName },
+      tags
+    } = this.props;
+
+    const {
+      instructions,
+      description
+    } = this.state;
+
     const patch = patchDetails.patches[patchSeoName];
     const canEdit = currentUser.isAdmin || this.currentUserCanEdit(patch);
-    const descriptionEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].description;
-    const instructionsEditMode = patchDetailsEditMode[patchSeoName] && patchDetailsEditMode[patchSeoName].instructions;
     const starForThisPatch = this.getCurrentUserStarForThisPatch(patch, currentUser);
     const starred = !!starForThisPatch;
 
     if(!patch){
-      return (
-        <div>
-        </div>
-      );
+      return <div />
     }
 
     return (
@@ -110,47 +190,67 @@ class PatchDetailsPage extends Component {
 
             <PatchTileSmall 
               patch={patch} 
-              loggedIn={currentUser.loggedIn} 
+              patchSeoNameFromRoute={patchSeoName}
+              loggedIn={currentUser.loggedIn}
+              isSaving={patchDetails.isSaving}
+              savedSuccess={patchDetails.savedSuccess}
               canEdit={canEdit} 
               onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} 
+              onUpdatePatchName={patchName => this.updatePatchName(patchName)}
+              onSetPublished={(published) => this.handleSetPublished(published)}
               onStarClick={(e)=> this.handleStarClick(e,patch, starForThisPatch)}
               starred={starred}
             />
 
             <PatchDetailsTile 
               title="Description" 
-              text={patch.description}
+              text={description}
+              onTextChange={description => this.handlePatchDetailsDescriptionChange(description)}
               isSaving={patchDetails.isSaving} 
               canEdit={canEdit} 
-              editMode={descriptionEditMode}
-              onTextChange={val => this.handlePatchDecriptionChange(val)}
-              handleEditClick={e => this.handleDescriptionEditClick(e)}
-              handleSaveClick={e => this.updatePatchDetails(e)} 
+              onSave={ () => this.handleUpdatePatchDetails()} 
             />
             
             { (patch.instructions || canEdit ) &&
               <PatchDetailsTile 
                 style={{background: 'grey'}} 
                 title="Instructions" 
-                text={patch.instructions} 
+                text={instructions} 
+                onTextChange={instructions => this.handlePatchDetailsInstructionsChange(instructions)}
                 isSaving={patchDetails.isSaving}
                 canEdit={canEdit} 
-                editMode={instructionsEditMode}
-                onTextChange={(val) => this.handlePatchInstructionsChange(val)} 
-                handleEditClick={e => this.handleInstructionsEditClick(e)}
-                handleSaveClick={e => this.updatePatchDetails(e)} 
+                onSave={() => this.handleUpdatePatchDetails()} 
               />
             }
 
-            <PatchStats canEdit={canEdit} patch={patch} />
+            <PatchStats 
+              isSaving={patchDetails.isSaving} 
+              availableTagList={tags.items} 
+              canEdit={canEdit} 
+              patch={patch} 
+              onSave={({tags}) => this.handleUpdatePatchDetails({tags})}
+              isSaving={patchDetails.isSaving}
+              savedSuccess={patchDetails.savedSuccess}
+            />
             
           </div>
 
           <div id="two-thirds" className="patch-library">
 
-            <PatchSoundcloud soundcloud={patch.soundcloud} />
+            <PatchSoundcloud 
+              soundcloud={patch.soundcloud} 
+              canEdit={canEdit}
+              isSaving={patchDetails.isSaving}
+              savedSuccess={patchDetails.savedSuccess}
+              onSave={soundcloud => this.handleUpdatePatchDetails({soundcloud})}
+            />
 
-            <PatchPreview onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} />
+            <PatchPreview 
+              onCompileClick={(e) => this.handleCompileClick(e,patch)} 
+              canEdit={canEdit} 
+              isSaving={patchDetails.isSaving}
+              onSave={(parameters => this.handleUpdatePatchDetails({parameters}))}
+              patch={patch} />
 
             <PatchCode onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} fileUrls={patch.github} />
 
@@ -162,28 +262,35 @@ class PatchDetailsPage extends Component {
   }
 
   componentDidMount(){
-    const { fetchPatchDetails , patchDetails, routeParams:{patchSeoName} } = this.props;
+    const { fetchPatchDetails, routeParams:{patchSeoName}, tags } = this.props;
     if(patchSeoName && !this.patchIsCached(patchSeoName)){
       this.props.fetchPatchDetails(patchSeoName);
+    }
+
+    if(!tags.items || !tags.items.length){
+      this.props.fetchTags();
     }
   }
 
 }
 
-const mapStateToProps = ({ patchDetails, patchDetailsEditMode, currentUser }) => {
+PatchDetailsPage.contextTypes = {
+  router: PropTypes.object.isRequired
+};
+
+const mapStateToProps = ({ patchDetails, currentUser, tags }) => {
   return {
     patchDetails,
-    patchDetailsEditMode,
-    currentUser
+    currentUser,
+    tags
   }
 };
 
 export default connect(mapStateToProps, { 
   fetchPatchDetails,
+  fetchTags,
   deletePatch,
   compilePatch,
   setPatchStarAndSendToSever,
-  serverUpdatePatchAndExitEditMode,
-  setEditModeForPatchDetails,
-  editPatchDetails
+  serverUpdatePatch
 })(PatchDetailsPage);

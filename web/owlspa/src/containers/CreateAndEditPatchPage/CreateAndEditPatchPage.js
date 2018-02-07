@@ -9,17 +9,18 @@ import {
   clearSourceFileErrors,
   compilePatch,
   gitHubURLFieldChange,
+  loadPatchInToEditPatchForm,
   removeGitHubFile,
   removeUploadedPatchFile,
-  serverSavePatch,
+  serverCreateOrUpdatePatch,
+  serverUploadPatchFiles,
   setMainSourceFile,
   sourceFileChange,
   updateCompilationType,
-  updatePatchName,
-  serverUploadPatchFiles
+  updatePatchName
 } from 'actions';
 
-class CreatePatchPage extends Component {
+class CreateAndEditPatchPage extends Component {
 
   generateUUID(){
     let time = new Date().getTime();
@@ -75,17 +76,44 @@ class CreatePatchPage extends Component {
 
   handleSaveClick(e){
     e.preventDefault();
-    this.savePatch();
+    
+    const {
+      routeParams: { patchSeoName },
+      patchDetails
+    } = this.props;
+
+    if(patchSeoName){
+      this.updatePatch(patchSeoName);
+    } else {
+      this.savePatch();
+    }
+
   }
 
   handleSaveAndCompileClick(e){
     e.preventDefault();
-    this.savePatch({ compile: true });
+    const {
+      routeParams: { patchSeoName },
+      patchDetails
+    } = this.props;
+
+    if(patchSeoName){
+      this.updatePatch(patchSeoName, {compile: true});
+    } else {
+      this.savePatch({ compile: true });
+    }
   }
 
   handleCancelClick(e){
     e.preventDefault();
-    customHistory.push('/patches/my-patches');
+    const {
+      routeParams: { patchSeoName }
+    } = this.props;
+    if(patchSeoName){
+      customHistory.push('/patch/' + patchSeoName);
+    } else {
+      customHistory.push('/patches/my-patches');
+    }
   }
 
   handleCompilationTypeChange(compilationType){
@@ -93,9 +121,9 @@ class CreatePatchPage extends Component {
   }
 
   savePatch(options){
-    const { patchName, sourceFiles, compilationType } = this.props.editPatchForm;
+    const { patchName, compilationType } = this.props.editPatchForm;
     this.props.clearSourceFileErrors();
-    this.props.serverSavePatch({
+    this.props.serverCreateOrUpdatePatch({
       name: patchName,
       inputs: 2,
       outputs: 2,
@@ -109,8 +137,39 @@ class CreatePatchPage extends Component {
       compilationType: compilationType,
       published: 0,
       starList:[],
-      github: sourceFiles.map(file => file.path)
+      github: this.getSortedSourceFilesMainFileFirst().map(file => file.path)
     }, options);  
+  }
+
+  updatePatch(patchSeoName, options){
+    const { 
+      editPatchForm: {
+        patchName, 
+        compilationType
+      }, 
+      patchDetails
+    } = this.props;
+
+    this.props.clearSourceFileErrors();
+    this.props.serverCreateOrUpdatePatch({
+      ...patchDetails.patches[patchSeoName],
+      name: patchName,
+      compilationType: compilationType,
+      github: this.getSortedSourceFilesMainFileFirst().map(file => file.path)
+    }, options); 
+  }
+
+  getSortedSourceFilesMainFileFirst(){
+    const {
+      editPatchForm: {
+        sourceFiles
+      }
+    } = this.props;
+    return sourceFiles.sort((a,b) => {
+      if(a.mainFile){ return -1; }
+      if(b.mainFile){ return 1; }
+      return a.timeStamp - b.timeStamp;
+    });
   }
 
   render(){ 
@@ -124,12 +183,12 @@ class CreatePatchPage extends Component {
       sourceFiles, 
       compilationType 
     } = editPatchForm;
+
+    const isEditMode = !!this.props.routeParams.patchSeoName;
+
     let mainSourceFile = null;
-    const sortedSourceFiles = sourceFiles.sort((a,b) => {
-      if(a.mainFile){ return -1; }
-      if(b.mainFile){ return 1; }
-      return a.timeStamp - b.timeStamp;
-    }).map( (file, i) => {
+    
+    const sortedSourceFiles = this.getSortedSourceFilesMainFileFirst().map( (file, i) => {
       if(file.mainFile){
         mainSourceFile = file;
       }
@@ -163,7 +222,7 @@ class CreatePatchPage extends Component {
       <div className="wrapper flexbox">
         <div className="content-container">
           <div className="white-box">
-            <h2>Create Patch</h2>
+            <h2>{isEditMode ? 'Edit Patch Source Files' : 'Create Patch'}</h2>
             <form id="patch-add-edit-form">
               <fieldset>
                 <legend>Patch Name</legend>
@@ -262,7 +321,23 @@ class CreatePatchPage extends Component {
   }
 
   componentDidMount(){
-    this.props.updatePatchName('untitled-' + this.generateUUID());
+    const {
+      routeParams: { patchSeoName },
+      patchDetails
+    } = this.props;
+
+    if(!patchSeoName){
+      this.props.updatePatchName('untitled-' + this.generateUUID());
+    }
+
+    if(patchSeoName){
+      if(patchDetails.patches[patchSeoName]){
+        this.props.loadPatchInToEditPatchForm(patchDetails.patches[patchSeoName]);
+      } else {
+        customHistory.push('/patch/' + patchSeoName);
+      }
+    }
+
   }
 
   componentWillUnmount(){
@@ -270,24 +345,26 @@ class CreatePatchPage extends Component {
   }
 }
 
-const mapStateToProps = ({ currentUser, editPatchForm }) => {
+const mapStateToProps = ({ currentUser, editPatchForm, patchDetails }) => {
   return {
+    patchDetails,
     currentUser,
     editPatchForm
   }
 };
 
 export default connect(mapStateToProps, { 
+  loadPatchInToEditPatchForm,
   clearEditPatchForm,
   serverUploadPatchFiles,
   removeUploadedPatchFile,
   gitHubURLFieldChange,
   addGitHubFile,
   removeGitHubFile,
-  serverSavePatch,
+  serverCreateOrUpdatePatch,
   setMainSourceFile,
   sourceFileChange,
   updateCompilationType,
   updatePatchName,
   clearSourceFileErrors
-})(CreatePatchPage);
+})(CreateAndEditPatchPage);
