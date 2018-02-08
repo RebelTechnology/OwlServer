@@ -77,7 +77,7 @@ function isPatchIdValid($patchId)
  */
 function getApiBaseUrl()
 {
-    $apiBaseUrl = 'https://www.rebeltech.org/api';
+    $apiBaseUrl = 'https://'.$_SERVER['HTTP_HOST'].'/api';
 /*
     $apiBaseUrl = 'http://hoxtonowl.localhost:3000';
     if (isset($_SERVER['APPLICATION_ENV'])) {
