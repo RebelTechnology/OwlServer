@@ -16,7 +16,7 @@ const rebelTechDomains = [
   'rebeltech.org'
 ];
 
-const isHoxtonOwlFile = (fileUrl) => {
+const isHostedSourceFile = (fileUrl) => {
   if(!fileUrl){
     return false;
   }
@@ -30,10 +30,11 @@ const isGithubFile = (fileUrl) => {
   return parseUrl(fileUrl).authority.indexOf('github.com') > -1;
 };
 
-const fetchHoxtonFile = (fileUrl) => {
+const fetchHostedFile = (fileUrl) => {
   if(!fileUrl){
     throw new error('no file url specified');
   }
+
   return fetch(parseUrl(fileUrl).path, {method:'GET'})
     .then(response => {
       if(response.status >= 400){
@@ -94,7 +95,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
 
     fileUrls.forEach((fileUrl, index) => {
 
-      if( !fileUrl || (!isHoxtonOwlFile(fileUrl) && !isGithubFile(fileUrl)) ){
+      if( !fileUrl || (!isHostedSourceFile(fileUrl) && !isGithubFile(fileUrl)) ){
         dispatch({
           type: FETCH_PATCH_SOURCE_FILE_ERROR,
           patchId,
@@ -104,13 +105,13 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
         return;
       }
 
-      if(isHoxtonOwlFile(fileUrl)){
+      if(isHostedSourceFile(fileUrl)){
         dispatch({
           type: FETCH_PATCH_SOURCE_FILE_REQUEST,
           patchId,
           index
         });
-        fetchHoxtonFile(fileUrl).then( text => {
+        fetchHostedFile(fileUrl).then( text => {
           dispatch({
             type: FETCH_PATCH_SOURCE_FILE_SUCCESS,
             patchId,

@@ -87,7 +87,7 @@ class PatchCode extends Component {
     return domain.indexOf('github.com') > -1;
   }
 
-  isHoxtonFile(fileUrl){
+  isHostedFile(fileUrl){
     if(!fileUrl){
       return false;
     }
@@ -160,10 +160,10 @@ class PatchCode extends Component {
     return patchSourceCodeFiles[patchId][activeTab].fileString;
   }
 
-  getOnlyHoxtonHostedFiles(fileList){
+  getOnlyHostedFiles(fileList){
     return fileList.filter(file => {
-      return this.isHoxtonFile(file.fileUrl);
-    })
+      return this.isHostedFile(file.fileUrl);
+    });
   }
 
   handlePatchCodeFileChange(index, newFileString){
@@ -173,14 +173,14 @@ class PatchCode extends Component {
 
   handleSavePatchFiles(e){
     const { serverSavePatchFiles, patch, patchSourceCodeFiles } = this.props;
-    const fileList = this.getOnlyHoxtonHostedFiles(patchSourceCodeFiles[patch._id]);
+    const fileList = this.getOnlyHostedFiles(patchSourceCodeFiles[patch._id]);
     serverSavePatchFiles(patch, fileList);
   }
 
   handleSaveAndCompilePatchFiles(e, options={}){
     if(options.unsavedFileChanges){
       const { serverSavePatchFiles, patch, patchSourceCodeFiles } = this.props;
-      const fileList = this.getOnlyHoxtonHostedFiles(patchSourceCodeFiles[patch._id]);
+      const fileList = this.getOnlyHostedFiles(patchSourceCodeFiles[patch._id]);
       serverSavePatchFiles(patch, fileList, {compile: true});
     } else {
       this.props.onCompileClick(e);
@@ -211,8 +211,8 @@ class PatchCode extends Component {
     const isPdFile = /\.pd$/i.test(activeTabFileName);
     const isGenFile = /\.gendsp$/i.test(activeTabFileName);
     const unsavedFileChanges = patchSourceCodeFiles[patch._id] && this.getPatchCodeHasBeenEdited(patchSourceCodeFiles[patch._id]);
-    const isHoxtonFile = this.isHoxtonFile(fileUrls[activeTab]);
-    const editorReadOnly = !canEdit || filesAreSaving || !isHoxtonFile || !editModeActive;
+    const isHostedFile = this.isHostedFile(fileUrls[activeTab]);
+    const editorReadOnly = !canEdit || filesAreSaving || !isHostedFile || !editModeActive;
     let pdPatchSvg = null;
     let genFileJson;
     const showPatchCodeEditControls = !isPdFile && !isGenFile;
