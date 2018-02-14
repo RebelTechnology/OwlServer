@@ -21,15 +21,6 @@ const initialState = {
   patchSeoNameChanged: null
 };
 
-const replaceHoxtonDomainInSourceFileLinks = (patchDetails) => {
-  if(patchDetails && patchDetails.github && patchDetails.github.length){
-    patchDetails.github = patchDetails.github.map(fileUrl => {
-      return fileUrl.replace('/hoxtonowl.com/', '/www.rebeltech.org/').replace('/www.hoxtonowl.com/', '/www.rebeltech.org/');
-    });
-  }
-  return patchDetails;
-}
-
 const removeStarFromList = (starList=[], star) => {
   if (!star || !star.userId){
     return starList;
@@ -74,7 +65,7 @@ const patchDetails = (state = initialState, action) => {
         isFetching: false,
         patches: {
           ...state.patches,
-          [action.patchDetails.seoName]:replaceHoxtonDomainInSourceFileLinks(action.patchDetails)
+          [action.patchDetails.seoName]:action.patchDetails
         }
       }
     case CLIENT_ADD_PATCH_STAR:

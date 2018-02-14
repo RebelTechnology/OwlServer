@@ -93,7 +93,7 @@ class PatchCode extends Component {
     }
     
     const domain = parseUrl(fileUrl).authority;
-    return domain.indexOf('rebeltech.org') > -1;
+    return domain.indexOf('rebeltech.org') > -1 || domain.indexOf('hoxtonowl.com') > -1;
   }
 
   getDownloadUrl(fileUrl){
