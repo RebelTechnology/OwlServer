@@ -6,8 +6,8 @@
   "scripts": {
     "test:prod": "karma start --single-run",
     "test:dev": "karma start",
-    "buildprod": "NODE_ENV=production webpack -p --config webpack.prod.config.js",
-    "builddev": "webpack --config webpack.dev.config.js",
+    "build:prod": "NODE_ENV=production webpack -p --config webpack.prod.config.js",
+    "build:dev": "webpack --config webpack.dev.config.js",
     "start": "webpack --config webpack.dev.config.js --watch"
   },
   "repository": {
@@ -64,7 +64,7 @@
     "react": "^15.4.2",
     "react-ace": "^3.6.0",
     "react-dom": "^15.4.2",
-    "react-modal": "^1.4.0",
+    "react-modal": "^2.3.3",
     "react-redux": "^4.4.5",
     "react-router": "^2.4.1",
     "redux": "^3.5.2",

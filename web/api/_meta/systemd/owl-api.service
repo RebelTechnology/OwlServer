@@ -4,8 +4,8 @@ Restart=always
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=owl-api
-User=nobody
-Group=nogroup
+User=daemon
+Group=daemon
 WorkingDirectory=/srv/owl/api
 
 [Install]

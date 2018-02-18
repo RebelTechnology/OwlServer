@@ -1,4 +1,5 @@
 import { 
+  LOAD_PATCH_INTO_EDIT_PATCH_FORM,
   UPLOADING_PATCH_FILES,
   PATCH_FILES_UPLOADED,
   ERROR_UPLOADING_PATCH_FILE,
@@ -73,6 +74,18 @@ const pushSourceFileError = (sourceFileErrors, index, error) => {
   return newSourceFileErrors;
 };
 
+const getSourceFileList = fileList => {
+  return fileList.map((filePath, i)=> {
+    let fileName = filePath.split('/');
+    fileName = fileName[fileName.length - 1];
+    return {
+      path: filePath,
+      name: fileName,
+      mainFile: i === 0
+    }
+  })
+}
+
 const initialState = {
   isUploading: false,
   isSavingPatch: false,
@@ -87,6 +100,13 @@ const initialState = {
 
 const editPatchForm = (state = initialState, action) => {
   switch (action.type) {
+    case LOAD_PATCH_INTO_EDIT_PATCH_FORM:
+      return {
+        ...initialState,
+        sourceFiles: getSourceFileList(action.patch.github),
+        patchName: action.patch.name,
+        compilationType: action.patch.compilationType || 'cpp'
+      }
     case UPDATE_PATCH_NAME:
       return { 
         ...state,

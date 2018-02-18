@@ -44,10 +44,17 @@ class Parameter extends Component {
   }
 
   handleMouseDown = (e) => {
-    e.preventDefault();
-    if(!this.props.active){
+    const {
+      editMode,
+      active
+    } = this.props;
+
+    !editMode && e.preventDefault();
+    
+    if(!active){
       return;
     }
+    
     this.setState({previousY: e.clientY});
     document.addEventListener('mouseup', this.handleMouseUp);
     document.addEventListener('mousemove', this.handleMouseMove);
@@ -71,7 +78,7 @@ class Parameter extends Component {
       id,
       value: val
     }
-    this.props.onChange(parameter);
+    this.props.onParamValueChange(parameter);
   }
 
   shouldComponentUpdate(nextProps,nextState){
@@ -84,7 +91,7 @@ class Parameter extends Component {
   }
 
   render(){
-    const { name, active, index } = this.props;
+    const { name, active, index, editMode, id, isSaving } = this.props;
     const { parameterValue } = this.state;
     const styleClases = classNames('patch-knob',{active:active});
 
@@ -104,7 +111,18 @@ class Parameter extends Component {
             viewBox="0 0 100 100">
             <circle cx="50" cy="10" r="6" fill={active ? '#ed7800':'#ccc'} />
           </svg>
-          <span className="parameter-name">{name}</span>
+          <span className="parameter-name">
+            {editMode ? (
+              <input 
+                style={{textTransform: 'uppercase'}}
+                disabled={isSaving}
+                onChange={e => this.props.onParamNameChange(id, e.target.value)} 
+                type="text" 
+                maxLength="19"
+                value={name} />
+              ) : name 
+            }
+          </span>
           <span className="parameter-value">{parameterValue}</span>
         </div>
     );
@@ -120,18 +138,22 @@ Parameter.propTypes = {
   name: PropTypes.string,
   id: PropTypes.string,
   active: PropTypes.bool,
-  onChange: PropTypes.func,
+  onParamValueChange: PropTypes.func,
   index: PropTypes.number.isRequired,
-  initialValue: PropTypes.number
+  initialValue: PropTypes.number,
+  editMode: PropTypes.bool,
+  onParamNameChange: PropTypes.func,
+  isSaving: PropTypes.bool
 }
 
 Parameter.defaultProps = {
   initialValue: 0,
-  min:0,
-  max:100,
-  onChange:()=>{},
-  active:false,
-  name:''
+  min: 0,
+  max: 100,
+  onParamValueChange: () => {},
+  onParamNameChange: () => {},
+  active: false,
+  name: ''
 }
 
 export default Parameter;

@@ -4,9 +4,8 @@ import currentUser from './currentUser';
 import dialog from './dialog';
 import editPatchForm from './editPatchForm';
 import owlState from './owlState';
-import patchCodeFiles from './patchCodeFiles';
+import patchSourceCodeFiles from './patchSourceCodeFiles';
 import patchDetails from './patchDetails';
-import patchDetailsEditMode from './patchDetailsEditMode';
 import patches from './patches';
 import patchJavaScript from './patchJavaScript';
 import patchListFilter from './patchListFilter';
@@ -27,10 +26,9 @@ const rootReducer = combineReducers({
   patchListFilter,
   patchListSearch,
   patchDetails,
-  patchDetailsEditMode,
   patchJavaScript,
   patchPlaying,
-  patchCodeFiles,
+  patchSourceCodeFiles,
   tags,
   webAudioPatch,
   webAudioPatchParameters

@@ -1,16 +1,26 @@
 
 import { parseUrl } from 'utils';
 import {
-  REQUEST_PATCH_CODE_FILE,
-  RECEIVE_PATCH_CODE_FILE,
-  REQUEST_PATCH_CODE_FILE_FAILED
+  FETCH_PATCH_SOURCE_FILE_REQUEST,
+  FETCH_PATCH_SOURCE_FILE_SUCCESS,
+  FETCH_PATCH_SOURCE_FILE_ERROR
 } from 'constants';
 
-const isHoxtonOwlFile = (fileUrl) => {
+import clearPatchSourceCodeFiles from './clearPatchSourceCodeFiles';
+
+const rebelTechDomains = [
+  'hoxtonowl.com',
+  'staging.hoxtonowl.com',
+  'www.rebeltech.org',
+  'dev.rebeltech.org',
+  'rebeltech.org'
+];
+
+const isHostedSourceFile = (fileUrl) => {
   if(!fileUrl){
     return false;
   }
-  return parseUrl(fileUrl).authority.indexOf('hoxtonowl.com') > -1;
+  return rebelTechDomains.indexOf(parseUrl(fileUrl).authority) > -1;
 };
 
 const isGithubFile = (fileUrl) => {
@@ -20,10 +30,11 @@ const isGithubFile = (fileUrl) => {
   return parseUrl(fileUrl).authority.indexOf('github.com') > -1;
 };
 
-const fetchHoxtonFile = (fileUrl) => {
+const fetchHostedFile = (fileUrl) => {
   if(!fileUrl){
     throw new error('no file url specified');
   }
+
   return fetch(parseUrl(fileUrl).path, {method:'GET'})
     .then(response => {
       if(response.status >= 400){
@@ -72,14 +83,21 @@ const decodeBase64AndRemoveNewLines = (base64) => {
   return window.atob(base64.replace(/\n/g, ''));
 };
 
-const fetchPatchCodeFiles = (fileUrls, patchId) => {
+const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
   return (dispatch) => {
+
+    if(!fileUrls || !patchId){
+      console.error('missing parameters');
+      return;
+    }
+
+    dispatch(clearPatchSourceCodeFiles(patchId));
 
     fileUrls.forEach((fileUrl, index) => {
 
-      if( !fileUrl || (!isHoxtonOwlFile(fileUrl) && !isGithubFile(fileUrl)) ){
+      if( !fileUrl || (!isHostedSourceFile(fileUrl) && !isGithubFile(fileUrl)) ){
         dispatch({
-          type: REQUEST_PATCH_CODE_FILE_FAILED,
+          type: FETCH_PATCH_SOURCE_FILE_ERROR,
           patchId,
           index,
           reason:'file url error'
@@ -87,15 +105,15 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
         return;
       }
 
-      if(isHoxtonOwlFile(fileUrl)){
+      if(isHostedSourceFile(fileUrl)){
         dispatch({
-          type: REQUEST_PATCH_CODE_FILE,
+          type: FETCH_PATCH_SOURCE_FILE_REQUEST,
           patchId,
           index
         });
-        fetchHoxtonFile(fileUrl).then( text => {
+        fetchHostedFile(fileUrl).then( text => {
           dispatch({
-            type: RECEIVE_PATCH_CODE_FILE,
+            type: FETCH_PATCH_SOURCE_FILE_SUCCESS,
             patchId,
             index,
             fileString: text,
@@ -104,7 +122,7 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
         }).catch( err => {
           console.error(err);
           dispatch({
-            type: REQUEST_PATCH_CODE_FILE_FAILED,
+            type: FETCH_PATCH_SOURCE_FILE_ERROR,
             patchId,
             index,
             reason:'// Could not fetch file.'
@@ -113,14 +131,14 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
       }
       if(isGithubFile(fileUrl)){
         dispatch({
-          type: REQUEST_PATCH_CODE_FILE,
+          type: FETCH_PATCH_SOURCE_FILE_REQUEST,
           patchId,
           index
         });
         fetchGithubFile(fileUrl).then( json => {
           if(json.content && json.encoding === 'base64'){
             dispatch({
-              type: RECEIVE_PATCH_CODE_FILE,
+              type: FETCH_PATCH_SOURCE_FILE_SUCCESS,
               patchId,
               index,
               fileString: decodeBase64AndRemoveNewLines(json.content),
@@ -128,7 +146,7 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
             });
           } else {
             dispatch({
-              type: REQUEST_PATCH_CODE_FILE_FAILED,
+              type: FETCH_PATCH_SOURCE_FILE_ERROR,
               patchId,
               index,
               reason:'// This file could not be fetched. Is it from a public GitHub repository?'
@@ -137,7 +155,7 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
         }).catch( err => {
           console.error(err);
           dispatch({
-            type: REQUEST_PATCH_CODE_FILE_FAILED,
+            type: FETCH_PATCH_SOURCE_FILE_ERROR,
             patchId,
             index,
             reason:'// Could not fetch file.'
@@ -149,4 +167,4 @@ const fetchPatchCodeFiles = (fileUrls, patchId) => {
   }
 }
 
-export default fetchPatchCodeFiles;
+export default fetchPatchSourceCodeFiles;

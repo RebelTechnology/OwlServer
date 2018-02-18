@@ -2,6 +2,7 @@ import {
   API_END_POINT,
   PATCH_SAVING,
   PATCH_SAVED,
+  PATCH_SEO_NAME_CHANGED,
   ERROR_SAVING_PATCH,
   ERROR_IN_SOURCE_FILE_URL,
   INVALID_FIELD_DATA
@@ -53,14 +54,26 @@ const serverUpdatePatch = (patch) => {
       })
       .then( json => {
         
-        if(json._id){
-          dispatch({type: PATCH_SAVED});
-          return 'patch updated';
+        if(json.patch){
+          dispatch({
+            type: PATCH_SAVED,
+            patch: json.patch
+          });
+          if(patch.seoName !== json.patch.seoName){
+            dispatch({
+              type: PATCH_SEO_NAME_CHANGED,
+              newSeoName: json.patch.seoName,
+              oldSeoName: patch.seoName,
+              newPatchName: patch.name
+            });
+          }
+          return { patchUpdated: true };
         } else {
-          throw new Error('Error updating patch: patch ID missing');
+          throw new Error('Error updating patch: patch missing');
         }
         
       }).catch((err) => {
+        console.error(err);
         dispatch(newDialog({
           header: 'Error Updating Patch',
           isError : true,

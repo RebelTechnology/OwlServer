@@ -33,6 +33,7 @@ class Dialog extends Component {
     const { activeDialogTab } = dialog;
 
     const customStyles = {
+      overlay: {zIndex: 9999},
       content : {
         top: '50%',
         left: '50%',

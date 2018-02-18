@@ -2,6 +2,7 @@ import {
   WORDPRESS_AJAX_END_POINT
 } from 'constants';
 
+// why does the client need to do this? this should happen on server automatically after uploading new files.
 const cleanUpTmpPatchFiles = (patchId) => {
   return (dispatch) => {
     if(!patchId){

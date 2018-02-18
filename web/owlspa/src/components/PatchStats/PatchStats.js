@@ -1,7 +1,20 @@
 import React, { Component, PropTypes } from 'react';
+import CSSModules from 'react-css-modules';
+import styles from './PatchStats.css';
 import { Tag } from 'components';
 
 class PatchStats extends Component {
+  
+  constructor(props){
+    super(props);
+    this.state = {
+      editTagMode: false,
+      tagFilter: '',
+      tags: props.patch && props.patch.tags ? props.patch.tags : [],
+      showTagsDropDown: false
+    };
+  }
+
   bytesToHumanReadable(bytes){
     var i = Math.floor( Math.log(bytes) / Math.log(1024) );
     return (bytes / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
@@ -17,8 +30,102 @@ class PatchStats extends Component {
     }
   }
 
+  handleEditTagsClick(e){
+    this.setState({
+      editTagMode: true
+    });
+  }
+
+  handleStopEditingTags(){
+    this.setState({
+      editTagMode: false
+    });
+  }
+
+  handleAddTag(tag){
+    const {
+      tags
+    } = this.state;
+
+    if(tags.indexOf(tag) > -1){
+      return;
+    }
+
+    this.setState({
+      tags: [
+        ...tags,
+        tag
+      ],
+      tagFilter: '',
+      showTagsDropDown: false
+    });
+  }
+
+  handleTagFilterInputClick(){
+    this.setState({
+      showTagsDropDown: true
+    });
+  }
+
+  handleTagFilterChange(tagFilter){
+    this.setState({
+      tagFilter
+    });
+  }
+
+  handleDeleteTag(tag){
+    this.setState({
+      tags: this.state.tags.filter(existingTag => tag !== existingTag),
+      showTagsDropDown: false
+    });
+  }
+
+  handleSaveTagsClick(){
+    const {
+      tags
+    } = this.state;
+
+    this.props.onSave({tags});
+  }
+
+  handleCancelTagsClick(){
+    const {
+      patch
+    } = this.props;
+
+    this.setState({
+      editTagMode: false,
+      tags: patch && patch.tags ? patch.tags : []
+    });
+  }
+
+  componentWillReceiveProps(nextProps){
+    const {
+      savedSuccess
+    } = this.props;
+
+    if(!savedSuccess && nextProps.savedSuccess){
+      this.setState({
+        editTagMode: false
+      });
+    }
+  }
+
   render(){
-    const { patch, canEdit } = this.props;
+    const { 
+      patch,
+      canEdit,
+      availableTagList,
+      isSaving,
+      savedSuccess
+    } = this.props;
+    
+    const {
+      editTagMode,
+      tagFilter,
+      tags,
+      showTagsDropDown
+    } = this.state;
 
     if(!patch){
       return (
@@ -27,54 +134,114 @@ class PatchStats extends Component {
     }
     return (
       <div className="patch-stats">
+      { /*
         <div className="patch-stats-row">
             <span className="parameter-label">Channels</span>
             <span className="parameter-value">{patch.inputs + ' in / ' + patch.outputs + ' out'}</span>
         </div>
-        { patch.cycles ? (
+        { patch.cycles && (
             <div className="patch-stats-row">
                 <span className="parameter-label">CPU</span>
                 <span className="parameter-value">{this.cyclesToPercent(patch.cycles)+'%'}</span>
             </div>
-          ): null
+          )
         }
-        { patch.bytes ? (
+        { patch.bytes && (
           <div className="patch-stats-row">
               <span className="parameter-label">Memory</span>
               <span className="parameter-value">{ this.bytesToHumanReadable(patch.bytes) + ' / 1Mb'}</span>
           </div>
-          ): null
+          )
         }
-        { patch.sysExAvailable ? (
+      */}
+        { patch.sysExAvailable && (
           <div className="patch-stats-row">
               <span className="parameter-label">SysEx</span>
               <span className="parameter-value">
                 <a className="sysExDownloadLink" href={'/api/builds/'+ patch._id +'?format=sysx&amp;download=1'}>Download</a>
-                {patch.sysExLastUpdated ? ' (built on ' + this.isoDateToLocaleString(patch.sysExLastUpdated) + ' )' : null}
+                {patch.sysExLastUpdated && ' (built on ' + this.isoDateToLocaleString(patch.sysExLastUpdated) + ' )'}
               </span>
           </div>
-          ): null
+          )
         }
-        { patch.jsAvailable ? (
+        { patch.jsAvailable && (
           <div className="patch-stats-row">
             <span className="parameter-label">JS</span>
             <span className="parameter-value">
               <a className="jsDownloadLink" href={'/api/builds/'+ patch._id +'?format=js&amp;download=1'}>Download</a>
-              { patch.jsLastUpdated ? ' (built on ' + this.isoDateToLocaleString(patch.jsLastUpdated) + ' )': null}
+              { patch.jsLastUpdated && ' (built on ' + this.isoDateToLocaleString(patch.jsLastUpdated) + ' )'}
             </span>
           </div>
-          ) : null
+          )
         }
-        { patch.downloadCount ? (
+        { (patch.downloadCount > 0) && (
           <div className="patch-stats-row">
               <span className="parameter-label">Downloads</span>
               <span className="parameter-value">{patch.downloadCount}</span>
           </div>
-          ): null
+          )
         }
-        <div className="patch-stats-row">
-          { patch.tags ? patch.tags.map( tag => <Tag key={tag} tag={tag} />): null }
+        <div className="patch-stats-row" style={{position: 'relative'}}>
+          { tags && tags.map( tag => <Tag editMode={editTagMode} onDelete={() => this.handleDeleteTag(tag)} key={tag} tag={tag} />) }          
+          { canEdit && !editTagMode && (
+            <div className="tag" onClick={e => this.handleEditTagsClick(e)}>
+              +
+            </div>
+          )}
         </div>
+        { editTagMode && (
+          <div className="patch-stats-row" style={{position: 'relative'}}>
+            <div styleName="tag-editor">
+              <input 
+                styleName="tag-editor-filter-input"
+                type="text" 
+                value={tagFilter} 
+                disabled={isSaving}
+                onClick={ e => this.handleTagFilterInputClick()}
+                onChange={(e) => this.handleTagFilterChange(e.target.value) } 
+              />
+              { showTagsDropDown && (
+                <ul styleName="tag-dropdown">
+                  { availableTagList && availableTagList.filter( tag => {
+                    return !tagFilter || tag.toUpperCase().indexOf(tagFilter.toUpperCase()) !== -1;
+                  }).filter( tag => {
+                    return tags.indexOf(tag) === -1;
+                  }).map( (tag, i) => {
+                    return (
+                      <li 
+                        key={i}
+                        onClick={() => this.handleAddTag(tag)} 
+                      >
+                      {tag}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              
+            </div>
+            <button 
+              className="btn-small" 
+              style={{
+                lineHeight: '6px',
+                margin: '2px'
+              }}
+              disabled={isSaving} 
+              onClick={ e => this.handleSaveTagsClick()} >
+              { isSaving ? '...saving' : 'save'  }
+            </button>
+            <button 
+              className="btn-small" 
+              style={{
+                lineHeight: '6px',
+                margin: '2px'
+              }}
+              disabled={isSaving} 
+              onClick={ e => this.handleCancelTagsClick()} >
+              cancel
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -82,7 +249,16 @@ class PatchStats extends Component {
 
 PatchStats.propTypes = {
   patch: PropTypes.object,
-  canEdit : PropTypes.bool
-}
+  canEdit : PropTypes.bool,
+  availableTagList: PropTypes.array,
+  onSave : PropTypes.func,
+  isSaving: PropTypes.bool,
+  savedSuccess: PropTypes.bool
+};
 
-export default PatchStats;
+PatchStats.defaultProps = {
+  availableTagList: [],
+  onSave: () => {}
+};
+
+export default CSSModules(PatchStats, styles);

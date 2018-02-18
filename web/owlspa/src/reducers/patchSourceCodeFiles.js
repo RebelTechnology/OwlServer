@@ -1,16 +1,17 @@
 import {
-  REQUEST_PATCH_CODE_FILE,
-  RECEIVE_PATCH_CODE_FILE,
-  REQUEST_PATCH_CODE_FILE_FAILED,
-  UPDATE_PATCH_CODE_FILE,
-  SERVER_SAVE_PATCH_CODE_FILES,
-  SERVER_SAVE_PATCH_CODE_FILES_SUCCESS,
-  SERVER_SAVE_PATCH_CODE_FILES_FAIL
+  FETCH_PATCH_SOURCE_FILE_REQUEST,
+  FETCH_PATCH_SOURCE_FILE_SUCCESS,
+  FETCH_PATCH_SOURCE_FILE_ERROR,
+  UPDATE_PATCH_SOURCE_FILE,
+  SAVE_PATCH_SOURCE_FILES_REQUEST,
+  SAVE_PATCH_SOURCE_FILES_SUCCESS,
+  SAVE_PATCH_SOURCE_FILES_ERROR,
+  CLEAR_PATCH_SOURCE_CODE_FILES
 } from 'constants';
 
 const initialState = {};
 
-const updateCodeFile = (state = [], index, data = {}) => {
+const updateSourceFileCode = (state = [], index, data = {}) => {
   let newState = [...state];
   newState[index] = {
     ...newState[index],
@@ -19,12 +20,12 @@ const updateCodeFile = (state = [], index, data = {}) => {
   return newState;
 };
 
-const patchCodeFiles = (state = initialState, action) => {
+const patchSourceCodeFiles = (state = initialState, action) => {
   switch (action.type) {
-    case RECEIVE_PATCH_CODE_FILE:
+    case FETCH_PATCH_SOURCE_FILE_SUCCESS:
       return {
         ...state,
-        [action.patchId]: updateCodeFile(state[action.patchId], action.index, {
+        [action.patchId]: updateSourceFileCode(state[action.patchId], action.index, {
           fileString: action.fileString,
           fileUrl: action.fileUrl,
           edited: false,
@@ -33,33 +34,33 @@ const patchCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case REQUEST_PATCH_CODE_FILE:
+    case FETCH_PATCH_SOURCE_FILE_REQUEST:
       return {
         ...state,
-        [action.patchId]: updateCodeFile(state[action.patchId], action.index, {
+        [action.patchId]: updateSourceFileCode(state[action.patchId], action.index, {
           isLoading: true
         })
       }
 
-    case REQUEST_PATCH_CODE_FILE_FAILED:
+    case FETCH_PATCH_SOURCE_FILE_ERROR:
       return {
         ...state,
-        [action.patchId]: updateCodeFile(state[action.patchId], action.index, {
+        [action.patchId]: updateSourceFileCode(state[action.patchId], action.index, {
           isLoading: false,
           errorFetching: action.reason
         })
       }
 
-    case UPDATE_PATCH_CODE_FILE:
+    case UPDATE_PATCH_SOURCE_FILE:
       return {
         ...state,
-        [action.patchId]: updateCodeFile(state[action.patchId], action.index, {
+        [action.patchId]: updateSourceFileCode(state[action.patchId], action.index, {
           fileString: action.fileString,
           edited: true
         })
       }
 
-    case SERVER_SAVE_PATCH_CODE_FILES:
+    case SAVE_PATCH_SOURCE_FILES_REQUEST:
       return {
         ...state,
         [action.patchId]: state[action.patchId].map(file => {
@@ -70,7 +71,7 @@ const patchCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case SERVER_SAVE_PATCH_CODE_FILES_SUCCESS:
+    case SAVE_PATCH_SOURCE_FILES_SUCCESS:
       return {
         ...state,
         [action.patchId]: state[action.patchId].map(file => {
@@ -82,7 +83,7 @@ const patchCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case SERVER_SAVE_PATCH_CODE_FILES_FAIL:
+    case SAVE_PATCH_SOURCE_FILES_ERROR:
       return {
         ...state,
         [action.patchId]: state[action.patchId].map(file => {
@@ -93,9 +94,15 @@ const patchCodeFiles = (state = initialState, action) => {
         })
       }
 
+    case CLEAR_PATCH_SOURCE_CODE_FILES:
+      return {
+        ...state,
+        [action.patchId]:[]
+      }
+
     default:
       return state
   }
 }
 
-export default patchCodeFiles;
+export default patchSourceCodeFiles;

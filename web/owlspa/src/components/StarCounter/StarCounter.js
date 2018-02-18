@@ -11,7 +11,7 @@ class StarCounter extends Component {
       <div styleName="star-counter">
         <IconButton 
           title={(starred ? 'unstar' : 'star') + ' this patch'} 
-          name={starred ? 'starred': 'star'} 
+          icon={starred ? 'starred': 'star'} 
           color="#555" 
           onClick={ onStarClick } >
           {starCount} Star{`${ starCount===1 ? '' : 's' }`}

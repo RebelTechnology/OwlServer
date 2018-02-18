@@ -23,7 +23,7 @@ if (!is_user_logged_in()) {
 <?php
 }
 ?>
-            <li><a href="http://www.rebeltech.org/shop/" class="order-button">Order</a></li>
+            <li><a href="https://www.rebeltech.org/shop/" class="order-button">Order</a></li>
         </ul>
     </div>
 </div>

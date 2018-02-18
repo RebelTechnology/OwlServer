@@ -1,7 +1,7 @@
 import {
-  SERVER_SAVE_PATCH_CODE_FILES,
-  SERVER_SAVE_PATCH_CODE_FILES_SUCCESS,  
-  SERVER_SAVE_PATCH_CODE_FILES_FAIL 
+  SAVE_PATCH_SOURCE_FILES_REQUEST,
+  SAVE_PATCH_SOURCE_FILES_SUCCESS,  
+  SAVE_PATCH_SOURCE_FILES_ERROR 
 } from 'constants';
 import serverUploadPatchFiles from './serverUploadPatchFiles';
 import compilePatch from './compilePatch';
@@ -15,7 +15,7 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
   return (dispatch) => {
 
     dispatch({
-      type: SERVER_SAVE_PATCH_CODE_FILES,
+      type: SAVE_PATCH_SOURCE_FILES_REQUEST,
       patchId: patch._id
     });
 
@@ -46,7 +46,7 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
         }));
 
         dispatch({
-          type: SERVER_SAVE_PATCH_CODE_FILES_FAIL,
+          type: SAVE_PATCH_SOURCE_FILES_ERROR,
           patchId: patch._id
         });
 
@@ -58,7 +58,7 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
       
       if(res.success){
         dispatch({
-          type: SERVER_SAVE_PATCH_CODE_FILES_SUCCESS,
+          type: SAVE_PATCH_SOURCE_FILES_SUCCESS,
           patchId: patch._id
         });
         if(options.compile){
@@ -68,7 +68,7 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
 
       if(res.error){
         dispatch({
-          type: SERVER_SAVE_PATCH_CODE_FILES_FAIL,
+          type: SAVE_PATCH_SOURCE_FILES_ERROR,
           patchId: patch._id
         });
       }

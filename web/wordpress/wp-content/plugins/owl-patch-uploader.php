@@ -77,6 +77,8 @@ function isPatchIdValid($patchId)
  */
 function getApiBaseUrl()
 {
+    $apiBaseUrl = 'https://'.$_SERVER['HTTP_HOST'].'/api';
+/*
     $apiBaseUrl = 'http://hoxtonowl.localhost:3000';
     if (isset($_SERVER['APPLICATION_ENV'])) {
         if ($_SERVER['APPLICATION_ENV'] == 'staging') {
@@ -85,7 +87,7 @@ function getApiBaseUrl()
             $apiBaseUrl = 'https://www.hoxtonowl.com/api';
         }
     }
-
+*/
     //return 'http://192.168.50.1:3000'; // Uncomment this line to run API locally
     return $apiBaseUrl;
 

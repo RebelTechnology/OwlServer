@@ -7,7 +7,7 @@ module.exports = {
     './src/index.js'
   ],
   output: {
-    path: path.join(__dirname, '../wordpress/wp-content/themes/hoxton-owl-2014/page-patch-library/js'),
+    path: path.join(__dirname, '../wordpress/wp-content/themes/shopkeeper-child/page-patch-library/js'),
     publicPath: '/',
     filename: 'bundle.js'
   },
@@ -21,14 +21,9 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract('style', 'css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss-loader')
+        loader: ExtractTextPlugin.extract('style', 'css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]')
       }
     ]
-  },
-  postcss: () => {
-    return [
-      require('postcss-autoreset')
-    ];
   },
   externals: {
     'cheerio': 'window',
