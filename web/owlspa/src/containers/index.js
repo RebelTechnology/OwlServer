@@ -1,6 +1,7 @@
 export App from './App/App';
 export CreateAndEditPatchPage from './CreateAndEditPatchPage/CreateAndEditPatchPage';
 export Dialog from './Dialog/Dialog'; 
+export MidiKeyboard from './MidiKeyboard/MidiKeyboard';
 export NavBar from './NavBar/NavBar';
 export OwlControl from './OwlControl/OwlControl';
 export PatchTile from './PatchTile/PatchTile';
