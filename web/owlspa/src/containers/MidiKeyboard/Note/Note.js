@@ -57,6 +57,16 @@ class Note extends Component {
     this.handleNoteOff();
   }
 
+  componentWillReceiveProps(nextProps){
+    if(!this.props.noteIsDown && nextProps.noteIsDown){
+      this.handleNoteOn();
+    }
+
+    if(this.props.noteIsDown && !nextProps.noteIsDown){
+      this.handleNoteOff();
+    }
+  }
+
   render(){
     const {
       type,
@@ -94,7 +104,8 @@ Note.propTypes = {
   isWhiteKey: PropTypes.bool,
   width: PropTypes.number,
   height: PropTypes.number,
-  x: PropTypes.number
+  x: PropTypes.number,
+  noteIsDown: PropTypes.bool,
 };
 
 Note.defaultProps = {

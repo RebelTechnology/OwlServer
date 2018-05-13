@@ -80,7 +80,8 @@ class PatchParameters extends Component {
     const { 
       patch,
       patchIsActive,
-      isSaving
+      isSaving,
+      canEdit
     } = this.props;
 
     const {
@@ -113,8 +114,8 @@ class PatchParameters extends Component {
     return (
       <div className="flexbox flex-center">
         { renderParameters }
-        { !editMode && <IconButton title="edit parameter names" icon={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ e => this.handleEditClick(e) } /> }
-        { editMode && <IconButton title="save" icon={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  e => this.handleSaveClick(e) } /> }
+        { canEdit && !editMode && <IconButton title="edit parameter names" icon={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ e => this.handleEditClick(e) } /> }
+        { canEdit && editMode && <IconButton title="save" icon={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  e => this.handleSaveClick(e) } /> }
       </div>
     );
   }

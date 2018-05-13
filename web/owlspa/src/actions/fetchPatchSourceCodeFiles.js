@@ -1,4 +1,3 @@
-
 import { parseUrl } from 'utils';
 import {
   FETCH_PATCH_SOURCE_FILE_REQUEST,

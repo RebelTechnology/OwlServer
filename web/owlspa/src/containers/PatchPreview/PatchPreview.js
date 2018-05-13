@@ -15,7 +15,8 @@ class PatchPreview extends Component {
     super(props);
     this.state = {
       audioSelectValue : 'none',
-      pushButtonLedColour : '#ececec'
+      pushButtonLedColour : '#ececec',
+      showMidiKeyboard: false
     };
   }
   
@@ -123,6 +124,12 @@ class PatchPreview extends Component {
     }
   }
 
+  toggleMidiKeyboardVisibility(){
+    this.setState({
+      showMidiKeyboard: !this.state.showMidiKeyboard
+    });
+  }
+
   updateWebAudioPatchParameters(nextParams){
     const { webAudioPatchParameters:currentParams, webAudioPatch:{instance} } = this.props;
     nextParams.forEach((nextParam, i) => {
@@ -178,29 +185,31 @@ class PatchPreview extends Component {
     } = this.props;
 
     const {
-      audioSelectValue
+      audioSelectValue,
+      showMidiKeyboard
     } = this.state;
 
     const playAudioFile = audioSelectValue !== 'none' && audioSelectValue !== 'mic';
     const audioSampleBasePath = '/wp-content/themes/shopkeeper-child/page-patch-library/audio/';
 
     return (
-      <div className="patch-preview-buttons">
-        { webAudioPatch.isReady ? (
-            <button
-              style={{display:'inline-block'}}
-              onClick={() => this.togglePatchAudio()} >
-              { webAudioPatch.isPlaying ? 'stop audio':'start audio' }
-            </button>
-          ) : (
-            <button 
-              style={{display:'inline-block'}}
-              disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
-              onClick={() => this.handleTestPatchButtonClick()} >
-              Play
-            </button>
-          )
-        }
+      <div className="patch-preview-buttons">    
+        { !webAudioPatch.isReady && (
+          <button 
+            style={{display:'inline-block'}}
+            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
+            onClick={() => this.handleTestPatchButtonClick()} >
+            Play
+          </button>
+        )}
+
+        { webAudioPatch.isReady && (
+          <button
+            style={{display:'inline-block'}}
+            onClick={() => this.togglePatchAudio()} >
+            { webAudioPatch.isPlaying ? 'stop audio':'start audio' }
+          </button>
+        )}
 
         { webAudioPatch.isPlaying && (
           <div className="audio-input-selector">
@@ -235,12 +244,18 @@ class PatchPreview extends Component {
   }
 
   render(){
+
+    const {
+      showMidiKeyboard
+    } = this.state;
+
     const { 
       patch,
       patchJavaScript,
       webAudioPatch,
       canEdit,
-      isSaving
+      isSaving,
+      owlState
     } = this.props;
     
     return (
@@ -277,8 +292,21 @@ class PatchPreview extends Component {
         </div>
 
         <OwlControl patch={patch} />
+
+        { (webAudioPatch.isReady || owlState.isConnected) && (
+          <button
+            style={{
+              marginLeft: '10px',
+              padding: '20px',
+              width: '165px',
+              lineHeight: '0px'
+            }}
+            onClick={() => this.toggleMidiKeyboardVisibility()} >
+            { showMidiKeyboard ? 'hide keyboard' : 'show keyboard'}
+          </button>
+        )}
         
-        <MidiKeyboard />
+        { (webAudioPatch.isReady || owlState.isConnected) && showMidiKeyboard && <MidiKeyboard /> }
 
       </div>
     );
@@ -303,8 +331,9 @@ PatchPreview.defaultProps = {
   onCompileClick: () => {}
 };
 
-const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatch }) => {
+const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatch, owlState }) => {
   return { 
+    owlState,
     patchJavaScript,
     webAudioPatchParameters,
     webAudioPatch
