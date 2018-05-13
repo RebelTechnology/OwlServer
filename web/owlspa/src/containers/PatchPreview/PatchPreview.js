@@ -296,7 +296,7 @@ class PatchPreview extends Component {
         { (webAudioPatch.isReady || owlState.isConnected) && (
           <button
             style={{
-              marginLeft: '10px',
+              margin: '10px',
               padding: '20px',
               width: '165px',
               lineHeight: '0px'
