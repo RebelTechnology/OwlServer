@@ -6,7 +6,6 @@ class PatchSoundcloud extends Component {
   constructor(props){
     super(props);
     this.state = {
-      editMode: false,
       soundcloud: props.soundcloud
     }
   }
@@ -17,114 +16,51 @@ class PatchSoundcloud extends Component {
     '&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true'
   }
 
-  handleEditSoundCloudClick(){
-    this.setState({
-      editMode: true
-    });
-  }
-  
   handleSoundCloudUrlChange(i, value){
     const updatedSoundcloud = [
-      ...this.state.soundcloud
+      ...this.props.soundcloud
     ];
 
     updatedSoundcloud[i] = value;
 
-    this.setState({
-      soundcloud: updatedSoundcloud
-    });
+    this.props.onChangeSoundCloudArr(updatedSoundcloud);
   
   }
 
-  handleAddSoundCloudClick(){
+  handleAddSoundCloud(){
     const {
       soundcloud
-    } = this.state;
+    } = this.props;
 
-    this.setState({
-      soundcloud: [
-        ...soundcloud,
-        ''
-      ]
-    });
+    this.props.onChangeSoundCloudArr([ ...soundcloud, '']);
   }
 
-  handleDeleteSoundCloudClick(i){
+  handleDeleteSoundCloud(i){
     const updatedSoundcloud = [
-      ...this.state.soundcloud
+      ...this.props.soundcloud
     ];
 
     updatedSoundcloud.splice(i, 1)
 
-    this.setState({
-      soundcloud: updatedSoundcloud
-    });
-  }
-
-  handleSaveSoundCloudClick(){
-    const {
-      soundcloud
-    } = this.state;
-
-    const soundcloudToSave = soundcloud.filter( url => !!url);
-    //TODO validate soundcloud urls before saving, perhaps do it as the user types it, the save button is disabled until valid.
-    this.props.onSave(soundcloudToSave);
-  }
-
-  handleCancelSoundCloudClick(){
-    const {
-      soundcloud
-    } = this.props;
-
-    this.setState({
-      editMode: false,
-      soundcloud
-    });
-  }
-
-  containsDifferentSoundCloud(nextProps){
-    if(nextProps.soundcloud.length !== this.props.soundcloud.length){
-      return true;
-    }
-
-    return !nextProps.soundcloud.every( (url, i) => this.props.soundcloud[i] === url);
-  }
-
-  componentWillReceiveProps(nextProps){
-    const {
-      savedSuccess,
-      soundcloud
-    } = this.props;
-
-    if(!savedSuccess && nextProps.savedSuccess){
-      this.setState({
-        editMode: false
-      });
-    }
-
-    if(this.containsDifferentSoundCloud(nextProps)){
-      this.setState({
-        soundcloud: nextProps.soundcloud
-      });
-    }
+    this.props.onChangeSoundCloudArr(updatedSoundcloud);
   }
 
   render(){
-    const { 
-      soundcloud,
-      editMode
-    } = this.state;
-
     const {
-      canEdit,
+      soundcloud,
+      editMode,
       isSaving
     } = this.props;
 
+    const styles = {};
+    if(!soundcloud.length){
+      styles.marginBottom = 0;
+    }
+
     return (
-      <div>
-        <div className="patch-soundcloud">
+      <div className="patch-soundcloud" style={styles}>
         { soundcloud.map((src, i) => {
-            return canEdit && editMode ? 
+            return editMode ? 
             ( <div key={i}>
                 <input 
                   style={{
@@ -142,7 +78,7 @@ class PatchSoundcloud extends Component {
                   title="delete this soundcloud link" 
                   icon={ isSaving ? 'loading' : 'delete' } 
                   disabled={isSaving}
-                  onClick={e => this.handleDeleteSoundCloudClick(i)} />
+                  onClick={e => this.handleDeleteSoundCloud(i)} />
               </div>
             ) : (
               <iframe 
@@ -155,7 +91,7 @@ class PatchSoundcloud extends Component {
               </iframe>
             );
         })}
-        { canEdit && editMode && (
+        { editMode && (
           <div>
             <button 
               className="btn-small" 
@@ -164,43 +100,11 @@ class PatchSoundcloud extends Component {
                 margin: '2px'
               }}
               disabled={isSaving} 
-              onClick={ e => this.handleAddSoundCloudClick()} >
-              Add A Link
-            </button>
-            <button 
-              className="btn-small" 
-              style={{
-                lineHeight: '6px',
-                margin: '2px'
-              }}
-              disabled={isSaving} 
-              onClick={ e => this.handleSaveSoundCloudClick()} >
-              { isSaving ? '...saving' : 'save'  }
-            </button>
-            <button 
-              className="btn-small" 
-              style={{
-                lineHeight: '6px',
-                margin: '2px'
-              }}
-              disabled={isSaving} 
-              onClick={ e => this.handleCancelSoundCloudClick()} >
-              cancel
+              onClick={ e => this.handleAddSoundCloud()} >
+              Add A Soundcloud Link
             </button>
           </div>
         )}
-        { canEdit && !editMode && (
-          <div>
-            <IconButton 
-              title="edit soundcloud links" 
-              icon={ isSaving ? 'loading' : 'edit' } 
-              disabled={isSaving}
-              onClick={e => this.handleEditSoundCloudClick(e)}>
-              Soundcloud links
-            </IconButton>
-          </div>
-        )}
-        </div>
       </div>
     );
   }
@@ -208,13 +112,14 @@ class PatchSoundcloud extends Component {
 
 PatchSoundcloud.propTypes = {
   soundCloud: PropTypes.array,
+  onChangeSoundCloudArr: PropTypes.func,
   isSaving: PropTypes.bool,
+  editMode: PropTypes.bool,
   savedSuccess: PropTypes.bool,
-  onSave: PropTypes.func
 };
 
 PatchSoundcloud.defaultProps = {
-  onSave: () => {},
+  onChangeSoundCloudArr: () => {},
   soundcloud: []
 };
 

@@ -8,9 +8,7 @@ class PatchStats extends Component {
   constructor(props){
     super(props);
     this.state = {
-      editTagMode: false,
       tagFilter: '',
-      tags: props.patch && props.patch.tags ? props.patch.tags : [],
       showTagsDropDown: false
     };
   }
@@ -30,35 +28,24 @@ class PatchStats extends Component {
     }
   }
 
-  handleEditTagsClick(e){
-    this.setState({
-      editTagMode: true
-    });
-  }
-
-  handleStopEditingTags(){
-    this.setState({
-      editTagMode: false
-    });
-  }
-
   handleAddTag(tag){
     const {
       tags
-    } = this.state;
+    } = this.props;
 
     if(tags.indexOf(tag) > -1){
       return;
     }
 
     this.setState({
-      tags: [
-        ...tags,
-        tag
-      ],
       tagFilter: '',
       showTagsDropDown: false
     });
+
+    this.props.onChangeTags([
+      ...tags,
+      tag
+    ]);
   }
 
   handleTagFilterInputClick(){
@@ -74,58 +61,33 @@ class PatchStats extends Component {
   }
 
   handleDeleteTag(tag){
-    this.setState({
-      tags: this.state.tags.filter(existingTag => tag !== existingTag),
-      showTagsDropDown: false
-    });
-  }
-
-  handleSaveTagsClick(){
     const {
       tags
-    } = this.state;
-
-    this.props.onSave({tags});
-  }
-
-  handleCancelTagsClick(){
-    const {
-      patch
     } = this.props;
 
     this.setState({
-      editTagMode: false,
-      tags: patch && patch.tags ? patch.tags : []
+      showTagsDropDown: false
     });
-  }
 
-  componentWillReceiveProps(nextProps){
-    const {
-      savedSuccess
-    } = this.props;
-
-    if(!savedSuccess && nextProps.savedSuccess){
-      this.setState({
-        editTagMode: false
-      });
-    }
+    this.props.onChangeTags(tags.filter(existingTag => tag !== existingTag))
   }
 
   render(){
     const { 
+      tags,
       patch,
-      canEdit,
+      editMode,
       availableTagList,
       isSaving,
       savedSuccess
     } = this.props;
     
     const {
-      editTagMode,
       tagFilter,
-      tags,
       showTagsDropDown
     } = this.state;
+
+    console.log('tags', tags);
 
     if(!patch){
       return (
@@ -182,19 +144,16 @@ class PatchStats extends Component {
           )
         }
         <div className="patch-stats-row" style={{position: 'relative'}}>
-          { tags && tags.map( tag => <Tag editMode={editTagMode} onDelete={() => this.handleDeleteTag(tag)} key={tag} tag={tag} />) }          
-          { canEdit && !editTagMode && (
-            <div className="tag" onClick={e => this.handleEditTagsClick(e)}>
-              +
-            </div>
-          )}
+          { tags && tags.map( tag => <Tag editMode={editMode} onDelete={() => this.handleDeleteTag(tag)} key={tag} tag={tag} />) }
         </div>
-        { editTagMode && (
+        { editMode && (
           <div className="patch-stats-row" style={{position: 'relative'}}>
             <div styleName="tag-editor">
               <input 
                 styleName="tag-editor-filter-input"
+                style={{width: '100px'}}
                 type="text" 
+                placeholder="add a tag"
                 value={tagFilter} 
                 disabled={isSaving}
                 onClick={ e => this.handleTagFilterInputClick()}
@@ -220,26 +179,6 @@ class PatchStats extends Component {
               )}
               
             </div>
-            <button 
-              className="btn-small" 
-              style={{
-                lineHeight: '6px',
-                margin: '2px'
-              }}
-              disabled={isSaving} 
-              onClick={ e => this.handleSaveTagsClick()} >
-              { isSaving ? '...saving' : 'save'  }
-            </button>
-            <button 
-              className="btn-small" 
-              style={{
-                lineHeight: '6px',
-                margin: '2px'
-              }}
-              disabled={isSaving} 
-              onClick={ e => this.handleCancelTagsClick()} >
-              cancel
-            </button>
           </div>
         )}
       </div>
@@ -249,16 +188,17 @@ class PatchStats extends Component {
 
 PatchStats.propTypes = {
   patch: PropTypes.object,
-  canEdit : PropTypes.bool,
+  editMode : PropTypes.bool,
   availableTagList: PropTypes.array,
-  onSave : PropTypes.func,
-  isSaving: PropTypes.bool,
-  savedSuccess: PropTypes.bool
+  tags: PropTypes.array,
+  onChangeTags : PropTypes.func,
+  isSaving: PropTypes.bool
 };
 
 PatchStats.defaultProps = {
   availableTagList: [],
-  onSave: () => {}
+  tags: [],
+  onChangeTags: () => {}
 };
 
 export default CSSModules(PatchStats, styles);

@@ -42,6 +42,23 @@
     clear: both;
 }
 
+.patch-title-published-editor {
+    text-align: right;
+    float: right;
+    clear: both;
+}
+
+.patch-title-published-editor label {
+    color: #fff;
+    display: inline-block;
+    margin-right: 10px;
+    font-weight: normal;
+}
+
+.patch-title-published-editor input {
+    margin: 5px;
+}
+
 @media only screen and (max-width: 1430px) {
     .patch-tile-small {
         width: 32%;

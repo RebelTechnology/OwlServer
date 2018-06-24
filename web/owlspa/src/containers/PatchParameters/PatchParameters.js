@@ -5,93 +5,31 @@ import { IconButton } from 'components';
 import { setWebAudioPatchParameter } from 'actions';
 
 class PatchParameters extends Component {
-  
-  constructor(props){
-    super(props);
-    this.state = {
-      editMode: false,
-      parameters: props.patch && props.patch.parameters || {}
-    }
-  }
 
   handleParameterValueChange(parameter){
     this.props.setWebAudioPatchParameter(parameter);
   }
 
-  handleEditClick(){
-    this.setState({
-      editMode: true
-    });
-  }
-
-  handleSaveClick(){
-    this.props.onSaveParamNames(this.state.parameters)
-  }
 
   handleParamNameChange(key, name){
     const {
       parameters
-    } = this.state;
-
-    this.setState({
-      parameters: {
-        ...parameters,
-        [key]: name
-      }
-    })
-  }
-
-  parameterNamesHaveChanged(nextProps){
-    const {
-      patch
     } = this.props;
 
-    if(patch !== nextProps.patch){
-      return true;
-    }
-
-    if(patch.parameters !== nextProps.patch.parameters){
-      return true;
-    }
-
-    return Object.keys(nextProps.patch.parameters).some(paramKey => {
-      return nextProps.patch.parameters[paramKey] !== patch.parameters[paramKey]
+    this.props.onChangeParamNames({
+      ...parameters,
+      [key]: name
     });
-
-  }
-
-  componentWillReceiveProps(nextProps){
-    
-    if(!nextProps.isSaving && this.props.isSaving){
-      this.setState({
-        editMode: false
-      });
-    }
-
-    if(this.parameterNamesHaveChanged(nextProps)){
-      this.setState({
-        parameters: nextProps.patch && nextProps.patch.parameters || {}
-      });
-    }
   }
 
   render(){
 
     const { 
-      patch,
       patchIsActive,
       isSaving,
-      canEdit
-    } = this.props;
-
-    const {
       editMode,
       parameters
-    } = this.state;
-
-    if(!patch){
-      return null;
-    }
+    } = this.props;
 
     const renderParameters = Object.keys(parameters).map((key, i) => {
       return ( 
@@ -114,8 +52,6 @@ class PatchParameters extends Component {
     return (
       <div className="flexbox flex-center">
         { renderParameters }
-        { canEdit && !editMode && <IconButton title="edit parameter names" icon={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ e => this.handleEditClick(e) } /> }
-        { canEdit && editMode && <IconButton title="save" icon={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  e => this.handleSaveClick(e) } /> }
       </div>
     );
   }
@@ -123,11 +59,11 @@ class PatchParameters extends Component {
 }
 
 PatchParameters.propTypes = {
-  patch: PropTypes.object,
   patchIsActive: PropTypes.bool,
-  canEdit: PropTypes.bool,
+  editMode: PropTypes.bool,
   isSaving: PropTypes.bool,
-  onSaveParamNames: PropTypes.func
+  onChangeParamNames: PropTypes.func,
+  parameters: PropTypes.object
 }
 
 export default connect(null, { setWebAudioPatchParameter })(PatchParameters);

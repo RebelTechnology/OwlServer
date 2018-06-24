@@ -1,7 +1,5 @@
 
 .tag-editor {
-  width: 150px;
-  float: left;
   margin-right: 10px;
   font-size: 16px;
   font-weight: normal;
@@ -10,7 +8,7 @@
 }
 
 .tag-editor-filter-input {
-  width: 100%;
+  width: 100px;
   display: inline-block;
   font-weight: normal;
   text-transform: uppercase;

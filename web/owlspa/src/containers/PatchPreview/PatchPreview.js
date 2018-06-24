@@ -253,9 +253,10 @@ class PatchPreview extends Component {
       patch,
       patchJavaScript,
       webAudioPatch,
-      canEdit,
+      editMode,
       isSaving,
-      owlState
+      owlState,
+      parameters
     } = this.props;
     
     return (
@@ -263,10 +264,10 @@ class PatchPreview extends Component {
         <div style={{paddingLeft:'30px'}}>
           <PatchParameters 
             patchIsActive={webAudioPatch.isPlaying} 
-            canEdit={canEdit}
-            onSaveParamNames={params => this.props.onSave(params)}
+            editMode={editMode}
+            onChangeParamNames={params => this.props.onChangeParamNames(params)}
             isSaving={isSaving}
-            patch={patch} 
+            parameters={parameters} 
           />
         </div>
 
@@ -320,14 +321,14 @@ class PatchPreview extends Component {
 
 PatchPreview.propTypes = {
   patch: PropTypes.object,
-  canEdit: PropTypes.bool,
+  editMode: PropTypes.bool,
   isSaving: PropTypes.bool,
-  onSave: PropTypes.func,
+  onChangeParamNames: PropTypes.func,
   onCompileClick: PropTypes.func
 }
 
 PatchPreview.defaultProps = {
-  onSave: () => {},
+  onChangeParamNames: () => {},
   onCompileClick: () => {}
 };
 
