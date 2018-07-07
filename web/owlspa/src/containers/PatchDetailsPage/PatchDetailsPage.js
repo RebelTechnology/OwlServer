@@ -22,8 +22,6 @@ class PatchDetailsPage extends Component {
       patch = patchDetails.patches[routeParams.patchSeoName] || {};
     }
 
-    console.log('patch', patch);
-
     const {
       description='',
       instructions='',
@@ -94,8 +92,6 @@ class PatchDetailsPage extends Component {
   }
 
   handleChangePublished(published){
-    console.log(published);
-
     this.setState({
       published
     });
@@ -129,6 +125,33 @@ class PatchDetailsPage extends Component {
     });
   }
 
+  handleOnCancelEditPatchClick(){
+    //revert state
+    const { routeParams, patchDetails } = this.props;
+    const patch = patchDetails.patches[routeParams.patchSeoName] || {};
+    
+    const {
+      description='',
+      instructions='',
+      name='',
+      published,
+      soundcloud=[],
+      parameters={},
+      tags=[]
+    } = patch;
+
+    this.setState({
+      description,
+      instructions,
+      published,
+      name,
+      editMode: false,
+      soundcloud,
+      parameters,
+      tags
+    });
+  }
+
   handleOnSavePatchClick(){
     const {
       instructions,
@@ -139,8 +162,22 @@ class PatchDetailsPage extends Component {
       parameters,
       tags
     } = this.state;
+
+    const filteredSoundcloudUrls = soundcloud.filter(url => /^https:\/\/soundcloud\.com\/.+\/.+/.test(url));
     
-    this.handleUpdatePatchDetails({ instructions, description, name, published, soundcloud, parameters, tags });
+    this.setState({
+      soundcloud: filteredSoundcloudUrls
+    });
+
+    this.handleUpdatePatchDetails({ 
+      instructions,
+      description,
+      name,
+      published,
+      soundcloud: filteredSoundcloudUrls,
+      parameters,
+      tags 
+    });
 
   }
 
@@ -257,8 +294,6 @@ class PatchDetailsPage extends Component {
     const starForThisPatch = this.getCurrentUserStarForThisPatch(patch, currentUser);
     const starred = !!starForThisPatch;
 
-    console.log('patch in render', patch);
-
     if(!patch){
       return <div />
     }
@@ -277,6 +312,7 @@ class PatchDetailsPage extends Component {
               isSaving={patchDetails.isSaving}
               onEditClick={() => this.handleOnEditPatchClick()}
               onSaveClick={() => this.handleOnSavePatchClick()}
+              onCancelClick={() => this.handleOnCancelEditPatchClick()}
               onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} 
               onPatchNameChange={patchName => this.handlePatchNameChange(patchName)}
               onChangePublished={published => this.handleChangePublished(published)}

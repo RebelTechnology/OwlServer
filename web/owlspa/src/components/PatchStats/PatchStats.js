@@ -87,8 +87,6 @@ class PatchStats extends Component {
       showTagsDropDown
     } = this.state;
 
-    console.log('tags', tags);
-
     if(!patch){
       return (
         <div></div>

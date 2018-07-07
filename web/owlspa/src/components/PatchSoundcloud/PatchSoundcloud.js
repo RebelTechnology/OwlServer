@@ -32,7 +32,7 @@ class PatchSoundcloud extends Component {
       soundcloud
     } = this.props;
 
-    this.props.onChangeSoundCloudArr([ ...soundcloud, '']);
+    this.props.onChangeSoundCloudArr([ ...soundcloud, 'https://soundcloud.com/']);
   }
 
   handleDeleteSoundCloud(i){

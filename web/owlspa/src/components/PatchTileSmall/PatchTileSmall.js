@@ -53,6 +53,7 @@ class PatchTileSmall extends Component {
           <div styleName="patch-tile-controls" style={{ marginBottom: '5px' }}>
             
             { !editMode && <IconButton title="edit patch" icon={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ () => this.props.onEditClick() } /> }
+            { editMode && <IconButton title="cancel" icon='cancel' disabled={isSaving} onClick={  () => this.props.onCancelClick() } /> }
             { editMode && <IconButton title="save" icon={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  () => this.props.onSaveClick() } /> }
             
             <IconButton title="delete patch" icon="delete" onClick={ onDeletePatchClick } /> 
@@ -113,6 +114,9 @@ PatchTileSmall.propTypes = {
   onChangePublished: PropTypes.func,
   onPatchNameChange: PropTypes.func,
   onStarClick: PropTypes.func,
+  onSaveClick: PropTypes.func,
+  onCancelClick: PropTypes.func,
+  onEditClick: PropTypes.func,
   starred: PropTypes.bool,
 };
 
@@ -120,6 +124,7 @@ PatchTileSmall.defaultProps = {
   onChangePublished: () => {},
   onPatchNameChange: () => {},
   onSaveClick: () => {},
+  onCancelClick: () => {},
   onEditClick: () => {}
 };
 
