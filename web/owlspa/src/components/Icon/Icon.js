@@ -6,7 +6,7 @@ import iconList from './iconList';
 class Icon extends Component {
 
   render(){
-    const { color, name, textPosition, size=iconList[name].size || 26  } = this.props;
+    const { color, name, textPosition, size=iconList[name] && iconList[name].size || 26  } = this.props;
 
     if(!iconList[name]){
       return null;

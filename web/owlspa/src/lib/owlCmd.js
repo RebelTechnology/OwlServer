@@ -20,8 +20,6 @@ const {
     OpenWareMidiControl
 } = openWareMidi;
 
-var monitorTask = undefined;
-
 function noteOn(note, velocity) {
   console.log("received noteOn "+note+"/"+velocity);
 }
@@ -434,6 +432,20 @@ HoxtonOwl.midiClient = {
         }
     },
 
+    sendNoteOn: function(note, velocity) {
+        console.log('sending Note On:', note, 'velocity:', velocity);
+        if(HoxtonOwl.midiClient.midiOutput){
+          HoxtonOwl.midiClient.midiOutput.send([0x90, note, velocity], 0);            
+        }
+    },
+
+    sendNoteOff: function(note, velocity) {
+        console.log('sending Note Off:', note, 'velocity:', velocity);
+        if(HoxtonOwl.midiClient.midiOutput){
+          HoxtonOwl.midiClient.midiOutput.send([0x80, note, velocity], 0);            
+        }
+    },
+
     // function sendSysexMessage(msg) {
     //     console.log("sending sysex msg "+msg);
     //     var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE ];
@@ -480,6 +492,8 @@ export default {
     connectToOwl : connectToOwl,
     loadPatchFromServer : loadPatchFromServer,
     startPollingOwlStatus: pollOwlStatus,
-    stopPollingOwlStatus: clearPollRequestTimeout
+    stopPollingOwlStatus: clearPollRequestTimeout,
+    sendNoteOn: HoxtonOwl.midiClient.sendNoteOn,
+    sendNoteOff: HoxtonOwl.midiClient.sendNoteOff
 }
 

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { PatchParameters, OwlControl } from 'containers';
+import { PatchParameters, OwlControl, MidiKeyboard } from 'containers';
 import { PatchPushButton } from 'components';
 import { webAudio } from 'lib';
 import classNames from 'classnames';
@@ -15,7 +15,8 @@ class PatchPreview extends Component {
     super(props);
     this.state = {
       audioSelectValue : 'none',
-      pushButtonLedColour : '#ececec'
+      pushButtonLedColour : '#ececec',
+      showMidiKeyboard: false
     };
   }
   
@@ -123,6 +124,12 @@ class PatchPreview extends Component {
     }
   }
 
+  toggleMidiKeyboardVisibility(){
+    this.setState({
+      showMidiKeyboard: !this.state.showMidiKeyboard
+    });
+  }
+
   updateWebAudioPatchParameters(nextParams){
     const { webAudioPatchParameters:currentParams, webAudioPatch:{instance} } = this.props;
     nextParams.forEach((nextParam, i) => {
@@ -171,31 +178,96 @@ class PatchPreview extends Component {
     }
   }
 
+  renderPatchPreviewButtons(){
+    const {
+      webAudioPatch,
+      patch
+    } = this.props;
+
+    const {
+      audioSelectValue,
+      showMidiKeyboard
+    } = this.state;
+
+    const playAudioFile = audioSelectValue !== 'none' && audioSelectValue !== 'mic';
+    const audioSampleBasePath = '/wp-content/themes/shopkeeper-child/page-patch-library/audio/';
+
+    return (
+      <div className="patch-preview-buttons">    
+        { !webAudioPatch.isReady && (
+          <button 
+            style={{display:'inline-block'}}
+            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
+            onClick={() => this.handleTestPatchButtonClick()} >
+            Play
+          </button>
+        )}
+
+        { webAudioPatch.isReady && (
+          <button
+            style={{display:'inline-block'}}
+            onClick={() => this.togglePatchAudio()} >
+            { webAudioPatch.isPlaying ? 'stop audio':'start audio' }
+          </button>
+        )}
+
+        { webAudioPatch.isPlaying && (
+          <div className="audio-input-selector">
+            <label htmlFor="patch-test-source">Audio Input:</label>
+            <select 
+              id="patch-test-source" 
+              onChange={e => this.handleChangeAudioSource(e)}
+              value={audioSelectValue} >
+              <option value="none">No Input</option>
+              <option value="mic">Microphone</option>
+              <option disabled>──────────</option>
+              <option value="gtr-jazz">Jazz Guitar</option>
+              <option value="rock-beat">Rock Beat</option>
+              <option value="synth">Synth</option>
+              <option value="white-noise">White Noise</option>
+            </select>
+
+            <audio 
+              id="patch-test-audio" 
+              controls 
+              loop 
+              preload="auto"
+              ref={(node) => this.initAudioDomNode(node)}>
+              { playAudioFile && <source src={audioSampleBasePath + audioSelectValue + '.mp3'} type="audio/mpeg" /> }
+              { playAudioFile && <source src={audioSampleBasePath + audioSelectValue + '.ogg'} type="audio/ogg" /> }
+            </audio>
+          </div>
+        )}
+      </div>
+    );
+
+  }
+
   render(){
+
+    const {
+      showMidiKeyboard
+    } = this.state;
+
     const { 
       patch,
       patchJavaScript,
       webAudioPatch,
-      canEdit,
-      isSaving
+      editMode,
+      isSaving,
+      owlState,
+      parameters
     } = this.props;
     
-    const { 
-      audioSelectValue
-    } = this.state;
-    
-    const audioSampleBasePath = '/wp-content/themes/shopkeeper-child/page-patch-library/audio/';
-    const playAudioFile = audioSelectValue !== 'none' && audioSelectValue !== 'mic';
-
     return (
       <div className="white-box2">
         <div style={{paddingLeft:'30px'}}>
           <PatchParameters 
             patchIsActive={webAudioPatch.isPlaying} 
-            canEdit={canEdit}
-            onSaveParamNames={params => this.props.onSave(params)}
+            editMode={editMode}
+            onChangeParamNames={params => this.props.onChangeParamNames(params)}
             isSaving={isSaving}
-            patch={patch} 
+            parameters={parameters} 
           />
         </div>
 
@@ -203,57 +275,11 @@ class PatchPreview extends Component {
           isActive={webAudioPatch.isPlaying}
           ledColour={webAudioPatch.isPlaying ? this.state.pushButtonLedColour : '#ececec'}
           onPushButtonDown={(e)=>this.handlePushButtonDown(e)}
-          onPushButtonUp={(e)=>this.handlePushButtonUp(e)} />
+          onPushButtonUp={(e)=>this.handlePushButtonUp(e)} 
+        />
 
-        <div className="patch-preview-buttons">
-
-          { webAudioPatch.isReady ? (
-              <button
-                style={{display:'inline-block'}}
-                onClick={() => this.togglePatchAudio()} >
-                { webAudioPatch.isPlaying ? 'stop audio':'start audio' }
-              </button>
-            ) : (
-              <button 
-                style={{display:'inline-block'}}
-                disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
-                onClick={() => this.handleTestPatchButtonClick()} >Play
-              </button>
-            )
-          }
-
-          { webAudioPatch.isPlaying ? (
-            <div className="audio-input-selector">
-              <label htmlFor="patch-test-source">Audio Input:</label>
-              <select 
-                id="patch-test-source" 
-                onChange={e => this.handleChangeAudioSource(e)}
-                value={this.state.audioSelectValue} >
-                <option value="none">No Input</option>
-                <option value="mic">Microphone</option>
-                <option disabled>──────────</option>
-                <option value="gtr-jazz">Jazz Guitar</option>
-                <option value="rock-beat">Rock Beat</option>
-                <option value="synth">Synth</option>
-                <option value="white-noise">White Noise</option>
-              </select>
-
-              <audio 
-                id="patch-test-audio" 
-                controls 
-                loop 
-                preload="auto"
-                ref={(node) => this.initAudioDomNode(node)}>
-                {playAudioFile ? (
-                  <source src={audioSampleBasePath + this.state.audioSelectValue + '.mp3'} type="audio/mpeg" />
-                ):null }
-                {playAudioFile ? (
-                  <source src={audioSampleBasePath + this.state.audioSelectValue + '.ogg'} type="audio/ogg" />
-                ):null }
-              </audio>
-            </div>
-          ) : null }
-        </div>
+        { this.renderPatchPreviewButtons() }
+        
         <div className="error-msg">
           {!webAudio.webAudioApiIsAvailable() ? (
             <div>
@@ -265,7 +291,24 @@ class PatchPreview extends Component {
               </div>
           ) : null}
         </div>
+
         <OwlControl patch={patch} />
+
+        { (webAudioPatch.isReady || owlState.isConnected) && (
+          <button
+            style={{
+              margin: '10px',
+              padding: '20px',
+              width: '165px',
+              lineHeight: '0px'
+            }}
+            onClick={() => this.toggleMidiKeyboardVisibility()} >
+            { showMidiKeyboard ? 'hide keyboard' : 'show keyboard'}
+          </button>
+        )}
+        
+        { (webAudioPatch.isReady || owlState.isConnected) && showMidiKeyboard && <MidiKeyboard /> }
+
       </div>
     );
   }
@@ -278,19 +321,20 @@ class PatchPreview extends Component {
 
 PatchPreview.propTypes = {
   patch: PropTypes.object,
-  canEdit: PropTypes.bool,
+  editMode: PropTypes.bool,
   isSaving: PropTypes.bool,
-  onSave: PropTypes.func,
+  onChangeParamNames: PropTypes.func,
   onCompileClick: PropTypes.func
 }
 
 PatchPreview.defaultProps = {
-  onSave: () => {},
+  onChangeParamNames: () => {},
   onCompileClick: () => {}
 };
 
-const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatch }) => {
+const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatch, owlState }) => {
   return { 
+    owlState,
     patchJavaScript,
     webAudioPatchParameters,
     webAudioPatch

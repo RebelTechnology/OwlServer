@@ -16,19 +16,33 @@ class PatchDetailsPage extends Component {
   constructor(props){
     super(props);
     const { routeParams, patchDetails } = props;
-    let description, instructions;
+    let patch = {};
+
     if(routeParams && patchDetails && patchDetails.patches && routeParams.patchSeoName){
-      const patch = patchDetails.patches[routeParams.patchSeoName];
-      if(patch){
-        description = patch.description;
-        instructions = patch.instructions;
-      }
+      patch = patchDetails.patches[routeParams.patchSeoName] || {};
     }
+
+    const {
+      description='',
+      instructions='',
+      name='',
+      published,
+      soundcloud=[],
+      parameters={},
+      tags=[]
+    } = patch;
+
+
     this.state = {
-      description: description || '',
-      instructions: instructions || '',
-      published: false
-    }
+      description,
+      instructions,
+      published,
+      name,
+      editMode: false,
+      soundcloud,
+      parameters,
+      tags
+    };
   }
 
   patchIsCached(patchSeoName){
@@ -77,32 +91,18 @@ class PatchDetailsPage extends Component {
     });
   }
 
-  updatePatchName(name){
-    const { routeParams:{patchSeoName}, patchDetails, serverUpdatePatch } = this.props;
-    const patch = patchDetails.patches[patchSeoName];
-    const updatedPatch = {
-      ...patch,
-      name
-    };
-    serverUpdatePatch(updatedPatch);
-  }
-
-  handleSetPublished(published){
-    this.handleUpdatePatchDetails({published});
+  handleChangePublished(published){
+    this.setState({
+      published
+    });
   }
 
   handleUpdatePatchDetails(properties){
     const { routeParams:{patchSeoName}, patchDetails } = this.props;
     const patch = patchDetails.patches[patchSeoName];
-    const {
-      instructions,
-      description
-    } = this.state;
 
     this.props.serverUpdatePatch({
       ...patch,
-      instructions,
-      description,
       ...properties
     });
   }
@@ -116,6 +116,92 @@ class PatchDetailsPage extends Component {
       add: !starForThisPatch,
       patchSeoName: patch.seoName,
       patchId: patch._id
+    });
+  }
+
+  handleOnEditPatchClick(){
+    this.setState({
+      editMode: true
+    });
+  }
+
+  handleOnCancelEditPatchClick(){
+    //revert state
+    const { routeParams, patchDetails } = this.props;
+    const patch = patchDetails.patches[routeParams.patchSeoName] || {};
+    
+    const {
+      description='',
+      instructions='',
+      name='',
+      published,
+      soundcloud=[],
+      parameters={},
+      tags=[]
+    } = patch;
+
+    this.setState({
+      description,
+      instructions,
+      published,
+      name,
+      editMode: false,
+      soundcloud,
+      parameters,
+      tags
+    });
+  }
+
+  handleOnSavePatchClick(){
+    const {
+      instructions,
+      description,
+      name,
+      published,
+      soundcloud,
+      parameters,
+      tags
+    } = this.state;
+
+    const filteredSoundcloudUrls = soundcloud.filter(url => /^https:\/\/soundcloud\.com\/.+\/.+/.test(url));
+    
+    this.setState({
+      soundcloud: filteredSoundcloudUrls
+    });
+
+    this.handleUpdatePatchDetails({ 
+      instructions,
+      description,
+      name,
+      published,
+      soundcloud: filteredSoundcloudUrls,
+      parameters,
+      tags 
+    });
+
+  }
+
+  handlePatchNameChange(name){
+    this.setState({
+      name
+    });
+  }
+
+  handleChangeSoundCloudArr(soundcloud){
+    this.setState({
+      soundcloud
+    });
+  }
+
+  handleChangeParamNames(parameters){
+    this.setState({
+      parameters
+    });
+  }
+
+  handleChangeTags(tags){
+    this.setState({
+      tags
     });
   }
 
@@ -152,10 +238,34 @@ class PatchDetailsPage extends Component {
           instructions: nextPatch.instructions
         });
       }
+
+      if(nextPatch.name !== thisPatch.name){
+        this.setState({
+          name: nextPatch.name
+        });
+      }
+
+      if(nextPatch.published !== thisPatch.published){
+        this.setState({
+          published: nextPatch.published
+        });
+      }
+
     } else if(nextPatch && !thisPatch){
       this.setState({
         instructions: nextPatch.instructions,
-        description: nextPatch.description
+        description: nextPatch.description,
+        name: nextPatch.name,
+        published: nextPatch.published,
+        soundcloud: nextPatch.soundcloud,
+        parameters: nextPatch.parameters,
+        tags: nextPatch.tags
+      });
+    }
+
+    if(!nextProps.patchDetails.isSaving && this.props.patchDetails.isSaving){
+      this.setState({
+        editMode: false
       });
     }
   }
@@ -165,12 +275,18 @@ class PatchDetailsPage extends Component {
       patchDetails,
       currentUser ,
       routeParams:{ patchSeoName },
-      tags
+      availableTags
     } = this.props;
 
     const {
       instructions,
-      description
+      description,
+      editMode,
+      name,
+      published,
+      soundcloud,
+      parameters,
+      tags
     } = this.state;
 
     const patch = patchDetails.patches[patchSeoName];
@@ -190,16 +306,19 @@ class PatchDetailsPage extends Component {
 
             <PatchTileSmall 
               patch={patch} 
-              patchSeoNameFromRoute={patchSeoName}
-              loggedIn={currentUser.loggedIn}
-              isSaving={patchDetails.isSaving}
-              savedSuccess={patchDetails.savedSuccess}
+              patchName={name}
               canEdit={canEdit} 
+              editMode={editMode}
+              isSaving={patchDetails.isSaving}
+              onEditClick={() => this.handleOnEditPatchClick()}
+              onSaveClick={() => this.handleOnSavePatchClick()}
+              onCancelClick={() => this.handleOnCancelEditPatchClick()}
               onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} 
-              onUpdatePatchName={patchName => this.updatePatchName(patchName)}
-              onSetPublished={(published) => this.handleSetPublished(published)}
+              onPatchNameChange={patchName => this.handlePatchNameChange(patchName)}
+              onChangePublished={published => this.handleChangePublished(published)}
               onStarClick={(e)=> this.handleStarClick(e,patch, starForThisPatch)}
               starred={starred}
+              published={published}
             />
 
             <PatchDetailsTile 
@@ -207,8 +326,7 @@ class PatchDetailsPage extends Component {
               text={description}
               onTextChange={description => this.handlePatchDetailsDescriptionChange(description)}
               isSaving={patchDetails.isSaving} 
-              canEdit={canEdit} 
-              onSave={ () => this.handleUpdatePatchDetails()} 
+              editMode={editMode}
             />
             
             { (patch.instructions || canEdit ) &&
@@ -218,19 +336,18 @@ class PatchDetailsPage extends Component {
                 text={instructions} 
                 onTextChange={instructions => this.handlePatchDetailsInstructionsChange(instructions)}
                 isSaving={patchDetails.isSaving}
-                canEdit={canEdit} 
-                onSave={() => this.handleUpdatePatchDetails()} 
+                editMode={editMode}
               />
             }
 
             <PatchStats 
               isSaving={patchDetails.isSaving} 
-              availableTagList={tags.items} 
-              canEdit={canEdit} 
+              availableTagList={availableTags.items}
+              tags={tags}
+              editMode={editMode}
+              onChangeTags={tags => this.handleChangeTags(tags)} 
               patch={patch} 
-              onSave={({tags}) => this.handleUpdatePatchDetails({tags})}
               isSaving={patchDetails.isSaving}
-              savedSuccess={patchDetails.savedSuccess}
             />
             
           </div>
@@ -238,18 +355,19 @@ class PatchDetailsPage extends Component {
           <div id="two-thirds" className="patch-library">
 
             <PatchSoundcloud 
-              soundcloud={patch.soundcloud} 
-              canEdit={canEdit}
+              soundcloud={soundcloud} 
+              editMode={editMode}
               isSaving={patchDetails.isSaving}
               savedSuccess={patchDetails.savedSuccess}
-              onSave={soundcloud => this.handleUpdatePatchDetails({soundcloud})}
+              onChangeSoundCloudArr={ soundcloudArr => this.handleChangeSoundCloudArr(soundcloudArr)}
             />
 
             <PatchPreview 
               onCompileClick={(e) => this.handleCompileClick(e,patch)} 
-              canEdit={canEdit} 
+              editMode={editMode} 
               isSaving={patchDetails.isSaving}
-              onSave={(parameters => this.handleUpdatePatchDetails({parameters}))}
+              parameters={parameters}
+              onChangeParamNames={(parameters => this.handleChangeParamNames(parameters))}
               patch={patch} />
 
             <PatchCode onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} fileUrls={patch.github} />
@@ -262,12 +380,12 @@ class PatchDetailsPage extends Component {
   }
 
   componentDidMount(){
-    const { fetchPatchDetails, routeParams:{patchSeoName}, tags } = this.props;
+    const { fetchPatchDetails, routeParams:{patchSeoName}, availableTags } = this.props;
     if(patchSeoName && !this.patchIsCached(patchSeoName)){
       this.props.fetchPatchDetails(patchSeoName);
     }
 
-    if(!tags.items || !tags.items.length){
+    if(!availableTags.items || !availableTags.items.length){
       this.props.fetchTags();
     }
   }
@@ -282,7 +400,7 @@ const mapStateToProps = ({ patchDetails, currentUser, tags }) => {
   return {
     patchDetails,
     currentUser,
-    tags
+    availableTags: tags
   }
 };
 

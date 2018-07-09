@@ -1,10 +1,8 @@
 /*
  * http://thealphanerd.io/blog/from-faust-to-webaudio/
- *
- * This legacy file has been imported more or less as is and should be re-written for react
  */
 
-var owl = {};
+var owl = owl || {};
 
 owl.audioContext = null;
 
@@ -17,6 +15,7 @@ navigator.getUserMedia = navigator.getUserMedia ||
     navigator.webkitGetUserMedia ||
     navigator.mozGetUserMedia ||
     navigator.msGetUserMedia;
+
 
 owl.initPatchAudio = function () {
     if(owl.webAudioApiIsAvailable()){
@@ -35,20 +34,26 @@ owl.initPatchAudio = function () {
     var WEB_getStatus = Module.cwrap('WEB_getStatus', 'string', []);
     var WEB_setButtons;
     var WEB_getButtons;
+    var WEB_processMidi;
     try {
         WEB_setButtons = Module.cwrap('WEB_setButtons', 'number', ['number']);
         WEB_getButtons = Module.cwrap('WEB_getButtons', 'number', []);
+        WEB_processMidi = Module.cwrap('WEB_processMidi', 'number', ['number', 'number', 'number', 'number']);
     }catch(x){}
 
-    var that = {}
+    var that = {};
     that.model = {
         inputNode: null,
-        fileNode: null,
+        fileNode: null, // owl.audioContext.createMediaElementSource(document.getElementById('patch-test-audio')),
         micNode: null
     };
     that.vectorsize = 2048;      
     console.log("audio[fs "+owl.audioContext.sampleRate+"][bs "+that.vectorsize+"]");
     WEB_setup(owl.audioContext.sampleRate, that.vectorsize);
+    
+    for(var i = 0; i < 5; i++){
+        console.log("parameter "+i+": "+WEB_getParameterName(i));
+    }
 
     // Bind to C++ Member Functions
     that.getNumInputs = function () {
@@ -70,23 +75,22 @@ owl.initPatchAudio = function () {
     that.compute = function (e) {
         var dspOutChans = HEAP32.subarray(that.outs >> 2, (that.outs + that.numOut * that.ptrsize) >> 2);
         var dspInChans = HEAP32.subarray(that.ins >> 2, (that.ins + that.ins * that.ptrsize) >> 2);
-        var i, j;
-        for (i = 0; i < that.numIn; i++)
+        for (var i = 0; i < that.numIn; i++)
         {
             var input = e.inputBuffer.getChannelData(i);
             var dspInput = HEAPF32.subarray(dspInChans[i] >> 2, (dspInChans[i] + that.vectorsize * that.ptrsize) >> 2);
 
-            for (j = 0; j < input.length; j++) {
+            for (var j = 0; j < input.length; j++) {
                 dspInput[j] = input[j];
             }
         }
 
         WEB_processBlock(that.ins, that.outs);
 
-        for(i = 0; i < that.numOut; i++){
+        for(var i = 0; i < that.numOut; i++){
             var output = e.outputBuffer.getChannelData(i);
             var dspOutput = HEAPF32.subarray(dspOutChans[i] >> 2, (dspOutChans[i] + that.vectorsize * that.ptrsize) >> 2);
-            for (j = 0; j < output.length; j++) {
+            for (var j = 0; j < output.length; j++) {
                 output[j] = dspOutput[j];
             }
         }
@@ -144,7 +148,7 @@ owl.initPatchAudio = function () {
         WEB_setParameter(key, val);
         return that;
     };
-    
+
     that.setButtons = function(values) {
         if(WEB_setButtons){
             WEB_setButtons(values);
@@ -219,6 +223,16 @@ owl.initPatchAudio = function () {
     that.disconnectFromOutput = function(){
         that.outputNode.disconnect();
     };
+
+
+    that.processMidi = function(status, d1, d2) {
+        var port = 0;
+        if(WEB_processMidi){
+            return WEB_processMidi(port, status, d1, d2);
+        } else {
+            return 0;
+        }
+    }
 
     that.ptrsize = 4; // assuming pointer in emscripten are 32bits
     // that.vectorsize = 2048;
