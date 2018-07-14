@@ -152,29 +152,46 @@ const patchFieldValidators = {
 
   parameters: {
     required: false,
+    requiredParameterProperties: [
+      { name: 'id', type: 'number' }, 
+      { name: 'name', type: 'string' },
+      { name: 'io', type: 'string', values: ['input', 'output'] }, 
+      { name: 'type', type: 'string', values: ['bool', 'float'] }
+    ],
     validate(val) {
-      if (typeof val !== 'object') {
+      if (!Array.isArray(val)) {
         throw new PatchFieldValidationError('parameters');
       }
-      for (let key in val) {
-        if (key !== 'a' && key !== 'b' && key !== 'c' && key !== 'd' && key !== 'e') {
-          throw new PatchFieldValidationError('parameters', 'Illegal parameter name.');
-        }
-        if (typeof val[key] !== 'string' || val[key].length < 1 || val[key] > 255) {
-          const err = new PatchFieldValidationError('parameters', 'This field should be at least 1 and at most 255 characters long.');
-          err.parameter = key;
-          throw err;
-        }
-      }
+
+      val.forEach(parameter => {
+        
+        this.parameters.requiredParameterProperties.forEach((requiredProp) => {
+          const parameterValue = parameter[requiredProp.name];
+          
+          if(typeof parameterValue !== requiredProp.type){
+            throw new PatchFieldValidationError('parameters', `"${requiredProp.name}" must be a ${requiredProp.type}, received: ${typeof parameterValue}`);
+          }
+
+          if(typeof parameterValue === 'string' && ( parameterValue.length < 1 || parameterValue.length > 255)){
+            throw new PatchFieldValidationError('parameters', `"${requiredProp.name}" must be between 1 and 255 characters, received length of ${parameterValue.length}`);
+          }
+
+          if(!!requiredProp.values && requiredProp.values.indexOf(parameterValue) === -1){
+            throw new PatchFieldValidationError('parameters', `"${requiredProp.name}" must be one of: ${requiredProp.values.join(',')}, received: ${parameterValue}`);
+          }
+
+        });
+
+      });
+
     },
     sanitize(val) {
-      for (let key in val) {
-        if (key !== 'a' && key !== 'b' && key !== 'c' && key !== 'd' && key !== 'e') {
-          delete val[key];
-        }
-        val[key] = val[key].trim();
-      }
-      return val;
+      return val.map(parameter => {
+        return this.parameters.requiredParameterProperties.reduce((acc, requiredProp) => {
+          acc[requiredProp.name] = requiredProp.type === 'string' ? parameter[requiredProp.name].trim() : parameter[requiredProp.name];
+          return acc;
+        }, {});
+      });
     }
   },
 
