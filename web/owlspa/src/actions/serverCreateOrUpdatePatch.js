@@ -101,12 +101,10 @@ const serverCreateOrUpdatePatch = (patch, options = {}) => {
             dispatch(compilePatch({
               seoName: json.patch.seoName,
               _id: json.patch._id
-            })).then(()=>{
-              return json.patch.seoName;
-            });
-          } else {
-            return json.patch.seoName;
+            }));
           }
+
+          return json.patch.seoName;
         });
         
       })
