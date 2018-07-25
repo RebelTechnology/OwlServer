@@ -164,12 +164,12 @@ function downloadGithubFile($githubFile, $dstPath) {
 function downloadSourceFile($url, $dstPath) {
 
     if (!is_string($url)) {
-        errorOut('Bad source file URL (1).');
+        outputError('Bad source file URL (1).');
     }
 
     $r = parse_url($url);
     if (false === $r) {
-        errorOut('Bad source file URL (2).');
+        outputError('Bad source file URL (2).');
     }
 
     if ($r['host'] === 'github.com' || $r['host'] === 'www.github.com') {
@@ -200,7 +200,7 @@ function downloadSourceFile($url, $dstPath) {
         return $filename;
 
     } else {
-        errorOut('Bad source file URL (3).');
+        outputError('Bad source file URL (3).');
         return false;
     }
 } // function downloadSelfHostedSourceFile
