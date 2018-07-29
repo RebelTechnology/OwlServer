@@ -44,9 +44,9 @@ class BoolParameter extends Component {
         style={{ color: isActive ? '#ed7800' : '#717171' }}
         styleName="boolparam-push-button"
         onMouseDown={(e) => isActive && this.handleButtonDown(e) }
-        onMouseUp={(e) => isActive && handleButtonUp(e) }
+        onMouseUp={(e) => isActive && this.handleButtonUp(e) }
         onTouchStart={(e) => isActive && this.handleButtonDown(e) }
-        onTouchEnd={(e) => isActive && handleButtonUp(e) }>
+        onTouchEnd={(e) => isActive && this.handleButtonUp(e) }>
         <div 
           style={{ 
             boxShadow: isActive ? 'inset 0px 0px 2px 2px rgba(0,0,0,0.25)' : '0px 0px 2px 2px rgba(0,0,0,0.3)',

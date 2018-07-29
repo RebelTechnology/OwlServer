@@ -149,7 +149,7 @@ class PatchPreview extends Component {
   patchParametersWillChange(nextProps){
     const { webAudioPatchParameters:nextParameters } = nextProps;
     const { webAudioPatchParameters:currentParameters } = this.props;
-    if(!nextParameters.length || !currentParameters.length){
+    if(nextParameters.length !== currentParameters.length){
       return false;
     }
     return nextParameters.some((nextParam, i) => {
