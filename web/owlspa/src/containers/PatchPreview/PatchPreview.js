@@ -132,7 +132,7 @@ class PatchPreview extends Component {
   updateWebAudioPatchParameters(nextParams){
     const { webAudioPatchParameters:currentParams, webAudioPatch:{instance} } = this.props;
 
-    const updateInstanceParameters = param => {
+    const updateInstanceParameters = (param, i) => {
       if(!instance){
         return;
       }
@@ -142,12 +142,12 @@ class PatchPreview extends Component {
 
     nextParams.forEach((nextParam, i) => {
       if(!currentParams[i] && nextParam && nextParam.value){
-        updateInstanceParameters(nextParam);
+        updateInstanceParameters(nextParam, i);
         return;
       } 
 
       if(nextParam.value !== currentParams[i].value){
-        updateInstanceParameters(nextParam);
+        updateInstanceParameters(nextParam, i);
         return;
       }
     });
