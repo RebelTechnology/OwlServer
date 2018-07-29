@@ -143,10 +143,12 @@ class PatchPreview extends Component {
     nextParams.forEach((nextParam, i) => {
       if(!currentParams[i] && nextParam && nextParam.value){
         updateInstanceParameters(nextParam);
+        return;
       } 
 
       if(nextParam.value !== currentParams[i].value){
         updateInstanceParameters(nextParam);
+        return;
       }
     });
   }
