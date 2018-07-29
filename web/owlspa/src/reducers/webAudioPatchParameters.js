@@ -3,11 +3,11 @@ import {
   RESET_WEB_AUDIO_PATCH_PARAMETERS,
   RESET_WEB_AUDIO_PATCH } from 'constants';
 
-const initialState = [];
+const initialState = {};
 
 const makeNewArray = (parameter, state)=>{
   let arr = [...state];
-  arr[parameter.index] = parameter;
+  arr[parameter.id] = parameter;
   return arr;
 }
 

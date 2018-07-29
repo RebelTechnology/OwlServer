@@ -324,41 +324,6 @@ span.parameter-label {
     background: #d4d4d4;
 }
 
-/* Patch knobs */
-
-.patch-knob {
-    color:#717171;
-    position: relative;
-    margin-right: 30px;
-    margin-bottom: 27px;
-    cursor: ns-resize;
-}
-
-.patch-knob.active {
-    color:#ed7800;
-}
-
-.patch-knob .parameter-name {
-    display: block;
-    position: absolute;
-    top: 95px;
-    width: 100%;
-    text-align: center;
-    text-transform: uppercase;
-}
-
-.patch-knob .parameter-value {
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 50px;
-    height: 20px;
-    margin-left: -25px;
-    margin-top: -10px;
-    text-align: center;
-}
-
 /* Patch Preview Controls */
 
 .patch-preview-buttons {
@@ -381,51 +346,6 @@ span.parameter-label {
 
 .patch-compile-button.isCompiling {
     padding-right: 36px;
-}
-
-.patch-push-button {
-    display: block;
-    position: relative;
-    width: 100px;
-    height: 65px;
-    margin: 25px auto 25px;
-    cursor: pointer;
-}
-
-.patch-push-button-led {
-    margin: auto;
-    display: block;
-    width: 40px;
-    height: 40px;
-    background-color: #ececec;
-    border-radius: 20px;
-    -webkit-box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
-    -moz-box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
-    box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
-}
-
-.patch-push-button.active:active .patch-push-button-led {
-    -webkit-box-shadow: inset 0px 0px 2px 2px rgba(0,0,0,0.25);
-    -moz-box-shadow: inset 0px 0px 2px 2px rgba(0,0,0,0.25);
-    box-shadow: inset 0px 0px 2px 2px rgba(0,0,0,0.25);
-}
-
-.patch-push-button label {
-    display: block;
-    color: #717171;
-    text-transform: uppercase;
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%,0);
-}
-
-.patch-push-button.active label {
-    color: #ed7800;
-} 
-
-.patch-preview-buttons #push-button:hover {
-
 }
 
 .audio-input-selector {

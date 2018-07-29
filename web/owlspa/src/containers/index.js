@@ -8,7 +8,7 @@ export PatchTile from './PatchTile/PatchTile';
 export PatchListPage from './PatchListPage/PatchListPage';
 export PatchDetailsPage from './PatchDetailsPage/PatchDetailsPage';
 export PatchPreview from './PatchPreview/PatchPreview';
-export Parameter from './Parameter/Parameter';
+export FloatParameter from './FloatParameter/FloatParameter';
 export PatchCode from './PatchCode/PatchCode';
 export PatchParameters from './PatchParameters/PatchParameters';
 export SearchInput from './SearchInput/SearchInput';

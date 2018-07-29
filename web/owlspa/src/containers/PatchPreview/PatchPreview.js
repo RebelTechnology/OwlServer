@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { PatchParameters, OwlControl, MidiKeyboard } from 'containers';
-import { PatchPushButton } from 'components';
 import { webAudio } from 'lib';
 import classNames from 'classnames';
 import { 
@@ -97,8 +96,8 @@ class PatchPreview extends Component {
     if(instance){
       instance.connectToOutput({outputs: patch.outputs});
       
-      webAudioPatchParameters.forEach((param,i)=>{
-        instance.update(i, param.value/100);
+      webAudioPatchParameters.forEach( (param, i) => {
+        instance.update(i, param.value / 100);
       });
 
       this.props.setPatchPlaying(true);
@@ -178,7 +177,7 @@ class PatchPreview extends Component {
     }
   }
 
-  renderPatchPreviewButtons(){
+  renderControlButtons(){
     const {
       webAudioPatch,
       patch
@@ -271,14 +270,7 @@ class PatchPreview extends Component {
           />
         </div>
 
-        <PatchPushButton
-          isActive={webAudioPatch.isPlaying}
-          ledColour={webAudioPatch.isPlaying ? this.state.pushButtonLedColour : '#ececec'}
-          onPushButtonDown={(e)=>this.handlePushButtonDown(e)}
-          onPushButtonUp={(e)=>this.handlePushButtonUp(e)} 
-        />
-
-        { this.renderPatchPreviewButtons() }
+        { this.renderControlButtons() }
         
         <div className="error-msg">
           {!webAudio.webAudioApiIsAvailable() ? (
@@ -323,6 +315,7 @@ PatchPreview.propTypes = {
   patch: PropTypes.object,
   editMode: PropTypes.bool,
   isSaving: PropTypes.bool,
+  parameters: PropTypes.array,
   onChangeParamNames: PropTypes.func,
   onCompileClick: PropTypes.func
 }

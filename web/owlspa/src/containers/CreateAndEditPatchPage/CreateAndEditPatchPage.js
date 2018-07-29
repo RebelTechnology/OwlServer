@@ -127,13 +127,14 @@ class CreateAndEditPatchPage extends Component {
       name: patchName,
       inputs: 2,
       outputs: 2,
-      parameters: {
-        a:'A',
-        b:'B',
-        c:'C',
-        d:'D',
-        e:'E'
-      },
+      parameters: [
+        { id: 0, name: "A", io: "input", type: "float" },
+        { id: 1, name: "B", io: "input", type: "float" },
+        { id: 2, name: "C", io: "input", type: "float" },
+        { id: 3, name: "D", io: "input", type: "float" },
+        { id: 4, name: "Exp", io: "input", type: "float" },
+        { id: 80, name: "Pushbutton", io: "input", type: "bool" }
+      ],
       compilationType: compilationType,
       published: 0,
       starList:[],

@@ -11,6 +11,13 @@ class PatchFieldValidationError extends Error {
   }
 }
 
+const requiredParameterProperties = [
+  { name: 'id', type: 'number' }, 
+  { name: 'name', type: 'string' },
+  { name: 'io', type: 'string', values: ['input', 'output'] }, 
+  { name: 'type', type: 'string', values: ['bool', 'float'] }
+];
+
 const patchFieldValidators = {
 
   _id: {
@@ -152,12 +159,6 @@ const patchFieldValidators = {
 
   parameters: {
     required: false,
-    requiredParameterProperties: [
-      { name: 'id', type: 'number' }, 
-      { name: 'name', type: 'string' },
-      { name: 'io', type: 'string', values: ['input', 'output'] }, 
-      { name: 'type', type: 'string', values: ['bool', 'float'] }
-    ],
     validate(val) {
       if (!Array.isArray(val)) {
         throw new PatchFieldValidationError('parameters');
@@ -165,7 +166,7 @@ const patchFieldValidators = {
 
       val.forEach(parameter => {
         
-        this.parameters.requiredParameterProperties.forEach((requiredProp) => {
+        requiredParameterProperties.forEach((requiredProp) => {
           const parameterValue = parameter[requiredProp.name];
           
           if(typeof parameterValue !== requiredProp.type){
@@ -187,7 +188,7 @@ const patchFieldValidators = {
     },
     sanitize(val) {
       return val.map(parameter => {
-        return this.parameters.requiredParameterProperties.reduce((acc, requiredProp) => {
+        return requiredParameterProperties.reduce((acc, requiredProp) => {
           acc[requiredProp.name] = requiredProp.type === 'string' ? parameter[requiredProp.name].trim() : parameter[requiredProp.name];
           return acc;
         }, {});

@@ -28,7 +28,7 @@ class PatchDetailsPage extends Component {
       name='',
       published,
       soundcloud=[],
-      parameters={},
+      parameters=[],
       tags=[]
     } = patch;
 
@@ -136,7 +136,7 @@ class PatchDetailsPage extends Component {
       name='',
       published,
       soundcloud=[],
-      parameters={},
+      parameters=[],
       tags=[]
     } = patch;
 

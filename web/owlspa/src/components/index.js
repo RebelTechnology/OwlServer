@@ -1,4 +1,5 @@
 export AuthorLink from './AuthorLink/AuthorLink';
+export BoolParameter from './BoolParameter/BoolParameter';
 export CompilationTypeSelector from './CompilationTypeSelector/CompilationTypeSelector';
 export CreatePatchTile from './CreatePatchTile/CreatePatchTile';
 export GenPatchFileSVG from './GenPatchFileSVG/GenPatchFileSVG';
@@ -7,7 +8,6 @@ export IconButton from './IconButton/IconButton';
 export NavLink from './NavLink/NavLink';
 export PatchCounter from './PatchCounter/PatchCounter';
 export PatchDetailsTile from './PatchDetailsTile/PatchDetailsTile';
-export PatchPushButton from './PatchPushButton/PatchPushButton';
 export PatchSoundcloud from './PatchSoundcloud/PatchSoundcloud';
 export PatchStats from './PatchStats/PatchStats';
 export PatchTileSmall from './PatchTileSmall/PatchTileSmall';
