@@ -31,8 +31,6 @@ class PatchParameters extends Component {
       parameters
     } = this.props;
 
-    console.log('parameters', parameters);
-
     const floatParameters = parameters
     .filter(parameter => parameter.type === 'float')
     .map((parameter, i) => {

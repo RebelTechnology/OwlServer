@@ -150,9 +150,17 @@ class PatchPreview extends Component {
     const { webAudioPatchParameters:nextParameters } = nextProps;
     const { webAudioPatchParameters:currentParameters } = this.props;
     if(nextParameters.length !== currentParameters.length){
-      return false;
+      return true;
     }
     return nextParameters.some((nextParam, i) => {
+      if(!currentParameters[i] && !nextParam){
+        return false;
+      }
+
+      if(!!currentParameters[i] !== !!nextParam){
+        return true; //todo remove when not using sparse arrays
+      }
+
       return currentParameters[i].value !== nextParam.value
     });
   }
