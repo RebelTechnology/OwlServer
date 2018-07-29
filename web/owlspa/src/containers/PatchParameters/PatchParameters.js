@@ -1,25 +1,25 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Parameter } from 'containers';
-import { IconButton } from 'components';
+import { FloatParameter } from 'containers';
+import { IconButton, BoolParameter } from 'components';
 import { setWebAudioPatchParameter } from 'actions';
 
 class PatchParameters extends Component {
 
-  handleParameterValueChange(parameter){
-    this.props.setWebAudioPatchParameter(parameter);
-  }
-
-
-  handleParamNameChange(key, name){
+  handleParamNameChange(id, name){
     const {
       parameters
     } = this.props;
 
-    this.props.onChangeParamNames({
-      ...parameters,
-      [key]: name
-    });
+    this.props.onChangeParamNames(parameters.map(parameter => {
+      if(parameter.id === id){
+        return {
+          ...parameter,
+          name
+        };
+      }
+      return parameter;
+    }));
   }
 
   render(){
@@ -31,27 +31,52 @@ class PatchParameters extends Component {
       parameters
     } = this.props;
 
-    const renderParameters = Object.keys(parameters).map((key, i) => {
+    console.log('parameters', parameters);
+
+    const floatParameters = parameters
+    .filter(parameter => parameter.type === 'float')
+    .map((parameter, i) => {
       return ( 
-        <Parameter 
+        <FloatParameter 
           active={patchIsActive} 
-          onParamValueChange={(param) => this.handleParameterValueChange(param)} 
-          key={key} 
-          id={key}
-          index={i}
+          onParamValueChange={ value => this.props.setWebAudioPatchParameter({id: parameter.id, value})} 
+          key={i} 
+          io={parameter.io}
           isSaving={isSaving}
-          name={parameters[key]} 
+          name={parameter.name} 
           editMode={editMode}
-          onParamNameChange={(key, name) => this.handleParamNameChange(key, name)}
+          onParamNameChange={name => this.handleParamNameChange(parameter.id, name)}
           min={0}
           max={100}
           initialValue={35}
-        />)
+        />);
+    });
+
+    const boolParameters = parameters
+    .filter(parameter => parameter.type === 'bool')
+    .map((parameter, i) => {
+      return ( 
+        <BoolParameter
+          key={i}
+          isActive={patchIsActive}
+          io={parameter.io}
+          name={parameter.name}
+          editMode={editMode}
+          isSaving={isSaving}
+          onParamNameChange={name => this.handleParamNameChange(parameter.id, name)}
+          onPushButtonDown={() => this.props.setWebAudioPatchParameter({ id: parameter.id, value: 4095 })}
+          onPushButtonUp={() => this.props.setWebAudioPatchParameter({ id: parameter.id, value: 0 })} 
+        />);
     });
 
     return (
-      <div className="flexbox flex-center">
-        { renderParameters }
+      <div>
+        <div className="flexbox flex-center">
+          { floatParameters }
+        </div>
+        <div className="flexbox flex-center">
+          { boolParameters }
+        </div>
       </div>
     );
   }
@@ -63,7 +88,7 @@ PatchParameters.propTypes = {
   editMode: PropTypes.bool,
   isSaving: PropTypes.bool,
   onChangeParamNames: PropTypes.func,
-  parameters: PropTypes.object
+  parameters: PropTypes.array
 }
 
 export default connect(null, { setWebAudioPatchParameter })(PatchParameters);

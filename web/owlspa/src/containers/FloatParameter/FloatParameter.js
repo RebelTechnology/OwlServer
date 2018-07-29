@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import { setWebAudioPatchParameter } from 'actions';
-import classNames from 'classnames';
+import CSSModules from 'react-css-modules';
+import styles from './FloatParameter.css';
 
-class Parameter extends Component {
+class FloatParameter extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -13,7 +13,7 @@ class Parameter extends Component {
 
   updateParamValue(e){
     const { previousY, parameterValue } = this.state;
-    const { index, min, max } = this.props;
+    const { min, max } = this.props;
     const yDifference = previousY - e.clientY;
 
     if(yDifference === 0){
@@ -40,7 +40,7 @@ class Parameter extends Component {
 
   setParameterValue(val){
     this.setState({parameterValue:val});
-    this.handleParameterChange(val);
+    this.props.onParamValueChange(val);
   }
 
   handleMouseDown = (e) => {
@@ -70,17 +70,6 @@ class Parameter extends Component {
     this.updateParamValue(e);
   }
 
-  handleParameterChange(val){
-    const { index , name, id } = this.props;
-    const parameter = {
-      index,
-      name,
-      id,
-      value: val
-    }
-    this.props.onParamValueChange(parameter);
-  }
-
   shouldComponentUpdate(nextProps,nextState){
     const { parameterValue, active } = this.state;
     return nextState.parameterValue !== parameterValue || nextProps.active !== active;
@@ -91,12 +80,14 @@ class Parameter extends Component {
   }
 
   render(){
-    const { name, active, index, editMode, id, isSaving } = this.props;
+    const { name, active, editMode, isSaving } = this.props;
     const { parameterValue } = this.state;
-    const styleClases = classNames('patch-knob',{active:active});
 
     return (
-        <div className={styleClases} onMouseDown={this.handleMouseDown}>
+        <div 
+          styleName="float-parameter"
+          style={{ color: active ? '#ed7800' : '#717171' }} 
+          onMouseDown={this.handleMouseDown}>
           <svg width="100" height="100" viewBox="0 0 100 100">
             <path style={{fill:'none',stroke:'#eee', strokeWidth:10}} d="
               M 22, 79
@@ -111,19 +102,19 @@ class Parameter extends Component {
             viewBox="0 0 100 100">
             <circle cx="50" cy="10" r="6" fill={active ? '#ed7800':'#ccc'} />
           </svg>
-          <span className="parameter-name">
+          <span styleName="parameter-name">
             {editMode ? (
               <input 
                 style={{textTransform: 'uppercase'}}
                 disabled={isSaving}
-                onChange={e => this.props.onParamNameChange(id, e.target.value)} 
+                onChange={e => this.props.onParamNameChange(e.target.value)} 
                 type="text" 
                 maxLength="19"
                 value={name} />
               ) : name 
             }
           </span>
-          <span className="parameter-value">{parameterValue}</span>
+          <span styleName="parameter-value">{parameterValue}</span>
         </div>
     );
   }
@@ -134,26 +125,26 @@ class Parameter extends Component {
   
 }
 
-Parameter.propTypes = {
+FloatParameter.propTypes = {
   name: PropTypes.string,
-  id: PropTypes.string,
+  io: PropTypes.string,
   active: PropTypes.bool,
   onParamValueChange: PropTypes.func,
-  index: PropTypes.number.isRequired,
   initialValue: PropTypes.number,
   editMode: PropTypes.bool,
   onParamNameChange: PropTypes.func,
   isSaving: PropTypes.bool
 }
 
-Parameter.defaultProps = {
+FloatParameter.defaultProps = {
   initialValue: 0,
   min: 0,
   max: 100,
   onParamValueChange: () => {},
   onParamNameChange: () => {},
   active: false,
-  name: ''
+  name: '',
+  io: 'input'
 }
 
-export default Parameter;
+export default CSSModules(FloatParameter, styles);

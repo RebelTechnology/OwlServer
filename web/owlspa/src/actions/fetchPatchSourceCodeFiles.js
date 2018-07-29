@@ -86,7 +86,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
   return (dispatch) => {
 
     if(!fileUrls || !patchId){
-      console.error('missing parameters');
+      console.error('missing fileUrls or patchId');
       return;
     }
 
