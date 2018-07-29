@@ -132,23 +132,16 @@ class PatchPreview extends Component {
   updateWebAudioPatchParameters(nextParams){
     const { webAudioPatchParameters:currentParams, webAudioPatch:{instance} } = this.props;
 
-    const updateInstanceParameters = (param, i) => {
-      if(!instance){
-        return;
-      }
-      const value = param.type === 'float' ? param.value/100 : param.value; // floats 0 - 1, bool 0 or 4095 ?
-      instance.update(i, value);
+    if(!instance){
+      return;
     }
 
     nextParams.forEach((nextParam, i) => {
-      if(!currentParams[i] && nextParam && nextParam.value){
-        updateInstanceParameters(nextParam, i);
-        return;
-      } 
-
-      if(nextParam.value !== currentParams[i].value){
-        updateInstanceParameters(nextParam, i);
-        return;
+      const existingParam = currentParams.filter(param => param.id === nextParam.id)[0];
+      if(!existingParam || (existingParam.value !== nextParam.value)){
+        const value = nextParam.type === 'float' ? nextParam.value / 100 : nextParam.value; // floats 0 - 1, bool 0 or 4095 ?
+        console.log('[sending data to patch] parameter id:', nextParam.id, 'value:', value);
+        instance.update(nextParam.id, value);
       }
     });
   }
@@ -166,15 +159,8 @@ class PatchPreview extends Component {
       return true;
     }
     return nextParameters.some((nextParam, i) => {
-      if(!currentParameters[i] && !nextParam){
-        return false;
-      }
-
-      if(!!currentParameters[i] !== !!nextParam){
-        return true; //todo remove when not using sparse arrays
-      }
-
-      return currentParameters[i].value !== nextParam.value
+      const existingParam = currentParameters.filter(param => param.id === nextParam.id)[0];
+      return !existingParam || (existingParam.value !== nextParam.value);
     });
   }
 

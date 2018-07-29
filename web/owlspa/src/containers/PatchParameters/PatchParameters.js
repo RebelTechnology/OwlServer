@@ -37,7 +37,7 @@ class PatchParameters extends Component {
       return ( 
         <FloatParameter 
           active={patchIsActive} 
-          onParamValueChange={ value => this.props.setWebAudioPatchParameter({id: parameter.id, value})} 
+          onParamValueChange={ value => this.props.setWebAudioPatchParameter({ ...parameter, value })} 
           key={i} 
           io={parameter.io}
           isSaving={isSaving}
@@ -62,8 +62,8 @@ class PatchParameters extends Component {
           editMode={editMode}
           isSaving={isSaving}
           onParamNameChange={name => this.handleParamNameChange(parameter.id, name)}
-          onPushButtonDown={() => this.props.setWebAudioPatchParameter({ id: parameter.id, value: 4095 })}
-          onPushButtonUp={() => this.props.setWebAudioPatchParameter({ id: parameter.id, value: 0 })} 
+          onPushButtonDown={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 4095 })}
+          onPushButtonUp={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 0 })} 
         />);
     });
 
