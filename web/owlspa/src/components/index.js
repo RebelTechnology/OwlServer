@@ -1,5 +1,4 @@
 export AuthorLink from './AuthorLink/AuthorLink';
-export BoolParameter from './BoolParameter/BoolParameter';
 export CompilationTypeSelector from './CompilationTypeSelector/CompilationTypeSelector';
 export CreatePatchTile from './CreatePatchTile/CreatePatchTile';
 export GenPatchFileSVG from './GenPatchFileSVG/GenPatchFileSVG';

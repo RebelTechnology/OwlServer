@@ -15,18 +15,15 @@ const config = require('../lib/config');
  * @param {string} format
  * @return {string}
  */
-const getBuildFormat = format => {
+const getBuildFormat = (buildFormat='sysx') => {
 
-  let buildFormat = 'sysx'; // default build format
-  if (format) {
-    buildFormat = format;
-  }
-  // validate
-  if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'sysex') {
-    throw { public: true, message: 'Invalid format.', status: 500 };
-  }
   if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
     buildFormat = 'sysx'; // normalize
+  }
+
+  // validate
+  if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'c') {
+    throw { public: true, message: 'Invalid format.', status: 500 };
   }
 
   return buildFormat;
@@ -132,6 +129,19 @@ router.put('/:id', (req, res) => {
       }
 
       // Compile patch
+      if (patch.compilationType === 'heavy') {
+        process.stdout.write('Compiling with Heavy\n');
+        //TODO execute heavy build script as promise and return response. (config.HeavyBuildScript.path)
+        //important to return a promise here so further exection below does not happen.
+        return res.status(200).json({
+          message: 'Compilation succeeded.',
+          stdout: '',
+          stderr: '',
+          success: true,
+          status: 200,
+        });
+      }
+
       let cmd = 'php ' + config.patchBuilder.path;
       if (format === 'js') {
         cmd += ' --web';

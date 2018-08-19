@@ -55,6 +55,8 @@ const download = (patch, patchModel, stream, format, res) => {
     buildFile = path.join(config.patchBuilder.sysexPath, patch.seoName + '.syx');
   } else if (format === 'js') {
     buildFile = path.join(config.patchBuilder.jsPath, patch.seoName + (config.patchBuilder.jsBuildType === 'min' ? '.min' : '') + '.js');
+  } else if(format === 'c'){
+    //buildFile = path.join(config.patchBuilder.cPath, patch.seoName + '.c' c extension ???
   }
   if (!fs.existsSync(buildFile)) { // FIXME - Move this somewhere else
     throw {

@@ -238,7 +238,7 @@ const patchFieldValidators = {
         }
         // https://soundcloud.com/hoxtonowl/johan-larsby-conny-distortion
         if (!/^https?:\/\/(?:www\.)?soundcloud\.com\/.+\/.+$/i.test(val[i])) {
-          const err = new PatchFieldValidationError('soundcloud', 'URL does not seem a valid SoundCloud track.');
+          const err = new PatchFieldValidationError('soundcloud', 'URL does not seem to be a valid SoundCloud track.');
           err.index = i;
           throw err;
         }

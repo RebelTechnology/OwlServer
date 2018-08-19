@@ -193,7 +193,7 @@ class PatchDetailsPage extends Component {
     });
   }
 
-  handleChangeParamNames(parameters){
+  handleChangeParameters(parameters){
     this.setState({
       parameters
     });
@@ -257,9 +257,9 @@ class PatchDetailsPage extends Component {
         description: nextPatch.description,
         name: nextPatch.name,
         published: nextPatch.published,
-        soundcloud: nextPatch.soundcloud,
-        parameters: nextPatch.parameters,
-        tags: nextPatch.tags
+        soundcloud: nextPatch.soundcloud || [],
+        parameters: nextPatch.parameters || [],
+        tags: nextPatch.tags || []
       });
     }
 
@@ -367,7 +367,7 @@ class PatchDetailsPage extends Component {
               editMode={editMode} 
               isSaving={patchDetails.isSaving}
               parameters={parameters}
-              onChangeParamNames={(parameters => this.handleChangeParamNames(parameters))}
+              onChangeParameters={parameters => this.handleChangeParameters(parameters)}
               patch={patch} />
 
             <PatchCode onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} fileUrls={patch.github} />

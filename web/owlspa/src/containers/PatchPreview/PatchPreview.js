@@ -267,11 +267,11 @@ class PatchPreview extends Component {
     
     return (
       <div className="white-box2">
-        <div style={{paddingLeft:'30px'}}>
+        <div>
           <PatchParameters 
             patchIsActive={webAudioPatch.isPlaying} 
             editMode={editMode}
-            onChangeParamNames={params => this.props.onChangeParamNames(params)}
+            onChangeParameters={params => this.props.onChangeParameters(params)}
             isSaving={isSaving}
             parameters={parameters} 
           />
@@ -323,12 +323,12 @@ PatchPreview.propTypes = {
   editMode: PropTypes.bool,
   isSaving: PropTypes.bool,
   parameters: PropTypes.array,
-  onChangeParamNames: PropTypes.func,
+  onChangeParameters: PropTypes.func,
   onCompileClick: PropTypes.func
 }
 
 PatchPreview.defaultProps = {
-  onChangeParamNames: () => {},
+  onChangeParameters: () => {},
   onCompileClick: () => {}
 };
 
