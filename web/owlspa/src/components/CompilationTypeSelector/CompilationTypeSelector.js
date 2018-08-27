@@ -41,7 +41,7 @@ class CompilationTypeSelector extends Component {
 
   render(){
     const { onCompilationTypeChange, compilationType, mainSourceFile } = this.props;
-    const allCompilationTypes = ['cpp', 'pd', 'faust', 'gen', 'maximilian'];
+    const allCompilationTypes = ['cpp', 'pd', 'heavy', 'faust', 'gen', 'maximilian'];
 
     return (
       <fieldset>

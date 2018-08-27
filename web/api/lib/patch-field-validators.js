@@ -61,7 +61,7 @@ const patchFieldValidators = {
   compilationType: {
     required: false,
     validate(val) {
-      const validTypes = [ 'cpp', 'faust', 'pd', 'gen' ];
+      const validTypes = [ 'cpp', 'faust', 'pd', 'heavy', 'gen', 'maximilian' ];
       if (typeof val !== 'string' || !validTypes.includes(val.toLowerCase())) {
         throw new PatchFieldValidationError('compilationType');
       }

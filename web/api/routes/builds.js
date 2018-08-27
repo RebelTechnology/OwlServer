@@ -6,6 +6,7 @@ const exec = require('child-process-promise').exec;
 const PatchModel = require('../models/patch');
 const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
 const { download: downloadBuild } = require('../lib/patch-build');
+const { buildHeavy } = require('../lib/patch-build-heavy');
 const errorResponse = require('../lib/error-response');
 const config = require('../lib/config');
 
@@ -128,20 +129,24 @@ router.put('/:id', (req, res) => {
         }
       }
 
-      // Compile patch
+      // Compile patch for heavy
       if (patch.compilationType === 'heavy') {
+
         process.stdout.write('Compiling with Heavy\n');
-        //TODO execute heavy build script as promise and return response. (config.HeavyBuildScript.path)
-        //important to return a promise here so further exection below does not happen.
-        return res.status(200).json({
-          message: 'Compilation succeeded.',
-          stdout: '',
-          stderr: '',
-          success: true,
-          status: 200,
+        
+        return buildHeavy(patch).then(({ success, stdout, stderr }) => {
+          res.status(200).json({
+            message: success ? 'Compilation succeeded' : 'Compilation failed',
+            stdout,
+            stderr,
+            success,
+            status: 200,
+          });
         });
+
       }
 
+      // Compile for other types
       let cmd = 'php ' + config.patchBuilder.path;
       if (format === 'js') {
         cmd += ' --web';
