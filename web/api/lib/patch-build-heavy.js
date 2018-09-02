@@ -85,6 +85,20 @@ const isAHostedFile = fileUrl => {
     fileUrl.indexOf('http://staging.hoxtonowl.com') === 0;
 };
 
+const isAGitHubFile = fileUlr => {
+  return fileUlr.indexOf('://github.com') > -1 || fileUlr.indexOf('://www.github.com') > -1;
+};
+
+const getFilename = fileUrl => {
+  if(!fileUrl){
+    return;
+  }
+
+  const urlSections = fileUrl.split('/');
+  const filename = urlSections[urlSections.length - 1].split('?')[0];
+  return filename;
+}
+
 const copyFile = (source, target) => {
   return new Promise(function(resolve, reject) {
     if(!source || !target){
@@ -108,7 +122,7 @@ const getPatchSourceFilesAndCopyToBuilSrcDir = patch => {
     patch.github.forEach(sourceFileUrl => {
       process.stdout.write(`copying source file ${sourceFileUrl}\n`);
 
-      if(sourceFileUrl.indexOf('://github.com') > -1 || sourceFileUrl.indexOf('://www.github.com') > -1){
+      if(isAGitHubFile(sourceFileUrl)){
 
         const fileUrl = constructGithubApiFileUrl(sourceFileUrl)
         actionPromises.push(fetchPatchSourceFileAndWriteToSrcDir(fileUrl, patch));
@@ -129,6 +143,9 @@ const getPatchSourceFilesAndCopyToBuilSrcDir = patch => {
   });
 };
 
+const getHeavyBuildSciptParametersStringFromPatch = parameters => {
+  return parameters.map(({id, name, io, type}) => `PAR_${id}_NAME="${name}" PAR_${id}_TYPE="${type}" PAR_${id}_IO="${io}"`).join(' ');
+};
 
 const buildHeavy = (patch) => {
 
@@ -155,10 +172,12 @@ const buildHeavy = (patch) => {
 
     const copyFilesAndRunBuildPromise = getPatchSourceFilesAndCopyToBuilSrcDir(patch).then(() => {
 
-      let cmdVars = `TARGET_DIR="${cPath}" PATCHNAME="${patch.name}"`;
+      const sourceDir = `${buildSourcePath}/${patch._id}/`;
+      const buildDir = `${buildTempPath}/${patch._id}/`;
+      const mainFilename = getFilename(patch.github[0]);
+      const parametersString = getHeavyBuildSciptParametersStringFromPatch(patch.parameters);
 
-      // iterate over parameters and files
-
+      const cmdVars = `PATCHNAME="${patch.name}" SOURCE_DIR="${sourceDir}" BUILD_DIR="${buildDir}" TARGET_DIR="${cPath}" MAIN_FILENAME="${mainFilename}" ${parametersString}`;
       const cmd = `${cmdVars} sh ${config.patchBuilder.heavyBuildScriptPath}`;
 
       process.stdout.write(`executing command: ${cmd} \n`);
