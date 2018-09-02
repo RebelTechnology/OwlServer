@@ -168,12 +168,12 @@ const buildHeavy = (patch) => {
     }
 
     removeAndCreateBuildDirs(patch);
-    // TODO later check if source files have changed rather than re-creating these dirs
+    // TODO check if source files have changed rather than re-creating these dirs
 
     const copyFilesAndRunBuildPromise = getPatchSourceFilesAndCopyToBuilSrcDir(patch).then(() => {
 
-      const sourceDir = `${buildSourcePath}/${patch._id}/`;
-      const buildDir = `${buildTempPath}/${patch._id}/`;
+      const sourceDir = `${buildSourcePath}/${patch._id}`;
+      const buildDir = `${buildTempPath}/${patch._id}`;
       const mainFilename = getFilename(patch.github[0]);
       const parametersString = getHeavyBuildSciptParametersStringFromPatch(patch.parameters);
 
