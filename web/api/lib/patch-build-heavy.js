@@ -34,9 +34,13 @@ const parseUrl = (urlString) => {
 const removeAndCreateBuildDirs = patch => {
   const patchDir = `/${patch._id}/`;
   const buildDirPaths = [buildSourcePath, buildTempPath, cPath].map( path => path + patchDir);
-  
+
   del.sync(buildDirPaths, { force: true });
-  buildDirPaths.forEach(mkdirp.sync);  
+  buildDirPaths.forEach(path => {
+    mkdirp.sync(path);
+    fs.chmodSync(path, 0o755);
+  });
+
 };
 
 const constructGithubApiFileUrl = (fileUrl) => {
@@ -55,16 +59,16 @@ const fetchPatchSourceFileAndWriteToSrcDir = (url, patch) => {
     }
 
     const urlSections = url.split('/');
-    const filename = urlSections[urlSections.length - 1]; 
+    const filename = urlSections[urlSections.length - 1].split('?')[0];
     const filePath = `${buildSourcePath}/${patch._id}/${filename}`;
 
-    request.get({ url, encoding: 'utf8'}, (error, response, body) => {
+    request.get({ url, headers:{ 'User-Agent': 'OwlServer'}, encoding: 'utf8', json: true }, (err, response, body) => {
 
       if(err){
         return reject(`failed to fetch a patch source file: ${filename} at ${url}`);
       }
 
-      fs.writeFile(filePath, body, 'binary',  (err) => {
+      fs.writeFile(filePath, body.content, 'base64',  (err) => {
         if(err){
           return reject('failed to write source file');
         }
@@ -76,8 +80,8 @@ const fetchPatchSourceFileAndWriteToSrcDir = (url, patch) => {
 };
 
 const isAHostedFile = fileUrl => {
-  return fileUrl.indexOf('https://www.rebeltech.org') === 0 || 
-    fileUrl.indexOf('https://dev.rebeltech.org') === 0 || 
+  return fileUrl.indexOf('https://www.rebeltech.org') === 0 ||
+    fileUrl.indexOf('https://dev.rebeltech.org') === 0 ||
     fileUrl.indexOf('http://staging.hoxtonowl.com') === 0;
 };
 
@@ -88,7 +92,7 @@ const copyFile = (source, target) => {
     }
 
     const readStream = fs.createReadStream(source);
-    const writeStream = fs.createWriteStream(target);
+    const writeStream = fs.createWriteStream(target, { mode: 0o664 });
     readStream.on('error', reject);
     writeStream.on('error', reject);
     writeStream.on('finish', resolve);
@@ -103,14 +107,14 @@ const getPatchSourceFilesAndCopyToBuilSrcDir = patch => {
 
     patch.github.forEach(sourceFileUrl => {
       process.stdout.write(`copying source file ${sourceFileUrl}\n`);
-      
+
       if(sourceFileUrl.indexOf('://github.com') > -1 || sourceFileUrl.indexOf('://www.github.com') > -1){
-        
+
         const fileUrl = constructGithubApiFileUrl(sourceFileUrl)
         actionPromises.push(fetchPatchSourceFileAndWriteToSrcDir(fileUrl, patch));
 
       } else if(isAHostedFile(sourceFileUrl)){
-        
+
         const urlSections = sourceFileUrl.split('/');
         const filename = urlSections[urlSections.length - 1];
         const fileDir = urlSections[urlSections.length - 2];
@@ -118,7 +122,7 @@ const getPatchSourceFilesAndCopyToBuilSrcDir = patch => {
         const targetPath = `${buildSourcePath}/${patch._id}/${filename}`;
         actionPromises.push(copyFile(sourcePath, targetPath));
       }
-    
+
     });
 
     resolve(Promise.all(actionPromises));
@@ -129,7 +133,7 @@ const getPatchSourceFilesAndCopyToBuilSrcDir = patch => {
 const buildHeavy = (patch) => {
 
   return new Promise(( resolve, reject ) => {
-    
+
     if(!patch){
       return reject('missing patch');
     }
@@ -143,7 +147,7 @@ const buildHeavy = (patch) => {
     }
 
     if(!patch.github || !patch.github.length){
-      return reject('patch has no files to compile'); 
+      return reject('patch has no files to compile');
     }
 
     removeAndCreateBuildDirs(patch);
