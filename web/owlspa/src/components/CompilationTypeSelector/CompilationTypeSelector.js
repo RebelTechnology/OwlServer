@@ -34,7 +34,7 @@ class CompilationTypeSelector extends Component {
   }
 
   componentWillReceiveProps(nextProps){
-    if(!nextProps.compilationtype && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
+    if(!nextProps.compilationType && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
       this.checkAndUpdateCompilatonType(nextProps.mainSourceFile.name);
     }
   }
@@ -65,11 +65,11 @@ class CompilationTypeSelector extends Component {
 
   componentDidMount(){
     const {
-      compilationtype,
+      compilationType,
       mainSourceFile
     } = this.props;
 
-    if(!compilationtype && mainSourceFile && mainSourceFile.name){
+    if(!compilationType && mainSourceFile && mainSourceFile.name){
       this.checkAndUpdateCompilatonType(mainSourceFile.name);
     }
   }
