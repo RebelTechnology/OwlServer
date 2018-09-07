@@ -64,7 +64,7 @@ const download = (patch, patchModel, stream, format, res) => {
   } else if (format === 'js') {
     buildFile = path.join(config.patchBuilder.jsPath, patch.seoName + (config.patchBuilder.jsBuildType === 'min' ? '.min' : '') + '.js');
   } else if(format === 'c'){
-    buildFile = path.join(config.patchBuilder.cPath, patch.seoName + '.zip');
+    buildFile = path.join(config.patchBuilder.cPath, `${patch._id}/${patch.seoName}.zip`);
   }
   if (!fs.existsSync(buildFile)) { // FIXME - Move this somewhere else
     throw {
