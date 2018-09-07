@@ -1,6 +1,5 @@
 'use strict';
 
-const path = require('path');
 const fs = require('fs');
 const del = require('del');
 const mkdirp = require('mkdirp');
@@ -21,14 +20,14 @@ const {
 
 const parseUrl = (urlString) => {
   const urlRegex = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
-  const result = urlRegex.exec(urlString)
+  const result = urlRegex.exec(urlString);
   return {
     scheme: result[2],
     authority: result[4],
     path: result[5],
     query: result[7],
     fragment: result[9]
-  }
+  };
 };
 
 const removeAndCreateBuildDirs = patch => {
@@ -76,7 +75,7 @@ const fetchPatchSourceFileAndWriteToSrcDir = (url, patch) => {
       });
     });
 
-  })
+  });
 };
 
 const isAHostedFile = fileUrl => {
@@ -97,7 +96,7 @@ const getFilename = fileUrl => {
   const urlSections = fileUrl.split('/');
   const filename = urlSections[urlSections.length - 1].split('?')[0];
   return filename;
-}
+};
 
 const copyFile = (source, target) => {
   return new Promise(function(resolve, reject) {
@@ -112,10 +111,10 @@ const copyFile = (source, target) => {
     writeStream.on('finish', resolve);
     readStream.pipe(writeStream);
   });
-}
+};
 
 const getPatchSourceFilesAndCopyToBuilSrcDir = patch => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
 
     const actionPromises = [];
 
@@ -124,7 +123,7 @@ const getPatchSourceFilesAndCopyToBuilSrcDir = patch => {
 
       if(isAGitHubFile(sourceFileUrl)){
 
-        const fileUrl = constructGithubApiFileUrl(sourceFileUrl)
+        const fileUrl = constructGithubApiFileUrl(sourceFileUrl);
         actionPromises.push(fetchPatchSourceFileAndWriteToSrcDir(fileUrl, patch));
 
       } else if(isAHostedFile(sourceFileUrl)){
@@ -174,10 +173,11 @@ const buildHeavy = (patch) => {
 
       const sourceDir = `${buildSourcePath}/${patch._id}`;
       const buildDir = `${buildTempPath}/${patch._id}`;
+      const targetDir = `${cPath}/${patch._id}`;
       const mainFilename = getFilename(patch.github[0]);
       const parametersString = getHeavyBuildSciptParametersStringFromPatch(patch.parameters);
 
-      const cmdVars = `PATCHNAME="${patch.name}" PATCH_SEO_NAME="${patch.seoName}" SOURCE_DIR="${sourceDir}" BUILD_DIR="${buildDir}" TARGET_DIR="${cPath}" MAIN_FILENAME="${mainFilename}" ${parametersString}`;
+      const cmdVars = `PATCHNAME="${patch.name}" PATCH_SEO_NAME="${patch.seoName}" SOURCE_DIR="${sourceDir}" BUILD_DIR="${buildDir}" TARGET_DIR="${targetDir}" MAIN_FILENAME="${mainFilename}" ${parametersString}`;
       const cmd = `${cmdVars} sh ${config.patchBuilder.heavyBuildScriptPath}`;
 
       process.stdout.write(`executing command: ${cmd} \n`);
