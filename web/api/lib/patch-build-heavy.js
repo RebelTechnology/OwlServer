@@ -177,7 +177,7 @@ const buildHeavy = (patch) => {
       const mainFilename = getFilename(patch.github[0]);
       const parametersString = getHeavyBuildSciptParametersStringFromPatch(patch.parameters);
 
-      const cmdVars = `PATCHNAME="${patch.name}" SOURCE_DIR="${sourceDir}" BUILD_DIR="${buildDir}" TARGET_DIR="${cPath}" MAIN_FILENAME="${mainFilename}" ${parametersString}`;
+      const cmdVars = `PATCHNAME="${patch.name}" PATCH_SEO_NAME="${patch.seoName}" SOURCE_DIR="${sourceDir}" BUILD_DIR="${buildDir}" TARGET_DIR="${cPath}" MAIN_FILENAME="${mainFilename}" ${parametersString}`;
       const cmd = `${cmdVars} sh ${config.patchBuilder.heavyBuildScriptPath}`;
 
       process.stdout.write(`executing command: ${cmd} \n`);
