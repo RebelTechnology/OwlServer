@@ -34,7 +34,7 @@ const getInfo = patch => {
   }
 
   // check if C build exists
-  const cFilePath = path.join(config.patchBuilder.cPath, patch.seoName + '.zip');
+  const cFilePath = path.join(config.patchBuilder.cPath, `${patch._id}/${patch.seoName}.zip`);
   if (fs.existsSync(cFilePath)) {
     result.cAvailable = true;
     result.cLastUpdated = fs.statSync(cFilePath).mtime;
