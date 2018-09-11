@@ -33,15 +33,15 @@ class CompilationTypeSelector extends Component {
       this.props.onCompilationTypeChange(newCompilationType);
   }
 
-  componentWillReceiveProps(newProps){
-    if(!this.props.mainSourceFile && newProps.mainSourceFile && newProps.mainSourceFile.name){
-      this.checkAndUpdateCompilatonType(newProps.mainSourceFile.name);
+  componentWillReceiveProps(nextProps){
+    if(!nextProps.compilationType && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
+      this.checkAndUpdateCompilatonType(nextProps.mainSourceFile.name);
     }
   }
 
   render(){
     const { onCompilationTypeChange, compilationType, mainSourceFile } = this.props;
-    const allCompilationTypes = ['cpp', 'pd', 'faust', 'gen', 'maximilian'];
+    const allCompilationTypes = ['cpp', 'pd', 'heavy', 'faust', 'gen', 'maximilian'];
 
     return (
       <fieldset>
@@ -64,8 +64,13 @@ class CompilationTypeSelector extends Component {
   }
 
   componentDidMount(){
-    if(this.props.mainSourceFile && this.props.mainSourceFile.name){
-      this.checkAndUpdateCompilatonType(this.props.mainSourceFile.name);
+    const {
+      compilationType,
+      mainSourceFile
+    } = this.props;
+
+    if(!compilationType && mainSourceFile && mainSourceFile.name){
+      this.checkAndUpdateCompilatonType(mainSourceFile.name);
     }
   }
   

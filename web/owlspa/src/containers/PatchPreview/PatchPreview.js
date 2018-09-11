@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { PatchParameters, OwlControl, MidiKeyboard } from 'containers';
-import { PatchPushButton } from 'components';
 import { webAudio } from 'lib';
 import classNames from 'classnames';
 import { 
@@ -97,8 +96,8 @@ class PatchPreview extends Component {
     if(instance){
       instance.connectToOutput({outputs: patch.outputs});
       
-      webAudioPatchParameters.forEach((param,i)=>{
-        instance.update(i, param.value/100);
+      webAudioPatchParameters.forEach( (param, i) => {
+        instance.update(i, param.value / 100);
       });
 
       this.props.setPatchPlaying(true);
@@ -132,11 +131,17 @@ class PatchPreview extends Component {
 
   updateWebAudioPatchParameters(nextParams){
     const { webAudioPatchParameters:currentParams, webAudioPatch:{instance} } = this.props;
+
+    if(!instance){
+      return;
+    }
+
     nextParams.forEach((nextParam, i) => {
-      if(nextParam.value !== currentParams[i].value){
-        if(instance){
-          instance.update(i, nextParam.value/100);
-        }
+      const existingParam = currentParams.filter(param => param.id === nextParam.id)[0];
+      if(!existingParam || (existingParam.value !== nextParam.value)){
+        const value = nextParam.type === 'float' ? nextParam.value / 100 : nextParam.value; // floats 0 - 1, bool 0 or 4095 ?
+        console.log('[sending data to patch] parameter id:', nextParam.id, 'value:', value);
+        instance.update(nextParam.id, value);
       }
     });
   }
@@ -150,11 +155,12 @@ class PatchPreview extends Component {
   patchParametersWillChange(nextProps){
     const { webAudioPatchParameters:nextParameters } = nextProps;
     const { webAudioPatchParameters:currentParameters } = this.props;
-    if(!nextParameters.length || !currentParameters.length){
-      return false;
+    if(nextParameters.length !== currentParameters.length){
+      return true;
     }
     return nextParameters.some((nextParam, i) => {
-      return currentParameters[i].value !== nextParam.value
+      const existingParam = currentParameters.filter(param => param.id === nextParam.id)[0];
+      return !existingParam || (existingParam.value !== nextParam.value);
     });
   }
 
@@ -178,7 +184,7 @@ class PatchPreview extends Component {
     }
   }
 
-  renderPatchPreviewButtons(){
+  renderControlButtons(){
     const {
       webAudioPatch,
       patch
@@ -261,24 +267,17 @@ class PatchPreview extends Component {
     
     return (
       <div className="white-box2">
-        <div style={{paddingLeft:'30px'}}>
+        <div>
           <PatchParameters 
             patchIsActive={webAudioPatch.isPlaying} 
             editMode={editMode}
-            onChangeParamNames={params => this.props.onChangeParamNames(params)}
+            onChangeParameters={params => this.props.onChangeParameters(params)}
             isSaving={isSaving}
             parameters={parameters} 
           />
         </div>
 
-        <PatchPushButton
-          isActive={webAudioPatch.isPlaying}
-          ledColour={webAudioPatch.isPlaying ? this.state.pushButtonLedColour : '#ececec'}
-          onPushButtonDown={(e)=>this.handlePushButtonDown(e)}
-          onPushButtonUp={(e)=>this.handlePushButtonUp(e)} 
-        />
-
-        { this.renderPatchPreviewButtons() }
+        { this.renderControlButtons() }
         
         <div className="error-msg">
           {!webAudio.webAudioApiIsAvailable() ? (
@@ -323,12 +322,13 @@ PatchPreview.propTypes = {
   patch: PropTypes.object,
   editMode: PropTypes.bool,
   isSaving: PropTypes.bool,
-  onChangeParamNames: PropTypes.func,
+  parameters: PropTypes.array,
+  onChangeParameters: PropTypes.func,
   onCompileClick: PropTypes.func
 }
 
 PatchPreview.defaultProps = {
-  onChangeParamNames: () => {},
+  onChangeParameters: () => {},
   onCompileClick: () => {}
 };
 

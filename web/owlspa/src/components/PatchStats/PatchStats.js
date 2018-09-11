@@ -134,6 +134,17 @@ class PatchStats extends Component {
           </div>
           )
         }
+        { patch.cAvailable && (
+          <div className="patch-stats-row">
+            <span className="parameter-label">C</span>
+            <span className="parameter-value">
+              <a href={'/api/builds/'+ patch._id +'?format=c&amp;download=1'}>Download</a>
+              { patch.cLastUpdated && ' (built on ' + this.isoDateToLocaleString(patch.cLastUpdated) + ' )'}
+            </span>
+          </div>
+          )
+        }
+
         { (patch.downloadCount > 0) && (
           <div className="patch-stats-row">
               <span className="parameter-label">Downloads</span>

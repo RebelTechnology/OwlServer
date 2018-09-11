@@ -6,6 +6,7 @@ const exec = require('child-process-promise').exec;
 const PatchModel = require('../models/patch');
 const { authTypes, API_USER_NAME } = require('../middleware/auth/constants');
 const { download: downloadBuild } = require('../lib/patch-build');
+const { buildHeavy } = require('../lib/patch-build-heavy');
 const errorResponse = require('../lib/error-response');
 const config = require('../lib/config');
 
@@ -15,18 +16,15 @@ const config = require('../lib/config');
  * @param {string} format
  * @return {string}
  */
-const getBuildFormat = format => {
+const getBuildFormat = (buildFormat='sysx') => {
 
-  let buildFormat = 'sysx'; // default build format
-  if (format) {
-    buildFormat = format;
-  }
-  // validate
-  if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'sysex') {
-    throw { public: true, message: 'Invalid format.', status: 500 };
-  }
   if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
     buildFormat = 'sysx'; // normalize
+  }
+
+  // validate
+  if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'c') {
+    throw { public: true, message: 'Invalid format.', status: 500 };
   }
 
   return buildFormat;
@@ -131,7 +129,24 @@ router.put('/:id', (req, res) => {
         }
       }
 
-      // Compile patch
+      // Compile patch for heavy
+      if (patch.compilationType === 'heavy') {
+
+        process.stdout.write('Compiling with Heavy\n');
+        
+        return buildHeavy(patch).then(({ success, stdout, stderr }) => {
+          res.status(200).json({
+            message: success ? 'Compilation succeeded' : 'Compilation failed',
+            stdout,
+            stderr,
+            success,
+            status: 200,
+          });
+        });
+
+      }
+
+      // Compile for other types
       let cmd = 'php ' + config.patchBuilder.path;
       if (format === 'js') {
         cmd += ' --web';

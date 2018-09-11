@@ -5,16 +5,13 @@ import {
 
 const initialState = [];
 
-const makeNewArray = (parameter, state)=>{
-  let arr = [...state];
-  arr[parameter.index] = parameter;
-  return arr;
-}
-
 const webAudioPatchParameters = (state = initialState, action) => {
   switch (action.type) {
     case SET_WEB_AUDIO_PATCH_PARAMETER:
-      return makeNewArray(action.parameter, state);
+      return [
+        ...state.filter(param => param.id !== action.parameter.id),
+        action.parameter
+      ];
     case RESET_WEB_AUDIO_PATCH_PARAMETERS:
       return initialState;
     case RESET_WEB_AUDIO_PATCH:

@@ -1,0 +1,58 @@
+.boolparam-push-button {
+    display: block;
+    position: relative;
+    width: 113px;
+    height: 94px;
+    margin: 40px 8px 0px;
+}
+
+.parameter-io {
+    display: block;
+    position: absolute;
+    top: -25px;
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.boolparam-push-button-led {
+    margin: 10px auto;
+    display: block;
+    width: 40px;
+    height: 40px;
+    background-color: #ececec;
+    border-radius: 20px;
+}
+
+.parameter-name {
+    display: block;
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.parameter-io-dropdown {
+    z-index: 999;
+    width: 85px;
+    position: absolute;
+    top: -43px;
+    height: auto;
+    right: 0;
+}
+
+.parameter-id-dropdown {
+    z-index: 999;
+    width: 163px;
+    position: absolute;
+    bottom: -35px;
+    height: auto;
+    left: -25px;
+    color: #000;
+}
+
+.parameter-id-dropdown select {
+    width: 139px;
+    height: auto;
+}

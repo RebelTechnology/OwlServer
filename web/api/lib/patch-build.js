@@ -16,6 +16,7 @@ const getInfo = patch => {
   const result = {
     sysExAvailable: false,
     jsAvailable: false,
+    cAvailable: false
   };
 
   // Get patch SysEx build
@@ -30,6 +31,13 @@ const getInfo = patch => {
   if (fs.existsSync(jsFile)) {
     result['jsAvailable'] = true;
     result['jsLastUpdated'] = fs.statSync(jsFile).mtime;
+  }
+
+  // check if C build exists
+  const cFilePath = path.join(config.patchBuilder.cPath, `${patch._id}/${patch.seoName}.zip`);
+  if (fs.existsSync(cFilePath)) {
+    result.cAvailable = true;
+    result.cLastUpdated = fs.statSync(cFilePath).mtime;
   }
 
   return result;
@@ -55,6 +63,8 @@ const download = (patch, patchModel, stream, format, res) => {
     buildFile = path.join(config.patchBuilder.sysexPath, patch.seoName + '.syx');
   } else if (format === 'js') {
     buildFile = path.join(config.patchBuilder.jsPath, patch.seoName + (config.patchBuilder.jsBuildType === 'min' ? '.min' : '') + '.js');
+  } else if(format === 'c'){
+    buildFile = path.join(config.patchBuilder.cPath, `${patch._id}/${patch.seoName}.zip`);
   }
   if (!fs.existsSync(buildFile)) { // FIXME - Move this somewhere else
     throw {
@@ -73,11 +83,15 @@ const download = (patch, patchModel, stream, format, res) => {
     // increment download count for sysx files
     patchModel.incrementDownloadCount(patch._id);
   }
+  
   res.setHeader('Content-length', fs.statSync(buildFile)['size']); // FIXME - Move this somewhere else
+  
   if (format === 'sysx') {
     res.setHeader('Content-type', 'application/octet-stream');
   } else if (format === 'js') {
     res.setHeader('Content-type', 'text/javascript');
+  } else if (format === 'c'){
+    res.setHeader('Content-type', 'application/zip');
   }
   const filestream = fs.createReadStream(buildFile);
   return filestream.pipe(res);

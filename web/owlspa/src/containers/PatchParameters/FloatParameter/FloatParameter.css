@@ -1,0 +1,59 @@
+.float-parameter {
+    color: #717171;
+    position: relative;
+    margin: 25px 15px 27px 15px;
+}
+
+.parameter-io {
+    display: block;
+    position: absolute;
+    top: -20px;
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.parameter-name {
+    display: block;
+    position: absolute;
+    top: 95px;
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.parameter-value {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 20px;
+    margin-left: -25px;
+    margin-top: -10px;
+    text-align: center;
+}
+
+.parameter-io-dropdown {
+    z-index: 999;
+    width: 85px;
+    position: absolute;
+    top: -39px;
+    height: auto;
+    right: -8px;
+}
+
+.parameter-id-dropdown {
+    z-index: 999;
+    width: 163px;
+    position: absolute;
+    bottom: -71px;
+    height: auto;
+    left: -32px;
+    color: #000;
+}
+
+.parameter-id-dropdown select {
+    width: 139px;
+    height: auto;
+}

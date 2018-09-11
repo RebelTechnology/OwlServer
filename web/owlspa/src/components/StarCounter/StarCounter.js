@@ -14,7 +14,8 @@ class StarCounter extends Component {
           icon={starred ? 'starred': 'star'} 
           color="#555" 
           onClick={ onStarClick } >
-          {starCount} Star{`${ starCount===1 ? '' : 's' }`}
+          { starCount > 0 ? starCount : null }
+          {starCount > 1 ? ' Stars' : ' Star'}
         </IconButton>
       </div>
     );

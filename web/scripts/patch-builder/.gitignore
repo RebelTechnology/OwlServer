@@ -1,4 +1,7 @@
 build
 build-js
+build-c
+build-src
+build-tmp
 vendor
 settings.php

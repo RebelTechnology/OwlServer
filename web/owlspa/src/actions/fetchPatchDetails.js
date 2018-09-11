@@ -1,4 +1,4 @@
-
+import customHistory from '../customHistory';
 import { 
   REQUEST_PATCH_DETAILS,
   RECEIVE_PATCH_DETAILS,
@@ -19,6 +19,9 @@ const fetchPatchDetails = (patchSeoName) => {
       .then( response => {
           if (response.status >= 400) {
             console.error('bad status:', response.status);
+            if(response.status === 404){
+              customHistory.push('/patch-not-found');
+            }
           } else {
             dispatch({
               type: RECEIVE_PATCH_DETAILS,

@@ -164,19 +164,19 @@ function downloadGithubFile($githubFile, $dstPath) {
 function downloadSourceFile($url, $dstPath) {
 
     if (!is_string($url)) {
-        errorOut('Bad source file URL (1).');
+        outputError('Bad source file URL (1).');
     }
 
     $r = parse_url($url);
     if (false === $r) {
-        errorOut('Bad source file URL (2).');
+        outputError('Bad source file URL (2).');
     }
 
     if ($r['host'] === 'github.com' || $r['host'] === 'www.github.com') {
 
         return downloadGithubFile($url, $dstPath);
 
-    } elseif ($r['host'] === 'www.rebeltech.org' || $r['host'] === 'dev.rebeltech.org' ||$r['host'] === 'hoxtonowl.com' || $r['host'] === 'www.hoxtonowl.com') {
+    } elseif ($r['host'] === 'www.rebeltech.org' || $r['host'] === 'rebeltech.org' || $r['host'] === 'dev.rebeltech.org' || $r['host'] === 'hoxtonowl.com' || $r['host'] === 'www.hoxtonowl.com') {
 
         $arrContextOptions = [];
         if (ENVIRONMENT !== ENVIRONMENT_PRODUCTION) { // accept self-signed SSL certificates
@@ -200,7 +200,7 @@ function downloadSourceFile($url, $dstPath) {
         return $filename;
 
     } else {
-        errorOut('Bad source file URL (3).');
+        outputError('Bad source file URL (3).');
         return false;
     }
 } // function downloadSelfHostedSourceFile
