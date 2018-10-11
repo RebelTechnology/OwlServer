@@ -286,7 +286,7 @@ function sendProgramRun(){
     console.log("sending sysex run command");
     var msg = [
         0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, 
-        OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7
+        OpenWareMidiSysexCommand.SYSEX_FIRMWARE_STORE, 0xf7
     ];
     HoxtonOwl.midiClient.logMidiData(msg);
     if(HoxtonOwl.midiClient.midiOutput){
