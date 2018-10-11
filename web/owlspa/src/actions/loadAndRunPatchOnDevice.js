@@ -5,14 +5,14 @@ import {
 import { owlCmd } from 'lib';
 import newDialog from './newDialog';
 
-const loadPatchOnToOwl = (patch) => {
+const loadAndRunPatchOnDevice = (patch) => {
   return (dispatch) => {
     owlCmd.stopPollingOwlStatus();
     dispatch({
       type: BEGIN_LOAD_PATCH_ON_TO_OWL
     });
 
-    return owlCmd.loadPatchFromServer(patch._id).then(result => {
+    return owlCmd.loadAndRunPatchOnDevice(patch._id).then(result => {
       dispatch({
         type: COMPLETE_LOAD_PATCH_ON_TO_OWL,
         patchLoaded: true
@@ -38,4 +38,4 @@ const loadPatchOnToOwl = (patch) => {
   }
 }
 
-export default loadPatchOnToOwl;
+export default loadAndRunPatchOnDevice;

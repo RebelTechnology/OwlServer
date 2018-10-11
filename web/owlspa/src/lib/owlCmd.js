@@ -224,6 +224,30 @@ function sendProgramData(data){
     });
 }
 
+function storeProgramInDeviceSlot(slot){
+    return new Promise((resolve, reject) => {
+        
+        if(typeof slot !== 'number' || slot < 0 || slot > 40){
+            reject(new Error('slot is not a number from 0 to 40'));
+            return;
+        }
+
+        console.log("sending sysex store command");
+        var msg = [
+            0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE,
+            OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, slot, 0xf7
+        ];
+
+        HoxtonOwl.midiClient.logMidiData(msg);
+        if(HoxtonOwl.midiClient.midiOutput){
+            HoxtonOwl.midiClient.midiOutput.send(msg, 0);
+            resolve();
+        } else {
+            reject(new Error('failed to store in slot: ' + slot));
+        }
+    });
+}
+
 function chunkData(data){
     var chunks = [];
     var start = 0;
@@ -280,13 +304,7 @@ function sendProgramFromUrl(url){
             var arrayBuffer = oReq.response; // Note: not oReq.responseText
             if(arrayBuffer) {  
                 var data = new Uint8Array(arrayBuffer);
-                resolve(
-                    sendProgramData(data).then(function(){
-                        sendProgramRun();
-                    }, function(err){
-                        console.error(err);
-                    })
-                );
+                resolve(sendProgramData(data));
             }
         }
         oReq.open("GET", url, true);
@@ -294,8 +312,23 @@ function sendProgramFromUrl(url){
     });
 }
 
-function loadPatchFromServer(patchId){
-    return sendProgramFromUrl(API_END_POINT + '/builds/' + patchId + '?format=sysx&amp;download=1');
+function loadPatchOnDevice(patchId){
+    const url = API_END_POINT + '/builds/' + patchId + '?format=sysx&amp;download=1';
+    return sendProgramFromUrl(url);
+}
+
+function storePatchInDeviceSlot(patchId, slot){
+    return loadPatchOnDevice(patchId).then(function(){
+        return storeProgramInDeviceSlot(slot);
+    });
+}
+
+function loadAndRunPatchOnDevice(patchId){
+    return loadPatchOnDevice(patchId).then(function(){
+        sendProgramRun();
+    }, function(err){
+        console.error(err);
+    });
 }
 
 
@@ -490,10 +523,10 @@ HoxtonOwl.midiClient = {
 
 export default {
     connectToOwl : connectToOwl,
-    loadPatchFromServer : loadPatchFromServer,
+    loadAndRunPatchOnDevice : loadAndRunPatchOnDevice,
+    storePatchInDeviceSlot: storePatchInDeviceSlot,
     startPollingOwlStatus: pollOwlStatus,
     stopPollingOwlStatus: clearPollRequestTimeout,
     sendNoteOn: HoxtonOwl.midiClient.sendNoteOn,
     sendNoteOff: HoxtonOwl.midiClient.sendNoteOff
 }
-
