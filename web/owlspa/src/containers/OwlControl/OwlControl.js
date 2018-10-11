@@ -23,7 +23,7 @@ class OwlControl extends Component {
   handleStorePatchButtonClick(){
     if(navigator.requestMIDIAccess){
     
-      const slot = window.prompt('please enter a slot number to store the patch in');
+      const slot = parseInt(window.prompt('Enter a slot number from 0 to 40'));
     
       if(typeof slot !== 'number' || slot < 0 || slot > 40){
         window.alert('slot must be a number between 0 and 40 inclusive');

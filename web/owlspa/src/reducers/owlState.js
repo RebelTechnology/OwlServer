@@ -14,15 +14,15 @@ import {
 
 const initialState = {
   isConnected: false,
-  isRequesting:false,
+  isRequesting: false,
   patchIsLoading: false,
   patchLoaded : false,
   patchIsStoring: false,
-  promptUserForStoreSlot: false,
+  patchStoredSuccess: false,
   loadedPatchName: null,
   firmWareVersion: null,
   status: null,
-  programMessage:null
+  programMessage: null
 };
 
 const owlState = (state = initialState, action) => {
