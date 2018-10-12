@@ -232,7 +232,7 @@ function storeProgramInDeviceSlot(slot){
             return;
         }
 
-        console.log("sending sysex store command");
+        console.log("sending sysex STORE command");
         var msg = [
             0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE,
             OpenWareMidiSysexCommand.SYSEX_FIRMWARE_STORE, slot, 0xf7
@@ -283,7 +283,7 @@ function sendDataChunks(index, chunks, resolve){
 }
 
 function sendProgramRun(){
-    console.log("sending sysex run command");
+    console.log("sending sysex RUN command");
     var msg = [
         0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, 
         OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7
