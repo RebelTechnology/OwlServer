@@ -71,7 +71,8 @@ const wordpressAuth = (req, res, next) => {
     .then(result => {
       if (!result) {
         process.stdout.write('auth: WP cookie verification failed.\n');
-        throw { public: true, message: 'Not authorized.', status: 401 };
+        return next();
+        //throw { public: true, message: 'Not authorized.', status: 401 };
       }
       process.stdout.write('auth: Getting WP user info...\n');
       wpUsername = wpCookie.split('|')[0];
