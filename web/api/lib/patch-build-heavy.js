@@ -183,7 +183,7 @@ const buildHeavy = (patch) => {
       process.stdout.write(`executing command: ${cmd} \n`);
 
       return exec(cmd)
-        .then( result => {
+        .then( ({ stdout, stderr }) => {
 
           return new Promise((resolve, reject) => {
 
@@ -193,18 +193,18 @@ const buildHeavy = (patch) => {
               if(err){
                 reject(err);
               } else {
-                resolve(result);
+                resolve({ stdout, stderr, success: true });
               }
             });
           }).catch(err => {
             
-            process.stderr.write('buildHeavy failed to rename patch.zip');
+            process.stderr.write('buildHeavy failed to rename patch.zip \n');
             process.stderr.write(err + '\n');
 
             return {
               success: false,
-              stdout: result.stdout,
-              stderr: 'failed to rename patch.zip'
+              stdout,
+              stderr: err.toString()
             };
           });
 
