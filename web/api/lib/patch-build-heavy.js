@@ -188,7 +188,7 @@ const buildHeavy = (patch) => {
           return new Promise((resolve, reject) => {
 
             const renameFileFrom = `${targetDir}/patch.zip`;
-            const renameFileTo = `${targetDir}/${patch.seoName}`;
+            const renameFileTo = `${targetDir}/${patch.seoName}.zip`;
             fs.rename(renameFileFrom, renameFileTo, err => {
               if(err){
                 reject(err);
