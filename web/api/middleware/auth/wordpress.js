@@ -71,7 +71,7 @@ const wordpressAuth = (req, res, next) => {
     .then(result => {
       if (!result) {
         process.stdout.write('auth: WP cookie verification failed.\n');
-        return next();
+        throw new Error('auth: WP cookie verification failed.');
         //throw { public: true, message: 'Not authorized.', status: 401 };
       }
       process.stdout.write('auth: Getting WP user info...\n');
@@ -81,7 +81,7 @@ const wordpressAuth = (req, res, next) => {
     .then(wpUserInfo => {
 
       if (!wpUserInfo) {
-        throw new Error();
+        throw new Error('wpUserInfo not found');
       }
 
       res.locals.authenticated = true;
@@ -106,7 +106,11 @@ const wordpressAuth = (req, res, next) => {
 
       next();
     })
-    .catch(error => errorResponse(error, res));
+    .catch(err => {
+      process.stderr.write(err + '\n');
+      next();
+      // errorResponse(error, res)
+    });
 };
 
 module.exports = wordpressAuth;
