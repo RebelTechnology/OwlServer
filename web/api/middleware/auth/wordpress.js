@@ -2,7 +2,6 @@
 
 const { validateAuthCookie, getUserInfo } = require('../../lib/wordpress-bridge.js');
 const { authTypes } = require('./constants');
-const errorResponse = require('../../lib/error-response');
 
 /**
  * Convenience function gets wordpress cookie if exists or returns false.
@@ -71,7 +70,8 @@ const wordpressAuth = (req, res, next) => {
     .then(result => {
       if (!result) {
         process.stdout.write('auth: WP cookie verification failed.\n');
-        throw { public: true, message: 'Not authorized.', status: 401 };
+        throw new Error('auth: WP cookie verification failed.');
+        //throw { public: true, message: 'Not authorized.', status: 401 };
       }
       process.stdout.write('auth: Getting WP user info...\n');
       wpUsername = wpCookie.split('|')[0];
@@ -80,7 +80,7 @@ const wordpressAuth = (req, res, next) => {
     .then(wpUserInfo => {
 
       if (!wpUserInfo) {
-        throw new Error();
+        throw new Error('wpUserInfo not found');
       }
 
       res.locals.authenticated = true;
@@ -105,7 +105,12 @@ const wordpressAuth = (req, res, next) => {
 
       next();
     })
-    .catch(error => errorResponse(error, res));
+    .catch(err => {
+      //an error here doesn't send an error response to the client so that requests that don't need auth are not broken.
+      process.stderr.write(err + '\n');
+      next();
+      // errorResponse(error, res)
+    });
 };
 
 module.exports = wordpressAuth;

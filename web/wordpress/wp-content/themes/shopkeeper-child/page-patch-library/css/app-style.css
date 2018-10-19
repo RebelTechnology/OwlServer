@@ -373,7 +373,8 @@ span.parameter-label {
 }
 
 .owl-device-control button {
-    float: left;
+    display: block;
+    margin-bottom: 15px;
     padding: 20px;
     line-height: 0px;
     width: 165px;
