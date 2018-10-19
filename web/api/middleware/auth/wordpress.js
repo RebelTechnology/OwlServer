@@ -2,7 +2,6 @@
 
 const { validateAuthCookie, getUserInfo } = require('../../lib/wordpress-bridge.js');
 const { authTypes } = require('./constants');
-const errorResponse = require('../../lib/error-response');
 
 /**
  * Convenience function gets wordpress cookie if exists or returns false.
@@ -107,6 +106,7 @@ const wordpressAuth = (req, res, next) => {
       next();
     })
     .catch(err => {
+      //an error here doesn't send an error response to the client so that requests that don't need auth are not broken.
       process.stderr.write(err + '\n');
       next();
       // errorResponse(error, res)
