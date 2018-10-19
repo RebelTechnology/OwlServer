@@ -235,7 +235,7 @@ function storeProgramInDeviceSlot(slot){
         console.log("sending sysex STORE command");
         var msg = [
             0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE,
-            OpenWareMidiSysexCommand.SYSEX_FIRMWARE_STORE, slot, 0xf7
+            OpenWareMidiSysexCommand.SYSEX_FIRMWARE_STORE, 0, 0, 0, 0, slot, 0xf7
         ];
 
         HoxtonOwl.midiClient.logMidiData(msg);
