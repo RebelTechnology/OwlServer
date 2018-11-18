@@ -40,17 +40,6 @@ Version: 1.0
   width: 100% !important;
 }
 
-/* custom logo for login form */
-
-#login h1 a, .login h1 a {
-  background-image: url("images/logo.png");
-  height: 65px;
-  width: 320px;
-  background-size: 320px 65px;
-  background-repeat: no-repeat;
-  padding-bottom: 30px;
-}
-
 
 /****************************************************************/
 /****************************************************************/
