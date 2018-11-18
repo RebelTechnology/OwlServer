@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import customHistory from '../../customHistory';
 import { setPatchListTopFilter, fetchPatchesAuthorsTags, deletePatch, setPatchListSearchTerm } from 'actions';
 import { PatchTile , SubFilter, SearchInput } from 'containers';
 import { PatchCounter, CreatePatchTile } from 'components';
@@ -8,6 +9,11 @@ import { getFilteredSortedPatches } from './selectors';
 class PatchListPage extends Component {
   
   componentWillReceiveProps(nextProps){
+    if(nextProps.routeParams.topFilter === 'my-patches' && nextProps.currentUser.loggedIn === false){
+      customHistory.push('/login');
+    }
+
+
     if(nextProps.routeParams.topFilter !== this.props.routeParams.topFilter){
       this.props.setPatchListTopFilter(nextProps.routeParams.topFilter);
     }

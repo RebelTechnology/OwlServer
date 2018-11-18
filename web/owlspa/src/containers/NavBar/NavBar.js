@@ -4,8 +4,10 @@ import { NavLink } from 'components';
 import { connect } from 'react-redux';
 
 class NavBar extends Component {
+
   render(){
     const { currentUser, location } = this.props;
+
     return (
       <div id="secondary-nav-bar">
         <div id="secondary-nav-bar-content">
@@ -15,7 +17,8 @@ class NavBar extends Component {
           <NavLink icon="authors" location={location} target="patches/authors">Authors</NavLink>
           <NavLink icon="all" location={location} target="patches/all">All</NavLink>
           <NavLink icon="search" location={location} target="patches/search">Search</NavLink>
-          { currentUser.loggedIn && <NavLink icon="myPatches" location={location} target="patches/my-patches">My Patches</NavLink> }
+          <NavLink icon="myPatches" location={location} target={currentUser.loggedIn ? 'patches/my-patches' : 'login'}>My Patches</NavLink>
+          <NavLink icon="usb" location={location} target="device">Device</NavLink>
         </div>
       </div>
     );
