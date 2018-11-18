@@ -46,5 +46,14 @@
   function wpse_login_styles() {
     wp_enqueue_style( 'wpse-custom-login', get_stylesheet_directory_uri() . '/style-login.css' );
   }
-
   add_action( 'login_enqueue_scripts', 'wpse_login_styles' );
+
+  function login_logo_url() {
+      return home_url();
+  }
+  add_filter( 'login_headerurl', 'login_logo_url' );
+
+  function login_logo_url_title() {
+      return 'Rebel Technology';
+  }
+  add_filter( 'login_headertitle', 'login_logo_url_title' );
