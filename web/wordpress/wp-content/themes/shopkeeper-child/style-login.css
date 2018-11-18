@@ -1,0 +1,6 @@
+/* child theme login page styles */
+
+#login h1 a, .login h1 a {
+  background-image: url("../images/logo.png");
+  padding-bottom: 30px;
+}
