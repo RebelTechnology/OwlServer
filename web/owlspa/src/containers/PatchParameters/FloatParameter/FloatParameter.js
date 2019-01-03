@@ -126,7 +126,7 @@ class FloatParameter extends Component {
           { editMode && (
             <IconButton 
               title="delete parameter" 
-              style={{ margin: 0, position: 'absolute', top: '-38px', left: '-23px', zIndex: '999' }}
+              style={{ margin: 0, position: 'absolute', top: '-38px', left: '-23px', zIndex: '99' }}
               icon="delete" 
               onClick={ this.props.onDelete } 
             />

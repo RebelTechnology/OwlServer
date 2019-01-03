@@ -9,11 +9,17 @@ import {
   OWL_PROGRAM_MESSAGE_RECEIVED,
   STORE_PATCH_ON_DEVICE_REQUEST,
   STORE_PATCH_ON_DEVICE_ERROR,
-  STORE_PATCH_ON_DEVICE_SUCCESS
+  STORE_PATCH_ON_DEVICE_SUCCESS,
+  SELECT_MIDI_INPUT_PORT_SUCCESS,
+  SELECT_MIDI_OUTPUT_PORT_SUCCESS
 } from 'constants';
 
 const initialState = {
   isConnected: false,
+  midiInputs: null,
+  midiOutputs: null,
+  connectedMidiInputPort: null,
+  connectedMidiOutputPort: null,
   isRequesting: false,
   patchIsLoading: false,
   patchLoaded : false,
@@ -37,7 +43,21 @@ const owlState = (state = initialState, action) => {
       return {
         ...state,
         isRequesting: false,
-        isConnected: action.isConnected
+        isConnected: action.isConnected,
+        midiInputs: action.midiInputs,
+        midiOutputs: action.midiOutputs,
+        connectedMidiInputPort: action.connectedMidiInputPort,
+        connectedMidiOutputPort: action.connectedMidiOutputPort,
+      }
+    case SELECT_MIDI_INPUT_PORT_SUCCESS: 
+      return {
+        ...state,
+        connectedMidiInputPort: action.connectedMidiInputPort
+      }
+    case SELECT_MIDI_OUTPUT_PORT_SUCCESS: 
+      return {
+        ...state,
+        connectedMidiOutputPort: action.connectedMidiOutputPort
       }
     case BEGIN_LOAD_PATCH_ON_TO_OWL:
       return {

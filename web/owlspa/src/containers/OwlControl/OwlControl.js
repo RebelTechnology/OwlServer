@@ -13,6 +13,11 @@ class OwlControl extends Component {
   }
 
   loadAndRunPatchOnDevice(){
+    if(!this.props.patch){
+      alert('no patch specified');
+      return;
+    }
+
     if(navigator.requestMIDIAccess){
       this.props.loadAndRunPatchOnDevice(this.props.patch);
     } else {
@@ -21,6 +26,11 @@ class OwlControl extends Component {
   }
 
   handleStorePatchButtonClick(){
+    if(!this.props.patch){
+      alert('no patch specified');
+      return;
+    }
+
     if(navigator.requestMIDIAccess){
     
       const slot = parseInt(window.prompt('Enter a slot number from 0 to 40'));
@@ -38,11 +48,11 @@ class OwlControl extends Component {
   }
 
   render(){
-    const { owlState } = this.props;
+    const { owlState, storeButton, loadButton, style } = this.props;
     
     return (
-      <div className="owl-device-control">
-        { owlState.isConnected && ( 
+      <div className="owl-device-control" style={style}>
+        { loadButton && owlState.isConnected && ( 
           <button 
             onClick={() => this.loadAndRunPatchOnDevice()}
             disabled={owlState.patchIsLoading}>
@@ -51,7 +61,7 @@ class OwlControl extends Component {
           </button> 
         )}
 
-        { owlState.isConnected && ( 
+        { storeButton && owlState.isConnected && ( 
           <button 
             onClick={() => this.handleStorePatchButtonClick()}
             disabled={owlState.patchIsStoring}>
@@ -64,7 +74,7 @@ class OwlControl extends Component {
           <button 
             onClick={() => this.connectToOwl()}
             disabled={owlState.isConnecting}>
-              {owlState.isConnecting ? 'Connecting ... ' : 'Connect to OWL'}
+              {owlState.isConnecting ? 'Connecting ... ' : 'Connect to Device'}
               {owlState.isConnecting && <i className="loading-spinner"></i>}
           </button>
         )}
@@ -91,7 +101,10 @@ class OwlControl extends Component {
 }
 
 OwlControl.propTypes = {
-  patch: PropTypes.object.isRequired
+  patch: PropTypes.object,
+  storeButton: PropTypes.bool,
+  loadButton: PropTypes.bool,
+  style: PropTypes.object
 }
 
 const mapStateToProps = ({ owlState }) => {

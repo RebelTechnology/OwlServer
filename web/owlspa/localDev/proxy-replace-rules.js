@@ -2,12 +2,16 @@ module.exports = [
 
   // 1. replace single file with local one
   {
-    pattern: 'www.rebeltech.org/wp-content/themes/shopkeeper-child/page-patch-library/js/bundle.js.map',      // Match url you wanna replace
+    pattern: 'rebeltech.org/wp-content/themes/shopkeeper-child/page-patch-library/js/bundle.js.map',      // Match url you wanna replace
     responder:  "/Users/sirg/Documents/test/OwlServer/web/wordpress/wp-content/themes/shopkeeper-child/page-patch-library/js/bundle.js.map"
   },
   {
-    pattern: 'www.rebeltech.org/wp-content/themes/shopkeeper-child/page-patch-library/js/bundle.js',      // Match url you wanna replace
+    pattern: 'rebeltech.org/wp-content/themes/shopkeeper-child/page-patch-library/js/bundle.js',      // Match url you wanna replace
     responder:  "/Users/sirg/Documents/test/OwlServer/web/wordpress/wp-content/themes/shopkeeper-child/page-patch-library/js/bundle.js"
+  },
+  {
+    pattern: 'rebeltech.org/wp-content/themes/shopkeeper-child/page-patch-library/css',      // Match url you wanna replace
+    responder:  "/Users/sirg/Documents/test/OwlServer/web/wordpress/wp-content/themes/shopkeeper-child/page-patch-library/css"
   },
 
   // 2. replace single file with web file

@@ -30,6 +30,8 @@ export resetPatchJavaScriptFile from './resetPatchJavaScriptFile';
 export resetPatchListSubFilter from './resetPatchListSubFilter';
 export resetWebAudioPatch from './resetWebAudioPatch';
 export resetWebAudioPatchParameters from './resetWebAudioPatchParameters';
+export selectMidiInput from './selectMidiInput';
+export selectMidiOutput from './selectMidiOutput';
 export serverCreateOrUpdatePatch from './serverCreateOrUpdatePatch';
 export serverSavePatchFiles from './serverSavePatchFiles';
 export serverAddPatchStar from './serverAddPatchStar';

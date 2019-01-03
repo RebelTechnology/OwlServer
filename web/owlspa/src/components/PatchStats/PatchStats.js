@@ -50,7 +50,7 @@ class PatchStats extends Component {
 
   handleTagFilterInputClick(){
     this.setState({
-      showTagsDropDown: true
+      showTagsDropDown: !this.state.showTagsDropDown
     });
   }
 
