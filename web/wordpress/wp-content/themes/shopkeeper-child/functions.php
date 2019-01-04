@@ -58,9 +58,9 @@
   }
   add_filter( 'login_headertitle', 'login_logo_url_title' );
 
-  function add_link_to_woocommerce_my_account_page_menu( $menu_links ){
-      $new = array( 'patch-library/patches/my-patches' => 'My Patches' );
+  function add_my_patches_link_to_woocommerce_my_account_page_menu( $menu_links ){
+      $new = array( '/patch-library/patches/my-patches' => 'My Patches' );
       return array_slice( $menu_links, 0, 1, true ) + $new + array_slice( $menu_links, 1, NULL, true );
   }
 
-  add_filter ( 'woocommerce_account_menu_items', 'add_link_to_woocommerce_my_account_page_menu' );
+  add_filter ( 'woocommerce_account_menu_items', 'add_my_patches_link_to_woocommerce_my_account_page_menu' );
