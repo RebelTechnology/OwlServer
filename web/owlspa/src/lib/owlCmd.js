@@ -45,8 +45,8 @@ function registerPatch(idx, name){
 
 function systemExclusive(data) {
     if(data.length > 3 && data[0] == 0xf0
-       && data[1] == MIDI_SYSEX_MANUFACTURER
-       && data[2] == MIDI_SYSEX_DEVICE){
+       && data[1] == MIDI_SYSEX_MANUFACTURER){
+       // && data[2] == MIDI_SYSEX_DEVICE){
     // console.log("sysex: 0x"+data[3].toString(16)+" length: "+data.length);
     switch(data[3]){
         case OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND:
