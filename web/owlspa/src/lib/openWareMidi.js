@@ -1,5 +1,6 @@
 export const MIDI_SYSEX_MANUFACTURER        = 0x7d;     /* Educational or development use only */
-export const MIDI_SYSEX_DEVICE              = 0x52;     /* OWL Open Ware Laboratory */
+export const MIDI_SYSEX_OMNI_DEVICE         = 0x52;     /* OWL Open Ware Laboratory */
+export const MIDI_SYSEX_OWL_DEVICE          = 0x20;
 
 export const SYSEX_CONFIGURATION_AUDIO_RATE           = "FS"
 export const SYSEX_CONFIGURATION_AUDIO_WIDTH          = "WH"
@@ -14,10 +15,15 @@ export const OpenWareMidiSysexCommand = {
   SYSEX_PRESET_NAME_COMMAND       : 0x01,
   SYSEX_PARAMETER_NAME_COMMAND    : 0x02,
   SYSEX_CONFIGURATION_COMMAND     : 0x03,
-  SYSEX_DFU_COMMAND               : 0x7e,
+  SYSEX_DEVICE_RESET_COMMAND      : 0x7d,
+  SYSEX_BOOTLOADER_COMMAND        : 0x7e,
   SYSEX_FIRMWARE_UPLOAD           : 0x10,
   SYSEX_FIRMWARE_STORE            : 0x11,
   SYSEX_FIRMWARE_RUN              : 0x12,
+  SYSEX_FIRMWARE_FLASH            : 0x13,
+  SYSEX_FLASH_ERASE               : 0x14,
+  SYSEX_SETTINGS_RESET            : 0x15,
+  SYSEX_SETTINGS_STORE            : 0x16,
   SYSEX_FIRMWARE_VERSION          : 0x20,
   SYSEX_DEVICE_ID                 : 0x21,
   SYSEX_PROGRAM_MESSAGE           : 0x22,
