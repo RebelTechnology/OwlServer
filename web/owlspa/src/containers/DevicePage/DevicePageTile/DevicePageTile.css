@@ -9,8 +9,8 @@
   font-family: 'Ubuntu', sans-serif;
   font-size: 14px;
   line-height: 14px;
+  margin-left: 0;
   margin-bottom: 10px;
-  margin-top: 20px;
   padding: 20px;
   padding-bottom: 10px;
   width: 100%;
@@ -60,6 +60,10 @@
     margin-left: 2%;
     margin-top: 0px;
     width: 32%;
+  }
+
+  .device-page-tile:first-child {
+    margin-left: 0;
   }
 }
 
