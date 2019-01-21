@@ -7,7 +7,9 @@
 import * as openWareMidi from './openWareMidi';
 import { API_END_POINT } from 'constants';
 import {
-    owlDispatchPresetChange,
+    deviceDispatchPresetReceived,
+    deviceDispatchDeviceUUIDReceived,
+    deviceDispatchProgramChange,
     owlDispatchPatchStatus,
     owlDispatchFirmWareVersion,
     owlDispatchProgramMessage
@@ -15,7 +17,7 @@ import {
 
 const {
     MIDI_SYSEX_MANUFACTURER,
-    MIDI_SYSEX_DEVICE,
+    MIDI_SYSEX_OMNI_DEVICE,
     OpenWareMidiSysexCommand,
     OpenWareMidiControl
 } = openWareMidi;
@@ -35,27 +37,17 @@ function getStringFromSysex(data, startOffset, endOffset){
   return str;
 }
 
-function sendCommand(cmd){
-    sendSysexCommand(cmd);
-}
-
-function registerPatch(idx, name){
-    //$('#patchnames').append($("<option>").attr('value',idx).text(name));
-}
-
 function systemExclusive(data) {
     if(data.length > 3 && data[0] == 0xf0
        && data[1] == MIDI_SYSEX_MANUFACTURER){
-       // && data[2] == MIDI_SYSEX_DEVICE){
+       // && data[2] == MIDI_SYSEX_OMNI_DEVICE){
     // console.log("sysex: 0x"+data[3].toString(16)+" length: "+data.length);
     switch(data[3]){
         case OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND:
             var name = getStringFromSysex(data, 5, 1);
-            var idx = data[4];
-
-            // registerPatch(idx, name);
-            owlDispatchPresetChange({preset:idx,name:name});   
-            console.log("preset "+idx+": "+name);
+            var slot = data[4];
+            deviceDispatchPresetReceived({ slot, name });   
+            console.log("preset received: " + slot + ": " + name);
             break;
         case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
             var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
@@ -77,6 +69,11 @@ function systemExclusive(data) {
             var msg = getStringFromSysex(data, 4, 1);
             owlDispatchProgramMessage(msg)
             console.log('PROGRAM MESSAGE: ',msg);
+            break;
+        case OpenWareMidiSysexCommand.SYSEX_DEVICE_ID:
+            var msg = getStringFromSysex(data, 4, 1);
+            deviceDispatchDeviceUUIDReceived(msg);
+            console.log('DEVICE UUID: ', msg);
             break;
         case OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS:
         default:
@@ -105,10 +102,8 @@ function controlChange(cc, value){
 }
 
 function programChange(pc){
-    console.log("received PC "+pc);
-    //var name = $("#patchnames option:eq("+pc+")").text();
-    console.log("patch name "+name);
-    //$("#patchname").text(name);               
+    console.log("received PC " + pc);
+    deviceDispatchProgramChange(pc);
 }
 
 
@@ -137,18 +132,6 @@ function clearPollRequestTimeout(){
 function setParameter(pid, value){
     console.log("parameter "+pid+": "+value);
     sendCc(OpenWareMidiControl.PATCH_PARAMETER_A+pid, value);
-}
-
-function selectOwlPatch(pid){
-    var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
-
-    console.log("select patch "+pid);
-
-    for(var i=0; i<5; ++i) {
-        $("#p"+i).text(""); // clear the prototype slider names
-    }
-    
-    sendPc(pid);
 }
 
 function sendLoadRequest(){
@@ -240,7 +223,7 @@ function storeProgramInDeviceSlot(slot){
 
         console.log("sending sysex STORE command");
         var msg = [
-            0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE,
+            0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE,
             OpenWareMidiSysexCommand.SYSEX_FIRMWARE_STORE, 0, 0, 0, 0, slot, 0xf7
         ];
 
@@ -252,6 +235,22 @@ function storeProgramInDeviceSlot(slot){
             reject(new Error('failed to store in slot: ' + slot));
         }
     });
+}
+
+function resetDevice(){
+    HoxtonOwl.midiClient.sendSysexCommand(OpenWareMidiSysexCommand.SYSEX_DEVICE_RESET_COMMAND);
+}
+
+function eraseDeviceStorage(){
+    HoxtonOwl.midiClient.sendSysexCommand(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE);
+}
+
+function showDeviceUUID(){
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID)
+}
+
+const setDeviceActivePresetSlot = slot => {
+    HoxtonOwl.midiClient.sendProgramChange(slot)
 }
 
 function chunkData(data){
@@ -291,7 +290,7 @@ function sendDataChunks(index, chunks, resolve){
 function sendProgramRun(){
     console.log("sending sysex RUN command");
     var msg = [
-        0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, 
+        0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE, 
         OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7
     ];
     HoxtonOwl.midiClient.logMidiData(msg);
@@ -363,9 +362,8 @@ HoxtonOwl.midiClient = {
     },
 
     logMidiData: function(data){
-      var arr = [];
-      for(var i=0; i<data.length; i++) arr.push((data[i]<16 ? '0' : '') + data[i].toString(16));
-      // console.log('MIDI:', arr.join(' '));
+      const arr = data.map(item => (item<16 ? '0' : '') + (item && item.toString(16)));
+      console.log('MIDI:', arr.join(' '));
     },
 
     onMIDIInit: function(midi, options) {
@@ -468,17 +466,17 @@ HoxtonOwl.midiClient = {
         }
     },
 
-    sendPc: function(value) {
+    sendProgramChange: function(value) {
         console.log("sending PC "+value);
-        if(midiOutput)
-          midiOutput.send([0xC0, value], 0);
+        if(HoxtonOwl.midiClient.midiOutput){
+          HoxtonOwl.midiClient.midiOutput.send([0xC0, value], 0);
+        }
     },
 
     sendCc: function(cc, value) {
         console.log("sending CC "+cc+"/"+value);
-        if(this.midiOutput)
-        {
-          this.midiOutput.send([0xB0, cc, value], 0);            
+        if(HoxtonOwl.midiClient.midiOutput){
+          HoxtonOwl.midiClient.midiOutput.send([0xB0, cc, value], 0);            
         }
     },
 
@@ -496,34 +494,12 @@ HoxtonOwl.midiClient = {
         }
     },
 
-    // function sendSysexMessage(msg) {
-    //     console.log("sending sysex msg "+msg);
-    //     var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE ];
-    //     msg.push.apply(msg, data.split(''));
-    //     msg.push(0xf7);
-    //     logMidiData(msg);
-    //     if(midiOutput)
-    //       midiOutput.send(msg, 0);
-    // }
-
     sendSysexCommand: function(cmd) {
         console.log("sending sysex command 0x"+cmd.toString(16));
-        var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, cmd, 0xf7 ];
-        logMidiData(msg);
-        if(midiOutput)
-          midiOutput.send(msg, 0);
-    },
-
-    sendSysexData: function(cmd, data) {
-        console.log("sending sysex data");
-        var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_DEVICE, cmd ];
-        for(var i=0; i<data.length; ++i)
-        msg.push(data.charCodeAt(i));
-        // msg.push.apply(msg, data);
-        msg.push(0xf7);
-        logMidiData(msg);
-        if(midiOutput)
-          midiOutput.send(msg, 0);
+        var msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE, cmd, 0xf7 ];
+        HoxtonOwl.midiClient.logMidiData(msg);
+        if(HoxtonOwl.midiClient.midiOutput)
+          HoxtonOwl.midiClient.midiOutput.send(msg, 0);
     },
 
     initialiseMidi: function(callback){
@@ -540,12 +516,16 @@ HoxtonOwl.midiClient = {
 
 export default {
     connectToOwl,
+    eraseDeviceStorage,
     loadAndRunPatchOnDevice,
-    storePatchInDeviceSlot,
+    resetDevice,
+    sendNoteOff: HoxtonOwl.midiClient.sendNoteOff,
+    sendNoteOn: HoxtonOwl.midiClient.sendNoteOn,
+    selectMidiInput: HoxtonOwl.midiClient.selectMidiInput,
+    selectMidiOutput: HoxtonOwl.midiClient.selectMidiOutput,
     startPollingOwlStatus: pollOwlStatus,
     stopPollingOwlStatus: clearPollRequestTimeout,
-    sendNoteOn: HoxtonOwl.midiClient.sendNoteOn,
-    sendNoteOff: HoxtonOwl.midiClient.sendNoteOff,
-    selectMidiInput: HoxtonOwl.midiClient.selectMidiInput,
-    selectMidiOutput: HoxtonOwl.midiClient.selectMidiOutput
+    setDeviceActivePresetSlot,
+    showDeviceUUID,
+    storePatchInDeviceSlot
 }

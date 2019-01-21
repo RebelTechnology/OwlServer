@@ -3,7 +3,9 @@ import {
   RECEIVE_CONNECTION_FROM_OWL,
   BEGIN_LOAD_PATCH_ON_TO_OWL,
   COMPLETE_LOAD_PATCH_ON_TO_OWL,
-  OWL_PRESET_CHANGE,
+  DEVICE_PRESET_RECEIVED,
+  DEVICE_PROGRAM_CHANGE,
+  DEVICE_UUID_RECEIVED,
   OWL_FIRMWARE_VERSION_RECEIVED,
   OWL_PATCH_STATUS_RECEIVED,
   OWL_PROGRAM_MESSAGE_RECEIVED,
@@ -25,10 +27,12 @@ const initialState = {
   patchLoaded : false,
   patchIsStoring: false,
   patchStoredSuccess: false,
-  loadedPatchName: null,
+  activePresetSlot: null,
   firmWareVersion: null,
   status: null,
-  programMessage: null
+  programMessage: null,
+  presets: [],
+  uuid: null
 };
 
 const owlState = (state = initialState, action) => {
@@ -89,11 +93,24 @@ const owlState = (state = initialState, action) => {
         patchIsStoring: false,
         patchStoredSuccess: true
       };
-    case OWL_PRESET_CHANGE:
+    case DEVICE_PROGRAM_CHANGE:
       return {
         ...state,
-        loadedPatchName : action.name
+        activePresetSlot : action.slot
       }
+    case DEVICE_PRESET_RECEIVED:
+      return {
+        ...state,
+        presets: [
+          ...state.presets.filter(preset => preset.slot !== action.slot),
+          { name: action.name, slot: action.slot }
+        ]
+      };
+    case DEVICE_UUID_RECEIVED:
+      return {
+        ...state,
+        uuid: action.uuid
+      };
     case OWL_FIRMWARE_VERSION_RECEIVED:
       return {
         ...state,
