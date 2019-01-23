@@ -139,6 +139,10 @@ function sendLoadRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
 }
 
+function requestDevicePresets(){
+    sendRequest(0x7f);
+}
+
 function onMidiInitialised(callback){
 
     // auto set the input and output to an OWL
@@ -243,6 +247,10 @@ function resetDevice(){
 
 function eraseDeviceStorage(){
     HoxtonOwl.midiClient.sendSysexCommand(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE);
+}
+
+function deleteDevicePresetFromSlot(slot){
+    HoxtonOwl.midiClient.sendSysexData(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE, [0, 0, 0, 0, slot])
 }
 
 function showDeviceUUID(){
@@ -502,6 +510,15 @@ HoxtonOwl.midiClient = {
           HoxtonOwl.midiClient.midiOutput.send(msg, 0);
     },
 
+    sendSysexData: function(cmd, data) {
+        console.log("sending sysex data");
+        const msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE, cmd, ...data, 0xf7 ];
+        HoxtonOwl.midiClient.logMidiData(msg);
+        if(HoxtonOwl.midiClient.midiOutput){
+          HoxtonOwl.midiClient.midiOutput.send(msg, 0);
+        }
+    },
+
     initialiseMidi: function(callback){
         HoxtonOwl.midiClient.midiInitialisedCallback = callback;
         var options = { sysex: true };
@@ -517,8 +534,10 @@ HoxtonOwl.midiClient = {
 export default {
     connectToOwl,
     eraseDeviceStorage,
+    deleteDevicePresetFromSlot,
     loadAndRunPatchOnDevice,
     resetDevice,
+    requestDevicePresets,
     sendNoteOff: HoxtonOwl.midiClient.sendNoteOff,
     sendNoteOn: HoxtonOwl.midiClient.sendNoteOn,
     selectMidiInput: HoxtonOwl.midiClient.selectMidiInput,

@@ -1,14 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import CSSModules from 'react-css-modules';
-import { setDeviceActivePresetSlot } from 'actions';
+import { deleteDevicePresetFromSlot, setDeviceActivePresetSlot } from 'actions';
 import styles from './PresetList.css';
 import { IconButton } from 'components';
 
 class PresetList extends Component {
 
   handleDeleteClick(slot){
-    console.log('delete clicked slot:', slot);
+    if(window.confirm(`Confirm delete preset in slot ${slot} ?`)){
+      this.props.deleteDevicePresetFromSlot(slot);
+    }
   }
 
   handleSelectPresetSlot(slot){
@@ -43,20 +45,27 @@ class PresetList extends Component {
                 { sortedPresets.map((preset, i) => {
                     
                     const isActive = preset.slot === activePresetSlot;
+                    const isRamSlot = preset.slot === 0;
 
                     return (
                       <tr key={i} className={isActive ? styles['is-active'] : null } style={{fontWeight: isActive ? 'bold': 'normal' }}>
-                        <td>{preset.slot}</td>
+                        <td>{ isRamSlot ? 'RAM Slot' : preset.slot }</td>
                         <td>{preset.name}</td>
-                        <td>{isActive ? 'Selected' : <button onClick={() => this.handleSelectPresetSlot(i) }>Select</button>}</td>
-                        <td>
-                          <IconButton 
-                            style={{ padding: '0 4px', marginBottom: '3px' }}
-                            title="Delete Preset" 
-                            icon="delete"
-                            onClick={() => this.handleDeleteClick(i)} 
-                          />
-                        </td>
+                        {isRamSlot && <td></td>}
+                        {isRamSlot && <td></td>}
+                        {!isRamSlot && (
+                          <td>{isActive ? 'Selected' : <button onClick={() => this.handleSelectPresetSlot(preset.slot) }>Select</button>}</td>
+                        )}
+                        {!isRamSlot && (
+                          <td>
+                            <IconButton 
+                              style={{ padding: '0 4px', marginBottom: '3px' }}
+                              title="Delete Preset" 
+                              icon="delete"
+                              onClick={() => this.handleDeleteClick(preset.slot)} 
+                            />
+                          </td>
+                        )}
                       </tr>
                     );
                   }
@@ -86,4 +95,4 @@ const mapStateToProps = ({
   }
 }
 
-export default connect(mapStateToProps, { setDeviceActivePresetSlot })(CSSModules(PresetList, styles));
+export default connect(mapStateToProps, { setDeviceActivePresetSlot, deleteDevicePresetFromSlot })(CSSModules(PresetList, styles));

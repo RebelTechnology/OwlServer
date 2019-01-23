@@ -21,6 +21,7 @@ const connectToOwl = () => {
         connectedMidiOutputPort,
       });
       owlCmd.startPollingOwlStatus();
+      owlCmd.requestDevicePresets();
     }, 
     (err) => {
       dispatch({

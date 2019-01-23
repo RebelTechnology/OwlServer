@@ -2,6 +2,7 @@ import {
   REQUEST_CONNECT_TO_OWL,
   RECEIVE_CONNECTION_FROM_OWL,
   BEGIN_LOAD_PATCH_ON_TO_OWL,
+  CLEAR_PRESET_LIST,
   COMPLETE_LOAD_PATCH_ON_TO_OWL,
   DEVICE_PRESET_RECEIVED,
   DEVICE_PROGRAM_CHANGE,
@@ -97,6 +98,12 @@ const owlState = (state = initialState, action) => {
       return {
         ...state,
         activePresetSlot : action.slot
+      }
+    case CLEAR_PRESET_LIST:
+      return {
+        ...state,
+        presets: [],
+        activePresetSlot: null
       }
     case DEVICE_PRESET_RECEIVED:
       return {

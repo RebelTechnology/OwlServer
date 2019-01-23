@@ -25,7 +25,7 @@
 }
 
 .preset-list th:first-child, .preset-list td:first-child {
-  width: 100px;
+  width: 150px;
   text-align: center;
   color: #e19758;
 }

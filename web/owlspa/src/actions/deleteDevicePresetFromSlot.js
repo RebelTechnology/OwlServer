@@ -3,20 +3,18 @@ import {
   CLEAR_PRESET_LIST
 } from 'constants';
 
-const resetDevice = () => {
+const deleteDevicePresetFromSlot = slot => {
   return (dispatch) => {
-    
     dispatch({
       type: CLEAR_PRESET_LIST
     });
-
-    owlCmd.resetDevice();
-
+    
+    owlCmd.deleteDevicePresetFromSlot(slot);
+    
     window.setTimeout(() => {
       owlCmd.requestDevicePresets();
     }, 1000);
-    
   }
 }
 
-export default resetDevice;
+export default deleteDevicePresetFromSlot;
