@@ -35,7 +35,7 @@
 }
 
 .parameter-io-dropdown {
-    z-index: 999;
+    z-index: 99;
     width: 85px;
     position: absolute;
     top: -39px;
@@ -44,7 +44,7 @@
 }
 
 .parameter-id-dropdown {
-    z-index: 999;
+    z-index: 99;
     width: 163px;
     position: absolute;
     bottom: -71px;

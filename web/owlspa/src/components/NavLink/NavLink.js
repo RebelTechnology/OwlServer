@@ -11,11 +11,12 @@ class NavLink extends Component {
     return location.pathname.indexOf(target) > -1;
   }
   render(){
-    const { target, children, icon } = this.props;
+    const { target, children, icon, onClick } = this.props;
     return (
       <Link 
         to={target} 
         styleName="nav-link"
+        onClick={ onClick }
         style={{
           opacity: this.isActiveLink() ? 1 : 0.5
         }}
@@ -32,6 +33,10 @@ NavLink.propTypes = {
   children: PropTypes.node,
   target: PropTypes.string.isRequired,
   className: PropTypes.string
+};
+
+NavLink.defaultProps = {
+  onClick: () => {}
 };
 
 export default  CSSModules(NavLink, styles);

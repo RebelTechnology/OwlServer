@@ -11,12 +11,17 @@ const connectToOwl = () => {
       type: REQUEST_CONNECT_TO_OWL
     });
 
-    return owlCmd.connectToOwl().then(result => {
+    return owlCmd.connectToOwl().then(({ isConnected, midiInputs, midiOutputs, connectedMidiInputPort, connectedMidiOutputPort }) => {
       dispatch({
         type: RECEIVE_CONNECTION_FROM_OWL,
-        isConnected: result.isConnected
+        isConnected,
+        midiInputs,
+        midiOutputs,
+        connectedMidiInputPort,
+        connectedMidiOutputPort,
       });
       owlCmd.startPollingOwlStatus();
+      owlCmd.requestDevicePresets();
     }, 
     (err) => {
       dispatch({

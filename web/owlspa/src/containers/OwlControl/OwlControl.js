@@ -13,6 +13,11 @@ class OwlControl extends Component {
   }
 
   loadAndRunPatchOnDevice(){
+    if(!this.props.patch){
+      alert('no patch specified');
+      return;
+    }
+
     if(navigator.requestMIDIAccess){
       this.props.loadAndRunPatchOnDevice(this.props.patch);
     } else {
@@ -21,6 +26,11 @@ class OwlControl extends Component {
   }
 
   handleStorePatchButtonClick(){
+    if(!this.props.patch){
+      alert('no patch specified');
+      return;
+    }
+
     if(navigator.requestMIDIAccess){
     
       const slot = parseInt(window.prompt('Enter a slot number from 0 to 40'));
@@ -38,42 +48,57 @@ class OwlControl extends Component {
   }
 
   render(){
-    const { owlState } = this.props;
-    
+    const { owlState, storeButton, loadButton, style } = this.props;
+
+    const {
+      firmWareVersion,
+      status,
+      programMessage,
+      isConnecting,
+      isConnected,
+      patchIsLoading,
+      patchIsStoring,
+      presets,
+      activePresetSlot
+    } = owlState;
+
+    const loadedPreset = presets.length && presets.find(preset => preset.slot === activePresetSlot);
+    const loadedPatchName = !!loadedPreset && loadedPreset.name;
+
     return (
-      <div className="owl-device-control">
-        { owlState.isConnected && ( 
+      <div className="owl-device-control" style={style}>
+        { loadButton && isConnected && ( 
           <button 
             onClick={() => this.loadAndRunPatchOnDevice()}
-            disabled={owlState.patchIsLoading}>
-            {owlState.patchIsLoading ? 'Loading ... ' : 'Load'}
-            {owlState.patchIsLoading && <i className="loading-spinner"></i> }
+            disabled={patchIsLoading}>
+            {patchIsLoading ? 'Loading ... ' : 'Load'}
+            {patchIsLoading && <i className="loading-spinner"></i> }
           </button> 
         )}
 
-        { owlState.isConnected && ( 
+        { storeButton && isConnected && ( 
           <button 
             onClick={() => this.handleStorePatchButtonClick()}
-            disabled={owlState.patchIsStoring}>
-            {owlState.patchIsStoring ? 'Storing ... ' : 'Store'}
-            {owlState.patchIsStoring && <i className="loading-spinner"></i> }
+            disabled={patchIsStoring}>
+            {patchIsStoring ? 'Storing ... ' : 'Store'}
+            {patchIsStoring && <i className="loading-spinner"></i> }
           </button> 
         )}
 
-        { !owlState.isConnected && (
+        { !isConnected && (
           <button 
             onClick={() => this.connectToOwl()}
-            disabled={owlState.isConnecting}>
-              {owlState.isConnecting ? 'Connecting ... ' : 'Connect to OWL'}
-              {owlState.isConnecting && <i className="loading-spinner"></i>}
+            disabled={isConnecting}>
+              {isConnecting ? 'Connecting ... ' : 'Connect to Device'}
+              {isConnecting && <i className="loading-spinner"></i>}
           </button>
         )}
 
         <div className="owl-device-stats">
-          {owlState.loadedPatchName && (<p><span>Loaded Patch:</span> {owlState.loadedPatchName}</p>)}
-          {owlState.firmWareVersion && (<p><span>Connected to:</span> {owlState.firmWareVersion}</p>)}
-          {owlState.status && (<p>{owlState.status}</p>)}
-          {owlState.programMessage && (<p><span>Message:</span> {owlState.programMessage}</p>)}
+          {loadedPatchName && (<p><span>Loaded Patch:</span> {loadedPatchName}</p>)}
+          {firmWareVersion && (<p><span>Connected to:</span> {firmWareVersion}</p>)}
+          {status && (<p>{status}</p>)}
+          {programMessage && (<p><span>Message:</span> {programMessage}</p>)}
         </div>
       </div>
     );
@@ -91,7 +116,10 @@ class OwlControl extends Component {
 }
 
 OwlControl.propTypes = {
-  patch: PropTypes.object.isRequired
+  patch: PropTypes.object,
+  storeButton: PropTypes.bool,
+  loadButton: PropTypes.bool,
+  style: PropTypes.object
 }
 
 const mapStateToProps = ({ owlState }) => {

@@ -60,7 +60,7 @@
     "es6-promise": "^3.2.1",
     "file-loader": "^0.10.1",
     "history": "^2.1.2",
-    "pd-fileutils": "^0.3.5",
+    "pd-fileutils": "https://github.com/goozo/pd-fileutils/tarball/master",
     "react": "^15.4.2",
     "react-ace": "^3.6.0",
     "react-dom": "^15.4.2",

@@ -291,7 +291,7 @@ class PatchPreview extends Component {
           ) : null}
         </div>
 
-        <OwlControl patch={patch} />
+        <OwlControl patch={patch} storeButton loadButton />
 
         { (webAudioPatch.isReady || owlState.isConnected) && (
           <button
