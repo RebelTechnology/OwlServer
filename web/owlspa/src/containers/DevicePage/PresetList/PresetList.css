@@ -16,6 +16,10 @@
   margin: 1px;
 }
 
+.preset-list th {
+  font-size: 19px !important;
+}
+
 .preset-list tr {
   height: 50px;
 }
@@ -39,6 +43,7 @@
   color: #fff;
   text-align: center;
   border-bottom: 1px solid #fff;
+  font-size: 16px;
 }
 
 .preset-list button {

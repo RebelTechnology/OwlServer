@@ -140,7 +140,8 @@ function sendLoadRequest(){
 }
 
 function requestDevicePresets(){
-    sendRequest(0x7f);
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
 }
 
 function onMidiInitialised(callback){

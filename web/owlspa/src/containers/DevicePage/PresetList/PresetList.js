@@ -49,7 +49,7 @@ class PresetList extends Component {
 
                     return (
                       <tr key={i} className={isActive ? styles['is-active'] : null } style={{fontWeight: isActive ? 'bold': 'normal' }}>
-                        <td>{ isRamSlot ? 'RAM Slot' : preset.slot }</td>
+                        <td>{ isRamSlot ? 'RAM' : preset.slot }</td>
                         <td>{preset.name}</td>
                         {isRamSlot && <td></td>}
                         {isRamSlot && <td></td>}
