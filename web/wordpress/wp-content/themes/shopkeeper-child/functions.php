@@ -36,8 +36,8 @@
     array('jquery'),
     '1.0' );
 
-    wp_register_style( 'spa_css', get_template_directory_uri().'-child/page-patch-library/css/owlspa.css', '', '1.0', 'screen' );
-    wp_register_style( 'legacy-app-style', get_template_directory_uri().'-child/page-patch-library/css/app-style.css', '', '1.0.0', 'screen' );
+    wp_register_style( 'spa_css', get_template_directory_uri().'-child/page-patch-library/css/owlspa.css', '', '2.0.1', 'screen' );
+    wp_register_style( 'legacy-app-style', get_template_directory_uri().'-child/page-patch-library/css/app-style.css', '', '2.0.1', 'screen' );
   }
 
   add_action('wp_enqueue_scripts', 'registerSpaScripts');
