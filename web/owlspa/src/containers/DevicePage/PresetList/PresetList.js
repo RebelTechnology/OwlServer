@@ -58,12 +58,12 @@ class PresetList extends Component {
                         )}
                         {!isRamSlot && (
                           <td>
-                            <IconButton 
+                            {/* <IconButton 
                               style={{ padding: '0 4px', marginBottom: '3px' }}
                               title="Delete Preset" 
                               icon="delete"
                               onClick={() => this.handleDeleteClick(preset.slot)} 
-                            />
+                            /> */}
                           </td>
                         )}
                       </tr>
