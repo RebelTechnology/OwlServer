@@ -1,3 +1,7 @@
+// uses nproxy https://github.com/goddyZhao/nproxy
+// nproxy -l proxy-replace-rules.js 
+// in chrome point auto proxy config to file url for proxy.pac: file:///  ...path_to.../owlspa/localDev/proxy.pac
+
 module.exports = [
 
   // 1. replace single file with local one
