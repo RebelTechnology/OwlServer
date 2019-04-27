@@ -177,37 +177,28 @@ const buildHeavy = (patch) => {
       const mainFilename = getFilename(patch.github[0]);
       const parametersString = getHeavyBuildSciptParametersStringFromPatch(patch.parameters);
 
-      const cmdVars = `PATCHNAME="${patch.name}" SOURCE_DIR="${sourceDir}" BUILD_DIR="${buildDir}" TARGET_DIR="${targetDir}" MAIN_FILENAME="${mainFilename}" ${parametersString}`;
+      const cmdVars = `PATCHNAME="${patch.name}" SOURCE_DIR="${sourceDir}" BUILD_DIR="${buildDir}" MAIN_FILENAME="${mainFilename}" ${parametersString}`;
       const cmd = `${cmdVars} sh ${config.patchBuilder.heavyBuildScriptPath}`;
 
       process.stdout.write(`executing command: ${cmd} \n`);
 
       return exec(cmd)
         .then( ({ stdout, stderr }) => {
+          return copyFile(`${buildDir}/patch.zip`, `${targetDir}/${patch.seoName}.zip`)
+            .then(() => {
+              del.sync(buildDir, { force: true });
+              return { stdout, stderr, success: true };
+            })
+            .catch(err => {
+              process.stderr.write('failed to copy patch.zip or delete the build dir\n');
+              process.stderr.write(err + '\n');
 
-          return new Promise((resolve, reject) => {
-
-            const renameFileFrom = `${targetDir}/patch.zip`;
-            const renameFileTo = `${targetDir}/${patch.seoName}.zip`;
-            fs.rename(renameFileFrom, renameFileTo, err => {
-              if(err){
-                reject(err);
-              } else {
-                resolve({ stdout, stderr, success: true });
-              }
+              return {
+                success: false,
+                stdout,
+                stderr: err.toString()
+              };
             });
-          }).catch(err => {
-            
-            process.stderr.write('buildHeavy failed to rename patch.zip \n');
-            process.stderr.write(err + '\n');
-
-            return {
-              success: false,
-              stdout,
-              stderr: err.toString()
-            };
-          });
-
         })
         .catch( ({ stdout, stderr }) => {
           return {
