@@ -273,7 +273,7 @@ class PatchPreview extends Component {
             editMode={editMode}
             onChangeParameters={params => this.props.onChangeParameters(params)}
             isSaving={isSaving}
-            parameters=[parameters]
+            parameters={parameters} 
           />
         </div>
 

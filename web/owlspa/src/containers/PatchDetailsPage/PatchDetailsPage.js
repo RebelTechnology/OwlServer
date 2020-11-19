@@ -366,7 +366,7 @@ class PatchDetailsPage extends Component {
               onCompileClick={(e) => this.handleCompileClick(e,patch)} 
               editMode={editMode} 
               isSaving={patchDetails.isSaving}
-              parameters=[parameters]
+              parameters={parameters}
               onChangeParameters={parameters => this.handleChangeParameters(parameters)}
               patch={patch} />
 
