@@ -19,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/pingdynasty/OwlServer/issues"
   },
-  "homepage": "https://github.com/pingdynasty/OwlServer/web/owlspa/#readme",
+  "homepage": "https://github.com/pingdynasty/OwlServer/tree/master/web/owlspa#readme",
   "devDependencies": {
     "babel-core": "^6.24.0",
     "babel-loader": "^6.4.0",
@@ -30,6 +30,7 @@
     "brace": "^0.8.0",
     "chai": "^3.5.0",
     "css-loader": "^0.26.4",
+    "del": "^6.0.0",
     "enzyme": "^2.7.1",
     "exports-loader": "^0.6.4",
     "extract-text-webpack-plugin": "^1.0.1",
