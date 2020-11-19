@@ -69,7 +69,6 @@ cp $DIR/$CLONE_DIR/web/scripts/deployment/deploy-api.sh $DIR/
 # Set privileges
 echo "Setting up permissions..."
 chown -R root $DIR/../api
-chgrp -R hoxtonowl $DIR/../api
 find $DIR/../api -type f -exec chmod 664 '{}' \;
 find $DIR/../api -type d -exec chmod 775 '{}' \;
 find $DIR/../api -type d -exec chmod g+s '{}' \;
