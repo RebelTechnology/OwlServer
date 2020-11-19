@@ -45,24 +45,21 @@ class DevicePage extends Component {
               <div>
                 <OwlControl />
                 <MidiPortSelector />
+               {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>UUID: {uuid}</div>}
               </div>
             </DevicePageTile>
 
             { isConnected && ( 
               <DevicePageTile title="Device Commands">
                 <div>
-                  {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>UUID: {uuid}</div>}
-                  <button onClick={() => this.handleShowUUIDClick() }>
-                    Show UUID
+                  <button onClick={() => this.handleGetPatchesClick() }>
+                    Get Patches
                   </button>
                   <button onClick={() => this.handleEraseStorageClick() }>
                     Erase Storage
                   </button>
                   <button onClick={() => this.handleResetDeviceClick() }>
                     Reset Device
-                  </button>
-                  <button onClick={() => this.handleGetPatchesClick() }>
-                    Get Patches
                   </button>
                 </div>
               </DevicePageTile>
