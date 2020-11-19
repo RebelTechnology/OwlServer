@@ -22,12 +22,12 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 # Work out environment
 HOSTNAME=`hostname`
-if [ "$HOSTNAME" = "ulrike" -o "$HOSTNAME" = "bella" ]
+if [ "$HOSTNAME" = "dev" ]
 then
   TARGET_ENV='staging'
   GIT_BRANCH='dev'
   SITE_URL='http://staging.hoxtonowl.com'
-elif [ "$HOSTNAME" = "nestor" ]
+elif [ "$HOSTNAME" = "www" ]
 then
   TARGET_ENV='production'
   GIT_BRANCH='master'

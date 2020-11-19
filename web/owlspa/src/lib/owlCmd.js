@@ -70,6 +70,11 @@ function systemExclusive(data) {
             owlDispatchProgramMessage(msg)
             console.log('PROGRAM MESSAGE: ',msg);
             break;
+        case OpenWareMidiSysexCommand.SYSEX_PROGRAM_ERROR:
+            var msg = getStringFromSysex(data, 4, 1);
+            owlDispatchProgramMessage(msg)
+            console.log('PROGRAM ERROR: ',msg);
+            break;
         case OpenWareMidiSysexCommand.SYSEX_DEVICE_ID:
             var msg = getStringFromSysex(data, 4, 1);
             deviceDispatchDeviceUUIDReceived(msg);
@@ -154,7 +159,7 @@ function onMidiInitialised(callback){
         connectedMidiOutputPort = null;
 
     for (var o = 0; o < HoxtonOwl.midiClient.midiOutputs.length; o++) {
-        if (HoxtonOwl.midiClient.midiOutputs[o].name.match('^OWL-MIDI')) {
+        if (HoxtonOwl.midiClient.midiOutputs[o].name.match('^OWL-')) {
             connectedMidiOutputPort = HoxtonOwl.midiClient.selectMidiOutput(HoxtonOwl.midiClient.midiOutputs[o].id);
             outConnected = true;
             break;
@@ -162,7 +167,7 @@ function onMidiInitialised(callback){
     }
 
     for (var i = 0; i < HoxtonOwl.midiClient.midiInputs.length; i++) {
-        if (HoxtonOwl.midiClient.midiInputs[i].name.match('^OWL-MIDI')) {
+        if (HoxtonOwl.midiClient.midiInputs[i].name.match('^OWL-')) {
             connectedMidiInputPort = HoxtonOwl.midiClient.selectMidiInput(HoxtonOwl.midiClient.midiInputs[i].id);
             inConnected = true;
             break;

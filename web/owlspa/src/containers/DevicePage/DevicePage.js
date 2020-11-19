@@ -5,6 +5,7 @@ import { resetDevice, eraseDeviceStorage, showDeviceUUID } from 'actions';
 import DevicePageTile from './DevicePageTile/DevicePageTile';
 import MidiPortSelector from './MidiPortSelector/MidiPortSelector';
 import PresetList from './PresetList/PresetList';
+import { owlCmd } from 'lib';
 
 class DevicePage extends Component {
 
@@ -18,6 +19,10 @@ class DevicePage extends Component {
     if(window.confirm('Are you sure you want to reset the device?')){
       this.props.resetDevice();
     }
+  }
+
+  handleGetPatchesClick(){
+    owlCmd.requestDevicePresets();
   }
 
   handleShowUUIDClick(){
@@ -40,15 +45,15 @@ class DevicePage extends Component {
               <div>
                 <OwlControl />
                 <MidiPortSelector />
+               {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>UUID: {uuid}</div>}
               </div>
             </DevicePageTile>
 
             { isConnected && ( 
               <DevicePageTile title="Device Commands">
                 <div>
-                  {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>UUID: {uuid}</div>}
-                  <button onClick={() => this.handleShowUUIDClick() }>
-                    Show UUID
+                  <button onClick={() => this.handleGetPatchesClick() }>
+                    Get Patches
                   </button>
                   <button onClick={() => this.handleEraseStorageClick() }>
                     Erase Storage

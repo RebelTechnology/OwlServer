@@ -17,6 +17,7 @@ fi
 
 echo "target environment is $target and github branch is $branch"
 
+git checkout $branch
 git pull origin $branch
 cd /opt/OwlServer/web/owlspa
 npm install

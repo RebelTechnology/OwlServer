@@ -22,11 +22,11 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 # Work out environment
 HOSTNAME=`hostname`
-if [ "$HOSTNAME" = "ulrike" -o "$HOSTNAME" = "bella" ]
+if [ "$HOSTNAME" = "dev" ]
 then
   TARGET_ENV='staging'
   GIT_BRANCH='dev'
-elif [ "$HOSTNAME" = "nestor" ]
+elif [ "$HOSTNAME" = "www" ]
 then
   TARGET_ENV='production'
   GIT_BRANCH='master'
@@ -69,7 +69,6 @@ cp $DIR/$CLONE_DIR/web/scripts/deployment/deploy-api.sh $DIR/
 # Set privileges
 echo "Setting up permissions..."
 chown -R root $DIR/../api
-chgrp -R hoxtonowl $DIR/../api
 find $DIR/../api -type f -exec chmod 664 '{}' \;
 find $DIR/../api -type d -exec chmod 775 '{}' \;
 find $DIR/../api -type d -exec chmod g+s '{}' \;
