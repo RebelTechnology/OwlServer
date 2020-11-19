@@ -20,6 +20,10 @@ class DevicePage extends Component {
     }
   }
 
+  handleGetPatchesClick(){
+    owlCmd.requestDevicePresets();
+  }
+
   handleShowUUIDClick(){
     this.props.showDeviceUUID();
   }
@@ -55,6 +59,9 @@ class DevicePage extends Component {
                   </button>
                   <button onClick={() => this.handleResetDeviceClick() }>
                     Reset Device
+                  </button>
+                  <button onClick={() => this.handleGetPatchesClick() }>
+                    Get Patches
                   </button>
                 </div>
               </DevicePageTile>
