@@ -5,6 +5,7 @@ import { resetDevice, eraseDeviceStorage, showDeviceUUID } from 'actions';
 import DevicePageTile from './DevicePageTile/DevicePageTile';
 import MidiPortSelector from './MidiPortSelector/MidiPortSelector';
 import PresetList from './PresetList/PresetList';
+import { owlCmd } from 'lib';
 
 class DevicePage extends Component {
 
