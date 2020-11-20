@@ -42,7 +42,7 @@ class DevicePage extends Component {
               <div>
                 <OwlControl />
                 <MidiPortSelector />
-               {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>UUID: {uuid}</div>}
+               {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>Device UUID: {uuid}</div>}
               </div>
             </DevicePageTile>
 
