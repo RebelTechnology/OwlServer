@@ -22,11 +22,8 @@ class DevicePage extends Component {
   }
 
   handleGetPatchesClick(){
-    owlCmd.requestDevicePresets();
-  }
-
-  handleShowUUIDClick(){
-    this.props.showDeviceUUID();
+    this.props.showDeviceUUID(); // request UUID
+    owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
   }
 
   render(){ 
@@ -45,7 +42,7 @@ class DevicePage extends Component {
               <div>
                 <OwlControl />
                 <MidiPortSelector />
-               {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>UUID: {uuid}</div>}
+               {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>Device UUID: {uuid}</div>}
               </div>
             </DevicePageTile>
 
@@ -53,7 +50,7 @@ class DevicePage extends Component {
               <DevicePageTile title="Device Commands">
                 <div>
                   <button onClick={() => this.handleGetPatchesClick() }>
-                    Get Patches
+                    Refresh
                   </button>
                   <button onClick={() => this.handleEraseStorageClick() }>
                     Erase Storage

@@ -28,6 +28,7 @@ export newDialog from './newDialog';
 export owlDispatchFirmWareVersion from './owlDispatchFirmWareVersion';
 export owlDispatchPatchStatus from './owlDispatchPatchStatus';
 export owlDispatchProgramMessage from './owlDispatchProgramMessage';
+export owlDispatchProgramError from './owlDispatchProgramError';
 export removeUploadedPatchFile from './removeUploadedPatchFile';
 export removeGitHubFile from './removeGitHubFile';
 export resetDevice from './resetDevice';

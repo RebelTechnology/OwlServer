@@ -12,7 +12,8 @@ import {
     deviceDispatchProgramChange,
     owlDispatchPatchStatus,
     owlDispatchFirmWareVersion,
-    owlDispatchProgramMessage
+    owlDispatchProgramMessage,
+    owlDispatchProgramError
 } from 'actions';
 
 const {
@@ -63,7 +64,7 @@ function systemExclusive(data) {
         case OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION:
             var msg = getStringFromSysex(data, 4, 1);
             owlDispatchFirmWareVersion(msg);
-            //console.log('FIRMWARE VERSION: ',msg);
+            console.log('FIRMWARE VERSION: ',msg);
             break;
         case OpenWareMidiSysexCommand.SYSEX_PROGRAM_MESSAGE:
             var msg = getStringFromSysex(data, 4, 1);
@@ -72,7 +73,7 @@ function systemExclusive(data) {
             break;
         case OpenWareMidiSysexCommand.SYSEX_PROGRAM_ERROR:
             var msg = getStringFromSysex(data, 4, 1);
-            owlDispatchProgramMessage(msg)
+            owlDispatchProgramError(msg)
             console.log('PROGRAM ERROR: ',msg);
             break;
         case OpenWareMidiSysexCommand.SYSEX_DEVICE_ID:
@@ -81,6 +82,10 @@ function systemExclusive(data) {
             console.log('DEVICE UUID: ', msg);
             break;
         case OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS:
+            var msg = getStringFromSysex(data, 4, 1);
+            owlDispatchProgramMessage(msg)
+            console.log('DEVICE STATS: ',msg);
+            break;
         default:
             var msg = getStringFromSysex(data, 4, 1);
             break;
@@ -141,12 +146,17 @@ function setParameter(pid, value){
 
 function sendLoadRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
-    sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
+    window.setTimeout(function(){    
+	sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
+    }, 1000);
 }
 
 function requestDevicePresets(){
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
-    sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
+    window.setTimeout(function(){    
+	sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
+    }, 1000);
 }
 
 function onMidiInitialised(callback){
