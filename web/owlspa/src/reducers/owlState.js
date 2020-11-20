@@ -10,6 +10,7 @@ import {
   OWL_FIRMWARE_VERSION_RECEIVED,
   OWL_PATCH_STATUS_RECEIVED,
   OWL_PROGRAM_MESSAGE_RECEIVED,
+  OWL_PROGRAM_ERROR_RECEIVED,
   STORE_PATCH_ON_DEVICE_REQUEST,
   STORE_PATCH_ON_DEVICE_ERROR,
   STORE_PATCH_ON_DEVICE_SUCCESS,
@@ -32,6 +33,7 @@ const initialState = {
   firmWareVersion: null,
   status: null,
   programMessage: null,
+  programError: null,
   presets: [],
   uuid: null
 };
@@ -132,6 +134,11 @@ const owlState = (state = initialState, action) => {
       return {
         ...state,
         programMessage : action.programMessage
+      }
+    case OWL_PROGRAM_ERROR_RECEIVED:
+      return {
+        ...state,
+        programError : action.programError
       }
     default:
       return state

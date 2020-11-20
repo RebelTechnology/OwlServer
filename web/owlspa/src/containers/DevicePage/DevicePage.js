@@ -22,11 +22,8 @@ class DevicePage extends Component {
   }
 
   handleGetPatchesClick(){
-    owlCmd.requestDevicePresets();
-  }
-
-  handleShowUUIDClick(){
-    this.props.showDeviceUUID();
+    owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
+    this.props.showDeviceUUID(); // request UUID
   }
 
   render(){ 
@@ -53,7 +50,7 @@ class DevicePage extends Component {
               <DevicePageTile title="Device Commands">
                 <div>
                   <button onClick={() => this.handleGetPatchesClick() }>
-                    Get Patches
+                    Refresh
                   </button>
                   <button onClick={() => this.handleEraseStorageClick() }>
                     Erase Storage

@@ -54,6 +54,7 @@ class OwlControl extends Component {
       firmWareVersion,
       status,
       programMessage,
+      programError,
       isConnecting,
       isConnected,
       patchIsLoading,
@@ -99,6 +100,7 @@ class OwlControl extends Component {
           {firmWareVersion && (<p><span>Connected to:</span> {firmWareVersion}</p>)}
           {status && (<p>{status}</p>)}
           {programMessage && (<p><span>Message:</span> {programMessage}</p>)}
+          {programError && (<p><span>Error:</span> {programError}</p>)}
         </div>
       </div>
     );
