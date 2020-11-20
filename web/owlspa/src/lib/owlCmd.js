@@ -146,13 +146,17 @@ function setParameter(pid, value){
 
 function sendLoadRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
-    sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
+    window.setTimeout(function(){    
+	sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
+    }, 1000);
 }
 
 function requestDevicePresets(){
-    sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
-    sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
     sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
+    window.setTimeout(function(){    
+	sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
+    }, 1000);
 }
 
 function onMidiInitialised(callback){

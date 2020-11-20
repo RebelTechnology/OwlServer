@@ -22,8 +22,8 @@ class DevicePage extends Component {
   }
 
   handleGetPatchesClick(){
-    owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
     this.props.showDeviceUUID(); // request UUID
+    owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
   }
 
   render(){ 
