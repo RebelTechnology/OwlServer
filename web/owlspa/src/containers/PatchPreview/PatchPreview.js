@@ -26,16 +26,6 @@ class PatchPreview extends Component {
     }
   }
 
-  handlePushButtonDown(e){
-    this.props.webAudioPatch.instance.setPushButtonDown();
-    this.updatePushButtonLedColour();
-  }
-
-  handlePushButtonUp(e){
-    this.props.webAudioPatch.instance.setPushButtonUp();
-    this.updatePushButtonLedColour();
-  }
-
   updatePushButtonLedColour(){
     if(this.props.webAudioPatch.instance){
       const pushButtonLedColour = this.props.webAudioPatch.instance.getPushButtonLedColour();
@@ -97,7 +87,8 @@ class PatchPreview extends Component {
       instance.connectToOutput({outputs: patch.outputs});
       
       webAudioPatchParameters.forEach( (param, i) => {
-        instance.update(i, param.value / 100);
+         param.value = instance.getParameter(i) * 100; 
+         // instance.update(i, param.value / 100);
       });
 
       this.props.setPatchPlaying(true);
