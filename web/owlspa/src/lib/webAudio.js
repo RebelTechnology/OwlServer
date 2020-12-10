@@ -24,7 +24,7 @@ owl.initPatchAudio = function () {
     } else {
         throw new Error('no web audio api');
     }
-    
+
     var WEB_setup = Module.cwrap('WEB_setup', 'number', ['number', 'number']);
     var WEB_processBlock = Module.cwrap('WEB_processBlock', 'number', ['number', 'number']);
     var WEB_setParameter = Module.cwrap('WEB_setParameter', 'number', ['number', 'number']);
@@ -32,69 +32,72 @@ owl.initPatchAudio = function () {
     var WEB_getParameterName = Module.cwrap('WEB_getParameterName', 'string', ['number']);
     var WEB_getMessage = Module.cwrap('WEB_getMessage', 'string', []);
     var WEB_getStatus = Module.cwrap('WEB_getStatus', 'string', []);
-    var WEB_setButtons;
+    var WEB_setButton;
     var WEB_getButtons;
     var WEB_processMidi;
+    var WEB_getParameter;
     try {
-        WEB_setButtons = Module.cwrap('WEB_setButtons', 'number', ['number']);
-        WEB_getButtons = Module.cwrap('WEB_getButtons', 'number', []);
-        WEB_processMidi = Module.cwrap('WEB_processMidi', 'number', ['number', 'number', 'number', 'number']);
+	WEB_setButton = Module.cwrap('WEB_setButton', 'number', ['number', 'number']);
+	WEB_getButtons = Module.cwrap('WEB_getButtons', 'number', []);
+	WEB_processMidi = Module.cwrap('WEB_processMidi', 'number', ['number', 'number', 'number', 'number']);
+	WEB_getParameter = Module.cwrap('WEB_getParameter', 'number', ['number']);
     }catch(x){}
 
     var that = {};
     that.model = {
-        inputNode: null,
-        fileNode: null, // owl.audioContext.createMediaElementSource(document.getElementById('patch-test-audio')),
-        micNode: null
+	inputNode: null,
+	fileNode: null, // owl.audioContext.createMediaElementSource(document.getElementById('patch-test-audio')),
+	micNode: null
     };
     that.vectorsize = 2048;      
-    console.log("audio[fs "+owl.audioContext.sampleRate+"][bs "+that.vectorsize+"]");
+
     WEB_setup(owl.audioContext.sampleRate, that.vectorsize);
+    console.log("audio[fs "+owl.audioContext.sampleRate+"][bs "+that.vectorsize+"]");
     
     for(var i = 0; i < 5; i++){
-        console.log("parameter "+i+": "+WEB_getParameterName(i));
+	console.log("parameter "+i+": "+WEB_getParameterName(i));
     }
 
     // Bind to C++ Member Functions
     that.getNumInputs = function () {
-        return 2; // DSP_getNumInputs(that.ptr);
+	return 2; // DSP_getNumInputs(that.ptr);
     };
 
     that.getNumOutputs = function () {
-        return 2; //DSP_getNumOutputs(that.ptr);
+	return 2; //DSP_getNumOutputs(that.ptr);
     };
 
     that.getMessage = function() {
-        return WEB_getMessage();
+	return WEB_getMessage();
     }
 
     that.getStatus = function() {
-        return WEB_getStatus();
+	return WEB_getStatus();
     }
 
     that.compute = function (e) {
-        var dspOutChans = HEAP32.subarray(that.outs >> 2, (that.outs + that.numOut * that.ptrsize) >> 2);
-        var dspInChans = HEAP32.subarray(that.ins >> 2, (that.ins + that.ins * that.ptrsize) >> 2);
-        for (var i = 0; i < that.numIn; i++)
-        {
-            var input = e.inputBuffer.getChannelData(i);
-            var dspInput = HEAPF32.subarray(dspInChans[i] >> 2, (dspInChans[i] + that.vectorsize * that.ptrsize) >> 2);
+	var dspOutChans = HEAP32.subarray(that.outs >> 2, (that.outs + that.numOut * that.ptrsize) >> 2);
+	var dspInChans = HEAP32.subarray(that.ins >> 2, (that.ins + that.ins * that.ptrsize) >> 2);
+	for (var i = 0; i < that.numIn; i++)
+	{
+	    var input = e.inputBuffer.getChannelData(i);
+	    var dspInput = HEAPF32.subarray(dspInChans[i] >> 2, (dspInChans[i] + that.vectorsize * that.ptrsize) >> 2);
 
-            for (var j = 0; j < input.length; j++) {
-                dspInput[j] = input[j];
-            }
-        }
+	    for (var j = 0; j < input.length; j++) {
+		dspInput[j] = input[j];
+	    }
+	}
 
-        WEB_processBlock(that.ins, that.outs);
+	WEB_processBlock(that.ins, that.outs);
 
-        for(var i = 0; i < that.numOut; i++){
-            var output = e.outputBuffer.getChannelData(i);
-            var dspOutput = HEAPF32.subarray(dspOutChans[i] >> 2, (dspOutChans[i] + that.vectorsize * that.ptrsize) >> 2);
-            for (var j = 0; j < output.length; j++) {
-                output[j] = dspOutput[j];
-            }
-        }
-        return that;
+	for(var i = 0; i < that.numOut; i++){
+	    var output = e.outputBuffer.getChannelData(i);
+	    var dspOutput = HEAPF32.subarray(dspOutChans[i] >> 2, (dspOutChans[i] + that.vectorsize * that.ptrsize) >> 2);
+	    for (var j = 0; j < output.length; j++) {
+		output[j] = dspOutput[j];
+	    }
+	}
+	return that;
     };
 
     // Change the input into the OWL patch node
@@ -112,16 +115,16 @@ owl.initPatchAudio = function () {
     }
 
     that.useMicrophoneInput = function () {
-        if (that.model.micNode) {
-            that.connectInput(that.model.micNode);
-        } else {
-            navigator.getUserMedia.call(navigator, {audio: true}, function (stream) {
+	if (that.model.micNode) {
+	    that.connectInput(that.model.micNode);
+	} else {
+	    navigator.getUserMedia.call(navigator, {audio: true}, function (stream) {
                 that.model.micNode = owl.audioContext.createMediaStreamSource(stream);
-                that.connectInput(that.model.micNode);
-            }, function (err) {
-                console.error(err);
-            });
-        }
+		that.connectInput(that.model.micNode);
+	    }, function (err) {
+		console.error(err);
+	    });
+	}
     }
 
     that.useFileInput = function (audioNode) {
@@ -130,74 +133,42 @@ owl.initPatchAudio = function () {
     }
 
     that.onFileSelect = function (files) {
-        var fileUrl = files[0] ? URL.createObjectURL(files[0]) : '';
-        var audioElement = document.getElementById('patch-test-audio');
-        audioElement.src = fileUrl;
+	var fileUrl = files[0] ? URL.createObjectURL(files[0]) : '';
+	var audioElement = document.getElementById('patch-test-audio');
+	audioElement.src = fileUrl;
     }
 
-    // Bind to Web Audio
     that.getParameterName = function(pid){
-        return WEB_getParameterName(pid);
+	return WEB_getParameterName(pid);
     }
 
     that.getPatchName = function(){
-        return WEB_getPatchName();
+	return WEB_getPatchName();
     }
 
     that.setButton = function(key, value) {
-	// key should be 0 for BUTTON_A, 1 for BUTTON_B et c
-	if(key == 0){
-	    if(value)
-		that.setPushButtonDown();
-	    else
-		that.setPushButtonUp();
-	}else{
-	    if(WEB_setButtons){
-		var buttonState = WEB_getButtons();
-		var mask = 1<<(key+3);
-		if(value)
-		    buttonState |= mask
-		else
-		    buttonState &= ~mask;
-		WEB_setButtons(buttonState);
-	    }
-        }
+	// key should be 1 for PUSHBUTTON, 4 for BUTTON_A, 5 for BUTTON_B et c
+	if(WEB_setButton)
+	    WEB_setButton(key, value);
         return that;
+    };
+
+    that.getParameter = function(key) {
+	if(WEB_getParameter)
+	    return WEB_getParameter(key);
+	return 0.5;
     };
 
     that.update = function (key, value) {
-	if(key < 80)
+	if(key < 80){
   	    WEB_setParameter(key, value);
-	else
-	    that.setButton(key-80, value);
+	}else if(key == 80){
+	    that.setButton(1, value);
+	    that.setButton(4, value);
+	}else{
+	    that.setButton(key-80+4, value);
+	}
 	return that;
-    };
-
-    that.setButtons = function(values) {
-        if(WEB_setButtons){
-            WEB_setButtons(values);
-        }
-        return that;
-    };
-
-    that.setPushButtonDown = function() {
-        if(WEB_setButtons){
-            var buttonState = WEB_getButtons();
-            buttonState |= 0x02;
-            buttonState &= ~0x04;
-            buttonState |= 0x08; 
-            WEB_setButtons(buttonState);
-        }
-    };
-
-    that.setPushButtonUp = function() {
-        if(WEB_setButtons){
-            var buttonState = WEB_getButtons();
-            buttonState &= ~0x02;
-            buttonState |= 0x04;
-            buttonState &= ~0x08; 
-            WEB_setButtons(buttonState);
-        }
     };
 
     that.getButtons = function() {
@@ -206,17 +177,6 @@ owl.initPatchAudio = function () {
         } else {
             return 0;
         }
-    };
-
-    that.toggleButton = function() {
-        if(WEB_getButtons){
-            var values = WEB_getButtons();
-            values ^= 0x02; // PUSHBUTTON;
-            values ^= 0x04; // GREEN_BUTTON;
-            values ^= 0x08; // RED_BUTTON;
-            WEB_setButtons(values);
-        }
-        return that;
     };
 
     that.getPushButtonLedColour = function(){
@@ -250,12 +210,12 @@ owl.initPatchAudio = function () {
 
 
     that.processMidi = function(status, d1, d2) {
-        var port = 0;
-        if(WEB_processMidi){
-            return WEB_processMidi(port, status, d1, d2);
-        } else {
-            return 0;
-        }
+	var port = 0;
+	if(WEB_processMidi){
+    	    return WEB_processMidi(port, status, d1, d2);
+	} else {
+	    return 0;
+	}
     }
 
     that.ptrsize = 4; // assuming pointer in emscripten are 32bits
