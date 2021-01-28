@@ -439,13 +439,19 @@ if ($buildCmd == 'make sysx') {
 
     switch ($patchSourceFileExt) {
 
-    case 'dsp': // Faust
+    case 'dsp': // FAUST
         $cmd .= 'FAUST=' . escapeshellarg($className) . ' ';
         break;
 
     case 'pd': // PureData
         $cmd .= 'HEAVY=' . escapeshellarg($className) . ' ';
         $cmd .= 'HEAVYTOKEN=' . escapeshellarg(HEAVY_TOKEN) . ' ';
+        break;
+
+    case 'soul': // SOUL
+    case 'soulpatch': // SOUL
+        $cmd .= 'SOUL=' . escapeshellarg($className) . ' ';
+        $cmd .= 'SOULFILE=' . escapeshellarg($sourceFile) . ' ';
         break;
 
     default: // C/C++ patch
@@ -458,7 +464,7 @@ if ($buildCmd == 'make sysx') {
          && MAKE_TARGET_SYSX == $makeTarget) {
     }
     $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
-
+    
 
 } elseif ($buildCmd == 'make gen') {
 

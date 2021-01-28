@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 class CompilationTypeSelector extends Component {
 
-  getFileExtention(fileName){
+  getFileExtension(fileName){
     const dotIndex = fileName.lastIndexOf('.');
     if( dotIndex === -1){
       return null;
@@ -12,7 +12,7 @@ class CompilationTypeSelector extends Component {
   }
 
   getCompilationTypeFromMainFileName(mainFileName){
-    switch(this.getFileExtention(mainFileName)){
+    switch(this.getFileExtension(mainFileName)){
       case 'gendsp':
         return 'gen';
       case 'maxpat':
@@ -21,6 +21,10 @@ class CompilationTypeSelector extends Component {
         return 'gen';
       case 'dsp':
         return 'faust';
+      case 'soul':
+        return 'soul';
+      case 'soulpatch':
+        return 'soul';
       case 'pd':
         return 'pd';
       default:
@@ -29,19 +33,20 @@ class CompilationTypeSelector extends Component {
   }
 
   checkAndUpdateCompilatonType(mainFileName){
+    // todo: find out why this is not called
     const newCompilationType = this.getCompilationTypeFromMainFileName(mainFileName);
-      this.props.onCompilationTypeChange(newCompilationType);
+    this.props.onCompilationTypeChange(newCompilationType);
   }
 
   componentWillReceiveProps(nextProps){
-    if(!nextProps.compilationType && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
+    if(this.props.compilationType === 'cpp' && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
       this.checkAndUpdateCompilatonType(nextProps.mainSourceFile.name);
     }
   }
 
   render(){
     const { onCompilationTypeChange, compilationType, mainSourceFile } = this.props;
-    const allCompilationTypes = ['cpp', 'pd', 'heavy', 'faust', 'gen', 'maximilian'];
+    const allCompilationTypes = ['cpp', 'pd', 'heavy', 'faust', 'gen', 'maximilian', 'soul'];
 
     return (
       <fieldset>
