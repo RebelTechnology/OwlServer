@@ -12,7 +12,6 @@ class CompilationTypeSelector extends Component {
   }
 
   getCompilationTypeFromMainFileName(mainFileName){
-    console.log("ext "+mainFileName+": "+this.getFileExtension(mainFileName));
     switch(this.getFileExtension(mainFileName)){
       case 'gendsp':
         return 'gen';
@@ -34,13 +33,13 @@ class CompilationTypeSelector extends Component {
   }
 
   checkAndUpdateCompilatonType(mainFileName){
+    // todo: find out why this is not called
     const newCompilationType = this.getCompilationTypeFromMainFileName(mainFileName);
-    console.log("type "+mainFileName+": "+newCompilationType);
     this.props.onCompilationTypeChange(newCompilationType);
   }
 
   componentWillReceiveProps(nextProps){
-    if(nextProps.compilationType === 'cpp' && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
+    if(this.props.compilationType === 'cpp' && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
       this.checkAndUpdateCompilatonType(nextProps.mainSourceFile.name);
     }
   }
