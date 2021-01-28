@@ -450,6 +450,7 @@ if ($buildCmd == 'make sysx') {
 
     case 'soul': // SOUL
         $cmd .= 'SOUL=' . escapeshellarg($className) . ' ';
+        $cmd .= 'SOULFILE=' . escapeshellarg($sourceFile) . ' ';
         break;
 
     default: // C/C++ patch
