@@ -40,7 +40,7 @@ class CompilationTypeSelector extends Component {
   }
 
   componentWillReceiveProps(nextProps){
-    if(!nextProps.compilationType && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
+    if(nextProps.compilationType === 'cpp' && !this.props.mainSourceFile && nextProps.mainSourceFile && nextProps.mainSourceFile.name){
       this.checkAndUpdateCompilatonType(nextProps.mainSourceFile.name);
     }
   }
