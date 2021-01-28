@@ -449,6 +449,7 @@ if ($buildCmd == 'make sysx') {
         break;
 
     case 'soul': // SOUL
+    case 'soulpatch': // SOUL
         $cmd .= 'SOUL=' . escapeshellarg($className) . ' ';
         $cmd .= 'SOULFILE=' . escapeshellarg($sourceFile) . ' ';
         break;
@@ -463,7 +464,7 @@ if ($buildCmd == 'make sysx') {
          && MAKE_TARGET_SYSX == $makeTarget) {
     }
     $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
-
+    
 
 } elseif ($buildCmd == 'make gen') {
 
