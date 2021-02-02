@@ -153,6 +153,8 @@ router.put('/:id', (req, res) => {
       }
       if (patch.compilationType === 'gen') {
         cmd += ' --gen';
+      } else if (patch.compilationType === 'maximilian') {
+        cmd += ' --maximilian';
       }
       cmd += ' ' + id;
       process.stdout.write('Running command "' + cmd + '"...\n');
