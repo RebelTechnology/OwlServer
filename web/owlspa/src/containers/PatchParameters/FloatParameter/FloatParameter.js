@@ -118,7 +118,7 @@ class FloatParameter extends Component {
           styleName="float-parameter"
           style={{ 
             cursor: active && isInputParam ? 'ns-resize' : 'auto',
-            color: active ? activeColor : '#717171',
+            color: activeColor,
             margin: editMode ? '48px 38px 80px' : '25px 15px 27px',
           }}
           onTouchStart={e => isInputParam && active && this.handlePointerDown(e) }

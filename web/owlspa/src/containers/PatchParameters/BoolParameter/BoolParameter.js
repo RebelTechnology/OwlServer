@@ -59,7 +59,7 @@ class BoolParameter extends Component {
         <div 
           style={{ 
             cursor: isActive && isInputParam ? 'pointer' : 'auto',
-            color: isActive ? activeColor : '#717171',
+            color: activeColor,
             margin: editMode ? '53px 31px 44px' : '40px 8px 0px',
             height: editMode ? '93px' : '92px'
           }}
