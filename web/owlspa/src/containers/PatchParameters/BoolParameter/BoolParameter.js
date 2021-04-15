@@ -45,6 +45,7 @@ class BoolParameter extends Component {
 
     const isInputParam = io === 'input';
     const activeColor = isInputParam ? '#ed7800' : '#007095';
+    const pid = String.fromCharCode('1'.charCodeAt(0)+id-80);
 
     const editModeWrapperStyles = editMode ? {
       background: isInputParam ? '#f9c996' : '#73b9d0',
@@ -82,7 +83,7 @@ class BoolParameter extends Component {
               </select>
             )}
 
-          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT' : 'OUTPUT' }</span>)}
+          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT {pid}' : 'OUTPUT {pid}' }</span>)}
           <div 
             style={{ 
               boxShadow: isActive ? 'inset 0px 0px 2px 2px rgba(0,0,0,0.25)' : '0px 0px 2px 2px rgba(0,0,0,0.3)',

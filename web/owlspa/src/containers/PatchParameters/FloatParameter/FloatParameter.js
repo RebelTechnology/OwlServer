@@ -103,6 +103,7 @@ class FloatParameter extends Component {
 
     const isInputParam = io === 'input';
     const activeColor = isInputParam ? '#ed7800' : '#007095';
+    const pid = String.fromCharCode('A'.charCodeAt(0)+id);
 
     const editModeWrapperStyles = editMode ? {
       background: isInputParam ? '#f9c996' : '#73b9d0',
@@ -138,7 +139,7 @@ class FloatParameter extends Component {
             </select>
           )}
 
-          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT' : 'OUTPUT' }</span>)}
+          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT {pid}' : 'OUTPUT {pid}' }</span>)}
           <svg width="100" height="100" viewBox="0 0 100 100">
             <path style={{fill:'none',stroke:'#eee', strokeWidth:10}} d="
               M 22, 79
