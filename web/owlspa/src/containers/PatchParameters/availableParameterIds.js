@@ -42,14 +42,14 @@ const availableParameterIds = {
     { id: 39, displayName: 'PARAMETER_DH'}
   ],
   bool : [
-    { id: 80, displayName: 'BUTTON_A'},
-    { id: 81, displayName: 'BUTTON_B'},
-    { id: 82, displayName: 'BUTTON_C'},
-    { id: 83, displayName: 'BUTTON_D'},
-    { id: 84, displayName: 'BUTTON_E'},
-    { id: 85, displayName: 'BUTTON_F'},
-    { id: 86, displayName: 'BUTTON_G'},
-    { id: 87, displayName: 'BUTTON_H'}
+    { id: 80, displayName: 'BUTTON_1'},
+    { id: 81, displayName: 'BUTTON_2'},
+    { id: 82, displayName: 'BUTTON_3'},
+    { id: 83, displayName: 'BUTTON_4'},
+    { id: 84, displayName: 'BUTTON_5'},
+    { id: 85, displayName: 'BUTTON_6'},
+    { id: 86, displayName: 'BUTTON_7'},
+    { id: 87, displayName: 'BUTTON_8'}
   ]
 };
 

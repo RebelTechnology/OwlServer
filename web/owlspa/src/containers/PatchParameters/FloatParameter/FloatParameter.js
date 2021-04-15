@@ -103,6 +103,7 @@ class FloatParameter extends Component {
 
     const isInputParam = io === 'input';
     const activeColor = isInputParam ? '#ed7800' : '#007095';
+    const pid = String.fromCharCode('A'.charCodeAt(0)+id);
 
     const editModeWrapperStyles = editMode ? {
       background: isInputParam ? '#f9c996' : '#73b9d0',
@@ -117,7 +118,7 @@ class FloatParameter extends Component {
           styleName="float-parameter"
           style={{ 
             cursor: active && isInputParam ? 'ns-resize' : 'auto',
-            color: active ? activeColor : '#717171',
+            color: activeColor,
             margin: editMode ? '48px 38px 80px' : '25px 15px 27px',
           }}
           onTouchStart={e => isInputParam && active && this.handlePointerDown(e) }
@@ -138,7 +139,7 @@ class FloatParameter extends Component {
             </select>
           )}
 
-          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT' : 'OUTPUT' }</span>)}
+          { !editMode && (<span styleName="parameter-io">{ isInputParam ? pid+' IN' : pid+' OUT' }</span>)}
           <svg width="100" height="100" viewBox="0 0 100 100">
             <path style={{fill:'none',stroke:'#eee', strokeWidth:10}} d="
               M 22, 79
