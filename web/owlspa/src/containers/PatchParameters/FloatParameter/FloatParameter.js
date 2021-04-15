@@ -139,7 +139,7 @@ class FloatParameter extends Component {
             </select>
           )}
 
-          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT {pid}' : 'OUTPUT {pid}' }</span>)}
+          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT '+pid : 'OUTPUT '+pid }</span>)}
           <svg width="100" height="100" viewBox="0 0 100 100">
             <path style={{fill:'none',stroke:'#eee', strokeWidth:10}} d="
               M 22, 79

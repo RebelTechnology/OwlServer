@@ -83,7 +83,7 @@ class BoolParameter extends Component {
               </select>
             )}
 
-          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT {pid}' : 'OUTPUT {pid}' }</span>)}
+          { !editMode && (<span styleName="parameter-io">{ isInputParam ? 'INPUT '+pid : 'OUTPUT '+pid }</span>)}
           <div 
             style={{ 
               boxShadow: isActive ? 'inset 0px 0px 2px 2px rgba(0,0,0,0.25)' : '0px 0px 2px 2px rgba(0,0,0,0.3)',
