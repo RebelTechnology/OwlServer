@@ -159,7 +159,6 @@ class FloatParameter extends Component {
             { editMode ? (
               <input 
                 style={{
-                  textTransform: 'uppercase',
                   padding: '9px',
                   height: '35px'
                 }}
