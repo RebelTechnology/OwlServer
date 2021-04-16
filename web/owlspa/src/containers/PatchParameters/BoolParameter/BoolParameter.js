@@ -45,7 +45,6 @@ class BoolParameter extends Component {
 
     const isInputParam = io === 'input';
     const activeColor = isInputParam ? '#ed7800' : '#007095';
-    // const pid = "B"+PatchParameters.getDisplayNameFromId('button', id)[0].split('_')[1];      
     const pidEntry = availableIds.find(item => item.id === id);
     const pid = pidEntry ? "B"+pidEntry.displayName.split('_')[1] : "N/A";
 
