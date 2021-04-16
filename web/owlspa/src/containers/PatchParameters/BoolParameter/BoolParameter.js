@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import CSSModules from 'react-css-modules';
 import styles from './BoolParameter.css';
 import { IconButton } from 'components';
-import { PatchParameters } from 'containers';
 
 class BoolParameter extends Component {
 
@@ -46,7 +45,8 @@ class BoolParameter extends Component {
 
     const isInputParam = io === 'input';
     const activeColor = isInputParam ? '#ed7800' : '#007095';
-    const pid = "B"+PatchParameters.getDisplayNameFromId('button', id)[0].split('_')[1];      
+    // const pid = "B"+PatchParameters.getDisplayNameFromId('button', id)[0].split('_')[1];      
+    const pid = "B"+availableIds.find(item => item.id === id).split('_')[1];
 
     const editModeWrapperStyles = editMode ? {
       background: isInputParam ? '#f9c996' : '#73b9d0',

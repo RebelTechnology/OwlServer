@@ -104,8 +104,8 @@ class FloatParameter extends Component {
     const isInputParam = io === 'input';
     const activeColor = isInputParam ? '#ed7800' : '#007095';
     // const pid = String.fromCharCode('A'.charCodeAt(0)+id);
-    // const pid = PatchParameters.getDisplayNameFromId('float', id)[0].split('_')[1];      
-    const pidEntry = availableIds.filter(({ id }) => id === fromId )[0];
+      // const pid = PatchParameters.getDisplayNameFromId('float', id)[0].split('_')[1];
+    const pidEntry = availableIds.filter(item => item.id === id)[0];
     const pid = pidEntry ? pidEntry.displayName.split('_')[1] : "N/A";
 
     const editModeWrapperStyles = editMode ? {
