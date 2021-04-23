@@ -382,6 +382,57 @@ if (!$onlyDloadFiles && !$keepTmpFiles) {
 }
 
 /*
+ * Generate metadata.h
+ */
+function is_param($var){
+ return $var['type'] == 'float';
+}
+function is_button($var){
+ return $var['type'] == 'bool';
+}
+
+$parameters = array_filter($patch['parameters'], "is_param");
+$buttons = array_filter($patch['parameters'], "is_button");
+
+$data = "#define OWL_METADATA 1
+const char* PatchMetadata::name = " . '"' . $patchName . '"' . ";
+const int PatchMetadata::channels_in = " . $patch['inputs'] . ";
+const int PatchMetadata::channels_out = " . $patch['outputs'] . ";
+const int PatchMetadata::parameter_count = " . count($parameters) . ";
+const int PatchMetadata::button_count = " . count($buttons) . ";
+
+const PatchMetadata::Control PatchMetadata::parameters[] = {
+";
+
+foreach ($parameters as $p) {
+$data .= "{" . $p['id'] . ", ";
+$data .= $p['io'] == 'input' ? "CONTROL_INPUT" : "CONTROL_OUTPUT";
+$data .= ', "' . $p['name'] . '"},' . PHP_EOL;
+}
+unset($p);
+
+$data .= "};
+const PatchMetadata::Control PatchMetadata::buttons[] = {
+";
+
+foreach ($buttons as $b) {
+$data .= "{ " . strval(intval($b['id']) - 80 + 4) . ", ";
+$data .= $b['io'] == 'input' ? "CONTROL_INPUT" : "CONTROL_OUTPUT";
+$data .= ', "' . $b['name'] . '"},' . PHP_EOL;
+}
+unset($b);
+
+$data .= "};" . PHP_EOL;
+
+$srcdir = $patchBuildDir . '/Source';
+if (!is_dir($srcdir)){
+  mkdir($srcdir);
+}
+file_put_contents($srcdir . '/metadata.h', $data);
+unset($srcdir);
+unset($data);
+
+/*
  * Get GitHub files
  */
 
