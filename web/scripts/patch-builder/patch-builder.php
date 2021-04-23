@@ -395,7 +395,7 @@ $parameters = array_filter($patch['parameters'], "is_param");
 $buttons = array_filter($patch['parameters'], "is_button");
 
 $data = "#define OWL_METADATA 1
-const char* PatchMetadata::name = " . '"' . $patchName . '"' . ";
+const char* PatchMetadata::name = " . '"' . $patch['name'] . '"' . ";
 const int PatchMetadata::channels_in = " . $patch['inputs'] . ";
 const int PatchMetadata::channels_out = " . $patch['outputs'] . ";
 const int PatchMetadata::parameter_count = " . count($parameters) . ";
