@@ -399,10 +399,9 @@ const char* PatchMetadata::name = " . '"' . $patchName . '"' . ";
 const int PatchMetadata::channels_in = " . $patch['inputs'] . ";
 const int PatchMetadata::channels_out = " . $patch['outputs'] . ";
 const int PatchMetadata::parameter_count = " . count($parameters) . ";
-const int PatchMetadata::button_count = " . count($buttons) . ";
+const int PatchMetadata::button_count = " . count($buttons) . ";" . PHP_EOL;
 
-const PatchMetadata::Control PatchMetadata::parameters[] = {
-";
+$data .= "const PatchMetadata::Control PatchMetadata::parameters[] = {" . PHP_EOL;
 foreach ($parameters as $p) {
 $data .= "{" . $p['id'] . ", ";
 $data .= $p['io'] == 'input' ? "CONTROL_INPUT" : "CONTROL_OUTPUT";
@@ -412,8 +411,7 @@ $data .= "};" . PHP_EOL;
 unset($p);
 unset($parameters);
 
-const PatchMetadata::Control PatchMetadata::buttons[] = {
-";
+$data .= "const PatchMetadata::Control PatchMetadata::buttons[] = {" . PHP_EOL;
 foreach ($buttons as $b) {
 $data .= "{ " . strval(intval($b['id']) - 80 + 4) . ", ";
 $data .= $b['io'] == 'input' ? "CONTROL_INPUT" : "CONTROL_OUTPUT";
