@@ -403,26 +403,25 @@ const int PatchMetadata::button_count = " . count($buttons) . ";
 
 const PatchMetadata::Control PatchMetadata::parameters[] = {
 ";
-
 foreach ($parameters as $p) {
 $data .= "{" . $p['id'] . ", ";
 $data .= $p['io'] == 'input' ? "CONTROL_INPUT" : "CONTROL_OUTPUT";
 $data .= ', "' . $p['name'] . '"},' . PHP_EOL;
 }
+$data .= "};" . PHP_EOL;
 unset($p);
+unset($parameters);
 
-$data .= "};
 const PatchMetadata::Control PatchMetadata::buttons[] = {
 ";
-
 foreach ($buttons as $b) {
 $data .= "{ " . strval(intval($b['id']) - 80 + 4) . ", ";
 $data .= $b['io'] == 'input' ? "CONTROL_INPUT" : "CONTROL_OUTPUT";
 $data .= ', "' . $b['name'] . '"},' . PHP_EOL;
 }
-unset($b);
-
 $data .= "};" . PHP_EOL;
+unset($b);
+unset($buttons);
 
 $srcdir = $patchBuildDir . '/Source';
 if (!is_dir($srcdir)){
