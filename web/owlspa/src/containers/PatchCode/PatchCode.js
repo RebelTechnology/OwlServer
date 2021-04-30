@@ -280,7 +280,7 @@ class PatchCode extends Component {
               {tabNavItems}
               {canEdit && (
                 <li onClick={ e => this.handleAddFileClick()}>
-                  <Icon name="plusSymbol" size={14} />
+                  <Icon name="edit" size={14} />
                 </li>
               )}
             </ul>
