@@ -269,7 +269,7 @@ class CreateAndEditPatchPage extends Component {
                     </div>
                   </div>
                   <div className="info-message" style={{marginBottom: '15px'}}>
-                    Supported File Types: c, h, cc, cpp, hpp, s, pd, dsp, maxproj, maxpat, gendsp, soul, soulpatch
+              Supported File Types: c, h, cc, cpp, hpp, s, pd, dsp, gendsp, maxproj, maxpat, genexpr, soul, soulpatch
                   </div>
                 </div>
 
