@@ -209,7 +209,7 @@ class PatchCode extends Component {
     const activeTabFileName = fileUrls.length && this.getFileName(fileUrls[activeTab]);
     const filesAreSaving = patchSourceCodeFiles[patch._id] && patchSourceCodeFiles[patch._id].some(file => file.isSaving);
     const isPdFile = /\.pd$/i.test(activeTabFileName);
-    const isGenFile = /\.gendsp$/i.test(activeTabFileName);
+    const isGenFile = /\.gendsp$/i.test(activeTabFileName) || /\.maxpat$/i.test(activeTabFileName) || /\.maxproj$/i.test(activeTabFileName);
     const unsavedFileChanges = patchSourceCodeFiles[patch._id] && this.getPatchCodeHasBeenEdited(patchSourceCodeFiles[patch._id]);
     const isHostedFile = this.isHostedFile(fileUrls[activeTab]);
     const editorReadOnly = !canEdit || filesAreSaving || !isHostedFile || !editModeActive;
