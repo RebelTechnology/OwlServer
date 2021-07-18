@@ -1,0 +1,67 @@
+version: "3.8"
+services:
+  mongodb:
+    image: mongo:4.4.6-bionic
+    container_name: mongo
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MONGO_INITDB_DATABASE: api
+      - MONGO_INITDB_ROOT_USERNAME: MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD: MONGO_INITDB_ROOT_PASSWORD
+    volumes:
+      - ./volumes/mongodb:/data/db
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+  api:
+    build:
+      dockerfile: ./web/api/Dockerfile
+      context: ./web
+    container_name: api
+    environment:
+      variables:
+        - NODE_ENV: staging
+        - API_PORT: 3000
+        - MONGO_COLLECTION: patches
+        - WORDPRESS_BASE_URL: https://wordpress
+        - PATCH_SOURCE_URL_FRAGMENT: wp-content/uploads/patch-files
+        - PATCH_FILES_SOURCE_PATH: /patch-files
+        - PATCH_BUILDER_PATH: /patch-builder/patch-builder.php
+        - HEAVY_BUILD_SCRIPT_PATH: /opt/OwlProgram/compile-heavy.sh
+        - BUILD_SOURCE_PATH: /patch-builder/build-src
+        - BUILD_TEMP_PATH: /patch-builder/build-tmp
+        - SYSEX_PATH: /patch-builder/build
+        - JS_PATH: /patch-builder/build-js
+        - C_PATH: /patch-builder/build-c
+        - JS_BUILD_TYPE: min
+        - MONGO_CONNECTION_STRING: MONGO_CONNECTION_STRING
+        - JWT_SECRET: JWT_SECRET
+        - API_KEY: API_KEY
+        - PATCH_UPLOAD_SECRET: PATCH_UPLOAD_SECRET
+        - WORDPRESS_XML_RPC_USERNAME: WORDPRESS_XML_RPC_USERNAME
+        - WORDPRESS_XML_RPC_PASSWORD: WORDPRESS_XML_RPC_PASSWORD
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+  # mysql:
+  #   image: mysql:5.7
+  #   restart: always
+  #   environment:
+  #     MYSQL_DATABASE: wordpress
+  #     MYSQL_USER: wordpress
+  #     MYSQL_RANDOM_ROOT_PASSWORD: "1"
+  #   volumes:
+  #     - ./mysql-dump/:/docker-entrypoint-initdb.d
+  #     - ./volumes/mysql:/var/lib/mysql
+  # wordpress:
+  #   build: wordpress
+  #   container_name: wordpress
+  #   ports:
+  #     - 8080:80
+  #   environment:
+  #     WORDPRESS_DB_HOST: mysql
+  #     WORDPRESS_DB_USER: wordpress
+  #     WORDPRESS_DB_PASSWORD: WORDPRESS_DB_PASSWORD
+  #     WORDPRESS_DB_NAME: wordpress
+  #   restart: always
