@@ -8,7 +8,7 @@ const PATCH_TYPE_FAUST     = 'faust';
 const PATCH_TYPE_PUREDATA  = 'pd';
 const PATCH_TYPE_UNKNOWN   = 'unknown';
 
-const MAKE_TARGET_SYSX     = 'sysex';
+const MAKE_TARGET_SYSEX    = 'sysex';
 const MAKE_TARGET_WEB      = 'web';
 const MAKE_TARGET_MINIFY   = 'minify';
 

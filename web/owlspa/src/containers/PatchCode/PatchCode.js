@@ -210,12 +210,13 @@ class PatchCode extends Component {
     const filesAreSaving = patchSourceCodeFiles[patch._id] && patchSourceCodeFiles[patch._id].some(file => file.isSaving);
     const isPdFile = /\.pd$/i.test(activeTabFileName);
     const isGenFile = /\.gendsp$/i.test(activeTabFileName); //  || /\.maxpat$/i.test(activeTabFileName) || /\.maxproj$/i.test(activeTabFileName); fix GenPatchFileSVG to support maxpat and maxproj structures
+    const isBinFile = /\.wav$/i.test(activeTabFileName) || /\.bin$/i.test(activeTabFileName);
     const unsavedFileChanges = patchSourceCodeFiles[patch._id] && this.getPatchCodeHasBeenEdited(patchSourceCodeFiles[patch._id]);
     const isHostedFile = this.isHostedFile(fileUrls[activeTab]);
     const editorReadOnly = !canEdit || filesAreSaving || !isHostedFile || !editModeActive;
     let pdPatchSvg = null;
     let genFileJson;
-    const showPatchCodeEditControls = !isPdFile && !isGenFile;
+    const showPatchCodeEditControls = !isPdFile && !isGenFile && !isBinFile;
 
     if(isPdFile && typeof activeTabFileString === 'string' && activeTabFileString !== 'Loading...'){
       pdPatchSvg = <div dangerouslySetInnerHTML={{__html: this.getSvgString(activeTabFileString)}} />

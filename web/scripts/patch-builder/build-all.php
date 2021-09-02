@@ -24,7 +24,7 @@ function usage() {
     echo '  --interval=<seconds> Interval in seconds before compiling the next patch. Defaults ' . DEFAULT_INTERVAL . ' to seconds.' . PHP_EOL;
     echo '  --skip=<X> 	 	 Skip the first X items.' . PHP_EOL;
     echo '  --limit=<X> 	 Process max X items.' . PHP_EOL;
-    echo '  --web                Compiles a patch into JavaScript instead of into .sysx.' . PHP_EOL;
+    echo '  --web                Compiles a patch into JavaScript instead of into .syx.' . PHP_EOL;
     echo '  --no-color           Suppresses coloured output.' . PHP_EOL;
     echo '  --dry-run            Dry run.' . PHP_EOL;
 } // function usage
@@ -45,7 +45,7 @@ if ((isset($options['h']) && false === $options['h']) || (isset($options['help']
     exit(1);
 }
 
-$makeTarget = MAKE_TARGET_SYSX;
+$makeTarget = MAKE_TARGET_SYSEX;
 if (isset($options['web']) && false === $options['web']) {
     $makeTarget = MAKE_TARGET_MINIFY;
 }

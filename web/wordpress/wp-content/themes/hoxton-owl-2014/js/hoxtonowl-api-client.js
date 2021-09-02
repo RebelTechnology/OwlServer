@@ -286,7 +286,7 @@ HoxtonOwl.ApiClient.prototype.deletePatch = function (patchId, callback) {
  * @param {string} patchId
  *     The patch ID.
  * @param {string} format
- *     The desired format (either `sysx` or `js`).
+ *     The desired format (either `sysex` or `js`).
  * @param {Function} callback
  *     A callback that will be invoked once data is loaded. This function will
  *     be passed the freshly loaded patch.

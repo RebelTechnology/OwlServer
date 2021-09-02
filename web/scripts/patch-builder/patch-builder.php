@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-// `make sysx` example:
+// `make sysex` example:
 // make BUILD='/tmp/owl-patch-xxx' PATCHSOURCE='/tmp/owl-patch-xxx' PATCHFILE='OverdrivePatch.hpp' PATCHNAME='Overdrive' PATCHCLASS='OverdrivePatch' PATCHIN=2 PATCHOUT=2 sysex
 
 use Symfony\Component\Process\Process;
@@ -257,7 +257,7 @@ if (isset($options['docker']) && false === $options['docker']) {
 }
 //$useDocker = true; // Uncomment this line to run API locally
 
-$buildCmd = 'make sysx';
+$buildCmd = 'make sysex';
 
 $keepTmpFiles = false;
 if (isset($options['keep-tmp-files']) && false === $options['keep-tmp-files']) {
@@ -275,7 +275,7 @@ if (isset($options['name'])) {
     }
 }
 
-$makeTarget = MAKE_TARGET_SYSX;
+$makeTarget = MAKE_TARGET_SYSEX;
 if (isset($options['web']) && false === $options['web']) {
     $makeTarget = MAKE_TARGET_MINIFY; // Same as MAKE_TARGET_WEB, but yields minified JS file
 }
@@ -470,7 +470,7 @@ if ($useDocker) {
 } else {
   $cmd = 'EM_CACHE="/api/emsdk/.emscripten_cache" EM_CONFIG="/api/emsdk/.emscripten" make ';
 }
-if ($buildCmd == 'make sysx') {
+if ($buildCmd == 'make sysex') {
 
     // First source file only
     // See: https://github.com/pingdynasty/OwlServer/issues/66#issuecomment-86660216
@@ -509,7 +509,7 @@ if ($buildCmd == 'make sysx') {
     $cmd .= $makeTarget;
 
     if (!(isset($options['sysex']) && false === $options['sysex'])
-         && MAKE_TARGET_SYSX == $makeTarget) {
+         && MAKE_TARGET_SYSEX == $makeTarget) {
     }
     $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
 
@@ -530,7 +530,7 @@ if ($buildCmd == 'make sysx') {
     $cmd .= 'GEN=' . escapeshellarg($className) . ' ';
     $cmd .= $makeTarget;
     if (!(isset($options['sysex']) && false === $options['sysex'])
-         && MAKE_TARGET_SYSX == $makeTarget) {
+         && MAKE_TARGET_SYSEX == $makeTarget) {
       $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
     }
 
@@ -550,7 +550,7 @@ if ($buildCmd == 'make sysx') {
     $cmd .= 'MAXIMILIAN=' . escapeshellarg($className) . ' ';
     $cmd .= $makeTarget;
     if (!(isset($options['sysex']) && false === $options['sysex'])
-         && MAKE_TARGET_SYSX == $makeTarget) {
+         && MAKE_TARGET_SYSEX == $makeTarget) {
       $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
     }
 
@@ -599,7 +599,7 @@ if (0 !== $exitCode) {
 }
 outputMessage('Build successful!');
 
-if (MAKE_TARGET_SYSX == $makeTarget) {
+if (MAKE_TARGET_SYSEX == $makeTarget) {
 
     /*
      * Move .syx file to download location

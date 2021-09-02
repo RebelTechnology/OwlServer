@@ -69,9 +69,9 @@ Retrieves a list of all tags.
 
 ### Builds (Compilation)
 
-#### GET /builds/:id[?format={sysex|sysx|js}]
+#### GET /builds/:id[?format={sysex|js}]
 Returns the build for the specified patch.
-The `format` parameter defaults to `sysx`.
+The `format` parameter defaults to `sysex`.
 
 #### \*PUT /builds/:id
 Builds the specified patch.

@@ -16,14 +16,14 @@ const config = require('../lib/config');
  * @param {string} format
  * @return {string}
  */
-const getBuildFormat = (buildFormat='sysx') => {
+const getBuildFormat = (buildFormat='sysex') => {
 
-  if (buildFormat === 'sysex') { // 'sysex' is just an alias for 'sysx'
-    buildFormat = 'sysx'; // normalize
+  if (buildFormat === 'syx') { // 'syx' is just an alias for 'sysex'
+    buildFormat = 'sysex'; // normalize
   }
 
   // validate
-  if (buildFormat !== 'js' && buildFormat !== 'sysx' && buildFormat !== 'c') {
+  if (buildFormat !== 'js' && buildFormat !== 'sysex' && buildFormat !== 'c') {
     throw { public: true, message: 'Invalid format.', status: 500 };
   }
 
@@ -33,9 +33,9 @@ const getBuildFormat = (buildFormat='sysx') => {
 /**
  * Downloads the build for the specified patch.
  *
- * GET /builds/{patchId}[?format={sysex|sysx|js}]
+ * GET /builds/{patchId}[?format={sysex|js}]
  *
- * The `format` parameter defaults to `sysx`.
+ * The `format` parameter defaults to `sysex`.
  */
 router.get('/:id', function (req, res) {
 
@@ -101,7 +101,7 @@ router.put('/:id', (req, res) => {
   }
 
   // Build format
-  let format = 'sysx'; // default
+  let format = 'sysex'; // default
   if (req.body.format) {
     try {
       format = getBuildFormat(req.body.format);

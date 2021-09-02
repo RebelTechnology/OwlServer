@@ -59,7 +59,7 @@ const download = (patch, patchModel, stream, format, res) => {
   let buildFile;
   let filename;
 
-  if (format === 'sysx') {
+  if (format === 'sysex') {
     buildFile = path.join(config.patchBuilder.sysexPath, patch.seoName + '.syx');
   } else if (format === 'js') {
     buildFile = path.join(config.patchBuilder.jsPath, patch.seoName + (config.patchBuilder.jsBuildType === 'min' ? '.min' : '') + '.js');
@@ -79,14 +79,14 @@ const download = (patch, patchModel, stream, format, res) => {
   if (!stream) {
     res.setHeader('Content-disposition', 'attachment; filename=' + filename);
   }
-  if(!stream && format === 'sysx') {
-    // increment download count for sysx files
+  if(!stream && format === 'sysex') {
+    // increment download count for sysex files
     patchModel.incrementDownloadCount(patch._id);
   }
   
   res.setHeader('Content-length', fs.statSync(buildFile)['size']); // FIXME - Move this somewhere else
   
-  if (format === 'sysx') {
+  if (format === 'sysex') {
     res.setHeader('Content-type', 'application/octet-stream');
   } else if (format === 'js') {
     res.setHeader('Content-type', 'text/javascript');

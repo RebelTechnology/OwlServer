@@ -572,7 +572,7 @@ function sendProgramFromUrl(url) {
 };
 
 export function loadPatchOnDevice(patchId) {
-	const url = API_END_POINT + '/builds/' + patchId + '?format=sysx&amp;download=1';
+	const url = API_END_POINT + '/builds/' + patchId + '?format=sysex&amp;download=1';
 	return sendProgramFromUrl(url);
 };
 

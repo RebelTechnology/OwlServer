@@ -118,7 +118,7 @@ class PatchStats extends Component {
           <div className="patch-stats-row">
               <span className="parameter-label">SysEx</span>
               <span className="parameter-value">
-                <a className="sysExDownloadLink" href={'/api/builds/'+ patch._id +'?format=sysx&amp;download=1'}>Download</a>
+                <a className="sysExDownloadLink" href={'/api/builds/'+ patch._id +'?format=sysex&amp;download=1'}>Download</a>
                 {patch.sysExLastUpdated && ' (built on ' + this.isoDateToLocaleString(patch.sysExLastUpdated) + ' )'}
               </span>
           </div>

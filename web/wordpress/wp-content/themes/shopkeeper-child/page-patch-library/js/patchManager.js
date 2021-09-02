@@ -565,7 +565,7 @@ HoxtonOwl.patchManager = {
                 // Show build download links
                 if (self.selectedPatch().sysExAvailable) {
                     $('.sysExDownloadLink').on('click', function(){
-                        window.location = apiClient.apiEndPoint + '/builds/' + self.selectedPatch()._id + '?format=sysx&amp;download=1';
+                        window.location = apiClient.apiEndPoint + '/builds/' + self.selectedPatch()._id + '?format=sysex&amp;download=1';
                     });
                 }
 
@@ -651,7 +651,7 @@ HoxtonOwl.patchManager = {
 
                 // hook up owl-load-button
                 $('#load-owl-button').click(function(){
-                    sendProgramFromUrl('/api/builds/' + selectedPatch()._id + '?format=sysx&amp;download=1');
+                    sendProgramFromUrl('/api/builds/' + selectedPatch()._id + '?format=sysex&amp;download=1');
                     statusRequestLoop();
                 });
 
@@ -687,7 +687,7 @@ HoxtonOwl.patchManager = {
         });
         $(document).on('click', '.compileLink', function(e) {
 
-            var target = 'sysx';
+            var target = 'sysex';
             if ($(e.target).hasClass('js')) {
                 target = 'js';
             }

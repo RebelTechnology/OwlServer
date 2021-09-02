@@ -48,7 +48,7 @@ client
 
     console.log('Downloading Sysex build...');
     const file = fs.createWriteStream('/tmp/patch.syx');
-    return client.downloadPatch(newPatchId, 'sysx', file);
+    return client.downloadPatch(newPatchId, 'sysex', file);
   })
 
   // Download JS build
