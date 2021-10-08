@@ -12,7 +12,7 @@ require_once __DIR__ . '/settings.php';
 
 define('PATCH_SRC_DIR_PREFIX',   'owl-src-');
 define('PATCH_BUILD_DIR_PREFIX', 'owl-build-');
-define('OWL_SRC_DIR',            '/opt/OwlProgram.online/');
+define('OWL_SRC_DIR',            '/opt/OwlProgram/');
 define('COMPILE_TIMEOUT',        80); // time-out in seconds
 
 $stdout = fopen('php://stdout', 'w+');
@@ -465,10 +465,10 @@ if ($onlyDloadFiles) {
  */
 
 if ($useDocker) {
-  $cmd = 'docker exec ' . DOCKER_CONTAINER_NAME . ' make -C /opt/OwlProgram.online ';
+  $cmd = 'docker exec ' . DOCKER_CONTAINER_NAME . ' make -C /opt/OwlProgram ';
   // in this case the env vars are already set inside the container
 } else {
-  $cmd = 'EM_CACHE="/opt/.emscripten_cache" EM_CONFIG="/opt/.emscripten" make ';
+  $cmd = 'EM_CACHE="/api/emsdk/.emscripten_cache" EM_CONFIG="/api/emsdk/.emscripten" make ';
 }
 if ($buildCmd == 'make sysx') {
 
@@ -512,7 +512,7 @@ if ($buildCmd == 'make sysx') {
          && MAKE_TARGET_SYSX == $makeTarget) {
     }
     $cmd .= ' ' . MAKE_TARGET_MINIFY; // build both web (minified) and sysex
-    
+
 
 } elseif ($buildCmd == 'make gen') {
 
