@@ -17,22 +17,31 @@ RUN apt update && \
     apt upgrade -y && \
     apt install -y build-essential make gcc-arm-none-eabi gcc
 
-RUN git clone https://github.com/pingdynasty/OwlProgram /opt/OwlProgram
+RUN git clone -b release/v21.1 https://github.com/pingdynasty/OwlProgram /opt/OwlProgram
 
 RUN cd /opt/OwlProgram && \
     git submodule init && \
     git submodule update
 
-ENV TOOLROOT = /usr/bin/
-
 RUN apt install -y python python-enum34 python-jinja2 python-nose2 && \
     git clone https://github.com/pingdynasty/hvcc.git
 
+RUN apt install -y faust
+
+RUN git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && \
+    ./emsdk install latest && ./emsdk activate latest && . ./emsdk_env.sh && cat ./emsdk_env.sh
+
+ENV TOOLROOT=/usr/bin/
+ENV PATH=/api/emsdk:/api/emsdk/upstream/emscripten:/api/emsdk/node/14.15.5_64bit/bin:$PATH
+ENV EMSDK=/api/emsdk
+ENV EM_CONFIG=/api/emsdk/.emscripten
+ENV EMSDK_NODE=/api/emsdk/node/14.15.5_64bit/bin/node
+
 RUN apt install -y libasound2-dev libcurl4-openssl-dev pkg-config && \
-    git clone https://github.com/pingdynasty/FirmwareSender && \
-    cd FirmwareSender/Builds/Linux && \
-    make && \
-    cp build/FirmwareSender /opt/OwlProgram/Tools && \
+    wget -cq https://github.com/pingdynasty/FirmwareSender/releases/download/v0.2/FirmwareSender-linux64.zip && \
+    unzip FirmwareSender-linux64.zip -d /opt/OwlProgram/Tools && \
+    chmod +x /opt/OwlProgram/Tools/FirmwareSender && chmod +x /opt/OwlProgram/Tools/FirmwareReceiver && \
+    cd /opt/OwlProgram && make libs && \
     cd /api
 
 EXPOSE 3000
