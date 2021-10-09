@@ -17,11 +17,13 @@ RUN apt update && \
     apt upgrade -y && \
     apt install -y build-essential make gcc-arm-none-eabi gcc
 
-RUN git clone -b release/v21.1 https://github.com/pingdynasty/OwlProgram /opt/OwlProgram
+RUN git clone -b develop https://github.com/pingdynasty/OwlProgram /opt/OwlProgram
 
 RUN cd /opt/OwlProgram && \
     git submodule init && \
     git submodule update
+
+RUN cd /opt/OwlProgram/Tools && yarn add uglify-js && cd /api
 
 RUN apt install -y python python-enum34 python-jinja2 python-nose2 && \
     git clone https://github.com/pingdynasty/hvcc.git
@@ -43,7 +45,7 @@ RUN apt install -y libasound2-dev libcurl4-openssl-dev pkg-config && \
     wget -cq https://github.com/pingdynasty/FirmwareSender/releases/download/v0.2/FirmwareSender-linux64.zip && \
     unzip FirmwareSender-linux64.zip -d /opt/OwlProgram/Tools && \
     chmod +x /opt/OwlProgram/Tools/FirmwareSender && chmod +x /opt/OwlProgram/Tools/FirmwareReceiver && \
-    cd /opt/OwlProgram && make libs && \
+    cd /opt/OwlProgram && make all && \
     cd /api
 
 EXPOSE 3000
