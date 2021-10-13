@@ -7,6 +7,10 @@
 # Use the '!' flag to negate the rule above:
 !.gitignore
 
+!.dockerignore
+
+!/Dockerfile
+
 # Then we add dirs and files back into the repo one by one.
 
 !/robots.txt

@@ -1,0 +1,43 @@
+name: mongo
+type: Backend Service
+
+image:
+  location: mongo:4.4.6-bionic
+  port: 27017
+
+count: 1
+cpu: 256
+memory: 1024
+
+exec: true
+
+variables:
+  PUID: 1000
+  PGID: 1000
+  LOG_LEVEL: debug
+  MONGO_INITDB_DATABASE: api
+
+environments:
+  dev:
+    secrets:
+      MONGO_INITDB_ROOT_USERNAME: /copilot/web/dev/secrets/mongo_root_user
+      MONGO_INITDB_ROOT_PASSWORD: /copilot/web/dev/secrets/mongo_root_password
+    storage:
+      volumes:
+        MongoDB:
+          efs:
+            id: fs-0a9464fa
+          path: /data/db
+          read_only: false
+        MongoInit:
+          efs:
+            id: fs-fa95650a
+          path: /docker-entrypoint-initdb.d
+          read_only: false
+
+  production:
+    variables:
+      LOG_LEVEL: info
+    secrets:
+      MONGO_INITDB_ROOT_USERNAME: /copilot/web/production/secrets/mongo_root_user
+      MONGO_INITDB_ROOT_PASSWORD: /copilot/web/production/secrets/mongo_root_password

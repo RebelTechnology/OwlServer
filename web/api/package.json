@@ -1,10 +1,4 @@
 {
-  "name": "owl-api",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "start": "node ./bin/www"
-  },
   "dependencies": {
     "assert": "^1.1.2",
     "body-parser": "~1.8.1",
@@ -13,7 +7,7 @@
     "cors": "^2.5.2",
     "debug": "^2.1.0",
     "del": "^3.0.0",
-    "dotenv": "^2.0.0",
+    "dotenv": "^8.2.0",
     "escape-string-regexp": "^1.0.5",
     "express": "~4.9.0",
     "jsonwebtoken": "^7.2.1",
@@ -32,5 +26,11 @@
   },
   "engine-strict": {
     "node": ">=6.6."
-  }
+  },
+  "name": "owl-api",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "version": "0.0.0"
 }
