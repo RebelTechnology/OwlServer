@@ -5,7 +5,7 @@ import {
 
 const eraseDeviceStorage = () => {
   return (dispatch) => {
-    
+
     dispatch({
       type: CLEAR_PRESET_LIST
     });
@@ -15,7 +15,7 @@ const eraseDeviceStorage = () => {
     window.setTimeout(() => {
       owlCmd.requestDevicePresets();
     }, 1000);
-    
+
   }
 }
 

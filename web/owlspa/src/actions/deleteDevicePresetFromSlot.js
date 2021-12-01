@@ -8,9 +8,9 @@ const deleteDevicePresetFromSlot = slot => {
     dispatch({
       type: CLEAR_PRESET_LIST
     });
-    
+
     owlCmd.deleteDevicePresetFromSlot(slot);
-    
+
     window.setTimeout(() => {
       owlCmd.requestDevicePresets();
     }, 1000);

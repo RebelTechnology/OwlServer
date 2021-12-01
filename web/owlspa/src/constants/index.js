@@ -10,7 +10,7 @@ export const RECEIVE_TAGS = 'RECEIVE_TAGS';
 export const REQUEST_CURRENT_USER = 'REQUEST_CURRENT_USER';
 export const RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
 
-export const REQUEST_PATCH_DETAILS = 'REQUEST_PATCH_DETAILS'; 
+export const REQUEST_PATCH_DETAILS = 'REQUEST_PATCH_DETAILS';
 export const RECEIVE_PATCH_DETAILS = 'RECEIVE_PATCH_DETAILS';
 
 export const REQUEST_DELETE_PATCH = 'REQUEST_DELETE_PATCH';
@@ -80,8 +80,8 @@ export const SELECT_MIDI_OUTPUT_PORT_SUCCESS = 'SELECT_MIDI_OUTPUT_PORT_SUCCESS'
 
 export const LOAD_PATCH_INTO_EDIT_PATCH_FORM = 'LOAD_PATCH_INTO_EDIT_PATCH_FORM';
 
-export const UPLOADING_PATCH_FILES = 'UPLOADING_PATCH_FILES'; 
-export const PATCH_FILES_UPLOADED = 'PATCH_FILES_UPLOADED'; 
+export const UPLOADING_PATCH_FILES = 'UPLOADING_PATCH_FILES';
+export const PATCH_FILES_UPLOADED = 'PATCH_FILES_UPLOADED';
 export const ERROR_UPLOADING_PATCH_FILE = 'ERROR_UPLOADING_PATCH_FILE';
 export const REMOVE_UPLOADED_FILE = 'REMOVE_UPLOADED_FILE';
 
@@ -108,4 +108,3 @@ export const CLIENT_REMOVE_PATCH_STAR = 'CLIENT_REMOVE_PATCH_STAR';
 export const API_END_POINT = '//' + window.location.host + '/api';
 export const WORDPRESS_AJAX_END_POINT = '//' + window.location.host + '/wp-admin/admin-ajax.php';
 export const PATCH_UPLOAD_DIR = window.location.protocol + '//' + window.location.host + '/wp-content/uploads/patch-files/';
-

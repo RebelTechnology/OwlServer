@@ -22,7 +22,7 @@ const connectToOwl = () => {
       });
       owlCmd.startPollingOwlStatus();
       owlCmd.requestDevicePresets();
-    }, 
+    },
     (err) => {
       dispatch({
         type: RECEIVE_CONNECTION_FROM_OWL,
@@ -36,7 +36,7 @@ const connectToOwl = () => {
           header :'Error',
           isError: true,
           contents: 'Failed to Connect to OWL'
-        }] 
+        }]
       }));
     });
   }

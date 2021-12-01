@@ -56,12 +56,12 @@ const owlState = (state = initialState, action) => {
         connectedMidiInputPort: action.connectedMidiInputPort,
         connectedMidiOutputPort: action.connectedMidiOutputPort,
       }
-    case SELECT_MIDI_INPUT_PORT_SUCCESS: 
+    case SELECT_MIDI_INPUT_PORT_SUCCESS:
       return {
         ...state,
         connectedMidiInputPort: action.connectedMidiInputPort
       }
-    case SELECT_MIDI_OUTPUT_PORT_SUCCESS: 
+    case SELECT_MIDI_OUTPUT_PORT_SUCCESS:
       return {
         ...state,
         connectedMidiOutputPort: action.connectedMidiOutputPort
@@ -78,19 +78,19 @@ const owlState = (state = initialState, action) => {
         patchIsLoading: false,
         patchLoaded : action.patchLoaded
       }
-    case STORE_PATCH_ON_DEVICE_REQUEST: 
+    case STORE_PATCH_ON_DEVICE_REQUEST:
       return {
         ...state,
         patchIsStoring: true,
         patchStoredSuccess: false
       };
-    case STORE_PATCH_ON_DEVICE_ERROR: 
+    case STORE_PATCH_ON_DEVICE_ERROR:
       return {
         ...state,
         patchIsStoring: false,
         patchStoredSuccess: false
       };
-    case STORE_PATCH_ON_DEVICE_SUCCESS: 
+    case STORE_PATCH_ON_DEVICE_SUCCESS:
       return {
         ...state,
         patchIsStoring: false,

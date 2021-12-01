@@ -43,7 +43,7 @@ class PresetList extends Component {
               </thead>
               <tbody>
                 { sortedPresets.map((preset, i) => {
-                    
+
                     const isActive = preset.slot === activePresetSlot;
                     const isRamSlot = preset.slot === 0;
 
@@ -80,15 +80,15 @@ class PresetList extends Component {
 
 }
 
-const mapStateToProps = ({ 
-  owlState: { 
+const mapStateToProps = ({
+  owlState: {
     presets,
     activePresetSlot,
     isConnected
-  } 
+  }
 }) => {
-  
-  return { 
+
+  return {
     presets,
     activePresetSlot,
     isConnected

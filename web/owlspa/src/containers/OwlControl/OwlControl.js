@@ -32,16 +32,16 @@ class OwlControl extends Component {
     }
 
     if(navigator.requestMIDIAccess){
-    
+
       const slot = parseInt(window.prompt('Enter a slot number from 0 to 40'));
-    
+
       if(typeof slot !== 'number' || slot < 0 || slot > 40){
         window.alert('slot must be a number between 0 and 40 inclusive');
         return;
       }
-    
+
       this.props.storePatchInDeviceSlot(this.props.patch, slot);
-    
+
     } else {
       window.alert('Please use a Web MIDI enabled browser (e.g. Chrome) to connect to your OWL');
     }
@@ -68,26 +68,26 @@ class OwlControl extends Component {
 
     return (
       <div className="owl-device-control" style={style}>
-        { loadButton && isConnected && ( 
-          <button 
+        { loadButton && isConnected && (
+          <button
             onClick={() => this.loadAndRunPatchOnDevice()}
             disabled={patchIsLoading}>
             {patchIsLoading ? 'Loading ... ' : 'Load'}
             {patchIsLoading && <i className="loading-spinner"></i> }
-          </button> 
+          </button>
         )}
 
-        { storeButton && isConnected && ( 
-          <button 
+        { storeButton && isConnected && (
+          <button
             onClick={() => this.handleStorePatchButtonClick()}
             disabled={patchIsStoring}>
             {patchIsStoring ? 'Storing ... ' : 'Store'}
             {patchIsStoring && <i className="loading-spinner"></i> }
-          </button> 
+          </button>
         )}
 
         { !isConnected && (
-          <button 
+          <button
             onClick={() => this.connectToOwl()}
             disabled={isConnecting}>
               {isConnecting ? 'Connecting ... ' : 'Connect to Device'}
@@ -125,7 +125,7 @@ OwlControl.propTypes = {
 }
 
 const mapStateToProps = ({ owlState }) => {
-  return { 
+  return {
     owlState
   }
 }

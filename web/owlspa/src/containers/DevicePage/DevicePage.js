@@ -26,8 +26,8 @@ class DevicePage extends Component {
     owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
   }
 
-  render(){ 
-    
+  render(){
+
     const {
       isConnected,
       uuid
@@ -46,7 +46,7 @@ class DevicePage extends Component {
               </div>
             </DevicePageTile>
 
-            { isConnected && ( 
+            { isConnected && (
               <DevicePageTile title="Device Commands">
                 <div>
                   <button onClick={() => this.handleGetPatchesClick() }>
@@ -78,7 +78,7 @@ class DevicePage extends Component {
 }
 
 const mapStateToProps = ({ owlState: { isConnected, presets, activePresetSlot, uuid } }) => {
-  return { 
+  return {
     isConnected,
     presets,
     activePresetSlot,

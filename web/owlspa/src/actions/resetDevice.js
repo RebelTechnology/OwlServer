@@ -5,7 +5,7 @@ import {
 
 const resetDevice = () => {
   return (dispatch) => {
-    
+
     dispatch({
       type: CLEAR_PRESET_LIST
     });
@@ -15,7 +15,7 @@ const resetDevice = () => {
     window.setTimeout(() => {
       owlCmd.requestDevicePresets();
     }, 1000);
-    
+
   }
 }
 
