@@ -32,7 +32,7 @@ class PresetList extends Component {
 
     return (
       <div styleName="preset-list" >
-        <h2>Presets</h2>
+        <h2>Patches</h2>
         {!!presets.length && (
           <div styleName="table-wrapper">
             <table>
@@ -57,14 +57,7 @@ class PresetList extends Component {
                           <td>{isActive ? 'Selected' : <button onClick={() => this.handleSelectPresetSlot(preset.slot) }>Select</button>}</td>
                         )}
                         {!isRamSlot && (
-                          <td>
-                            {/* <IconButton 
-                              style={{ padding: '0 4px', marginBottom: '3px' }}
-                              title="Delete Preset" 
-                              icon="delete"
-                              onClick={() => this.handleDeleteClick(preset.slot)} 
-                            /> */}
-                          </td>
+                          <td><button onClick={() => this.handleDeleteClick(preset.slot)}>Delete</button></td>
                         )}
                       </tr>
                     );
