@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus } from 'actions';
+import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus, showDeviceUUID } from 'actions';
 
 class OwlControl extends Component {
 
@@ -48,7 +48,7 @@ class OwlControl extends Component {
   }
 
   render(){
-    const { owlState, storeButton, loadButton, style } = this.props;
+    const { owlState, storeButton, loadButton, style, showDeviceUUID } = this.props;
 
     const {
       firmWareVersion,
@@ -61,7 +61,11 @@ class OwlControl extends Component {
       patchIsStoring,
       presets,
       activePresetSlot
+      uuid,
     } = owlState;
+
+
+    if (!uuid) this.props.showDeviceUUID();
 
     const loadedPreset = presets.length && presets.find(preset => preset.slot === activePresetSlot);
     const loadedPatchName = !!loadedPreset && loadedPreset.name;
@@ -101,6 +105,7 @@ class OwlControl extends Component {
           {status && (<p>{status}</p>)}
           {programMessage && (<p><span>Message:</span> {programMessage}</p>)}
           {programError && (<p><span>Error:</span> {programError}</p>)}
+          { uuid && (<p><span>Device UUID:</span> <code>{uuid}</code></p>) }
         </div>
       </div>
     );
@@ -130,4 +135,4 @@ const mapStateToProps = ({ owlState }) => {
   }
 }
 
-export default connect(mapStateToProps, { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus })(OwlControl);
+export default connect(mapStateToProps, { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus, showDeviceUUID })(OwlControl);

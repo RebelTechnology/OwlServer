@@ -1,7 +1,6 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import { OwlControl } from 'containers';
-import { resetDevice, eraseDeviceStorage, showDeviceUUID } from 'actions';
 import DevicePageTile from './DevicePageTile/DevicePageTile';
 import MidiPortSelector from './MidiPortSelector/MidiPortSelector';
 import PresetList from './PresetList/PresetList';
@@ -22,7 +21,6 @@ class DevicePage extends Component {
   }
 
   handleGetPatchesClick(){
-    this.props.showDeviceUUID(); // request UUID
     owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
   }
 
@@ -30,7 +28,6 @@ class DevicePage extends Component {
 
     const {
       isConnected,
-      uuid
     } = this.props;
 
     return (
@@ -42,7 +39,6 @@ class DevicePage extends Component {
               <div>
                 <OwlControl />
                 <MidiPortSelector />
-               {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>Device UUID: {uuid}</div>}
               </div>
             </DevicePageTile>
 
@@ -77,13 +73,12 @@ class DevicePage extends Component {
 
 }
 
-const mapStateToProps = ({ owlState: { isConnected, presets, activePresetSlot, uuid } }) => {
+const mapStateToProps = ({ owlState: { isConnected, presets, activePresetSlot } }) => {
   return {
     isConnected,
     presets,
     activePresetSlot,
-    uuid
   }
 };
 
-export default connect(mapStateToProps, { resetDevice, eraseDeviceStorage, showDeviceUUID })(DevicePage);
+export default connect(mapStateToProps, { resetDevice, eraseDeviceStorage })(DevicePage);
