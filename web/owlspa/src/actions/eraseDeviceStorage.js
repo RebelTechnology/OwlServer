@@ -1,6 +1,7 @@
 import { owlCmd } from 'lib';
 import {
-  CLEAR_PRESET_LIST
+  CLEAR_PRESET_LIST,
+  CLEAR_RESOURCE_LIST,
 } from 'constants';
 
 const eraseDeviceStorage = () => {
@@ -8,6 +9,10 @@ const eraseDeviceStorage = () => {
 
     dispatch({
       type: CLEAR_PRESET_LIST
+    });
+
+    dispatch({
+      type: CLEAR_RESOURCE_LIST
     });
 
     owlCmd.eraseDeviceStorage();

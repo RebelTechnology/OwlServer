@@ -3,8 +3,10 @@ import {
   RECEIVE_CONNECTION_FROM_OWL,
   BEGIN_LOAD_PATCH_ON_TO_OWL,
   CLEAR_PRESET_LIST,
+  CLEAR_RESOURCE_LIST,
   COMPLETE_LOAD_PATCH_ON_TO_OWL,
   DEVICE_PRESET_RECEIVED,
+  DEVICE_RESOURCE_RECEIVED,
   DEVICE_PROGRAM_CHANGE,
   DEVICE_UUID_RECEIVED,
   OWL_FIRMWARE_VERSION_RECEIVED,
@@ -35,6 +37,7 @@ const initialState = {
   programMessage: null,
   programError: null,
   presets: [],
+  resources: [],
   uuid: null
 };
 
@@ -107,11 +110,24 @@ const owlState = (state = initialState, action) => {
         presets: [],
         activePresetSlot: null
       }
+    case CLEAR_RESOURCE_LIST:
+      return {
+        ...state,
+        resources: [],
+      }
     case DEVICE_PRESET_RECEIVED:
       return {
         ...state,
         presets: [
           ...state.presets.filter(preset => preset.slot !== action.slot),
+          { name: action.name, slot: action.slot }
+        ]
+      };
+    case DEVICE_RESOURCE_RECEIVED:
+      return {
+        ...state,
+        resources: [
+          ...state.resources.filter(resource => resource.slot !== action.slot),
           { name: action.name, slot: action.slot }
         ]
       };

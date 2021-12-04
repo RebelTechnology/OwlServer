@@ -2,9 +2,11 @@ import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import { OwlControl } from 'containers';
 import classNames from 'classnames';
+import { resetDevice, eraseDeviceStorage } from 'actions';
 import DevicePageTile from './DevicePageTile/DevicePageTile';
 import MidiPortSelector from './MidiPortSelector/MidiPortSelector';
 import PresetList from './PresetList/PresetList';
+import ResourceList from './ResourceList/ResourceList';
 import { owlCmd } from 'lib';
 
 class DevicePage extends Component {
@@ -14,6 +16,7 @@ class DevicePage extends Component {
     this.state = {
       activeTab: 0,
       showingPresets: true,
+      showingResources: false,
     };
   }
 
@@ -33,22 +36,33 @@ class DevicePage extends Component {
     owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
   }
 
+  getResources(){
+    owlCmd.requestDeviceResources(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
+  }
+
   handleRefreshClick() {
     if (this.state.showingPresets)
       this.getPresets();
 
+    else if (this.state.showingResources)
+      this.getResources();
   }
 
   handleChangeTab(_,activeTab){
     const showingPresets = !this.state.showingPresets;
+    const showingResources = !this.state.showingResources;
+
     this.setState({
       showingPresets,
+      showingResources,
       activeTab,
     });
 
     if (showingPresets && this.props.presets.length === 0)
       this.getPresets();
 
+    else if (showingResources && this.props.resources.length === 0)
+      this.getResources();
   }
 
   render(){
@@ -60,9 +74,10 @@ class DevicePage extends Component {
     const {
       activeTab,
       showingPresets,
+      showingResources,
     } = this.state;
 
-    const tabNavItems = ['Patches'].map((t,i) => (
+    const tabNavItems = ['Patches', 'Resources'].map((t,i) => (
       <li onClick={(e) => this.handleChangeTab(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
         <span>{t}</span>
       </li>
@@ -85,6 +100,7 @@ class DevicePage extends Component {
                 <div>
                   <button onClick={() => this.handleRefreshClick() }>
                     { showingPresets && "Refresh Patches" }
+                    { showingResources && "Refresh Resources" }
                   </button>
                   <button onClick={() => this.handleEraseStorageClick() }>
                     Erase Storage
@@ -107,6 +123,9 @@ class DevicePage extends Component {
                 <PresetList />
               )}
 
+              { isConnected && showingResources && (
+                <ResourceList />
+              )}
             </div>
           </div>
         </div>
@@ -116,11 +135,12 @@ class DevicePage extends Component {
 
 }
 
-const mapStateToProps = ({ owlState: { isConnected, presets, activePresetSlot } }) => {
+const mapStateToProps = ({ owlState: { isConnected, presets, resources, activePresetSlot } }) => {
   return {
     isConnected,
     presets,
     activePresetSlot,
+    resources,
   }
 };
 

@@ -8,6 +8,7 @@ import * as openWareMidi from './openWareMidi';
 import { API_END_POINT } from 'constants';
 import {
     deviceDispatchPresetReceived,
+    deviceDispatchResourceReceived,
     deviceDispatchDeviceUUIDReceived,
     deviceDispatchProgramChange,
     owlDispatchPatchStatus,
@@ -49,6 +50,12 @@ function systemExclusive(data) {
             var slot = data[4];
             deviceDispatchPresetReceived({ slot, name });
             console.log("preset received: " + slot + ": " + name);
+            break;
+        case OpenWareMidiSysexCommand.SYSEX_RESOURCE_NAME_COMMAND:
+            var name = getStringFromSysex(data, 5, 1);
+            var slot = data[4];
+            deviceDispatchResourceReceived({ slot, name });
+            console.log("resource received: " + slot + ": " + name);
             break;
         case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
             var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
@@ -153,6 +160,14 @@ function sendLoadRequest(){
 function requestDevicePresets(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
+    window.setTimeout(function(){
+	sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
+    }, 1000);
+}
+
+function requestDeviceResources(){
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_RESOURCE_NAME_COMMAND);
     window.setTimeout(function(){
 	sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
     }, 1000);
@@ -264,6 +279,10 @@ function eraseDeviceStorage(){
 }
 
 function deleteDevicePresetFromSlot(slot){
+    HoxtonOwl.midiClient.sendSysexData(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE, [0, 0, 0, 0, slot])
+}
+
+function deleteDeviceResourceFromSlot(slot){
     HoxtonOwl.midiClient.sendSysexData(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE, [0, 0, 0, 0, slot])
 }
 
@@ -549,9 +568,11 @@ export default {
     connectToOwl,
     eraseDeviceStorage,
     deleteDevicePresetFromSlot,
+    deleteDeviceResourceFromSlot,
     loadAndRunPatchOnDevice,
     resetDevice,
     requestDevicePresets,
+    requestDeviceResources,
     sendNoteOff: HoxtonOwl.midiClient.sendNoteOff,
     sendNoteOn: HoxtonOwl.midiClient.sendNoteOn,
     selectMidiInput: HoxtonOwl.midiClient.selectMidiInput,

@@ -1,0 +1,37 @@
+.table-wrapper {
+  border: 1px solid #5d5d5d;
+  border-radius: 5px;
+  background: #5d5d5d;
+}
+
+.resource-list h2 {
+  color: #5d5d5d;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.resource-list table {
+  border-collapse: collapse;
+  margin: 1px;
+}
+
+.resource-list th {
+  font-size: 19px !important;
+}
+
+.resource-list tr {
+  height: 50px;
+}
+
+.resource-list td, .resource-list th {
+  background: #5d5d5d;
+  color: #fff;
+  text-align: center;
+  border-bottom: 1px solid #fff;
+  font-size: 16px;
+}
+
+.resource-list button {
+  padding: 20px;
+  line-height: 0;
+}
