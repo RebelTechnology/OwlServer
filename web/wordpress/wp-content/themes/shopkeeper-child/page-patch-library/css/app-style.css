@@ -922,7 +922,7 @@ h2 {
 }
 
 .btn-large:disabled {
-  background-color: #ccc; 
+  background-color: #ccc;
   border-bottom: 2px solid #999;
 }
 
@@ -1420,5 +1420,3 @@ input[type=submit]:disabled:hover, input[type=reset]:disabled:hover, input[type=
         width: 48.9%;
     }
 }
-
-
