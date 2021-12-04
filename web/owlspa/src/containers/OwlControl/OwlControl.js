@@ -61,7 +61,7 @@ class OwlControl extends Component {
       patchIsLoading,
       patchIsStoring,
       presets,
-      activePresetSlot
+      activePresetSlot,
       uuid,
     } = owlState;
 
