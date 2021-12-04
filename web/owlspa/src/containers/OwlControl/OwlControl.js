@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus, showDeviceUUID } from 'actions';
+import styles from './OwlControl.css';
 
 class OwlControl extends Component {
 
@@ -100,11 +101,11 @@ class OwlControl extends Component {
         )}
 
         <div className="owl-device-stats">
-          {loadedPatchName && (<p><span>Loaded Patch:</span> {loadedPatchName}</p>)}
-          {firmWareVersion && (<p><span>Connected to:</span> {firmWareVersion}</p>)}
-          {status && (<p>{status}</p>)}
-          {programMessage && (<p><span>Message:</span> {programMessage}</p>)}
-          {programError && (<p><span>Error:</span> {programError}</p>)}
+          { loadedPatchName && (<p><span>Loaded Patch:</span> <code>{loadedPatchName}</code></p>) }
+          { firmWareVersion && (<p><span>Firmware:</span> <code>{firmWareVersion}</code></p>) }
+          { status && status.map((t,i) => { return (<p key={i}><span>{t[0]}:</span> <code>{t[1]}</code></p>) }) }
+          { programMessage && (<p><span>Message:</span> <code>{programMessage}</code></p>) }
+          { programError && (<p><span>Error:</span> <code>{programError}</code></p>) }
           { uuid && (<p><span>Device UUID:</span> <code>{uuid}</code></p>) }
         </div>
       </div>
