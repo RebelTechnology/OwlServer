@@ -32,7 +32,6 @@ class PresetList extends Component {
 
     return (
       <div styleName="preset-list" >
-        <h2>Patches</h2>
         {!!presets.length && (
           <div styleName="table-wrapper">
             <table>
