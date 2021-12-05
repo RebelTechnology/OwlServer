@@ -1,6 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus, showDeviceUUID } from 'actions';
+
+import { owlCmd } from '../../lib';
+
+import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot } from 'actions';
+
 import styles from './OwlControl.css';
 
 class OwlControl extends Component {
@@ -49,7 +53,7 @@ class OwlControl extends Component {
   }
 
   render(){
-    const { owlState, storeButton, loadButton, style, showDeviceUUID } = this.props;
+    const { owlState, storeButton, loadButton, style } = this.props;
 
     const {
       firmWareVersion,
@@ -66,7 +70,7 @@ class OwlControl extends Component {
     } = owlState;
 
 
-    if (!uuid) this.props.showDeviceUUID();
+    if (!uuid) owl.showDeviceUUID();
 
     const loadedPreset = presets.length && presets.find(preset => preset.slot === activePresetSlot);
     const loadedPatchName = !!loadedPreset && loadedPreset.name;
@@ -114,12 +118,12 @@ class OwlControl extends Component {
 
   componentDidMount(){
     if(this.props.owlState.isConnected){
-      this.props.startPollingOwlStatus();
+      owlCmd.startPollingOwlStatus();
     }
   }
 
   componentWillUnmount(){
-    this.props.stopPollingOwlStatus();
+    owlCmd.stopPollingOwlStatus();
   }
 }
 
@@ -136,4 +140,4 @@ const mapStateToProps = ({ owlState }) => {
   }
 }
 
-export default connect(mapStateToProps, { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus, showDeviceUUID })(OwlControl);
+export default connect(mapStateToProps, { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot })(OwlControl);

@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import CSSModules from 'react-css-modules';
-import { deleteDevicePresetFromSlot, setDeviceActivePresetSlot } from 'actions';
+import { deleteDevicePresetFromSlot } from 'actions';
 import styles from './PresetList.css';
 import { IconButton } from 'components';
+import { owlCmd } from '../../../lib';
 
 class PresetList extends Component {
 
@@ -14,7 +15,7 @@ class PresetList extends Component {
   }
 
   handleSelectPresetSlot(slot){
-    this.props.setDeviceActivePresetSlot(slot);
+    owlCmd.setDeviceActivePresetSlot(slot);
   }
 
   render(){
@@ -87,4 +88,4 @@ const mapStateToProps = ({
   }
 }
 
-export default connect(mapStateToProps, { setDeviceActivePresetSlot, deleteDevicePresetFromSlot })(CSSModules(PresetList, styles));
+export default connect(mapStateToProps, { deleteDevicePresetFromSlot })(CSSModules(PresetList, styles));
