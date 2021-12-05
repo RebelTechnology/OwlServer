@@ -1,14 +1,16 @@
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
+
 import newDialog from './newDialog';
 
 const loadAndRunPatchOnDevice = (patch) => {
   return (dispatch) => {
-    owlCmd.stopPollingOwlStatus();
+    owl.pollStatusStop();
+
     dispatch({
       type: 'BEGIN_LOAD_PATCH_ON_TO_OWL'
     });
 
-    return owlCmd.loadAndRunPatchOnDevice(patch._id).then(result => {
+    return owl.loadAndRunPatchOnDevice(patch._id).then(result => {
       dispatch({
         type: 'COMPLETE_LOAD_PATCH_ON_TO_OWL',
         patchLoaded: true
@@ -29,7 +31,7 @@ const loadAndRunPatchOnDevice = (patch) => {
         }]
       }));
     }).then(()=>{
-      owlCmd.startPollingOwlStatus();
+      owl.pollStatus();
     })
   }
 }

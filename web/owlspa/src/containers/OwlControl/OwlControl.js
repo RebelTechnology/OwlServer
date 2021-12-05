@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-import { owlCmd } from '../../lib';
+import * as owl from 'lib/owlCmd';
 
 import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot } from 'actions';
 
@@ -70,7 +70,7 @@ class OwlControl extends Component {
     } = owlState;
 
 
-    if (!uuid) owl.showDeviceUUID();
+    if (!uuid) owl.deviceUUID();
 
     const loadedPreset = presets.length && presets.find(preset => preset.slot === activePresetSlot);
     const loadedPatchName = !!loadedPreset && loadedPreset.name;
@@ -118,12 +118,12 @@ class OwlControl extends Component {
 
   componentDidMount(){
     if(this.props.owlState.isConnected){
-      owlCmd.startPollingOwlStatus();
+      owl.pollStatus();
     }
   }
 
   componentWillUnmount(){
-    owlCmd.stopPollingOwlStatus();
+    owl.pollStatusStop();
   }
 }
 

@@ -1,9 +1,9 @@
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
 
 const selectMidiInput = (id) => {
   return (dispatch) => {
 
-    const connectedMidiInputPort = owlCmd.selectMidiInput(id);
+    const connectedMidiInputPort = owl.selectMidiInput(id);
 
     if(connectedMidiInputPort){
       dispatch({

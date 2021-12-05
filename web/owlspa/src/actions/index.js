@@ -54,7 +54,6 @@ export setPatchPlaying from './setPatchPlaying';
 export setPatchStarAndSendToSever from './setPatchStarAndSendToSever';
 export setWebAudioPatch from './setWebAudioPatch';
 export setWebAudioPatchParameter from './setWebAudioPatchParameter';
-export showDeviceUUID from './showDeviceUUID';
 export sourceFileChange from './sourceFileChange';
 export storePatchInDeviceSlot from './storePatchInDeviceSlot';
 export togglePatchListSubFilter from './togglePatchListSubFilter';

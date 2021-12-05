@@ -1,4 +1,4 @@
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
 
 const eraseDeviceStorage = () => {
   return (dispatch) => {
@@ -11,10 +11,10 @@ const eraseDeviceStorage = () => {
       type: 'CLEAR_RESOURCE_LIST'
     });
 
-    owlCmd.eraseDeviceStorage();
+    owl.eraseDeviceStorage();
 
     window.setTimeout(() => {
-      owlCmd.requestDevicePresets();
+      owl.requestDevicePresets();
     }, 1000);
 
   }

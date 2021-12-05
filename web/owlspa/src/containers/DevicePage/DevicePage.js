@@ -7,7 +7,7 @@ import DevicePageTile from './DevicePageTile/DevicePageTile';
 import MidiPortSelector from './MidiPortSelector/MidiPortSelector';
 import PresetList from './PresetList/PresetList';
 import ResourceList from './ResourceList/ResourceList';
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
 
 class DevicePage extends Component {
   constructor(props) {
@@ -33,11 +33,11 @@ class DevicePage extends Component {
   }
 
   getPresets(){
-    owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
+    owl.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
   }
 
   getResources(){
-    owlCmd.requestDeviceResources(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
+    owl.requestDeviceResources(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
   }
 
   handleRefreshClick() {

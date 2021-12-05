@@ -1,4 +1,5 @@
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
+
 import newDialog from './newDialog';
 
 const connectToOwl = () => {
@@ -7,7 +8,7 @@ const connectToOwl = () => {
       type: 'REQUEST_CONNECT_TO_OWL'
     });
 
-    return owlCmd.connectToOwl().then(({ isConnected, midiInputs, midiOutputs, connectedMidiInputPort, connectedMidiOutputPort }) => {
+    return owl.connect().then(({ isConnected, midiInputs, midiOutputs, connectedMidiInputPort, connectedMidiOutputPort }) => {
       dispatch({
         type: 'RECEIVE_CONNECTION_FROM_OWL',
         isConnected,
@@ -16,8 +17,8 @@ const connectToOwl = () => {
         connectedMidiInputPort,
         connectedMidiOutputPort,
       });
-      owlCmd.startPollingOwlStatus();
-      owlCmd.requestDevicePresets();
+      owl.pollStatus();
+      owl.requestDevicePresets();
     },
     (err) => {
       dispatch({

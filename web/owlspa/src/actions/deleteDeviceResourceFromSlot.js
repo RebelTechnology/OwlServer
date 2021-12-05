@@ -1,4 +1,4 @@
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
 
 export default function deleteDeviceResourceFromSlot(slot) {
   return (dispatch) => {
@@ -6,10 +6,10 @@ export default function deleteDeviceResourceFromSlot(slot) {
       type: 'CLEAR_RESOURCE_LIST'
     });
 
-    owlCmd.deleteDeviceResourceFromSlot(slot);
+    owl.deleteDeviceResourceFromSlot(slot);
 
     window.setTimeout(() => {
-      owlCmd.requestDeviceResources();
+      owl.requestDeviceResources();
     }, 1000);
   }
 }

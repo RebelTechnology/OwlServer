@@ -133,13 +133,13 @@ function sendStatusRequest(){
 }
 
 var pollRequestTimeout;
-function pollOwlStatus() {
+export function pollStatus() {
     sendStatusRequest();
-    clearPollRequestTimeout();
-    pollRequestTimeout = window.setTimeout(pollOwlStatus, 2000);
+    pollStatusStop();
+    pollRequestTimeout = window.setTimeout(pollStatus, 2000);
 }
 
-function clearPollRequestTimeout(){
+export function pollStatusStop(){
     if(pollRequestTimeout){
         window.clearTimeout(pollRequestTimeout);
     }
@@ -157,7 +157,7 @@ function sendLoadRequest(){
     }, 1000);
 }
 
-function requestDevicePresets(){
+export function requestDevicePresets(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
     window.setTimeout(function(){
@@ -165,7 +165,7 @@ function requestDevicePresets(){
     }, 1000);
 }
 
-function requestDeviceResources(){
+export function requestDeviceResources(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
     sendRequest(OpenWareMidiSysexCommand.SYSEX_RESOURCE_NAME_COMMAND);
     window.setTimeout(function(){
@@ -224,7 +224,7 @@ function updatePermission(name, status) {
     console.log('update permission for ' + name + ' with ' + status);
 }
 
-function connectToOwl() {
+export function connect() {
     return new Promise((resolve, reject)=>{
         HoxtonOwl.midiClient.initialiseMidi(function(){
             onMidiInitialised((owlConnection) => {
@@ -270,27 +270,27 @@ function storeProgramInDeviceSlot(slot){
     });
 }
 
-function resetDevice(){
+export function resetDevice(){
     HoxtonOwl.midiClient.sendSysexCommand(OpenWareMidiSysexCommand.SYSEX_DEVICE_RESET_COMMAND);
 }
 
-function eraseDeviceStorage(){
+export function eraseDeviceStorage(){
     HoxtonOwl.midiClient.sendSysexCommand(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE);
 }
 
-function deleteDevicePresetFromSlot(slot){
+export function deleteDevicePresetFromSlot(slot){
     HoxtonOwl.midiClient.sendSysexData(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE, [0, 0, 0, 0, slot])
 }
 
-function deleteDeviceResourceFromSlot(slot){
+export function deleteDeviceResourceFromSlot(slot){
     HoxtonOwl.midiClient.sendSysexData(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE, [0, 0, 0, 0, slot])
 }
 
-function showDeviceUUID(){
+export function deviceUUID(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID)
 }
 
-const setDeviceActivePresetSlot = slot => {
+export function setDeviceActivePresetSlot(slot) {
     HoxtonOwl.midiClient.sendProgramChange(slot)
 }
 
@@ -358,18 +358,18 @@ function sendProgramFromUrl(url){
     });
 }
 
-function loadPatchOnDevice(patchId){
+export function loadPatchOnDevice(patchId){
     const url = API_END_POINT + '/builds/' + patchId + '?format=sysx&amp;download=1';
     return sendProgramFromUrl(url);
 }
 
-function storePatchInDeviceSlot(patchId, slot){
+export function storePatchInDeviceSlot(patchId, slot){
     return loadPatchOnDevice(patchId).then(function(){
         return storeProgramInDeviceSlot(slot);
     });
 }
 
-function loadAndRunPatchOnDevice(patchId){
+export function loadAndRunPatchOnDevice(patchId){
     return loadPatchOnDevice(patchId).then(function(){
         sendProgramRun();
     }, function(err){
@@ -377,6 +377,21 @@ function loadAndRunPatchOnDevice(patchId){
     });
 }
 
+export function sendNoteOff() {
+	HoxtonOwl.midiClient.sendNoteOff(...arguments);
+}
+
+export function sendNoteOn() {
+	HoxtonOwl.midiClient.sendNoteOn(...arguments);
+}
+
+export function selectMidiInput() {
+	HoxtonOwl.midiClient.selectMidiInput(...arguments);
+}
+
+export function selectMidiOutput() {
+	HoxtonOwl.midiClient.selectMidiOutput(...arguments);
+}
 
 /*
 *
@@ -566,24 +581,4 @@ HoxtonOwl.midiClient = {
         }
     }
 
-}
-
-export default {
-    connectToOwl,
-    eraseDeviceStorage,
-    deleteDevicePresetFromSlot,
-    deleteDeviceResourceFromSlot,
-    loadAndRunPatchOnDevice,
-    resetDevice,
-    requestDevicePresets,
-    requestDeviceResources,
-    sendNoteOff: HoxtonOwl.midiClient.sendNoteOff,
-    sendNoteOn: HoxtonOwl.midiClient.sendNoteOn,
-    selectMidiInput: HoxtonOwl.midiClient.selectMidiInput,
-    selectMidiOutput: HoxtonOwl.midiClient.selectMidiOutput,
-    startPollingOwlStatus: pollOwlStatus,
-    stopPollingOwlStatus: clearPollRequestTimeout,
-    setDeviceActivePresetSlot,
-    showDeviceUUID,
-    storePatchInDeviceSlot
 }

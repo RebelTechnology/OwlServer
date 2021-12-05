@@ -1,4 +1,4 @@
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
 
 const resetDevice = () => {
   return (dispatch) => {
@@ -7,10 +7,10 @@ const resetDevice = () => {
       type: 'CLEAR_PRESET_LIST'
     });
 
-    owlCmd.resetDevice();
+    owl.resetDevice();
 
     window.setTimeout(() => {
-      owlCmd.requestDevicePresets();
+      owl.requestDevicePresets();
     }, 1000);
 
   }

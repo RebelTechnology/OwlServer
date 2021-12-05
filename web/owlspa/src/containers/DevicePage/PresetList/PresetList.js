@@ -4,7 +4,7 @@ import CSSModules from 'react-css-modules';
 import { deleteDevicePresetFromSlot } from 'actions';
 import styles from './PresetList.css';
 import { IconButton } from 'components';
-import { owlCmd } from '../../../lib';
+import * as owl from '../../../lib/owlCmd';
 
 class PresetList extends Component {
 
@@ -15,7 +15,7 @@ class PresetList extends Component {
   }
 
   handleSelectPresetSlot(slot){
-    owlCmd.setDeviceActivePresetSlot(slot);
+    owl.setDeviceActivePresetSlot(slot);
   }
 
   render(){

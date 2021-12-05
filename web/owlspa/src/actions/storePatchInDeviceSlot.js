@@ -1,21 +1,22 @@
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
 
 import newDialog from './newDialog';
 
 const storePatchInDeviceSlot = (patch, slot) => {
   return (dispatch) => {
-    owlCmd.stopPollingOwlStatus();
+    owl.pollStatusStop();
+
     dispatch({
       type: 'STORE_PATCH_ON_DEVICE_REQUEST'
     });
 
-    return owlCmd.storePatchInDeviceSlot(patch._id, slot).then(() => {
+    return owl.storePatchInDeviceSlot(patch._id, slot).then(() => {
 
       dispatch({
         type: 'STORE_PATCH_ON_DEVICE_SUCCESS'
       });
 
-      owlCmd.startPollingOwlStatus();
+      owl.pollStatus();
 
     }).catch(err => {
 
@@ -35,7 +36,7 @@ const storePatchInDeviceSlot = (patch, slot) => {
         }]
       }));
 
-      owlCmd.startPollingOwlStatus();
+      owl.pollStatus();
 
     });
   }
