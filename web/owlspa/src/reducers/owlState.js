@@ -1,25 +1,3 @@
-import {
-  REQUEST_CONNECT_TO_OWL,
-  RECEIVE_CONNECTION_FROM_OWL,
-  BEGIN_LOAD_PATCH_ON_TO_OWL,
-  CLEAR_PRESET_LIST,
-  CLEAR_RESOURCE_LIST,
-  COMPLETE_LOAD_PATCH_ON_TO_OWL,
-  DEVICE_PRESET_RECEIVED,
-  DEVICE_RESOURCE_RECEIVED,
-  DEVICE_PROGRAM_CHANGE,
-  DEVICE_UUID_RECEIVED,
-  OWL_FIRMWARE_VERSION_RECEIVED,
-  OWL_PATCH_STATUS_RECEIVED,
-  OWL_PROGRAM_MESSAGE_RECEIVED,
-  OWL_PROGRAM_ERROR_RECEIVED,
-  STORE_PATCH_ON_DEVICE_REQUEST,
-  STORE_PATCH_ON_DEVICE_ERROR,
-  STORE_PATCH_ON_DEVICE_SUCCESS,
-  SELECT_MIDI_INPUT_PORT_SUCCESS,
-  SELECT_MIDI_OUTPUT_PORT_SUCCESS
-} from 'constants';
-
 const initialState = {
   isConnected: false,
   midiInputs: null,
@@ -43,13 +21,13 @@ const initialState = {
 
 const owlState = (state = initialState, action) => {
   switch (action.type) {
-    case REQUEST_CONNECT_TO_OWL:
+    case 'REQUEST_CONNECT_TO_OWL':
       return {
         ...state,
         isRequesting: true,
         isConnected: false
       }
-    case RECEIVE_CONNECTION_FROM_OWL:
+    case 'RECEIVE_CONNECTION_FROM_OWL':
       return {
         ...state,
         isRequesting: false,
@@ -59,63 +37,63 @@ const owlState = (state = initialState, action) => {
         connectedMidiInputPort: action.connectedMidiInputPort,
         connectedMidiOutputPort: action.connectedMidiOutputPort,
       }
-    case SELECT_MIDI_INPUT_PORT_SUCCESS:
+    case 'SELECT_MIDI_INPUT_PORT_SUCCESS':
       return {
         ...state,
         connectedMidiInputPort: action.connectedMidiInputPort
       }
-    case SELECT_MIDI_OUTPUT_PORT_SUCCESS:
+    case 'SELECT_MIDI_OUTPUT_PORT_SUCCESS':
       return {
         ...state,
         connectedMidiOutputPort: action.connectedMidiOutputPort
       }
-    case BEGIN_LOAD_PATCH_ON_TO_OWL:
+    case 'BEGIN_LOAD_PATCH_ON_TO_OWL':
       return {
         ...state,
         patchIsLoading: true,
         patchLoaded : false
       }
-    case COMPLETE_LOAD_PATCH_ON_TO_OWL:
+    case 'COMPLETE_LOAD_PATCH_ON_TO_OWL':
       return {
         ...state,
         patchIsLoading: false,
         patchLoaded : action.patchLoaded
       }
-    case STORE_PATCH_ON_DEVICE_REQUEST:
+    case 'STORE_PATCH_ON_DEVICE_REQUEST':
       return {
         ...state,
         patchIsStoring: true,
         patchStoredSuccess: false
       };
-    case STORE_PATCH_ON_DEVICE_ERROR:
+    case 'STORE_PATCH_ON_DEVICE_ERROR':
       return {
         ...state,
         patchIsStoring: false,
         patchStoredSuccess: false
       };
-    case STORE_PATCH_ON_DEVICE_SUCCESS:
+    case 'STORE_PATCH_ON_DEVICE_SUCCESS':
       return {
         ...state,
         patchIsStoring: false,
         patchStoredSuccess: true
       };
-    case DEVICE_PROGRAM_CHANGE:
+    case 'DEVICE_PROGRAM_CHANGE':
       return {
         ...state,
         activePresetSlot : action.slot
       }
-    case CLEAR_PRESET_LIST:
+    case 'CLEAR_PRESET_LIST':
       return {
         ...state,
         presets: [],
         activePresetSlot: null
       }
-    case CLEAR_RESOURCE_LIST:
+    case 'CLEAR_RESOURCE_LIST':
       return {
         ...state,
         resources: [],
       }
-    case DEVICE_PRESET_RECEIVED:
+    case 'DEVICE_PRESET_RECEIVED':
       return {
         ...state,
         presets: [
@@ -123,7 +101,7 @@ const owlState = (state = initialState, action) => {
           { name: action.name, slot: action.slot }
         ]
       };
-    case DEVICE_RESOURCE_RECEIVED:
+    case 'DEVICE_RESOURCE_RECEIVED':
       return {
         ...state,
         resources: [
@@ -131,33 +109,33 @@ const owlState = (state = initialState, action) => {
           { name: action.name, slot: action.slot }
         ]
       };
-    case DEVICE_UUID_RECEIVED:
+    case 'DEVICE_UUID_RECEIVED':
       return {
         ...state,
         uuid: action.uuid
       };
-    case OWL_FIRMWARE_VERSION_RECEIVED:
+    case 'OWL_FIRMWARE_VERSION_RECEIVED':
       return {
         ...state,
         firmWareVersion : action.firmWare
       }
-    case OWL_PATCH_STATUS_RECEIVED:
+    case 'OWL_PATCH_STATUS_RECEIVED':
       return {
         ...state,
         status : action.status
       }
-    case OWL_PROGRAM_MESSAGE_RECEIVED:
+    case 'OWL_PROGRAM_MESSAGE_RECEIVED':
       return {
         ...state,
         programMessage : action.programMessage
       }
-    case OWL_PROGRAM_ERROR_RECEIVED:
+    case 'OWL_PROGRAM_ERROR_RECEIVED':
       return {
         ...state,
         programError : action.programError
       }
     default:
-      return state
+      return state;
   }
 }
 

@@ -1,7 +1,3 @@
-import {
-  OWL_PATCH_STATUS_RECEIVED
-} from 'constants';
-
 import { dispatch } from '../index';
 
 const owlDispatchPatchStatus = (status) => {
@@ -18,7 +14,7 @@ const owlDispatchPatchStatus = (status) => {
 	}
 
   dispatch({
-    type: OWL_PATCH_STATUS_RECEIVED,
+    type: 'OWL_PATCH_STATUS_RECEIVED',
     status: s,
   });
 }

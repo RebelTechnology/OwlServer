@@ -1,14 +1,3 @@
-import {
-  FETCH_PATCH_SOURCE_FILE_REQUEST,
-  FETCH_PATCH_SOURCE_FILE_SUCCESS,
-  FETCH_PATCH_SOURCE_FILE_ERROR,
-  UPDATE_PATCH_SOURCE_FILE,
-  SAVE_PATCH_SOURCE_FILES_REQUEST,
-  SAVE_PATCH_SOURCE_FILES_SUCCESS,
-  SAVE_PATCH_SOURCE_FILES_ERROR,
-  CLEAR_PATCH_SOURCE_CODE_FILES
-} from 'constants';
-
 const initialState = {};
 
 const updateSourceFileCode = (state = [], index, data = {}) => {
@@ -22,7 +11,7 @@ const updateSourceFileCode = (state = [], index, data = {}) => {
 
 const patchSourceCodeFiles = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_PATCH_SOURCE_FILE_SUCCESS:
+    case 'FETCH_PATCH_SOURCE_FILE_SUCCESS':
       return {
         ...state,
         [action.patchId]: updateSourceFileCode(state[action.patchId], action.index, {
@@ -34,7 +23,7 @@ const patchSourceCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case FETCH_PATCH_SOURCE_FILE_REQUEST:
+    case 'FETCH_PATCH_SOURCE_FILE_REQUEST':
       return {
         ...state,
         [action.patchId]: updateSourceFileCode(state[action.patchId], action.index, {
@@ -42,7 +31,7 @@ const patchSourceCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case FETCH_PATCH_SOURCE_FILE_ERROR:
+    case 'FETCH_PATCH_SOURCE_FILE_ERROR':
       return {
         ...state,
         [action.patchId]: updateSourceFileCode(state[action.patchId], action.index, {
@@ -51,7 +40,7 @@ const patchSourceCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case UPDATE_PATCH_SOURCE_FILE:
+    case 'UPDATE_PATCH_SOURCE_FILE':
       return {
         ...state,
         [action.patchId]: updateSourceFileCode(state[action.patchId], action.index, {
@@ -60,7 +49,7 @@ const patchSourceCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case SAVE_PATCH_SOURCE_FILES_REQUEST:
+    case 'SAVE_PATCH_SOURCE_FILES_REQUEST':
       return {
         ...state,
         [action.patchId]: state[action.patchId].map(file => {
@@ -71,7 +60,7 @@ const patchSourceCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case SAVE_PATCH_SOURCE_FILES_SUCCESS:
+    case 'SAVE_PATCH_SOURCE_FILES_SUCCESS':
       return {
         ...state,
         [action.patchId]: state[action.patchId].map(file => {
@@ -83,7 +72,7 @@ const patchSourceCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case SAVE_PATCH_SOURCE_FILES_ERROR:
+    case 'SAVE_PATCH_SOURCE_FILES_ERROR':
       return {
         ...state,
         [action.patchId]: state[action.patchId].map(file => {
@@ -94,14 +83,14 @@ const patchSourceCodeFiles = (state = initialState, action) => {
         })
       }
 
-    case CLEAR_PATCH_SOURCE_CODE_FILES:
+    case 'CLEAR_PATCH_SOURCE_CODE_FILES':
       return {
         ...state,
         [action.patchId]:[]
       }
 
     default:
-      return state
+      return state;
   }
 }
 

@@ -1,8 +1,3 @@
-import {
-  SAVE_PATCH_SOURCE_FILES_REQUEST,
-  SAVE_PATCH_SOURCE_FILES_SUCCESS,  
-  SAVE_PATCH_SOURCE_FILES_ERROR 
-} from 'constants';
 import serverUploadPatchFiles from './serverUploadPatchFiles';
 import compilePatch from './compilePatch';
 import newDialog from './newDialog';
@@ -15,12 +10,12 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
   return (dispatch) => {
 
     dispatch({
-      type: SAVE_PATCH_SOURCE_FILES_REQUEST,
+      type: 'SAVE_PATCH_SOURCE_FILES_REQUEST',
       patchId: patch._id
     });
 
     let fileList;
-    
+
     try {
       fileList = codeFiles.map(file => {
         return new File([file.fileString], getFileNameFromUrl(file.fileUrl), {type : 'application/octet-stream'});
@@ -42,23 +37,23 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
             header :'Error',
             isError: true,
             contents: 'your browser is unable to save files: '
-          }] 
+          }]
         }));
 
         dispatch({
-          type: SAVE_PATCH_SOURCE_FILES_ERROR,
+          type: 'SAVE_PATCH_SOURCE_FILES_ERROR',
           patchId: patch._id
         });
 
         return;
       }
     }
-    
+
     dispatch(serverUploadPatchFiles(fileList, patch._id)).then(res => {
-      
+
       if(res.success){
         dispatch({
-          type: SAVE_PATCH_SOURCE_FILES_SUCCESS,
+          type: 'SAVE_PATCH_SOURCE_FILES_SUCCESS',
           patchId: patch._id
         });
         if(options.compile){
@@ -68,7 +63,7 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
 
       if(res.error){
         dispatch({
-          type: SAVE_PATCH_SOURCE_FILES_ERROR,
+          type: 'SAVE_PATCH_SOURCE_FILES_ERROR',
           patchId: patch._id
         });
       }

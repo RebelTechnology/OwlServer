@@ -1,20 +1,17 @@
-import { 
-  SET_PATCHLIST_SEARCH_TERM
-} from 'constants';
-
 const initialState = {
   searchTerm: null
 };
 
 const patchListSearch = (state = initialState, action) => {
   switch (action.type) {
-    case SET_PATCHLIST_SEARCH_TERM:
+    case 'SET_PATCHLIST_SEARCH_TERM':
       return {
         ...state,
         searchTerm: action.searchTerm || null
-      }
+      };
+
     default:
-      return state
+      return state;
   }
 }
 

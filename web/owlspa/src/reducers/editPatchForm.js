@@ -1,28 +1,3 @@
-import { 
-  LOAD_PATCH_INTO_EDIT_PATCH_FORM,
-  UPLOADING_PATCH_FILES,
-  PATCH_FILES_UPLOADED,
-  ERROR_UPLOADING_PATCH_FILE,
-  REMOVE_UPLOADED_FILE,
-  ADD_GITHUB_FILE,
-  SOURCE_FILE_CHANGE,
-  SET_MAIN_SOURCE_FILE,
-  GITHUB_URL_FIELD_CHANGE,
-  REMOVE_GITHUB_FILE,
-  UPDATE_PATCH_NAME,
-  ERROR_SAVING_PATCH,
-  ERROR_IN_SOURCE_FILE_URL,
-  CLEAR_SOURCE_FILE_ERRORS,
-  CLEAR_EDIT_PATCH_FORM,
-  INVALID_FIELD_DATA,
-  PATCH_SAVING,
-  PATCH_SAVED,
-  REQUEST_COMPILE_PATCH,
-  RECEIVE_COMPILE_PATCH,
-  PATCH_COMPILATION_FAILED,
-  UPDATE_COMPILATION_TYPE
-} from 'constants';
-
 const setMainSourcefile = (sourceFiles, mainSourceFile) => {
   return sourceFiles.map(sourceFile => {
     return {
@@ -100,149 +75,150 @@ const initialState = {
 
 const editPatchForm = (state = initialState, action) => {
   switch (action.type) {
-    case LOAD_PATCH_INTO_EDIT_PATCH_FORM:
+    case 'LOAD_PATCH_INTO_EDIT_PATCH_FORM':
       return {
         ...initialState,
         sourceFiles: getSourceFileList(action.patch.github),
         patchName: action.patch.name,
         compilationType: action.patch.compilationType || 'cpp'
-      }
-    case UPDATE_PATCH_NAME:
-      return { 
+      };
+
+    case 'UPDATE_PATCH_NAME':
+      return {
         ...state,
         patchName: action.patchName
-      }
+      };
 
-    case PATCH_SAVING:
-      return { 
+    case 'PATCH_SAVING':
+      return {
         ...state,
         isSavingPatch: true
-      }
+      };
 
-    case PATCH_SAVED:
-      return { 
+    case 'PATCH_SAVED':
+      return {
         ...state,
         isSavingPatch: false
-      }
+      };
 
-    case ERROR_SAVING_PATCH:
-      return { 
+    case 'ERROR_SAVING_PATCH':
+      return {
         ...state,
         isSavingPatch: false
-      }
+      };
 
-    case UPLOADING_PATCH_FILES:
-      return { 
+    case 'UPLOADING_PATCH_FILES':
+      return {
         ...state,
         isUploading: true
-      }
+      };
 
-    case PATCH_FILES_UPLOADED:
-      return { 
+    case 'PATCH_FILES_UPLOADED':
+      return {
         ...state,
         isUploading: false,
         sourceFiles: [
           ...updateSourceFiles(state.sourceFiles, action.files)
         ]
-      }
+      };
 
-    case REMOVE_UPLOADED_FILE:
-      return { 
+    case 'REMOVE_UPLOADED_FILE':
+      return {
         ...state,
         sourceFiles: state.sourceFiles.filter(file => {
           return file.name !== action.fileName;
         })
-      }
+      };
 
-    case GITHUB_URL_FIELD_CHANGE:
-      return { 
+    case 'GITHUB_URL_FIELD_CHANGE':
+      return {
         ...state,
         gitHubURLField: action.gitHubURL
-      }
+      };
 
-    case ADD_GITHUB_FILE:
-      return { 
+    case 'ADD_GITHUB_FILE':
+      return {
         ...state,
         sourceFiles: [
           ...updateSourceFiles(state.sourceFiles, action.gitHubFile)
         ],
         gitHubURLField: ''
-      }
+      };
 
-    case SOURCE_FILE_CHANGE:
+    case 'SOURCE_FILE_CHANGE':
       return {
         ...state,
         sourceFiles: [
           ...updateSourceFiles(state.sourceFiles, action.sourceFile)
         ]
-      }
+      };
 
-    case SET_MAIN_SOURCE_FILE:
+    case 'SET_MAIN_SOURCE_FILE':
       return {
         ...state,
         sourceFiles: [
           ...setMainSourcefile(state.sourceFiles, action.mainSourceFile)
         ]
-      }
+      };
 
-    case ERROR_UPLOADING_PATCH_FILE:
+    case 'ERROR_UPLOADING_PATCH_FILE':
       return {
         ...state,
         isUploading: false
-      }
+      };
 
-    case ERROR_IN_SOURCE_FILE_URL:
+    case 'ERROR_IN_SOURCE_FILE_URL':
       return {
         ...state,
         sourceFileErrors: pushSourceFileError(state.sourceFileErrors, action.index, action.error)
-      }
+      };
 
-    case CLEAR_SOURCE_FILE_ERRORS:
+    case 'CLEAR_SOURCE_FILE_ERRORS':
       return {
         ...state,
         sourceFileErrors: []
-      }
+      };
 
-    case INVALID_FIELD_DATA:
+    case 'INVALID_FIELD_DATA':
       return {
         ...state,
         invalidFields: {
           ...state.invalidFields,
           [action.field]: action.error
         }
-      }
+      };
 
-    case CLEAR_EDIT_PATCH_FORM:
+    case 'CLEAR_EDIT_PATCH_FORM':
      return {
         ...initialState
-      }
+     };
 
-    case REQUEST_COMPILE_PATCH:
+    case 'REQUEST_COMPILE_PATCH':
       return {
         ...state,
         isCompiling : true
-      }
+      };
 
-    case RECEIVE_COMPILE_PATCH:
+    case 'RECEIVE_COMPILE_PATCH':
       return {
         ...state,
         isCompiling : false
-      }
+      };
 
-    case PATCH_COMPILATION_FAILED:
+    case 'PATCH_COMPILATION_FAILED':
       return {
         ...state,
         isCompiling : false
-      }
+      };
 
-    case UPDATE_COMPILATION_TYPE:
+    case 'UPDATE_COMPILATION_TYPE':
       return {
         ...state,
         compilationType : action.compilationType
-      }
+      };
 
     default:
-      return state
+      return state;
   }
 }
 

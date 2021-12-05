@@ -1,19 +1,15 @@
-import {
-  REQUEST_CONNECT_TO_OWL,
-  RECEIVE_CONNECTION_FROM_OWL
-} from 'constants';
 import { owlCmd } from 'lib';
 import newDialog from './newDialog';
 
 const connectToOwl = () => {
   return (dispatch) => {
     dispatch({
-      type: REQUEST_CONNECT_TO_OWL
+      type: 'REQUEST_CONNECT_TO_OWL'
     });
 
     return owlCmd.connectToOwl().then(({ isConnected, midiInputs, midiOutputs, connectedMidiInputPort, connectedMidiOutputPort }) => {
       dispatch({
-        type: RECEIVE_CONNECTION_FROM_OWL,
+        type: 'RECEIVE_CONNECTION_FROM_OWL',
         isConnected,
         midiInputs,
         midiOutputs,
@@ -25,7 +21,7 @@ const connectToOwl = () => {
     },
     (err) => {
       dispatch({
-        type: RECEIVE_CONNECTION_FROM_OWL,
+        type: 'RECEIVE_CONNECTION_FROM_OWL',
         isConnected: false
       });
       console.error(err);

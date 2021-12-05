@@ -1,9 +1,4 @@
 import { parseUrl } from 'utils';
-import {
-  FETCH_PATCH_SOURCE_FILE_REQUEST,
-  FETCH_PATCH_SOURCE_FILE_SUCCESS,
-  FETCH_PATCH_SOURCE_FILE_ERROR
-} from 'constants';
 
 import clearPatchSourceCodeFiles from './clearPatchSourceCodeFiles';
 
@@ -44,7 +39,7 @@ const fetchHostedFile = (fileUrl) => {
     });
 };
 
-/* 
+/*
 * constructGithubApiFileUrl
 *
 * input:
@@ -96,7 +91,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
 
       if( !fileUrl || (!isHostedSourceFile(fileUrl) && !isGithubFile(fileUrl)) ){
         dispatch({
-          type: FETCH_PATCH_SOURCE_FILE_ERROR,
+          type: 'FETCH_PATCH_SOURCE_FILE_ERROR',
           patchId,
           index,
           reason:'file url error'
@@ -106,13 +101,13 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
 
       if(isHostedSourceFile(fileUrl)){
         dispatch({
-          type: FETCH_PATCH_SOURCE_FILE_REQUEST,
+          type: 'FETCH_PATCH_SOURCE_FILE_REQUEST',
           patchId,
           index
         });
         fetchHostedFile(fileUrl).then( text => {
           dispatch({
-            type: FETCH_PATCH_SOURCE_FILE_SUCCESS,
+            type: 'FETCH_PATCH_SOURCE_FILE_SUCCESS',
             patchId,
             index,
             fileString: text,
@@ -121,7 +116,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
         }).catch( err => {
           console.error(err);
           dispatch({
-            type: FETCH_PATCH_SOURCE_FILE_ERROR,
+            type: 'FETCH_PATCH_SOURCE_FILE_ERROR',
             patchId,
             index,
             reason:'// Could not fetch file.'
@@ -130,14 +125,14 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
       }
       if(isGithubFile(fileUrl)){
         dispatch({
-          type: FETCH_PATCH_SOURCE_FILE_REQUEST,
+          type: 'FETCH_PATCH_SOURCE_FILE_REQUEST',
           patchId,
           index
         });
         fetchGithubFile(fileUrl).then( json => {
           if(json.content && json.encoding === 'base64'){
             dispatch({
-              type: FETCH_PATCH_SOURCE_FILE_SUCCESS,
+              type: 'FETCH_PATCH_SOURCE_FILE_SUCCESS',
               patchId,
               index,
               fileString: decodeBase64AndRemoveNewLines(json.content),
@@ -145,7 +140,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
             });
           } else {
             dispatch({
-              type: FETCH_PATCH_SOURCE_FILE_ERROR,
+              type: 'FETCH_PATCH_SOURCE_FILE_ERROR',
               patchId,
               index,
               reason:'// This file could not be fetched. Is it from a public GitHub repository?'
@@ -154,7 +149,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
         }).catch( err => {
           console.error(err);
           dispatch({
-            type: FETCH_PATCH_SOURCE_FILE_ERROR,
+            type: 'FETCH_PATCH_SOURCE_FILE_ERROR',
             patchId,
             index,
             reason:'// Could not fetch file.'

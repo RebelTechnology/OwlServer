@@ -1,7 +1,5 @@
 import {
   API_END_POINT,
-  REQUEST_PATCHES,
-  RECEIVE_PATCHES
 } from 'constants';
 
 import newDialog from './newDialog';
@@ -9,7 +7,7 @@ import newDialog from './newDialog';
 const fetchPatches = () => {
   return (dispatch) => {
     dispatch({
-      type: REQUEST_PATCHES
+      type: 'REQUEST_PATCHES'
     });
 
     return fetch( API_END_POINT + '/patches/')
@@ -24,7 +22,7 @@ const fetchPatches = () => {
             throw new Error('bad server status: ' + response.status);
           } else {
             dispatch({
-              type: RECEIVE_PATCHES,
+              type: 'RECEIVE_PATCHES',
               patches: response.result
             });
           }
@@ -38,7 +36,7 @@ const fetchPatches = () => {
             header :'Error',
             isError: true,
             contents: err.message
-          }] 
+          }]
         }));
       })
   }

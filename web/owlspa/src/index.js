@@ -5,11 +5,12 @@ import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
+
 import customHistory from './customHistory';
 import routes from './routes';
-import rootReducer from 'reducers';
+import reducers from './reducers';
 
-const store = createStore(rootReducer, composeWithDevTools(
+const store = createStore(reducers, composeWithDevTools(
   applyMiddleware(thunk),
 ));
 

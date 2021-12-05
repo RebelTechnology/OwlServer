@@ -1,6 +1,3 @@
-import {
-  SELECT_MIDI_INPUT_PORT_SUCCESS
-} from 'constants';
 import { owlCmd } from 'lib';
 
 const selectMidiInput = (id) => {
@@ -10,11 +7,11 @@ const selectMidiInput = (id) => {
 
     if(connectedMidiInputPort){
       dispatch({
-        type: SELECT_MIDI_INPUT_PORT_SUCCESS,
+        type: 'SELECT_MIDI_INPUT_PORT_SUCCESS',
         connectedMidiInputPort
       });
     }
-    
+
   }
 };
 

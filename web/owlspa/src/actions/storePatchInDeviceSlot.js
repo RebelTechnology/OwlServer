@@ -1,34 +1,30 @@
-import {
-  STORE_PATCH_ON_DEVICE_REQUEST,
-  STORE_PATCH_ON_DEVICE_SUCCESS,
-  STORE_PATCH_ON_DEVICE_ERROR
-} from 'constants';
 import { owlCmd } from 'lib';
+
 import newDialog from './newDialog';
 
 const storePatchInDeviceSlot = (patch, slot) => {
   return (dispatch) => {
     owlCmd.stopPollingOwlStatus();
     dispatch({
-      type: STORE_PATCH_ON_DEVICE_REQUEST
+      type: 'STORE_PATCH_ON_DEVICE_REQUEST'
     });
 
     return owlCmd.storePatchInDeviceSlot(patch._id, slot).then(() => {
-      
+
       dispatch({
-        type: STORE_PATCH_ON_DEVICE_SUCCESS
+        type: 'STORE_PATCH_ON_DEVICE_SUCCESS'
       });
-      
+
       owlCmd.startPollingOwlStatus();
 
     }).catch(err => {
-      
+
       dispatch({
-        type: STORE_PATCH_ON_DEVICE_ERROR
+        type: 'STORE_PATCH_ON_DEVICE_ERROR'
       });
-      
+
       console.error(err);
-      
+
       dispatch(newDialog({
         header: 'Failed to store patch device',
         isError : true,
@@ -36,11 +32,11 @@ const storePatchInDeviceSlot = (patch, slot) => {
           header :'Error',
           isError: true,
           contents: 'Failed to store the patch on the device'
-        }] 
+        }]
       }));
 
       owlCmd.startPollingOwlStatus();
-    
+
     });
   }
 }

@@ -471,6 +471,10 @@ HoxtonOwl.midiClient = {
         //     sysexMessage = [];
         // }
         return;
+
+        default:
+        console.log('HERE: ', event);
+        return;
         }
     },
 

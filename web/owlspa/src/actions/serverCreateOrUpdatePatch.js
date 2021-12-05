@@ -2,11 +2,6 @@ import customHistory from '../customHistory';
 import { compilePatch, cleanUpTmpPatchFiles } from 'actions';
 import {
   API_END_POINT,
-  PATCH_SAVING,
-  PATCH_SAVED,
-  ERROR_SAVING_PATCH,
-  ERROR_IN_SOURCE_FILE_URL,
-  INVALID_FIELD_DATA
 } from 'constants';
 import newDialog from './newDialog';
 
@@ -37,7 +32,7 @@ const replaceTempDirInPatchSourceFileUrls = patch => {
 const serverCreateOrUpdatePatch = (patch, options = {}) => {
   return (dispatch) => {
     dispatch({
-      type: PATCH_SAVING
+      type: 'PATCH_SAVING'
     });
 
     let path = '/patches/';
@@ -62,13 +57,13 @@ const serverCreateOrUpdatePatch = (patch, options = {}) => {
           if(json.type === 'not_valid' && json.field){
             if(json.field === 'github'){
               dispatch({
-                type: ERROR_IN_SOURCE_FILE_URL,
+                type: 'ERROR_IN_SOURCE_FILE_URL',
                 index: json.index,
                 error: json.message || 'error with file url'
               });
             } else {
               dispatch({
-                type: INVALID_FIELD_DATA,
+                type: 'INVALID_FIELD_DATA',
                 field: json.field,
                 error: json.message
               });
@@ -91,9 +86,9 @@ const serverCreateOrUpdatePatch = (patch, options = {}) => {
         }
 
         return dispatch(cleanUpTmpPatchFiles(json.patch._id)).then(() => {
-          
+
           dispatch({
-            type: PATCH_SAVED,
+            type: 'PATCH_SAVED',
             patch: replaceTempDirInPatchSourceFileUrls(json.patch)
           });
 
@@ -106,7 +101,7 @@ const serverCreateOrUpdatePatch = (patch, options = {}) => {
 
           return json.patch.seoName;
         });
-        
+
       })
       .then(seoName => {
         redirectToPatchDetails(seoName);
@@ -123,7 +118,7 @@ const serverCreateOrUpdatePatch = (patch, options = {}) => {
           }]
         }));
         dispatch({
-          type: ERROR_SAVING_PATCH
+          type: 'ERROR_SAVING_PATCH'
         });
       });
   }

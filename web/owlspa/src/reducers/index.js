@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+
 import authors from './authors';
 import currentUser from './currentUser';
 import dialog from './dialog';
@@ -16,7 +17,7 @@ import thunk from 'redux-thunk';
 import webAudioPatch from './webAudioPatch';
 import webAudioPatchParameters from './webAudioPatchParameters';
 
-const rootReducer = combineReducers({
+const reducers = combineReducers({
   authors,
   currentUser,
   dialog,
@@ -34,4 +35,4 @@ const rootReducer = combineReducers({
   webAudioPatchParameters
 });
 
-export default rootReducer;
+export default reducers;

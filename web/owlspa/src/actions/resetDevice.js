@@ -1,13 +1,10 @@
 import { owlCmd } from 'lib';
-import {
-  CLEAR_PRESET_LIST
-} from 'constants';
 
 const resetDevice = () => {
   return (dispatch) => {
 
     dispatch({
-      type: CLEAR_PRESET_LIST
+      type: 'CLEAR_PRESET_LIST'
     });
 
     owlCmd.resetDevice();

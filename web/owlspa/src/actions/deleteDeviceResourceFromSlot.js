@@ -1,12 +1,9 @@
 import { owlCmd } from 'lib';
-import {
-  CLEAR_RESOURCE_LIST
-} from 'constants';
 
-const deleteDeviceResourceFromSlot = slot => {
+export default function deleteDeviceResourceFromSlot(slot) {
   return (dispatch) => {
     dispatch({
-      type: CLEAR_RESOURCE_LIST
+      type: 'CLEAR_RESOURCE_LIST'
     });
 
     owlCmd.deleteDeviceResourceFromSlot(slot);
@@ -16,5 +13,3 @@ const deleteDeviceResourceFromSlot = slot => {
     }, 1000);
   }
 }
-
-export default deleteDeviceResourceFromSlot;

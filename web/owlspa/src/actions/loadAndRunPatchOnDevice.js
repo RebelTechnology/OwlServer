@@ -1,7 +1,3 @@
-import {
-  BEGIN_LOAD_PATCH_ON_TO_OWL,
-  COMPLETE_LOAD_PATCH_ON_TO_OWL
-} from 'constants';
 import { owlCmd } from 'lib';
 import newDialog from './newDialog';
 
@@ -9,17 +5,17 @@ const loadAndRunPatchOnDevice = (patch) => {
   return (dispatch) => {
     owlCmd.stopPollingOwlStatus();
     dispatch({
-      type: BEGIN_LOAD_PATCH_ON_TO_OWL
+      type: 'BEGIN_LOAD_PATCH_ON_TO_OWL'
     });
 
     return owlCmd.loadAndRunPatchOnDevice(patch._id).then(result => {
       dispatch({
-        type: COMPLETE_LOAD_PATCH_ON_TO_OWL,
+        type: 'COMPLETE_LOAD_PATCH_ON_TO_OWL',
         patchLoaded: true
       });
     }, (err) => {
       dispatch({
-        type: COMPLETE_LOAD_PATCH_ON_TO_OWL,
+        type: 'COMPLETE_LOAD_PATCH_ON_TO_OWL',
         patchLoaded: false
       });
       console.error(err);
@@ -30,7 +26,7 @@ const loadAndRunPatchOnDevice = (patch) => {
           header :'Error',
           isError: true,
           contents: 'Failed to load patch to OWL'
-        }] 
+        }]
       }));
     }).then(()=>{
       owlCmd.startPollingOwlStatus();

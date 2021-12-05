@@ -1,11 +1,8 @@
-
-import { REQUEST_CURRENT_USER, RECEIVE_CURRENT_USER } from 'constants';
-
 const fetchCurrentUser = () => {
   return (dispatch) => {
 
     dispatch({
-      type: REQUEST_CURRENT_USER
+      type: 'REQUEST_CURRENT_USER'
     });
 
     return fetch('/wp-admin/admin-ajax.php?action=owl-get-current-user-info', {credentials: 'same-origin'})
@@ -17,7 +14,7 @@ const fetchCurrentUser = () => {
             console.error('bad status:', response.status);
           } else {
             dispatch({
-              type: RECEIVE_CURRENT_USER,
+              type: 'RECEIVE_CURRENT_USER',
               user: response.result
             });
           }
