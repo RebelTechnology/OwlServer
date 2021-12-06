@@ -69,8 +69,7 @@ class OwlControl extends Component {
       uuid,
     } = owlState;
 
-
-    if (!uuid) owl.deviceUUID();
+    if (!uuid && isConnected) owl.deviceUUID();
 
     const loadedPreset = presets.length && presets.find(preset => preset.slot === activePresetSlot);
     const loadedPatchName = !!loadedPreset && loadedPreset.name;
