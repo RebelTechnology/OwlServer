@@ -38,7 +38,7 @@ class PresetList extends Component {
             <table>
               <thead>
                 <tr>
-                  <th>Slot</th><th>Name</th><th></th><th></th>
+                  <th>Slot</th><th>Name</th><th>Size</th><th></th><th></th>
                 </tr>
               </thead>
               <tbody>
@@ -51,6 +51,7 @@ class PresetList extends Component {
                       <tr key={i} className={isActive ? styles['is-active'] : null } style={{fontWeight: isActive ? 'bold': 'normal' }}>
                         <td>{ isRamSlot ? 'RAM' : preset.slot }</td>
                         <td>{preset.name}</td>
+                        <td><code>{preset.size}</code></td>
                         {isRamSlot && <td></td>}
                         {isRamSlot && <td></td>}
                         {!isRamSlot && (

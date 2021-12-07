@@ -98,7 +98,7 @@ const owlState = (state = initialState, action) => {
         ...state,
         presets: [
           ...state.presets.filter(preset => preset.slot !== action.slot),
-          { name: action.name, slot: action.slot }
+          { name: action.name, slot: action.slot, size: action.size }
         ]
       };
     case 'DEVICE_RESOURCE_RECEIVED':
