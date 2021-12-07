@@ -386,6 +386,9 @@ function selectPorts({inputs, outputs}) {
 		}
 	}
 
+	if (!input) throw new Error('Failed to connect to MIDI input');
+	if (!output) throw new Error('Failed to connect to MIDI output');
+
 	return {
 		input,
 		output,
@@ -402,10 +405,10 @@ function updatePermission(name, status) {
 export function connect() {
 	return new Promise((resolve, reject) => {
 		midiClient.init(messageHandler)
-			.catch(e => reject(e))
 			.then(r => selectPorts(r))
 			.then(r => resolve(r))
 			.then(_ => sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION))
+			.catch(e => reject(e));
 	});
 };
 
