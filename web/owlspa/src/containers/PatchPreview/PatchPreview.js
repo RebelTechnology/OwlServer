@@ -183,7 +183,6 @@ class PatchPreview extends Component {
 
     const {
       audioSelectValue,
-      showMidiKeyboard
     } = this.state;
 
     const playAudioFile = audioSelectValue !== 'none' && audioSelectValue !== 'mic';
@@ -235,6 +234,8 @@ class PatchPreview extends Component {
             </audio>
           </div>
         )}
+
+        <hr />
       </div>
     );
 
@@ -258,31 +259,19 @@ class PatchPreview extends Component {
 
     return (
       <div className="white-box2">
-        <div>
-          <PatchParameters
-            patchIsActive={webAudioPatch.isPlaying}
-            editMode={editMode}
-            onChangeParameters={params => this.props.onChangeParameters(params)}
-            isSaving={isSaving}
-            parameters={parameters}
-          />
-        </div>
+        { webAudioPatch.isPlaying && (
+          <div>
+            <PatchParameters
+              patchIsActive={webAudioPatch.isPlaying}
+              editMode={editMode}
+              onChangeParameters={params => this.props.onChangeParameters(params)}
+              isSaving={isSaving}
+              parameters={parameters}
+            />
 
-        { this.renderControlButtons() }
-
-        <div className="error-msg">
-          {!webAudio.webAudioApiIsAvailable() ? (
-            <div>
-              <p><strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.</p>
-              <p>consider upgrading your browser. Here's a
-                <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a>
-                of browsers that do support the Web Audio API.
-              </p>
-              </div>
-          ) : null}
-        </div>
-
-        <OwlControl patch={patch} storeButton loadButton />
+            <hr />
+          </div>
+        )}
 
         { (webAudioPatch.isReady || owlState.isConnected) && (
           <button
@@ -297,8 +286,23 @@ class PatchPreview extends Component {
           </button>
         )}
 
-        { (webAudioPatch.isReady || owlState.isConnected) && showMidiKeyboard && <MidiKeyboard /> }
+        { (webAudioPatch.isReady || owlState.isConnected) && showMidiKeyboard &&
+          <MidiKeyboard />
+        }
 
+        { this.renderControlButtons() }
+
+        {!webAudio.webAudioApiIsAvailable() ? (
+          <div className="error-msg">
+            <p><strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.</p>
+            <p>consider upgrading your browser. Here's a
+              <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a>
+              of browsers that do support the Web Audio API.
+            </p>
+          </div>
+        ) : null}
+
+        <OwlControl patch={patch} storeButton loadButton />
       </div>
     );
   }

@@ -233,7 +233,7 @@ class GenPatchFileSVG extends Component {
         xmlns="http://www.w3.org/2000/svg"
         width={width || rect[2]}
         height={height || rect[3]}
-        style={{overflow: 'visible', margin: '50px 0'}} >
+        style={{overflow: 'visible', margin: 'auto', display: 'block' }} >
 
         { this.renderPatchLines(patchLines) }
         { this.renderNewObjs(newObjs) }
