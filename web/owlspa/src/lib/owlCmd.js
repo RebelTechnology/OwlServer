@@ -37,6 +37,29 @@ function getStringFromSysex(data, startOffset, endOffset) {
 	return str;
 };
 
+const crcTable = (function() {
+	let c;
+	const t = [];
+
+	for (let n = 0; n < 256; n++) {
+		c = n;
+		for (let k = 0; k < 8; k++)
+			c = ((c&1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+
+		t[n] = c;
+	}
+
+	return t;
+})();
+
+function crc32(str) {
+	let crc = 0 ^ (-1);
+
+	for (let i = 0; i < str.length; i++)
+		crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+
+	return (crc ^ (-1)) >>> 0;
+};
 
 function decodeInt(x) {
 	const msb = x[0];
@@ -53,6 +76,94 @@ function decodeInt(x) {
 	return y;
 };
 
+function encodeInt(x) {
+	return [
+		((x&0x80000000)?1:0) | ((x&0x800000)?2:0) | ((x&0x8000)?4:0) | ((x&0x80)?8:0),
+		(x>>24) & 0x7f, (x>>16) & 0x7f, (x>>8) & 0x7f, (x>>0) & 0x7f
+	];
+};
+
+function encodeSysexData(data) {
+	log("encoding", data.length, "bytes");
+
+	const sysex = [];
+	let cnt = 0;
+	let cnt7 = 0;
+	let pos = 0;
+	sysex[0] = 0;
+
+	for (cnt = 0; cnt < data.length; cnt++) {
+		const c = data.charCodeAt(cnt) & 0x7F;
+		const msb = data.charCodeAt(cnt) >> 7;
+
+		sysex[pos] |= msb << cnt7;
+		sysex[pos + 1 + cnt7] = c;
+
+		if (cnt7++ == 6) {
+			pos += 8;
+			sysex[pos] = 0;
+			cnt7 = 0;
+		}
+	}
+
+	return sysex;
+};
+
+function packageSysexData(raw) {
+	const data = encodeSysexData(raw);
+	const chunks = [];
+	let i = 0;
+
+	// all messages must have message index
+	// first message contains data length
+	let packageIndex = 0;
+	let msg = [
+		0xf0,
+		MIDI_SYSEX_MANUFACTURER,
+		MIDI_SYSEX_OMNI_DEVICE,
+		OpenWareMidiSysexCommand.SYSEX_FIRMWARE_UPLOAD
+	];
+	msg = msg.concat(encodeInt(packageIndex++));
+	msg = msg.concat(encodeInt(raw.length));
+
+	msg.push(0xf7);
+
+	chunks.push(msg);
+
+	while (i < data.length) {
+		msg = [
+			0xf0,
+			MIDI_SYSEX_MANUFACTURER,
+			MIDI_SYSEX_OMNI_DEVICE,
+			OpenWareMidiSysexCommand.SYSEX_FIRMWARE_UPLOAD
+		];
+		msg = msg.concat(encodeInt(packageIndex++));
+
+		let j = msg.length;
+		for (; j<249 && i<data.length; ++j)
+			msg[j] = data[i++];
+
+		msg[j] = 0xf7;
+		chunks.push(msg);
+	}
+
+	msg = [
+		0xf0,
+		MIDI_SYSEX_MANUFACTURER,
+		MIDI_SYSEX_OMNI_DEVICE,
+		OpenWareMidiSysexCommand.SYSEX_FIRMWARE_UPLOAD
+	];
+	msg = msg.concat(encodeInt(packageIndex++));
+
+	const checksum = crc32(raw);
+	log("Checksum:", checksum);
+	msg = msg.concat(encodeInt(checksum));
+	msg.push(0xf7);
+	chunks.push(msg);
+
+	return chunks;
+};
+
 export function systemCalls(data) {
 	if (!(data.length > 3
 				&& data[0] == 0xF0
@@ -64,9 +175,10 @@ export function systemCalls(data) {
 		const name = getStringFromSysex(data, 5, 1);
 		const slot = data[4];
 		const size = data.length > 5+6+name.length ? decodeInt(data.slice(6+name.length)) : 0;
+		const crc = data.length > 5+5+6+name.length ? decodeInt(data.slice(5+6+name.length)) : 0;
 
-		deviceDispatchPresetReceived({ slot, name, size });
-		log("preset received:", slot, "name: ", name, "size:", size);
+		deviceDispatchPresetReceived({ slot, name, size, crc });
+		log("preset received:", slot, "name: ", name, "size:", size, "CRC:", "0x"+crc.toString(16));
 
 		break;
 	}
