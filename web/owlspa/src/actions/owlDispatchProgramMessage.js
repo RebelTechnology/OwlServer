@@ -7,8 +7,6 @@ const owlDispatchProgramMessage = (msg) => {
 	let m = ['MESSAGE', msg];
 	if (s) m = ['STORAGE', formatBytes(s[1]).string + " / " + formatBytes(s[2]).string];
 
-	console.log(s, m)
-
   dispatch({
     type: 'OWL_PROGRAM_MESSAGE_RECEIVED',
     programMessage: m

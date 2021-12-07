@@ -22,7 +22,7 @@ export class SearchInput extends Component {
 }
 
 const mapStateToProps = ({ patchListSearch }) => {
-  return { 
+  return {
     patchListSearch
   }
 }

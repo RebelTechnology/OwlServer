@@ -99,7 +99,7 @@ const getPatchesBySearchTerm = createSelector([ getPublicPatches, getSearchTerm 
   });
 });
 
-export const getFilteredSortedPatches = createSelector([ 
+export const getFilteredSortedPatches = createSelector([
   getTopFilter,
   getPublicPatchesSortByTime,
   getPublicPatchesSortByAuthor,

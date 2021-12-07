@@ -55,14 +55,14 @@ class CompilationTypeSelector extends Component {
         <legend>Compilation Type</legend>
         <div className="row">
           <label>Type</label>
-          <select 
+          <select
             style={{fontSize:'18px'}}
-            name="compilationtype" 
+            name="compilationtype"
             onChange={(e) => onCompilationTypeChange(e.target.value)}
             value={compilationType}>
             { allCompilationTypes.map(type => {
                 return (<option key={type} value={type}>{type}</option>);
-              }) 
+              })
             }
           </select>
         </div>
@@ -80,7 +80,7 @@ class CompilationTypeSelector extends Component {
       this.checkAndUpdateCompilatonType(mainSourceFile.name);
     }
   }
-  
+
 }
 
 CompilationTypeSelector.propTypes = {

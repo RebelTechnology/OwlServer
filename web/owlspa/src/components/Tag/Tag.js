@@ -2,9 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 
 class Tag extends Component {
-  
+
   onClick(e){
-    const { 
+    const {
       editMode
     } = this.props;
 
@@ -18,7 +18,7 @@ class Tag extends Component {
   }
 
   render(){
-    const { 
+    const {
       tag,
       editMode
     } = this.props;

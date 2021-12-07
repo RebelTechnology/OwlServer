@@ -30,7 +30,7 @@ NavBar.propTypes = {
 }
 
 const mapStateToProps = ({ currentUser }) => {
-  return { 
+  return {
     currentUser
   }
 }

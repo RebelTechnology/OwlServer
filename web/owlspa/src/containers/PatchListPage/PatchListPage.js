@@ -7,7 +7,7 @@ import { PatchCounter, CreatePatchTile } from 'components';
 import { getFilteredSortedPatches } from './selectors';
 
 class PatchListPage extends Component {
-  
+
   componentWillReceiveProps(nextProps){
     if(nextProps.routeParams.topFilter === 'my-patches' && nextProps.currentUser.loggedIn === false){
       customHistory.push('/login');
@@ -35,7 +35,7 @@ class PatchListPage extends Component {
     const { filteredSortedPatches, patchListFilter: { topFilter }, routeParams, currentUser } = this.props;
     const patchesToBeRendered = filteredSortedPatches.map( patch => {
       return (
-        <PatchTile 
+        <PatchTile
           key={patch._id}
           id={patch._id}
           name={patch.name}

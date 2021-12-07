@@ -41,17 +41,17 @@ class MidiPortSelector extends Component {
 
 }
 
-const mapStateToProps = ({ 
-  owlState: { 
+const mapStateToProps = ({
+  owlState: {
     isConnected,
     midiInputs,
     midiOutputs,
     connectedMidiInputPort,
     connectedMidiOutputPort
-  } 
+  }
 }) => {
-  
-  return { 
+
+  return {
     isConnected,
     midiInputs,
     midiOutputs,

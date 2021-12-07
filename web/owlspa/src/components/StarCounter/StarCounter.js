@@ -9,10 +9,10 @@ class StarCounter extends Component {
     const { onStarClick, starCount, starred } = this.props;
     return (
       <div styleName="star-counter">
-        <IconButton 
-          title={(starred ? 'unstar' : 'star') + ' this patch'} 
-          icon={starred ? 'starred': 'star'} 
-          color="#555" 
+        <IconButton
+          title={(starred ? 'unstar' : 'star') + ' this patch'}
+          icon={starred ? 'starred': 'star'}
+          color="#555"
           onClick={ onStarClick } >
           { starCount > 0 ? starCount : null }
           {starCount > 1 ? ' Stars' : ' Star'}

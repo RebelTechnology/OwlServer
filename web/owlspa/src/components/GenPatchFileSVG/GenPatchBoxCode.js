@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
 class GenPatchBoxCode extends Component {
-  
+
   constructor(props){
     super(props);
     this.state = {
@@ -39,11 +39,11 @@ class GenPatchBoxCode extends Component {
 
   render(){
     const { x, y, code, color } = this.props;
-    if(!code){ 
-      return null; 
+    if(!code){
+      return null;
     }
     const { lineArr } = this.state;
-  
+
     return (
       <text
         x={x}

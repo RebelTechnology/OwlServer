@@ -24,7 +24,7 @@ class Note extends Component {
 
     this.props.onNoteOff();
   }
-  
+
   onMouseEnter(){
     const {
       mouseIsDown
@@ -81,15 +81,15 @@ class Note extends Component {
     } = this.state;
 
     return (
-      <rect 
-        onMouseUp={ e => this.onMouseUp() } 
-        onMouseDown={ e => this.onMouseDown() } 
-        onMouseEnter={ e => this.onMouseEnter() } 
-        onMouseLeave={ e => this.onMouseLeave() } 
-        stroke={ isWhiteKey ? '#555555' : '979797' } 
+      <rect
+        onMouseUp={ e => this.onMouseUp() }
+        onMouseDown={ e => this.onMouseDown() }
+        onMouseEnter={ e => this.onMouseEnter() }
+        onMouseLeave={ e => this.onMouseLeave() }
+        stroke={ isWhiteKey ? '#555555' : '979797' }
         fill={ noteIsOn ? '#e19758' : isWhiteKey ? '#FFFFF7' : '4B4B4B' }
         x={x}
-        y="0" 
+        y="0"
         width={ isWhiteKey ? width : Math.floor(width / 2) }
         height={ isWhiteKey ?  height : Math.floor(height * 0.7 )}
       />

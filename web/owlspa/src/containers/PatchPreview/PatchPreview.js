@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { PatchParameters, OwlControl, MidiKeyboard } from 'containers';
 import { webAudio } from 'lib';
 import classNames from 'classnames';
-import { 
+import {
   fetchPatchJavaScriptFile,
   setWebAudioPatch,
   setPatchPlaying,
@@ -18,7 +18,7 @@ class PatchPreview extends Component {
       showMidiKeyboard: false
     };
   }
-  
+
   handleTestPatchButtonClick(){
     const { patch, patch:{jsAvailable}, fetchPatchJavaScriptFile } = this.props;
     if(webAudio.webAudioApiIsAvailable() && jsAvailable){
@@ -45,7 +45,7 @@ class PatchPreview extends Component {
     if(this.props.webAudioPatch.isPlaying){
       this.updatePushButtonLedColour();
     }
-    this.pushButtonLedTimeout = window.setTimeout(() => this.pollForPushButtonLedColour(), 500);  
+    this.pushButtonLedTimeout = window.setTimeout(() => this.pollForPushButtonLedColour(), 500);
   }
 
   createPatchInstance(){
@@ -63,7 +63,7 @@ class PatchPreview extends Component {
 
   handleChangeAudioSource(e){
     const audioSelectValue = e.target.value;
-    this.setState({audioSelectValue});    
+    this.setState({audioSelectValue});
 
     if(audioSelectValue === 'none'){
       this.props.webAudioPatch.instance.clearInput();
@@ -85,9 +85,9 @@ class PatchPreview extends Component {
     instance = instance || webAudioPatch.instance;
     if(instance){
       instance.connectToOutput({outputs: patch.outputs});
-      
+
       webAudioPatchParameters.forEach( (param, i) => {
-         param.value = instance.getParameter(i) * 100; 
+         param.value = instance.getParameter(i) * 100;
          // instance.update(i, param.value / 100);
       });
 
@@ -160,7 +160,7 @@ class PatchPreview extends Component {
     const { webAudioPatch:{isReady:willBeReady} } = nextProps;
     return !isReady && willBeReady;
   }
-  
+
   componentWillReceiveProps(nextProps){
     if(this.patchJavaScriptWillLoad(nextProps)){
       this.createPatchInstance();
@@ -190,11 +190,11 @@ class PatchPreview extends Component {
     const audioSampleBasePath = '/wp-content/themes/shopkeeper-child/page-patch-library/audio/';
 
     return (
-      <div className="patch-preview-buttons">    
+      <div className="patch-preview-buttons">
         { !webAudioPatch.isReady && (
-          <button 
+          <button
             style={{display:'inline-block'}}
-            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() } 
+            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() }
             onClick={() => this.handleTestPatchButtonClick()} >
             Play
           </button>
@@ -211,8 +211,8 @@ class PatchPreview extends Component {
         { webAudioPatch.isPlaying && (
           <div className="audio-input-selector">
             <label htmlFor="patch-test-source">Audio Input:</label>
-            <select 
-              id="patch-test-source" 
+            <select
+              id="patch-test-source"
               onChange={e => this.handleChangeAudioSource(e)}
               value={audioSelectValue} >
               <option value="none">No Input</option>
@@ -224,10 +224,10 @@ class PatchPreview extends Component {
               <option value="white-noise">White Noise</option>
             </select>
 
-            <audio 
-              id="patch-test-audio" 
-              controls 
-              loop 
+            <audio
+              id="patch-test-audio"
+              controls
+              loop
               preload="auto"
               ref={(node) => this.initAudioDomNode(node)}>
               { playAudioFile && <source src={audioSampleBasePath + audioSelectValue + '.mp3'} type="audio/mpeg" /> }
@@ -246,7 +246,7 @@ class PatchPreview extends Component {
       showMidiKeyboard
     } = this.state;
 
-    const { 
+    const {
       patch,
       patchJavaScript,
       webAudioPatch,
@@ -255,27 +255,27 @@ class PatchPreview extends Component {
       owlState,
       parameters
     } = this.props;
-    
+
     return (
       <div className="white-box2">
         <div>
-          <PatchParameters 
-            patchIsActive={webAudioPatch.isPlaying} 
+          <PatchParameters
+            patchIsActive={webAudioPatch.isPlaying}
             editMode={editMode}
             onChangeParameters={params => this.props.onChangeParameters(params)}
             isSaving={isSaving}
-            parameters={parameters} 
+            parameters={parameters}
           />
         </div>
 
         { this.renderControlButtons() }
-        
+
         <div className="error-msg">
           {!webAudio.webAudioApiIsAvailable() ? (
             <div>
               <p><strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.</p>
-              <p>consider upgrading your browser. Here's a 
-                <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a> 
+              <p>consider upgrading your browser. Here's a
+                <a target="_blank" href="http://caniuse.com/#feat=audio-api">list</a>
                 of browsers that do support the Web Audio API.
               </p>
               </div>
@@ -296,7 +296,7 @@ class PatchPreview extends Component {
             { showMidiKeyboard ? 'hide keyboard' : 'show keyboard'}
           </button>
         )}
-        
+
         { (webAudioPatch.isReady || owlState.isConnected) && showMidiKeyboard && <MidiKeyboard /> }
 
       </div>
@@ -324,7 +324,7 @@ PatchPreview.defaultProps = {
 };
 
 const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPatch, owlState }) => {
-  return { 
+  return {
     owlState,
     patchJavaScript,
     webAudioPatchParameters,
@@ -332,8 +332,8 @@ const mapStateToProps = ({ patchJavaScript, webAudioPatchParameters, webAudioPat
   }
 }
 
-export default connect(mapStateToProps, { 
-  fetchPatchJavaScriptFile, 
+export default connect(mapStateToProps, {
+  fetchPatchJavaScriptFile,
   setWebAudioPatch,
   setPatchPlaying,
   resetWebAudioPatch

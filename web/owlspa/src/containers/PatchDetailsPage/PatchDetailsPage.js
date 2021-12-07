@@ -1,6 +1,6 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
-import { 
+import {
   fetchPatchDetails,
   fetchTags,
   deletePatch,
@@ -129,7 +129,7 @@ class PatchDetailsPage extends Component {
     //revert state
     const { routeParams, patchDetails } = this.props;
     const patch = patchDetails.patches[routeParams.patchSeoName] || {};
-    
+
     const {
       description='',
       instructions='',
@@ -164,19 +164,19 @@ class PatchDetailsPage extends Component {
     } = this.state;
 
     const filteredSoundcloudUrls = soundcloud.filter(url => /^https:\/\/soundcloud\.com\/.+\/.+/.test(url));
-    
+
     this.setState({
       soundcloud: filteredSoundcloudUrls
     });
 
-    this.handleUpdatePatchDetails({ 
+    this.handleUpdatePatchDetails({
       instructions,
       description,
       name,
       published,
       soundcloud: filteredSoundcloudUrls,
       parameters,
-      tags 
+      tags
     });
 
   }
@@ -270,8 +270,8 @@ class PatchDetailsPage extends Component {
     }
   }
 
-  render(){ 
-    const { 
+  render(){
+    const {
       patchDetails,
       currentUser ,
       routeParams:{ patchSeoName },
@@ -304,16 +304,16 @@ class PatchDetailsPage extends Component {
 
           <div id="one-third" className="patch-library">
 
-            <PatchTileSmall 
-              patch={patch} 
+            <PatchTileSmall
+              patch={patch}
               patchName={name}
-              canEdit={canEdit} 
+              canEdit={canEdit}
               editMode={editMode}
               isSaving={patchDetails.isSaving}
               onEditClick={() => this.handleOnEditPatchClick()}
               onSaveClick={() => this.handleOnSavePatchClick()}
               onCancelClick={() => this.handleOnCancelEditPatchClick()}
-              onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)} 
+              onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)}
               onPatchNameChange={patchName => this.handlePatchNameChange(patchName)}
               onChangePublished={published => this.handleChangePublished(published)}
               onStarClick={(e)=> this.handleStarClick(e,patch, starForThisPatch)}
@@ -321,50 +321,50 @@ class PatchDetailsPage extends Component {
               published={published}
             />
 
-            <PatchDetailsTile 
-              title="Description" 
+            <PatchDetailsTile
+              title="Description"
               text={description}
               onTextChange={description => this.handlePatchDetailsDescriptionChange(description)}
-              isSaving={patchDetails.isSaving} 
+              isSaving={patchDetails.isSaving}
               editMode={editMode}
             />
-            
+
             { (patch.instructions || canEdit ) &&
-              <PatchDetailsTile 
-                style={{background: 'grey'}} 
-                title="Instructions" 
-                text={instructions} 
+              <PatchDetailsTile
+                style={{background: 'grey'}}
+                title="Instructions"
+                text={instructions}
                 onTextChange={instructions => this.handlePatchDetailsInstructionsChange(instructions)}
                 isSaving={patchDetails.isSaving}
                 editMode={editMode}
               />
             }
 
-            <PatchStats 
-              isSaving={patchDetails.isSaving} 
+            <PatchStats
+              isSaving={patchDetails.isSaving}
               availableTagList={availableTags.items}
               tags={tags}
               editMode={editMode}
-              onChangeTags={tags => this.handleChangeTags(tags)} 
-              patch={patch} 
+              onChangeTags={tags => this.handleChangeTags(tags)}
+              patch={patch}
               isSaving={patchDetails.isSaving}
             />
-            
+
           </div>
 
           <div id="two-thirds" className="patch-library">
 
-            <PatchSoundcloud 
-              soundcloud={soundcloud} 
+            <PatchSoundcloud
+              soundcloud={soundcloud}
               editMode={editMode}
               isSaving={patchDetails.isSaving}
               savedSuccess={patchDetails.savedSuccess}
               onChangeSoundCloudArr={ soundcloudArr => this.handleChangeSoundCloudArr(soundcloudArr)}
             />
 
-            <PatchPreview 
-              onCompileClick={(e) => this.handleCompileClick(e,patch)} 
-              editMode={editMode} 
+            <PatchPreview
+              onCompileClick={(e) => this.handleCompileClick(e,patch)}
+              editMode={editMode}
               isSaving={patchDetails.isSaving}
               parameters={parameters}
               onChangeParameters={parameters => this.handleChangeParameters(parameters)}
@@ -404,7 +404,7 @@ const mapStateToProps = ({ patchDetails, currentUser, tags }) => {
   }
 };
 
-export default connect(mapStateToProps, { 
+export default connect(mapStateToProps, {
   fetchPatchDetails,
   fetchTags,
   deletePatch,

@@ -4,6 +4,7 @@ import newDialog from './newDialog';
 
 const loadAndRunPatchOnDevice = (patch) => {
   return (dispatch) => {
+
     owl.pollStatusStop();
 
     dispatch({

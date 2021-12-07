@@ -58,9 +58,9 @@ class Dialog extends Component {
           <ul className="dialog-tabs">
             {dialog.tabs.map((tab,i) => {
               return (
-                <li 
+                <li
                   className={classNames({active:i === activeDialogTab,error:tab.isError})}
-                  key={i} 
+                  key={i}
                   onClick={(e)=>this.setActiveDialogTab(e,i)} >
                   {tab.header}
                 </li>
@@ -74,7 +74,7 @@ class Dialog extends Component {
             <button onClick={() => this.closeModal()}>close</button>
           </div>
         </div>
-       
+
       </Modal>
     )
   }
@@ -86,7 +86,7 @@ class Dialog extends Component {
 
 
 const mapStateToProps = ({ dialog }) => {
-  return { 
+  return {
     dialog
   }
 }

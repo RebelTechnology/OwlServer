@@ -70,7 +70,7 @@ class PatchParameters extends Component {
 
   render(){
 
-    const { 
+    const {
       patchIsActive,
       isSaving,
       editMode,
@@ -80,22 +80,22 @@ class PatchParameters extends Component {
     const floatParameters = parameters.filter(parameter => parameter.type === 'float').sort((a, b) => a.id - b.id);
     const usedFloatParameterIds = floatParameters.map(({ id }) => id);
     const availableFloatIds = availableParameterIds.float.filter(idEntry => usedFloatParameterIds.indexOf(idEntry.id) === -1)
-    
+
     const boolParameters = parameters.filter(parameter => parameter.type === 'bool').sort((a, b) => a.id - b.id);
     const usedBoolParameterIds = boolParameters.map(({ id }) => id);
     const availableBoolIds = availableParameterIds.bool.filter(idEntry => usedBoolParameterIds.indexOf(idEntry.id) === -1)
-    
+
     const renderFloatParameters = floatParameters.map((parameter, i) => {
       const thisIdEntry = availableParameterIds.float.filter(idEntry => idEntry.id === parameter.id);
-      return ( 
-        <FloatParameter 
-          active={patchIsActive} 
-          onParamValueChange={ value => this.props.setWebAudioPatchParameter({ ...parameter, value })} 
-          key={i} 
+      return (
+        <FloatParameter
+          active={patchIsActive}
+          onParamValueChange={ value => this.props.setWebAudioPatchParameter({ ...parameter, value })}
+          key={i}
           id={parameter.id}
           io={parameter.io}
           isSaving={isSaving}
-          name={parameter.name} 
+          name={parameter.name}
           editMode={editMode}
           onDelete={ () => this.handleDeleteParam(parameter.id) }
           onEdit={ editedParameter => this.handleEditedParam(parameter, editedParameter)}
@@ -108,7 +108,7 @@ class PatchParameters extends Component {
 
     const renderBoolParameters = boolParameters.map((parameter, i) => {
       const thisIdEntry = availableParameterIds.bool.filter(idEntry => idEntry.id === parameter.id);
-      return ( 
+      return (
         <BoolParameter
           key={i}
           isActive={patchIsActive}
@@ -121,7 +121,7 @@ class PatchParameters extends Component {
           onEdit={editedParameter => this.handleEditedParam(parameter, editedParameter)}
           availableIds={thisIdEntry.concat(availableBoolIds)}
           onPushButtonDown={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 4095 })}
-          onPushButtonUp={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 0 })} 
+          onPushButtonUp={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 0 })}
         />);
     });
 
@@ -130,19 +130,19 @@ class PatchParameters extends Component {
         <div className="flexbox flex-center">
           { renderFloatParameters }
           { editMode && (
-            <AddParameterButton 
-              text="add parameter" 
-              onClick={ () => this.handleAddParameterclick({ type: 'float', availableIds: availableFloatIds }) } 
+            <AddParameterButton
+              text="add parameter"
+              onClick={ () => this.handleAddParameterclick({ type: 'float', availableIds: availableFloatIds }) }
             />
           )}
         </div>
         <div className="flexbox flex-center">
           { renderBoolParameters }
           { editMode && (
-            <AddParameterButton 
-              text="add button" 
-              onClick={ () => this.handleAddParameterclick({ type: 'bool', availableIds: availableBoolIds }) } 
-            /> 
+            <AddParameterButton
+              text="add button"
+              onClick={ () => this.handleAddParameterclick({ type: 'bool', availableIds: availableBoolIds }) }
+            />
           )}
         </div>
       </div>

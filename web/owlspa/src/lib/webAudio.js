@@ -20,7 +20,7 @@ navigator.getUserMedia = navigator.getUserMedia ||
 owl.initPatchAudio = function () {
     if(owl.webAudioApiIsAvailable()){
         var AudioContext = window.AudioContext || window.webkitAudioContext;
-        owl.audioContext = owl.audioContext || new AudioContext(); // makes sure there's only one audioContext 
+        owl.audioContext = owl.audioContext || new AudioContext(); // makes sure there's only one audioContext
     } else {
         throw new Error('no web audio api');
     }
@@ -49,11 +49,11 @@ owl.initPatchAudio = function () {
 	fileNode: null, // owl.audioContext.createMediaElementSource(document.getElementById('patch-test-audio')),
 	micNode: null
     };
-    that.vectorsize = 2048;      
+    that.vectorsize = 2048;
 
     WEB_setup(owl.audioContext.sampleRate, that.vectorsize);
     console.log("audio[fs "+owl.audioContext.sampleRate+"][bs "+that.vectorsize+"]");
-    
+
     for(var i = 0; i < 5; i++){
 	console.log("parameter "+i+": "+WEB_getParameterName(i));
     }
@@ -235,16 +235,16 @@ owl.initPatchAudio = function () {
     that.ins = Module._malloc(that.ptrsize * that.numIn);
 
     // assign to our array of pointer elements an array of 32bit floats, one for each channel. currently we assume pointers are 32bits
-    for (var i = 0; i < that.numIn; i++) { 
+    for (var i = 0; i < that.numIn; i++) {
         // assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
-        HEAP32[(that.ins >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize); 
+        HEAP32[(that.ins >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize);
     }
 
     //ptrsize, change to eight or use Runtime.QUANTUM? or what?
-    that.outs = Module._malloc(that.ptrsize * that.numOut); 
+    that.outs = Module._malloc(that.ptrsize * that.numOut);
 
     // assign to our array of pointer elements an array of 64bit floats, one for each channel. currently we assume pointers are 32bits
-    for (var i = 0; i < that.numOut; i++) { 
+    for (var i = 0; i < that.numOut; i++) {
         // assign memory at that.ins[i] to a new ptr value. maybe there's an easier way, but this is clearer to me than any typedarray magic beyond the presumably TypedArray HEAP32
         HEAP32[(that.outs >> 2) + i] = Module._malloc(that.vectorsize * that.samplesize);
     }

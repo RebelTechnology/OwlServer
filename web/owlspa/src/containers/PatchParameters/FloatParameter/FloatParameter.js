@@ -58,7 +58,7 @@ class FloatParameter extends Component {
     } = this.props;
 
     !editMode && e.preventDefault();
-    
+
     if(!active){
       return;
     }
@@ -67,8 +67,8 @@ class FloatParameter extends Component {
       this.setState({previousY: Math.round(e.touches[0].clientY) });
       document.addEventListener('touchmove', this.handlePointerMove);
       return;
-    } 
-    
+    }
+
     this.setState({previousY: e.clientY });
     document.addEventListener('mouseup', this.handlePointerUp);
     document.addEventListener('mousemove', this.handlePointerMove);
@@ -115,9 +115,9 @@ class FloatParameter extends Component {
 
     return (
       <div style={editModeWrapperStyles}>
-        <div 
+        <div
           styleName="float-parameter"
-          style={{ 
+          style={{
             cursor: active && isInputParam ? 'ns-resize' : 'auto',
             color: activeColor,
             margin: editMode ? '48px 38px 80px' : '25px 15px 27px',
@@ -126,11 +126,11 @@ class FloatParameter extends Component {
           onTouchEnd={e => isInputParam && active && this.handlePointerUp(e) }
           onMouseDown={e => isInputParam && this.handlePointerDown(e)}>
           { editMode && (
-            <IconButton 
-              title="delete parameter" 
+            <IconButton
+              title="delete parameter"
               style={{ margin: 0, position: 'absolute', top: '-38px', left: '-23px', zIndex: '99' }}
-              icon="delete" 
-              onClick={ this.props.onDelete } 
+              icon="delete"
+              onClick={ this.props.onDelete }
             />
           )}
           { editMode && (
@@ -148,26 +148,26 @@ class FloatParameter extends Component {
               "
             />
           </svg>
-          <svg 
-            style={{position:'absolute', top:0, left:0, transform:'rotate('+ this.getParameterValueAsRotationDegrees(parameterValue)+'deg)'}} 
-            width="100" 
-            height="100" 
+          <svg
+            style={{position:'absolute', top:0, left:0, transform:'rotate('+ this.getParameterValueAsRotationDegrees(parameterValue)+'deg)'}}
+            width="100"
+            height="100"
             viewBox="0 0 100 100">
             <circle cx="50" cy="10" r="6" fill={ active ? activeColor : '#ccc' } />
           </svg>
           <span styleName="parameter-name">
             { editMode ? (
-              <input 
+              <input
                 style={{
                   padding: '9px',
                   height: '35px'
                 }}
                 disabled={isSaving}
-                onChange={e => this.props.onEdit({ name: e.target.value })} 
-                type="text" 
+                onChange={e => this.props.onEdit({ name: e.target.value })}
+                type="text"
                 maxLength="19"
                 value={name} />
-              ) : name 
+              ) : name
             }
           </span>
           <span styleName="parameter-value">{parameterValue}</span>
@@ -187,7 +187,7 @@ class FloatParameter extends Component {
   componentDidMount(){
     this.setParameterValue(this.props.initialValue)
   }
-  
+
 }
 
 FloatParameter.propTypes = {

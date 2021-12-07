@@ -1,6 +1,6 @@
 .patch-author {
   box-sizing: border-box;
-  font-family: Ubuntu, sans-serif; 
+  font-family: Ubuntu, sans-serif;
   float: left;
 }
 
@@ -9,7 +9,7 @@
   display: inline-block;
   padding: 10px;
   color: #fff;
-  font-family: Ubuntu, sans-serif; 
+  font-family: Ubuntu, sans-serif;
   font-size: 12px;
   font-weight: 100;
   background: #5d5d5d;

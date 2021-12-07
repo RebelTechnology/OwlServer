@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { IconButton } from 'components';
 
 class PatchSoundcloud extends Component {
-  
+
   constructor(props){
     super(props);
     this.state = {
@@ -11,7 +11,7 @@ class PatchSoundcloud extends Component {
   }
 
   getSoundcloudSrcUrl(src){
-    return 'https://w.soundcloud.com/player/?url=' + 
+    return 'https://w.soundcloud.com/player/?url=' +
     encodeURIComponent(src) +
     '&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true'
   }
@@ -24,7 +24,7 @@ class PatchSoundcloud extends Component {
     updatedSoundcloud[i] = value;
 
     this.props.onChangeSoundCloudArr(updatedSoundcloud);
-  
+
   }
 
   handleAddSoundCloud(){
@@ -60,46 +60,46 @@ class PatchSoundcloud extends Component {
     return (
       <div className="patch-soundcloud" style={styles}>
         { soundcloud.map((src, i) => {
-            return editMode ? 
+            return editMode ?
             ( <div key={i}>
-                <input 
+                <input
                   style={{
                     width: '80%',
                     maxWidth: '700px',
                     display: 'inline-block'
                   }}
-                  type="text" 
+                  type="text"
                   placeholder="https://soundcloud.com/"
-                  value={src} 
+                  value={src}
                   disabled={isSaving}
-                  onChange={(e) => this.handleSoundCloudUrlChange(i, e.target.value) } 
+                  onChange={(e) => this.handleSoundCloudUrlChange(i, e.target.value) }
                 />
-                <IconButton 
-                  title="delete this soundcloud link" 
-                  icon={ isSaving ? 'loading' : 'delete' } 
+                <IconButton
+                  title="delete this soundcloud link"
+                  icon={ isSaving ? 'loading' : 'delete' }
                   disabled={isSaving}
                   onClick={e => this.handleDeleteSoundCloud(i)} />
               </div>
             ) : (
-              <iframe 
-                key={i} 
-                width="100%" 
-                height="250" 
-                scrolling="no" 
-                frameBorder="no" 
+              <iframe
+                key={i}
+                width="100%"
+                height="250"
+                scrolling="no"
+                frameBorder="no"
                 src={this.getSoundcloudSrcUrl(src)}>
               </iframe>
             );
         })}
         { editMode && (
           <div>
-            <button 
-              className="btn-small" 
+            <button
+              className="btn-small"
               style={{
                 lineHeight: '6px',
                 margin: '2px'
               }}
-              disabled={isSaving} 
+              disabled={isSaving}
               onClick={ e => this.handleAddSoundCloud()} >
               Add A Soundcloud Link
             </button>

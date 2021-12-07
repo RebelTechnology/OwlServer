@@ -43,7 +43,6 @@ class PresetList extends Component {
               </thead>
               <tbody>
                 { sortedPresets.map((preset, i) => {
-
                     const isActive = preset.slot === activePresetSlot;
                     const isRamSlot = preset.slot === 0;
 

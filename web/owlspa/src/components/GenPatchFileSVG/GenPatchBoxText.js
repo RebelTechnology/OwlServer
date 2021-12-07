@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
 class GenPatchBoxText extends Component {
-  
+
   constructor(props){
     super(props);
     this.state = {
@@ -40,7 +40,7 @@ class GenPatchBoxText extends Component {
     }
     this.textElem = textElem;
     const { boxWidth } = this.props;
-    const textWidth = textElem.getBBox().width;    
+    const textWidth = textElem.getBBox().width;
     if(boxWidth < textWidth){
       this.splitTextIntoTextRows(textWidth);
     }
@@ -56,11 +56,11 @@ class GenPatchBoxText extends Component {
 
   render(){
     const { x, y, text, color } = this.props;
-    if(!text){ 
-      return null; 
+    if(!text){
+      return null;
     }
     const { textRows } = this.state;
-  
+
     return (
       <text
         x={x}

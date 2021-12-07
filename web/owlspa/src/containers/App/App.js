@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 class App extends Component {
 
-  render(){ 
+  render(){
     const { location, routeParams, children } = this.props;
     return (
       <div>

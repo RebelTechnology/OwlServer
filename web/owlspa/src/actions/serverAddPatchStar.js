@@ -19,7 +19,7 @@ const serverAddPatchStar = (patchId) => {
     .then( response => {
       if (response.status >= 400) {
         throw new Error('bad server status: ' + response.status);
-      } 
+      }
        return response;
     });
   }

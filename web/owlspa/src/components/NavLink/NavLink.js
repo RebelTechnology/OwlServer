@@ -13,8 +13,8 @@ class NavLink extends Component {
   render(){
     const { target, children, icon, onClick } = this.props;
     return (
-      <Link 
-        to={target} 
+      <Link
+        to={target}
         styleName="nav-link"
         onClick={ onClick }
         style={{

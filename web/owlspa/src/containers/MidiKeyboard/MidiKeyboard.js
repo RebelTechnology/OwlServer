@@ -7,7 +7,7 @@ class MidiKeyboard extends Component {
 
   constructor(props){
     super(props);
-    
+
     this.state = {
       mouseIsDown: false,
       notesDown: [],
@@ -32,7 +32,7 @@ class MidiKeyboard extends Component {
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
-  
+
   }
 
   handleMidiKeyboardMouseDown(e){
@@ -267,14 +267,14 @@ class MidiKeyboard extends Component {
           const note = key.note + (octaveNumber * 12);
           const noteIsDown = notesDown.indexOf(note) > -1;
           return (
-            <Note 
-              key={i} 
+            <Note
+              key={i}
               noteIsDown={noteIsDown}
-              mouseIsDown={mouseIsDown} 
-              isWhiteKey 
-              onNoteOn={() => this.handleNoteOn(note)} 
+              mouseIsDown={mouseIsDown}
+              isWhiteKey
+              onNoteOn={() => this.handleNoteOn(note)}
               onNoteOff={() => this.handleNoteOff(note)}
-              x={key.x} 
+              x={key.x}
             />
           )
         }) }
@@ -282,13 +282,13 @@ class MidiKeyboard extends Component {
           const note = key.note + (octaveNumber * 12);
           const noteIsDown = notesDown.indexOf(note) > -1;
           return (
-            <Note 
-              key={i} 
+            <Note
+              key={i}
               noteIsDown={noteIsDown}
-              mouseIsDown={mouseIsDown} 
-              onNoteOn={() => this.handleNoteOn(note)} 
-              onNoteOff={() => this.handleNoteOff(note)} 
-              x={key.x} 
+              mouseIsDown={mouseIsDown}
+              onNoteOn={() => this.handleNoteOn(note)}
+              onNoteOff={() => this.handleNoteOff(note)}
+              x={key.x}
             />
           )
         }) }
@@ -299,16 +299,16 @@ class MidiKeyboard extends Component {
   render(){
     return (
       <div>
-        <svg 
+        <svg
           style={{cursor:'pointer', width: '100%'}}
-          viewBox="0 0 2800 400" 
+          viewBox="0 0 2800 400"
           height="140"
           onMouseDown={e => this.handleMidiKeyboardMouseDown(e)}
           onMouseUp={() => this.handleMidiKeyboardMouseUp()}>
           <defs></defs>
-            
+
             {[0,1,2,3,4].map((octave) => this.renderOctave(octave))}
-            
+
         </svg>
       </div>
     );
@@ -320,7 +320,7 @@ class MidiKeyboard extends Component {
 }
 
 const mapStateToProps = ({ owlState, webAudioPatch }) => {
-  return { 
+  return {
     owlState,
     webAudioPatch
   }

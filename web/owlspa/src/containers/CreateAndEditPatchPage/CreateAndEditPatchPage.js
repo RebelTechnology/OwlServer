@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import customHistory from '../../customHistory';
 import classNames from 'classnames';
 import { CompilationTypeSelector } from 'components';
-import { 
+import {
   addGitHubFile,
   clearEditPatchForm,
   clearSourceFileErrors,
@@ -76,7 +76,7 @@ class CreateAndEditPatchPage extends Component {
 
   handleSaveClick(e){
     e.preventDefault();
-    
+
     const {
       routeParams: { patchSeoName },
       patchDetails
@@ -139,15 +139,15 @@ class CreateAndEditPatchPage extends Component {
       published: 0,
       starList:[],
       github: this.getSortedSourceFilesMainFileFirst().map(file => file.path)
-    }, options);  
+    }, options);
   }
 
   updatePatch(patchSeoName, options){
-    const { 
+    const {
       editPatchForm: {
-        patchName, 
+        patchName,
         compilationType
-      }, 
+      },
       patchDetails
     } = this.props;
 
@@ -157,7 +157,7 @@ class CreateAndEditPatchPage extends Component {
       name: patchName,
       compilationType: compilationType,
       github: this.getSortedSourceFilesMainFileFirst().map(file => file.path)
-    }, options); 
+    }, options);
   }
 
   getSortedSourceFilesMainFileFirst(){
@@ -173,34 +173,34 @@ class CreateAndEditPatchPage extends Component {
     });
   }
 
-  render(){ 
+  render(){
     const { currentUser, editPatchForm } = this.props;
-    const { 
+    const {
       patchName,
-      sourceFileErrors, 
-      invalidFields, 
-      isSavingPatch, 
-      isCompiling, 
-      sourceFiles, 
-      compilationType 
+      sourceFileErrors,
+      invalidFields,
+      isSavingPatch,
+      isCompiling,
+      sourceFiles,
+      compilationType
     } = editPatchForm;
 
     const isEditMode = !!this.props.routeParams.patchSeoName;
 
     let mainSourceFile = null;
-    
+
     const sortedSourceFiles = this.getSortedSourceFilesMainFileFirst().map( (file, i) => {
       if(file.mainFile){
         mainSourceFile = file;
       }
       return (
         <div className="row" key={file.name}>
-          <a 
+          <a
             href={file.path}
             target="_blank"
             style={{width: '60%', marginLeft:'10px', marginRight:'10px'}}
             className={ classNames({ 'invalid': !!sourceFileErrors[i] }) }
-            id={'frm-patch-github_' + i} 
+            id={'frm-patch-github_' + i}
           >
             {file.name}
           </a>
@@ -210,7 +210,7 @@ class CreateAndEditPatchPage extends Component {
               Set Main
             </button>
           )}
-          
+
           <button style={{ display:'inline-block', marginLeft:'10px' }} onClick={(e) => this.handleRemoveFile(e, file)}>remove</button>
           { sourceFileErrors[i] ? (
             <div className="error-message" style={{ display:'block' }}> { sourceFileErrors[i] } </div>
@@ -229,10 +229,10 @@ class CreateAndEditPatchPage extends Component {
                 <legend>Patch Name</legend>
                 <div className="row">
                   <label htmlFor="frm-patch-name">Name</label>
-                  <input 
-                    className={ classNames('form-control', {'invalid': !!invalidFields.name }) } 
-                    type="text" 
-                    id="frm-patch-name" 
+                  <input
+                    className={ classNames('form-control', {'invalid': !!invalidFields.name }) }
+                    type="text"
+                    id="frm-patch-name"
                     value={patchName}
                     onChange={(e) => this.handlePatchNameChange(e)}
                     name="name" />
@@ -242,28 +242,28 @@ class CreateAndEditPatchPage extends Component {
                 </div>
               </fieldset>
                 { sortedSourceFiles.length ? (
-                    <CompilationTypeSelector 
+                    <CompilationTypeSelector
                       mainSourceFile={mainSourceFile}
                       compilationType={compilationType}
-                      onCompilationTypeChange={(val) => this.handleCompilationTypeChange(val)} 
+                      onCompilationTypeChange={(val) => this.handleCompilationTypeChange(val)}
                     />
-                  ) : null 
+                  ) : null
                 }
               <fieldset id="frm-patch-github">
                 <legend>Add Source Files</legend>
                 <div className="info-message" style={{ marginBottom: '15px' }}>Upload files or add files from GitHub.</div>
-                
+
                 <div className="row">
                   <label>Upload Files</label>
                   <div className="form-control">
                     <div className="file-upload-container">
                       {editPatchForm.isUploading ? 'Uploading...' : 'Choose files...' }
                       {editPatchForm.isUploading ? null : (
-                        <input 
-                          type="file" 
-                          id="frm-patch-file" 
-                          name="files[]" 
-                          multiple 
+                        <input
+                          type="file"
+                          id="frm-patch-file"
+                          name="files[]"
+                          multiple
                           onChange={(e) => this.handleFileUploadChange(e)} />
                       )}
                     </div>
@@ -276,8 +276,8 @@ class CreateAndEditPatchPage extends Component {
                 <div id="frm-patch-github_template" className="row repeat">
                   <label htmlFor="frm-patch-github_#index#">GitHub File Url</label>
                   <div className="form-control">
-                    <input 
-                      type="url" 
+                    <input
+                      type="url"
                       value={editPatchForm.gitHubURLField}
                       onChange={(e) => this.handleGitHubURLFieldChange(e)}/>
                     <button onClick={(e)=> this.handleAddGithubUrlClick(e)} style={{ marginLeft:'20px' }}>ADD</button>
@@ -290,26 +290,26 @@ class CreateAndEditPatchPage extends Component {
                 <fieldset>
                   <legend>Source Files</legend>
                   { sortedSourceFiles }
-                </fieldset> 
+                </fieldset>
               ): null
             }
               <div className="row btn-row">
-                <button 
+                <button
                   disabled={ (isSavingPatch || isCompiling ) }
-                  className="btn-large" 
+                  className="btn-large"
                   onClick={(e) => this.handleSaveClick(e)} >
                   {isSavingPatch ? 'Saving . . .': 'Save'}
                   {isSavingPatch ? <i className="loading-spinner"></i> : null}
                 </button>
-                <button 
+                <button
                   disabled={ (isSavingPatch || isCompiling )}
-                  className="btn-large" 
+                  className="btn-large"
                   onClick={(e) => this.handleSaveAndCompileClick(e)} >
                   {isSavingPatch ? 'Saving . . .' : ( isCompiling ? 'Compiling . . .' : 'Save and Compile')}
                   {isSavingPatch || isCompiling ? <i className="loading-spinner"></i> : null}
                 </button>
-                <button 
-                  className="btn-large" 
+                <button
+                  className="btn-large"
                   onClick={(e) => this.handleCancelClick(e)} >
                   CANCEL
                 </button>
@@ -354,7 +354,7 @@ const mapStateToProps = ({ currentUser, editPatchForm, patchDetails }) => {
   }
 };
 
-export default connect(mapStateToProps, { 
+export default connect(mapStateToProps, {
   loadPatchInToEditPatchForm,
   clearEditPatchForm,
   serverUploadPatchFiles,

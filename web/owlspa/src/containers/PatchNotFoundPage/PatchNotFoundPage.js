@@ -2,7 +2,7 @@ import React, { PropTypes, Component }  from 'react';
 
 class PatchNotFoundPage extends Component {
 
-  render(){ 
+  render(){
     return (
       <div className="wrapper flexbox">
         <div className="content-container">

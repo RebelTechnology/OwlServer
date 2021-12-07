@@ -3,7 +3,7 @@ import GenPatchBoxText from './GenPatchBoxText';
 import GenPatchBoxCode from './GenPatchBoxCode';
 
 class GenPatchFileSVG extends Component {
-  
+
   constructor(props){
     super(props);
   }
@@ -63,17 +63,17 @@ class GenPatchFileSVG extends Component {
       const numoutlets = box.box.numoutlets;
       return (
         <svg width={width} height={height} x={x} y={y} key={i}>
-          <rect 
-            x={0} 
-            y={0} 
-            width={width} 
-            height={height} 
+          <rect
+            x={0}
+            y={0}
+            width={width}
+            height={height}
             fill="#888" />
-          <rect 
-            x={0} 
-            y={4} 
-            width={width} 
-            height={height - 8} 
+          <rect
+            x={0}
+            y={4}
+            width={width}
+            height={height - 8}
             fill="#555" />
           { this.renderInletsAndOutLets(numinlets, numoutlets, x, y, width, height)}
           <GenPatchBoxText
@@ -118,31 +118,31 @@ class GenPatchFileSVG extends Component {
       const numoutlets = box.box.numoutlets;
       return (
         <svg width={width} height={height} x={x} y={y} key={i}>
-          <rect 
-            x={0} 
-            y={0} 
-            width={width} 
+          <rect
+            x={0}
+            y={0}
+            width={width}
             height={height}
-            rx="8" 
-            ry="8" 
+            rx="8"
+            ry="8"
             fill="#888" />
-          <rect 
-            x={4} 
-            y={16} 
-            width={width - 8} 
-            height={height - 32} 
+          <rect
+            x={4}
+            y={16}
+            width={width - 8}
+            height={height - 32}
             fill="#fff" />
-          <rect 
-            x={4} 
-            y={16} 
-            width={31} 
-            height={height - 32} 
+          <rect
+            x={4}
+            y={16}
+            width={31}
+            height={height - 32}
             fill="#888" />
-          <rect 
-            x={4} 
-            y={16} 
-            width={30} 
-            height={height - 32} 
+          <rect
+            x={4}
+            y={16}
+            width={30}
+            height={height - 32}
             fill="#e9e9e9" />
           <text
             x={width - 53}
@@ -180,7 +180,7 @@ class GenPatchFileSVG extends Component {
     const height = box.box.patching_rect[3];
     const numports = isSource ? box.box.numoutlets : box.box.numinlets;
     const portSpacing = this.getPortSpacing(width, numports)
-    return { 
+    return {
       x: boxX + 10 + portSpacing * portIndex,
       y: boxY + (isSource ? height - 1 : 1)
     }
@@ -230,11 +230,11 @@ class GenPatchFileSVG extends Component {
 
     return (
       <svg
-        xmlns="http://www.w3.org/2000/svg" 
+        xmlns="http://www.w3.org/2000/svg"
         width={width || rect[2]}
         height={height || rect[3]}
         style={{overflow: 'visible', margin: '50px 0'}} >
-        
+
         { this.renderPatchLines(patchLines) }
         { this.renderNewObjs(newObjs) }
         { this.renderCodeBoxes(codeBoxes) }

@@ -11,7 +11,7 @@ describe('CompilationTypeSelector', () => {
   let wrapper = mount(
     <CompilationTypeSelector
       mainSourceFile={mockMainFile}
-      compilationType={ compilationType } 
+      compilationType={ compilationType }
       onCompilationTypeChange={ onCompilationTypeChange }/>
   );
 
@@ -23,7 +23,7 @@ describe('CompilationTypeSelector', () => {
     expect(CompilationTypeSelector).to.be.a('function');
   });
 
-  it('renders a fieldset', () => {    
+  it('renders a fieldset', () => {
     const fieldset = wrapper.find('fieldset');
     expect(fieldset).to.have.length(1);
   });
@@ -46,7 +46,7 @@ describe('CompilationTypeSelector', () => {
   it('onChangeHandler is called with correct value on select val change', () => {
     let onCompilationTypeChange = sinon.spy();
     let wrapper = mount(
-      <CompilationTypeSelector 
+      <CompilationTypeSelector
         compilationType={ compilationType }
         onCompilationTypeChange={ onCompilationTypeChange }/>
     );
@@ -57,15 +57,15 @@ describe('CompilationTypeSelector', () => {
     expect(onCompilationTypeChange.calledWith(mockEvent.target.value)).to.be.true;
   });
 
-  
+
   describe('onChangeHandler returns correct comilationType when mainFileName is passed in', () => {
-    
+
     it('.pd files should return \'pd\' compilation type', () => {
       const onCompilationTypeChange = sinon.spy();
       const mockMainFile = {name: "fakefile.pd", path: "fakefile.pd", type: "gitHub", mainFile: true, timeStamp: 1475156840382};
       let wrapper = mount(
-        <CompilationTypeSelector 
-          compilationType={ compilationType } 
+        <CompilationTypeSelector
+          compilationType={ compilationType }
           onCompilationTypeChange={ onCompilationTypeChange }
           mainSourceFile={ mockMainFile } />
       );
@@ -78,8 +78,8 @@ describe('CompilationTypeSelector', () => {
       const onCompilationTypeChange = sinon.spy();
       const mockMainFile = {name: "fakefile.dsp", path: "fakefile.dsp", type: "gitHub", mainFile: true, timeStamp: 1475156840382};
       let wrapper = mount(
-        <CompilationTypeSelector 
-          compilationType={ compilationType } 
+        <CompilationTypeSelector
+          compilationType={ compilationType }
           onCompilationTypeChange={ onCompilationTypeChange }
           mainSourceFile={ mockMainFile } />
       );
@@ -92,8 +92,8 @@ describe('CompilationTypeSelector', () => {
       const onCompilationTypeChange = sinon.spy();
       const mockMainFile = {name: "fakefile.hpp", path: "fakefile.hpp", type: "gitHub", mainFile: true, timeStamp: 1475156840382};
       let wrapper = mount(
-        <CompilationTypeSelector 
-          compilationType={ compilationType } 
+        <CompilationTypeSelector
+          compilationType={ compilationType }
           onCompilationTypeChange={ onCompilationTypeChange }
           mainSourceFile={ mockMainFile } />
       );
@@ -103,5 +103,5 @@ describe('CompilationTypeSelector', () => {
     });
   });
 
-      
+
 });

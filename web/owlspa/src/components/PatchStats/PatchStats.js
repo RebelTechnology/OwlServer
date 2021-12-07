@@ -4,7 +4,7 @@ import styles from './PatchStats.css';
 import { Tag } from 'components';
 
 class PatchStats extends Component {
-  
+
   constructor(props){
     super(props);
     this.state = {
@@ -73,7 +73,7 @@ class PatchStats extends Component {
   }
 
   render(){
-    const { 
+    const {
       tags,
       patch,
       editMode,
@@ -81,7 +81,7 @@ class PatchStats extends Component {
       isSaving,
       savedSuccess
     } = this.props;
-    
+
     const {
       tagFilter,
       showTagsDropDown
@@ -158,15 +158,15 @@ class PatchStats extends Component {
         { editMode && (
           <div className="patch-stats-row" style={{position: 'relative'}}>
             <div styleName="tag-editor">
-              <input 
+              <input
                 styleName="tag-editor-filter-input"
                 style={{width: '100px'}}
-                type="text" 
+                type="text"
                 placeholder="add a tag"
-                value={tagFilter} 
+                value={tagFilter}
                 disabled={isSaving}
                 onClick={ e => this.handleTagFilterInputClick()}
-                onChange={(e) => this.handleTagFilterChange(e.target.value) } 
+                onChange={(e) => this.handleTagFilterChange(e.target.value) }
               />
               { showTagsDropDown && (
                 <ul styleName="tag-dropdown">
@@ -176,9 +176,9 @@ class PatchStats extends Component {
                     return tags.indexOf(tag) === -1;
                   }).map( (tag, i) => {
                     return (
-                      <li 
+                      <li
                         key={i}
-                        onClick={() => this.handleAddTag(tag)} 
+                        onClick={() => this.handleAddTag(tag)}
                       >
                       {tag}
                       </li>
@@ -186,7 +186,7 @@ class PatchStats extends Component {
                   })}
                 </ul>
               )}
-              
+
             </div>
           </div>
         )}

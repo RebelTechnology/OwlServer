@@ -10,7 +10,7 @@ class PatchTileSmall extends Component {
   }
 
   render(){
-    const { 
+    const {
       patch,
       canEdit,
       editMode,
@@ -29,7 +29,7 @@ class PatchTileSmall extends Component {
     }
     const starCount = patch.starList ? patch.starList.length : 0;
     const author = patch.author;
-    
+
     let patchVisibilityStyles = {};
     if(published){
       patchVisibilityStyles.background = 'none';
@@ -41,59 +41,59 @@ class PatchTileSmall extends Component {
         <div styleName="patch-title">
           { editMode ? (
             <input
-              type="text" 
-              style={{backgroundColor: isSaving ? '#bbb' : '#fff'}} 
-              disabled={isSaving} 
-              value={patchName} 
-              onChange={ e => this.props.onPatchNameChange(e.target.value) } 
+              type="text"
+              style={{backgroundColor: isSaving ? '#bbb' : '#fff'}}
+              disabled={isSaving}
+              value={patchName}
+              onChange={ e => this.props.onPatchNameChange(e.target.value) }
             />) : patchName
-          }   
+          }
         </div>
         { canEdit && (
           <div styleName="patch-tile-controls" style={{ marginBottom: '5px' }}>
-            
+
             { !editMode && <IconButton title="edit patch" icon={ isSaving ? 'loading' : 'edit' } disabled={isSaving} onClick={ () => this.props.onEditClick() } /> }
             { editMode && <IconButton title="cancel" icon='cancel' disabled={isSaving} onClick={  () => this.props.onCancelClick() } /> }
             { editMode && <IconButton title="save" icon={ isSaving ? 'loading' : 'save' } disabled={isSaving} onClick={  () => this.props.onSaveClick() } /> }
-            
-            <IconButton title="delete patch" icon="delete" onClick={ onDeletePatchClick } /> 
-            
+
+            <IconButton title="delete patch" icon="delete" onClick={ onDeletePatchClick } />
+
             { !editMode && (
               <div className="patch-visibility" style={patchVisibilityStyles} >
                 { published ? 'PUBLISHED' : 'PRIVATE'}
               </div>
             )}
-          
+
           </div>)
-        } 
+        }
 
 
         { editMode && (
           <div styleName="patch-title-published-editor">
             <label>
-              <input 
+              <input
                 disabled={isSaving}
-                type="radio" 
-                value="PUBLISHED" 
-                name="published" 
+                type="radio"
+                value="PUBLISHED"
+                name="published"
                 checked={published}
-                onChange={e => this.props.onChangePublished(true)} 
+                onChange={e => this.props.onChangePublished(true)}
               />
               PUBLISHED
             </label>
             <label>
               <input
                 disabled={isSaving}
-                type="radio" 
-                value="PRIVATE" 
-                name="published" 
+                type="radio"
+                value="PRIVATE"
+                name="published"
                 checked={!published}
-                onChange={e => this.props.onChangePublished(false)} 
+                onChange={e => this.props.onChangePublished(false)}
               />
               PRIVATE
             </label>
           </div>
-        )}  
+        )}
         <div styleName="star-counter-wrapper">
           <StarCounter starCount={starCount} starred={starred} onStarClick={ onStarClick } />
         </div>

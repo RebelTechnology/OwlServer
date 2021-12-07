@@ -12,16 +12,16 @@ class PatchDetailsTile extends Component {
       <div styleName="patch-details-tile" style={style}>
         <h2 style={{ marginBottom:'10px' }}>{title}</h2>
         { editMode ? (
-            <textarea 
-              style={{backgroundColor: isSaving ? '#bbb' : '#fff'}} 
-              disabled={isSaving} 
-              value={text} 
-              onChange={ e => this.props.onTextChange(e.target.value) } 
+            <textarea
+              style={{backgroundColor: isSaving ? '#bbb' : '#fff'}}
+              disabled={isSaving}
+              value={text}
+              onChange={ e => this.props.onTextChange(e.target.value) }
             />
           ) : (
             <p>{text}</p>
-          ) 
-        }   
+          )
+        }
       </div>
     );
   }

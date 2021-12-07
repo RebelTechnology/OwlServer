@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Tag, AuthorLink } from 'components';
 
 class PatchTile extends Component {
-  
+
   handlePatchClick(e, seoName){
     this.context.router.push('/patch/'+ seoName);
   }
@@ -13,7 +13,7 @@ class PatchTile extends Component {
   }
 
   render(){
-    const { 
+    const {
       id,
       name,
       published,
@@ -24,7 +24,7 @@ class PatchTile extends Component {
       loggedIn,
       onDeletePatchClick
     } = this.props;
-    
+
     return (
       <div className="patch-tile" onClick={ (e) => this.handlePatchClick(e, seoName) } >
         <div className="patch-title-controls">
@@ -34,10 +34,10 @@ class PatchTile extends Component {
               <div className="patch-visibility">
                 PRIVATE
               </div>
-            )}    
-          </div> 
+            )}
+          </div>
           <AuthorLink author={authorName} />
-          <span className="patch-description-list-view">{ description }</span>     
+          <span className="patch-description-list-view">{ description }</span>
         </div>
         <div className="patch-baseline">
           { tags ?

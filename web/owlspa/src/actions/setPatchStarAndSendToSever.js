@@ -5,7 +5,7 @@ import serverRemovePatchStar from './serverRemovePatchStar';
 
 const setPatchStarAndSendToSever = ({add, star, patchSeoName, patchId}) => {
   return dispatch => {
-    //optimistically set client state for star but if server fails revert. 
+    //optimistically set client state for star but if server fails revert.
     if(add){
       dispatch(clientAddPatchStar({star, patchSeoName}));
       dispatch(serverAddPatchStar(patchId))
@@ -15,7 +15,7 @@ const setPatchStarAndSendToSever = ({add, star, patchSeoName, patchId}) => {
             star:{
               userId: response.result.userId,
               timeStamp: response.result.timeStamp
-            }, 
+            },
             patchSeoName
           }))
         })

@@ -17,7 +17,6 @@ const getScript = (scriptUrl) => {
     };
     script.src = scriptUrl;
   });
-  
 }
 
 export default getScript;

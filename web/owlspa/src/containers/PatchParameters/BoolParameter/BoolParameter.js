@@ -29,7 +29,7 @@ class BoolParameter extends Component {
   }
 
   render(){
-    const { 
+    const {
       isActive,
       name,
       isSaving,
@@ -57,8 +57,8 @@ class BoolParameter extends Component {
 
     return (
       <div style={editModeWrapperStyles}>
-        <div 
-          style={{ 
+        <div
+          style={{
             cursor: isActive && isInputParam ? 'pointer' : 'auto',
             color: activeColor,
             margin: editMode ? '53px 31px 44px' : '40px 8px 0px',
@@ -70,11 +70,11 @@ class BoolParameter extends Component {
           onTouchStart={e => isInputParam && isActive && this.handleButtonDown(e) }
           onTouchEnd={e => isInputParam && isActive && this.handleButtonUp(e) }>
           { editMode && (
-            <IconButton 
-              title="delete parameter" 
+            <IconButton
+              title="delete parameter"
               style={{ margin: 0, position: 'absolute', top: '-42px', left: '-12px', zIndex: '999' }}
-              icon="delete" 
-              onClick={ this.props.onDelete } 
+              icon="delete"
+              onClick={ this.props.onDelete }
             />
           )}
           { editMode && (
@@ -85,26 +85,26 @@ class BoolParameter extends Component {
             )}
 
           { !editMode && (<span styleName="parameter-io">{ isInputParam ? pid+' IN' : pid+' OUT' }</span>)}
-          <div 
-            style={{ 
+          <div
+            style={{
               boxShadow: isActive ? 'inset 0px 0px 2px 2px rgba(0,0,0,0.25)' : '0px 0px 2px 2px rgba(0,0,0,0.3)',
-              backgroundColor: isActive ? ledColour : '#ececec' 
-            }} 
+              backgroundColor: isActive ? ledColour : '#ececec'
+            }}
             styleName="boolparam-push-button-led">
           </div>
           <span styleName="parameter-name">
             {editMode ? (
-              <input 
+              <input
                 style={{
                   padding: '9px',
                   height: '35px'
                 }}
                 disabled={isSaving}
-                onChange={e => this.props.onEdit({ name: e.target.value })} 
-                type="text" 
+                onChange={e => this.props.onEdit({ name: e.target.value })}
+                type="text"
                 maxLength="19"
                 value={name} />
-              ) : name 
+              ) : name
             }
           </span>
 

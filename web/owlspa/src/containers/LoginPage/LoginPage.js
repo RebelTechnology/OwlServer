@@ -6,14 +6,14 @@ class LoginPage extends Component {
     document.location.href = `${document.location.origin}/wp-login.php?redirect_to=${document.location.origin}/patch-library/${page}`;
   }
 
-  render(){ 
+  render(){
     return (
       <div className="wrapper flexbox">
         <div className="content-container">
 
           <div className="patch-library" style={{ textAlign: 'center', margin: '150px auto' }}>
             <h5>Redirecting to Login...</h5>
-            
+
           </div>
 
         </div>

@@ -7,7 +7,7 @@ class IconButton extends Component {
 
   render(){
     const { onClick, disabled, size, color, icon, children, title, style } = this.props;
-    
+
     const styles = {
       width: `${children ? 'auto' : size}px`,
       height: `${size}px`,
@@ -15,13 +15,13 @@ class IconButton extends Component {
       top: 0,
       ...style
     };
-    
+
     return (
-      <button 
+      <button
         title={title}
         styleName="icon-button"
         style={styles}
-        disabled={disabled} 
+        disabled={disabled}
         onClick={onClick}>
         <Icon color={disabled ? '#999' : color} name={icon} />
         { children }
