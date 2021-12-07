@@ -39,6 +39,21 @@ function getStringFromSysex(data, startOffset, endOffset){
   return str;
 }
 
+function decodeInt(x) {
+	const msb = x[0];
+	let y = x[1] << 24;
+
+	y += x[2] << 16;
+	y += x[3] << 8;
+	y += x[4] << 0;
+	y += (msb & 0x01) ? 0x80000000 : 0;
+	y += (msb & 0x02) ? 0x800000 : 0;
+	y += (msb & 0x04) ? 0x8000 : 0;
+	y += (msb & 0x08) ? 0x80 : 0;
+
+	return y;
+};
+
 function systemExclusive(data) {
     if(data.length > 3 && data[0] == 0xf0
        && data[1] == MIDI_SYSEX_MANUFACTURER){
@@ -48,7 +63,8 @@ function systemExclusive(data) {
         case OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND:
             var name = getStringFromSysex(data, 5, 1);
             var slot = data[4];
-            deviceDispatchPresetReceived({ slot, name });
+            var size = data.length > 5+6+name.length ? decodeInt(data.slice(6+name.length)) : 0;
+            deviceDispatchPresetReceived({ slot, name, size });
             console.log("preset received: " + slot + ": " + name);
             break;
         case OpenWareMidiSysexCommand.SYSEX_RESOURCE_NAME_COMMAND:
