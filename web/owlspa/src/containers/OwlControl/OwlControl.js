@@ -107,7 +107,7 @@ class OwlControl extends Component {
           { loadedPatchName && (<p><span>Loaded Patch:</span> <code>{loadedPatchName}</code></p>) }
           { firmWareVersion && (<p><span>Firmware:</span> <code>{firmWareVersion}</code></p>) }
           { status && status.map((t,i) => { return (<p key={i}><span>{t[0]}:</span> <code>{t[1]}</code></p>) }) }
-          { programMessage && (<p><span>Message:</span> <code>{programMessage}</code></p>) }
+          { programMessage && (<p><span>{programMessage[0]}:</span> <code>{programMessage[1]}</code></p>) }
           { programError && (<p><span>Error:</span> <code>{programError}</code></p>) }
           { uuid && (<p><span>Device UUID:</span> <code>{uuid}</code></p>) }
         </div>
