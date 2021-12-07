@@ -1,9 +1,5 @@
-
 import {
   API_END_POINT,
-  REQUEST_COMPILE_PATCH,
-  RECEIVE_COMPILE_PATCH,
-  PATCH_COMPILATION_FAILED
 } from 'constants';
 
 import newDialog from './newDialog';
@@ -16,7 +12,7 @@ const compilePatch = (patch) => {
       return;
     }
     dispatch({
-      type: REQUEST_COMPILE_PATCH,
+      type: 'REQUEST_COMPILE_PATCH',
       patchSeoName: patch.seoName
     });
 
@@ -32,18 +28,18 @@ const compilePatch = (patch) => {
       .then( json => {
         if(json.success){
           dispatch({
-            type: RECEIVE_COMPILE_PATCH,
+            type: 'RECEIVE_COMPILE_PATCH',
             patchSeoName: patch.seoName
           });
           dispatch(fetchPatchDetails(patch.seoName));
           dispatch(fetchPatchJavaScriptFile(patch))
         } else {
           dispatch({
-            type: PATCH_COMPILATION_FAILED,
+            type: 'PATCH_COMPILATION_FAILED',
             patchSeoName: patch.seoName
           });
         }
-        
+
         dispatch(newDialog({
           header: 'Patch Compilation ' + (json.success ? 'Succeeded' : 'Failed'),
           activeDialogTab:json.success ? 0 : 1,
@@ -57,12 +53,12 @@ const compilePatch = (patch) => {
               isError: !json.success,
               contents:json.stderr
             }
-          ] 
+          ]
         }));
       }).catch((err) => {
         console.error(err);
         dispatch({
-          type: PATCH_COMPILATION_FAILED,
+          type: 'PATCH_COMPILATION_FAILED',
           patchSeoName: patch.seoName
         });
         dispatch(newDialog({
@@ -72,7 +68,7 @@ const compilePatch = (patch) => {
             header :'Error',
             isError: true,
             contents: err.message
-          }] 
+          }]
         }));
       });
   }

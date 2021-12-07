@@ -1,13 +1,17 @@
-import {
-  OWL_PROGRAM_MESSAGE_RECEIVED
-} from 'constants';
-
 import { dispatch } from '../index';
+import { formatBytes } from '../utils';
 
-const owlDispatchProgramMessage = (programMessage) => {
+const owlDispatchProgramMessage = (msg) => {
+	let s = msg.match(/Storage (\d+)\/(\d+)/);
+
+	let m = ['MESSAGE', msg];
+	if (s) m = ['STORAGE', formatBytes(s[1]).string + " / " + formatBytes(s[2]).string];
+
+	console.log(s, m)
+
   dispatch({
-    type: OWL_PROGRAM_MESSAGE_RECEIVED,
-    programMessage
+    type: 'OWL_PROGRAM_MESSAGE_RECEIVED',
+    programMessage: m
   });
 }
 

@@ -1,14 +1,12 @@
 
 import {
   API_END_POINT,
-  REQUEST_TAGS,
-  RECEIVE_TAGS
 } from 'constants';
 
 const fetchTags = () => {
   return (dispatch) => {
     dispatch({
-      type: REQUEST_TAGS
+      type: 'REQUEST_TAGS'
     });
 
     return fetch( API_END_POINT + '/tags/')
@@ -20,7 +18,7 @@ const fetchTags = () => {
             console.error('bad status:', response.status);
           } else {
             dispatch({
-              type: RECEIVE_TAGS,
+              type: 'RECEIVE_TAGS',
               tags: response.result
             });
           }

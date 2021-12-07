@@ -1,18 +1,15 @@
-import { owlCmd } from 'lib';
-import {
-  CLEAR_PRESET_LIST
-} from 'constants';
+import * as owl from 'lib/owlCmd';
 
 const deleteDevicePresetFromSlot = slot => {
   return (dispatch) => {
     dispatch({
-      type: CLEAR_PRESET_LIST
+      type: 'CLEAR_PRESET_LIST'
     });
-    
-    owlCmd.deleteDevicePresetFromSlot(slot);
-    
+
+    owl.deleteDevicePresetFromSlot(slot);
+
     window.setTimeout(() => {
-      owlCmd.requestDevicePresets();
+      owl.requestDevicePresets();
     }, 1000);
   }
 }

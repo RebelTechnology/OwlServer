@@ -8,6 +8,7 @@ import * as openWareMidi from './openWareMidi';
 import { API_END_POINT } from 'constants';
 import {
     deviceDispatchPresetReceived,
+    deviceDispatchResourceReceived,
     deviceDispatchDeviceUUIDReceived,
     deviceDispatchProgramChange,
     owlDispatchPatchStatus,
@@ -47,8 +48,14 @@ function systemExclusive(data) {
         case OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND:
             var name = getStringFromSysex(data, 5, 1);
             var slot = data[4];
-            deviceDispatchPresetReceived({ slot, name });   
+            deviceDispatchPresetReceived({ slot, name });
             console.log("preset received: " + slot + ": " + name);
+            break;
+        case OpenWareMidiSysexCommand.SYSEX_RESOURCE_NAME_COMMAND:
+            var name = getStringFromSysex(data, 5, 1);
+            var slot = data[4];
+            deviceDispatchResourceReceived({ slot, name });
+            console.log("resource received: " + slot + ": " + name);
             break;
         case OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND:
             var parameter_map = [' ', 'a', 'b', 'c', 'd', 'e'];
@@ -59,7 +66,7 @@ function systemExclusive(data) {
         case OpenWareMidiSysexCommand.SYSEX_PROGRAM_STATS:
             var msg = getStringFromSysex(data, 4, 1);
             console.log('PATCH STATUS: ',msg);
-            owlDispatchPatchStatus(msg);    
+            owlDispatchPatchStatus(msg);
             break;
         case OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION:
             var msg = getStringFromSysex(data, 4, 1);
@@ -116,7 +123,6 @@ function programChange(pc){
     deviceDispatchProgramChange(pc);
 }
 
-
 function sendRequest(type){
     HoxtonOwl.midiClient.sendCc(OpenWareMidiControl.REQUEST_SETTINGS, type);
 }
@@ -127,13 +133,13 @@ function sendStatusRequest(){
 }
 
 var pollRequestTimeout;
-function pollOwlStatus() {
+export function pollStatus() {
     sendStatusRequest();
-    clearPollRequestTimeout();
-    pollRequestTimeout = window.setTimeout(pollOwlStatus, 2000);
+    pollStatusStop();
+    pollRequestTimeout = window.setTimeout(pollStatus, 2000);
 }
 
-function clearPollRequestTimeout(){
+export function pollStatusStop(){
     if(pollRequestTimeout){
         window.clearTimeout(pollRequestTimeout);
     }
@@ -146,15 +152,23 @@ function setParameter(pid, value){
 
 function sendLoadRequest(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
-    window.setTimeout(function(){    
+    window.setTimeout(function(){
 	sendRequest(OpenWareMidiSysexCommand.SYSEX_PARAMETER_NAME_COMMAND);
     }, 1000);
 }
 
-function requestDevicePresets(){
+export function requestDevicePresets(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
     sendRequest(OpenWareMidiSysexCommand.SYSEX_PRESET_NAME_COMMAND);
-    window.setTimeout(function(){    
+    window.setTimeout(function(){
+	sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
+    }, 1000);
+}
+
+export function requestDeviceResources(){
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_FIRMWARE_VERSION);
+    sendRequest(OpenWareMidiSysexCommand.SYSEX_RESOURCE_NAME_COMMAND);
+    window.setTimeout(function(){
 	sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
     }, 1000);
 }
@@ -162,7 +176,7 @@ function requestDevicePresets(){
 function onMidiInitialised(callback){
 
     // auto set the input and output to an OWL
-    
+
     var outConnected = false,
         inConnected = false,
         connectedMidiInputPort = null,
@@ -173,7 +187,7 @@ function onMidiInitialised(callback){
             connectedMidiOutputPort = HoxtonOwl.midiClient.selectMidiOutput(HoxtonOwl.midiClient.midiOutputs[o].id);
             outConnected = true;
             break;
-        }        
+        }
     }
 
     for (var i = 0; i < HoxtonOwl.midiClient.midiInputs.length; i++) {
@@ -181,9 +195,9 @@ function onMidiInitialised(callback){
             connectedMidiInputPort = HoxtonOwl.midiClient.selectMidiInput(HoxtonOwl.midiClient.midiInputs[i].id);
             inConnected = true;
             break;
-        }        
+        }
     }
-    
+
     if (inConnected && outConnected) {
         console.log('connected to an OWL');
         // $('#ourstatus').text('Connected to an OWL')
@@ -210,7 +224,7 @@ function updatePermission(name, status) {
     console.log('update permission for ' + name + ' with ' + status);
 }
 
-function connectToOwl() {
+export function connect() {
     return new Promise((resolve, reject)=>{
         HoxtonOwl.midiClient.initialiseMidi(function(){
             onMidiInitialised((owlConnection) => {
@@ -224,10 +238,9 @@ function connectToOwl() {
     });
 }
 
-
 function sendProgramData(data){
     return new Promise( (resolve, reject) => {
-        console.log("sending program data "+data.length+" bytes"); 
+        console.log("sending program data "+data.length+" bytes");
         var chunks = chunkData(data);
         sendDataChunks(0, chunks, resolve);
     });
@@ -235,7 +248,7 @@ function sendProgramData(data){
 
 function storeProgramInDeviceSlot(slot){
     return new Promise((resolve, reject) => {
-        
+
         if(typeof slot !== 'number' || slot < 0 || slot > 40){
             reject(new Error('slot is not a number from 0 to 40'));
             return;
@@ -257,23 +270,27 @@ function storeProgramInDeviceSlot(slot){
     });
 }
 
-function resetDevice(){
+export function resetDevice(){
     HoxtonOwl.midiClient.sendSysexCommand(OpenWareMidiSysexCommand.SYSEX_DEVICE_RESET_COMMAND);
 }
 
-function eraseDeviceStorage(){
+export function eraseDeviceStorage(){
     HoxtonOwl.midiClient.sendSysexCommand(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE);
 }
 
-function deleteDevicePresetFromSlot(slot){
+export function deleteDevicePresetFromSlot(slot){
     HoxtonOwl.midiClient.sendSysexData(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE, [0, 0, 0, 0, slot])
 }
 
-function showDeviceUUID(){
+export function deleteDeviceResourceFromSlot(slot){
+    HoxtonOwl.midiClient.sendSysexData(OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE, [0, 0, 0, 0, slot])
+}
+
+export function deviceUUID(){
     sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_ID)
 }
 
-const setDeviceActivePresetSlot = slot => {
+export function setDeviceActivePresetSlot(slot) {
     HoxtonOwl.midiClient.sendProgramChange(slot)
 }
 
@@ -301,7 +318,7 @@ function sendDataChunks(index, chunks, resolve){
         HoxtonOwl.midiClient.logMidiData(chunks[index]);
         if(HoxtonOwl.midiClient.midiOutput){
             //console.log("sending chunk "+ index + ' with '+ chunks[index].length +" bytes sysex");
-            HoxtonOwl.midiClient.midiOutput.send(chunks[index], 0);            
+            HoxtonOwl.midiClient.midiOutput.send(chunks[index], 0);
         }
         sendDataTimeout = window.setTimeout(function(){
             sendDataChunks(++index, chunks, resolve);
@@ -314,14 +331,14 @@ function sendDataChunks(index, chunks, resolve){
 function sendProgramRun(){
     console.log("sending sysex RUN command");
     var msg = [
-        0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE, 
+        0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE,
         OpenWareMidiSysexCommand.SYSEX_FIRMWARE_RUN, 0xf7
     ];
     HoxtonOwl.midiClient.logMidiData(msg);
     if(HoxtonOwl.midiClient.midiOutput){
         HoxtonOwl.midiClient.midiOutput.send(msg, 0);
     }
-      
+
 }
 
 function sendProgramFromUrl(url){
@@ -329,9 +346,9 @@ function sendProgramFromUrl(url){
         console.log("sending patch from url "+url);
         var oReq = new XMLHttpRequest();
         oReq.responseType = "arraybuffer";
-        oReq.onload = function (oEvent) {   
+        oReq.onload = function (oEvent) {
             var arrayBuffer = oReq.response; // Note: not oReq.responseText
-            if(arrayBuffer) {  
+            if(arrayBuffer) {
                 var data = new Uint8Array(arrayBuffer);
                 resolve(sendProgramData(data));
             }
@@ -341,18 +358,18 @@ function sendProgramFromUrl(url){
     });
 }
 
-function loadPatchOnDevice(patchId){
+export function loadPatchOnDevice(patchId){
     const url = API_END_POINT + '/builds/' + patchId + '?format=sysx&amp;download=1';
     return sendProgramFromUrl(url);
 }
 
-function storePatchInDeviceSlot(patchId, slot){
+export function storePatchInDeviceSlot(patchId, slot){
     return loadPatchOnDevice(patchId).then(function(){
         return storeProgramInDeviceSlot(slot);
     });
 }
 
-function loadAndRunPatchOnDevice(patchId){
+export function loadAndRunPatchOnDevice(patchId){
     return loadPatchOnDevice(patchId).then(function(){
         sendProgramRun();
     }, function(err){
@@ -360,6 +377,21 @@ function loadAndRunPatchOnDevice(patchId){
     });
 }
 
+export function sendNoteOff() {
+	HoxtonOwl.midiClient.sendNoteOff(...arguments);
+}
+
+export function sendNoteOn() {
+	HoxtonOwl.midiClient.sendNoteOn(...arguments);
+}
+
+export function selectMidiInput() {
+	HoxtonOwl.midiClient.selectMidiInput(...arguments);
+}
+
+export function selectMidiOutput() {
+	HoxtonOwl.midiClient.selectMidiOutput(...arguments);
+}
 
 /*
 *
@@ -454,6 +486,10 @@ HoxtonOwl.midiClient = {
         //     sysexMessage = [];
         // }
         return;
+
+        default:
+        console.log('HERE: ', event);
+        return;
         }
     },
 
@@ -469,7 +505,7 @@ HoxtonOwl.midiClient = {
         }
 
         midiInput = HoxtonOwl.midiClient.midiInputs.find(input => input.id === id);
-        
+
         if(midiInput){
             console.log("selecting MIDI input ", midiInput);
             midiInput.onmidimessage = this.MIDIMessageEventHandler;
@@ -483,10 +519,10 @@ HoxtonOwl.midiClient = {
         }
 
         var midiOutput = HoxtonOwl.midiClient.midiOutput = HoxtonOwl.midiClient.midiOutputs.find(output => output.id === id);
-        
+
         if(midiOutput){
-          console.log("selecting MIDI output ", midiOutput);   
-          return midiOutput;     
+          console.log("selecting MIDI output ", midiOutput);
+          return midiOutput;
         }
     },
 
@@ -500,21 +536,21 @@ HoxtonOwl.midiClient = {
     sendCc: function(cc, value) {
         console.log("sending CC "+cc+"/"+value);
         if(HoxtonOwl.midiClient.midiOutput){
-          HoxtonOwl.midiClient.midiOutput.send([0xB0, cc, value], 0);            
+          HoxtonOwl.midiClient.midiOutput.send([0xB0, cc, value], 0);
         }
     },
 
     sendNoteOn: function(note, velocity) {
         console.log('sending Note On:', note, 'velocity:', velocity);
         if(HoxtonOwl.midiClient.midiOutput){
-          HoxtonOwl.midiClient.midiOutput.send([0x90, note, velocity], 0);            
+          HoxtonOwl.midiClient.midiOutput.send([0x90, note, velocity], 0);
         }
     },
 
     sendNoteOff: function(note, velocity) {
         console.log('sending Note Off:', note, 'velocity:', velocity);
         if(HoxtonOwl.midiClient.midiOutput){
-          HoxtonOwl.midiClient.midiOutput.send([0x80, note, velocity], 0);            
+          HoxtonOwl.midiClient.midiOutput.send([0x80, note, velocity], 0);
         }
     },
 
@@ -545,22 +581,4 @@ HoxtonOwl.midiClient = {
         }
     }
 
-}
-
-export default {
-    connectToOwl,
-    eraseDeviceStorage,
-    deleteDevicePresetFromSlot,
-    loadAndRunPatchOnDevice,
-    resetDevice,
-    requestDevicePresets,
-    sendNoteOff: HoxtonOwl.midiClient.sendNoteOff,
-    sendNoteOn: HoxtonOwl.midiClient.sendNoteOn,
-    selectMidiInput: HoxtonOwl.midiClient.selectMidiInput,
-    selectMidiOutput: HoxtonOwl.midiClient.selectMidiOutput,
-    startPollingOwlStatus: pollOwlStatus,
-    stopPollingOwlStatus: clearPollRequestTimeout,
-    setDeviceActivePresetSlot,
-    showDeviceUUID,
-    storePatchInDeviceSlot
 }

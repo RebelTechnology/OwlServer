@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { 
+import {
   fetchPatchSourceCodeFiles,
   updatePatchSourceCodeFile,
-  serverSavePatchFiles 
-} from 'actions'; 
+  serverSavePatchFiles
+} from 'actions';
 import classNames from 'classnames';
 import { parseUrl } from 'utils';
 import { GenPatchFileSVG, Icon } from 'components';
@@ -91,7 +91,7 @@ class PatchCode extends Component {
     if(!fileUrl){
       return false;
     }
-    
+
     const domain = parseUrl(fileUrl).authority;
     return domain.indexOf('rebeltech.org') > -1 || domain.indexOf('hoxtonowl.com') > -1;
   }
@@ -224,7 +224,7 @@ class PatchCode extends Component {
     if(isGenFile && activeTabFileString){
       genFileJson = JSON.parse(activeTabFileString);
     }
-    
+
     const tabNavItems = fileUrls.map((fileUrl, i )=> {
       const fileName = this.getFileName(fileUrl);
       return (
@@ -243,7 +243,7 @@ class PatchCode extends Component {
           { canEdit && (
             <h6 className="patchcode-toolbar" style={{marginBottom:'10px'}}>
               { showPatchCodeEditControls && (
-                <button 
+                <button
                   onClick={e => this.handleEditPatchCodeClick(e)}
                   disabled={filesAreSaving}
                   style={ editModeActive ? {backgroundColor:'#c52374', borderBottomColor: '#86154e'} : {} }
@@ -252,7 +252,7 @@ class PatchCode extends Component {
                 </button>
               )}
               { showPatchCodeEditControls && (
-                <button 
+                <button
                   onClick={e => this.handleSavePatchFiles(e)}
                   disabled={filesAreSaving || !unsavedFileChanges}
                   className="btn-large save-patch-code">
@@ -260,21 +260,21 @@ class PatchCode extends Component {
                   {filesAreSaving && <i className="loading-spinner"></i>}
                 </button>
               )}
-              <button 
+              <button
                 onClick={e => this.handleSaveAndCompilePatchFiles(e, {unsavedFileChanges})}
                 disabled={filesAreSaving || patch.isCompiling}
                 className="btn-large save-and-compile-patch-code">
                 {unsavedFileChanges ? 'SAVE & COMPILE' : 'COMPILE' }
                 { (filesAreSaving || patch.isCompiling) && <i className="loading-spinner"></i> }
               </button>
-              <button 
+              <button
                 onClick={e => this.editorToggelDayNightMode(e)}
                 className="btn-large">
                 {editorNightMode ? 'DAY': 'NIGHT'}
               </button>
             </h6>
           )}
-          
+
           <div id="github-files" className={ classNames({'edit-mode': editModeActive }) }>
             <ul className="tab-nav">
               {tabNavItems}
@@ -288,8 +288,8 @@ class PatchCode extends Component {
               { errorFetchingFile }
 
               { isGitHubfile && <a href={fileUrls[activeTab]} target="_blank" className="github-link">Open this file on GitHub</a> }
-              
-              { showPatchCodeEditControls && (activeTabFileString === '' || activeTabFileString) && ( 
+
+              { showPatchCodeEditControls && (activeTabFileString === '' || activeTabFileString) && (
                 <AceEditor
                   mode="c_cpp"
                   theme={ editorNightMode ? 'monokai' : 'github'}
@@ -342,7 +342,7 @@ const mapStateToProps = ({ patchSourceCodeFiles }) => {
   }
 }
 
-export default connect(mapStateToProps, { 
+export default connect(mapStateToProps, {
   fetchPatchSourceCodeFiles,
   updatePatchSourceCodeFile,
   serverSavePatchFiles

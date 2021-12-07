@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import CSSModules from 'react-css-modules';
-import { deleteDevicePresetFromSlot, setDeviceActivePresetSlot } from 'actions';
+import { deleteDevicePresetFromSlot } from 'actions';
 import styles from './PresetList.css';
 import { IconButton } from 'components';
+import * as owl from '../../../lib/owlCmd';
 
 class PresetList extends Component {
 
@@ -14,7 +15,7 @@ class PresetList extends Component {
   }
 
   handleSelectPresetSlot(slot){
-    this.props.setDeviceActivePresetSlot(slot);
+    owl.setDeviceActivePresetSlot(slot);
   }
 
   render(){
@@ -32,7 +33,6 @@ class PresetList extends Component {
 
     return (
       <div styleName="preset-list" >
-        <h2>Presets</h2>
         {!!presets.length && (
           <div styleName="table-wrapper">
             <table>
@@ -43,7 +43,7 @@ class PresetList extends Component {
               </thead>
               <tbody>
                 { sortedPresets.map((preset, i) => {
-                    
+
                     const isActive = preset.slot === activePresetSlot;
                     const isRamSlot = preset.slot === 0;
 
@@ -57,14 +57,7 @@ class PresetList extends Component {
                           <td>{isActive ? 'Selected' : <button onClick={() => this.handleSelectPresetSlot(preset.slot) }>Select</button>}</td>
                         )}
                         {!isRamSlot && (
-                          <td>
-                            {/* <IconButton 
-                              style={{ padding: '0 4px', marginBottom: '3px' }}
-                              title="Delete Preset" 
-                              icon="delete"
-                              onClick={() => this.handleDeleteClick(preset.slot)} 
-                            /> */}
-                          </td>
+                          <td><button onClick={() => this.handleDeleteClick(preset.slot)}>Delete</button></td>
                         )}
                       </tr>
                     );
@@ -80,19 +73,19 @@ class PresetList extends Component {
 
 }
 
-const mapStateToProps = ({ 
-  owlState: { 
+const mapStateToProps = ({
+  owlState: {
     presets,
     activePresetSlot,
     isConnected
-  } 
+  }
 }) => {
-  
-  return { 
+
+  return {
     presets,
     activePresetSlot,
     isConnected
   }
 }
 
-export default connect(mapStateToProps, { setDeviceActivePresetSlot, deleteDevicePresetFromSlot })(CSSModules(PresetList, styles));
+export default connect(mapStateToProps, { deleteDevicePresetFromSlot })(CSSModules(PresetList, styles));

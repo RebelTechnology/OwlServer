@@ -1,10 +1,3 @@
-import { 
-  REQUEST_PATCHES,
-  RECEIVE_PATCHES,
-  RECEIVE_PATCHES_AUTHORS_TAGS,
-  PATCH_DELETED } from 'constants';
-
-
 const initialState = {
   isFetching: false,
   items: []
@@ -28,23 +21,23 @@ const addMissingAuthorNamesToPatches = ({patches, authors}) => {
 
 const patches = (state = initialState, action) => {
   switch (action.type) {
-    case REQUEST_PATCHES:
+    case 'REQUEST_PATCHES':
       return {
         ...state,
         isFetching: true
       }
-    case RECEIVE_PATCHES:
+    case 'RECEIVE_PATCHES':
       return {
         ...state,
         isFetching: false,
         items: action.patches
       }
-    case RECEIVE_PATCHES_AUTHORS_TAGS:
+    case 'RECEIVE_PATCHES_AUTHORS_TAGS':
       return {
         ...state,
         items: addMissingAuthorNamesToPatches(action.state)
       }
-    case PATCH_DELETED:
+    case 'PATCH_DELETED':
       return {
         ...state,
         items: state.items.filter( patch => {
@@ -52,7 +45,7 @@ const patches = (state = initialState, action) => {
         })
       }
     default:
-      return state
+      return state;
   }
 }
 

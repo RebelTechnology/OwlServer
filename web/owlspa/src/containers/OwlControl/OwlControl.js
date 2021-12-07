@@ -1,6 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus } from 'actions';
+
+import * as owl from 'lib/owlCmd';
+
+import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot } from 'actions';
+
+import styles from './OwlControl.css';
 
 class OwlControl extends Component {
 
@@ -32,16 +37,16 @@ class OwlControl extends Component {
     }
 
     if(navigator.requestMIDIAccess){
-    
+
       const slot = parseInt(window.prompt('Enter a slot number from 0 to 40'));
-    
+
       if(typeof slot !== 'number' || slot < 0 || slot > 40){
         window.alert('slot must be a number between 0 and 40 inclusive');
         return;
       }
-    
+
       this.props.storePatchInDeviceSlot(this.props.patch, slot);
-    
+
     } else {
       window.alert('Please use a Web MIDI enabled browser (e.g. Chrome) to connect to your OWL');
     }
@@ -60,34 +65,37 @@ class OwlControl extends Component {
       patchIsLoading,
       patchIsStoring,
       presets,
-      activePresetSlot
+      activePresetSlot,
+      uuid,
     } = owlState;
+
+    if (!uuid && isConnected) owl.deviceUUID();
 
     const loadedPreset = presets.length && presets.find(preset => preset.slot === activePresetSlot);
     const loadedPatchName = !!loadedPreset && loadedPreset.name;
 
     return (
       <div className="owl-device-control" style={style}>
-        { loadButton && isConnected && ( 
-          <button 
+        { loadButton && isConnected && (
+          <button
             onClick={() => this.loadAndRunPatchOnDevice()}
             disabled={patchIsLoading}>
             {patchIsLoading ? 'Loading ... ' : 'Load'}
             {patchIsLoading && <i className="loading-spinner"></i> }
-          </button> 
+          </button>
         )}
 
-        { storeButton && isConnected && ( 
-          <button 
+        { storeButton && isConnected && (
+          <button
             onClick={() => this.handleStorePatchButtonClick()}
             disabled={patchIsStoring}>
             {patchIsStoring ? 'Storing ... ' : 'Store'}
             {patchIsStoring && <i className="loading-spinner"></i> }
-          </button> 
+          </button>
         )}
 
         { !isConnected && (
-          <button 
+          <button
             onClick={() => this.connectToOwl()}
             disabled={isConnecting}>
               {isConnecting ? 'Connecting ... ' : 'Connect to Device'}
@@ -96,11 +104,12 @@ class OwlControl extends Component {
         )}
 
         <div className="owl-device-stats">
-          {loadedPatchName && (<p><span>Loaded Patch:</span> {loadedPatchName}</p>)}
-          {firmWareVersion && (<p><span>Connected to:</span> {firmWareVersion}</p>)}
-          {status && (<p>{status}</p>)}
-          {programMessage && (<p><span>Message:</span> {programMessage}</p>)}
-          {programError && (<p><span>Error:</span> {programError}</p>)}
+          { loadedPatchName && (<p><span>Loaded Patch:</span> <code>{loadedPatchName}</code></p>) }
+          { firmWareVersion && (<p><span>Firmware:</span> <code>{firmWareVersion}</code></p>) }
+          { status && status.map((t,i) => { return (<p key={i}><span>{t[0]}:</span> <code>{t[1]}</code></p>) }) }
+          { programMessage && (<p><span>{programMessage[0]}:</span> <code>{programMessage[1]}</code></p>) }
+          { programError && (<p><span>Error:</span> <code>{programError}</code></p>) }
+          { uuid && (<p><span>Device UUID:</span> <code>{uuid}</code></p>) }
         </div>
       </div>
     );
@@ -108,12 +117,12 @@ class OwlControl extends Component {
 
   componentDidMount(){
     if(this.props.owlState.isConnected){
-      this.props.startPollingOwlStatus();
+      owl.pollStatus();
     }
   }
 
   componentWillUnmount(){
-    this.props.stopPollingOwlStatus();
+    owl.pollStatusStop();
   }
 }
 
@@ -125,9 +134,9 @@ OwlControl.propTypes = {
 }
 
 const mapStateToProps = ({ owlState }) => {
-  return { 
+  return {
     owlState
   }
 }
 
-export default connect(mapStateToProps, { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot, startPollingOwlStatus, stopPollingOwlStatus })(OwlControl);
+export default connect(mapStateToProps, { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot })(OwlControl);

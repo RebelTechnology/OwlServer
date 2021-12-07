@@ -10,7 +10,7 @@ class DevicePageTile extends Component {
 
     return (
       <div styleName="device-page-tile" style={style}>
-        <h2 style={{ marginBottom:'10px' }}>{title}</h2>
+        <h2 style={{ textAlign:'center' }}>{title}</h2>
         { children }
       </div>
     );

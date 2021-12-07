@@ -6,7 +6,6 @@ import configureStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import SearchInput from './SearchInput';
-import { SET_PATCHLIST_SEARCH_TERM } from 'constants';
 
 const middleware = [thunk];
 const mockStore = configureStore(middleware);
@@ -30,7 +29,7 @@ describe('SearchInput', () => {
     expect(SearchInput).to.be.a('function');
   });
 
-  it('renders a text input field', () => { 
+  it('renders a text input field', () => {
     const wrapper = mount(
       <Provider store={store}>
         <SearchInput />
@@ -39,7 +38,7 @@ describe('SearchInput', () => {
     expect(wrapper.find('input').props().type).to.equal('text');
   });
 
-  it('renders the correct value from the store in the input', () => { 
+  it('renders the correct value from the store in the input', () => {
     const wrapper = mount(
       <Provider store={store}>
         <SearchInput />
@@ -64,5 +63,5 @@ describe('SearchInput', () => {
     input.simulate('change', mockEvent);
     expect(store.dispatch.calledWith(action)).to.be.true;
   });
-      
+
 });

@@ -1,21 +1,22 @@
-import { owlCmd } from 'lib';
-import {
-  CLEAR_PRESET_LIST
-} from 'constants';
+import * as owl from 'lib/owlCmd';
 
 const eraseDeviceStorage = () => {
   return (dispatch) => {
-    
+
     dispatch({
-      type: CLEAR_PRESET_LIST
+      type: 'CLEAR_PRESET_LIST'
     });
 
-    owlCmd.eraseDeviceStorage();
+    dispatch({
+      type: 'CLEAR_RESOURCE_LIST'
+    });
+
+    owl.eraseDeviceStorage();
 
     window.setTimeout(() => {
-      owlCmd.requestDevicePresets();
+      owl.requestDevicePresets();
     }, 1000);
-    
+
   }
 }
 

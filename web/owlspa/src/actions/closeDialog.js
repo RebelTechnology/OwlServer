@@ -1,8 +1,6 @@
-import { CLOSE_DIALOG } from 'constants';
-
 const closeDialog = () => {
   return {
-    type: CLOSE_DIALOG
+    type: 'CLOSE_DIALOG'
   };
 }
 

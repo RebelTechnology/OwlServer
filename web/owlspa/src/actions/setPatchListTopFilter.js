@@ -1,8 +1,6 @@
-import { SET_PATCHLIST_TOP_FILTER } from 'constants';
-
 const setPatchListTopFilter = (topFilter) => {
   return {
-    type: SET_PATCHLIST_TOP_FILTER,
+    type: 'SET_PATCHLIST_TOP_FILTER',
     topFilter
   };
 }

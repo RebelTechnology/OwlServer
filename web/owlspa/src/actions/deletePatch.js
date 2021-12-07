@@ -1,9 +1,8 @@
-import customHistory from '../customHistory';
 import {
   API_END_POINT,
-  REQUEST_DELETE_PATCH,
-  PATCH_DELETED
 } from 'constants';
+
+import customHistory from '../customHistory';
 
 const deletePatch = (patch, options = {}) => {
   return (dispatch) => {
@@ -16,7 +15,7 @@ const deletePatch = (patch, options = {}) => {
     }
 
     dispatch({
-      type: REQUEST_DELETE_PATCH,
+      type: 'REQUEST_DELETE_PATCH',
       patchSeoName: patch.seoName
     });
 
@@ -31,7 +30,7 @@ const deletePatch = (patch, options = {}) => {
       })
       .then( json => {
         dispatch({
-          type: PATCH_DELETED,
+          type: 'PATCH_DELETED',
           patchSeoName: patch.seoName,
           message: json.message
         });

@@ -1,20 +1,17 @@
-import {
-  SELECT_MIDI_OUTPUT_PORT_SUCCESS
-} from 'constants';
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
 
 const selectMidiOutput = (id) => {
   return (dispatch) => {
 
-    const connectedMidiOutputPort = owlCmd.selectMidiOutput(id);
+    const connectedMidiOutputPort = owl.selectMidiOutput(id);
 
     if(connectedMidiOutputPort){
       dispatch({
-        type: SELECT_MIDI_OUTPUT_PORT_SUCCESS,
+        type: 'SELECT_MIDI_OUTPUT_PORT_SUCCESS',
         connectedMidiOutputPort
       });
     }
-    
+
   }
 };
 

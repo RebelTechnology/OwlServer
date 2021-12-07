@@ -1,7 +1,6 @@
 import {
   fetchPatches, fetchAuthors, fetchTags
 } from 'actions';
-import { RECEIVE_PATCHES_AUTHORS_TAGS } from 'constants';
 
 const fetchPatchesAuthorsTags = () => {
   return (dispatch, getState) => {
@@ -11,7 +10,7 @@ const fetchPatchesAuthorsTags = () => {
       dispatch(fetchTags())
     ]).then(() => {
       dispatch({
-        type: RECEIVE_PATCHES_AUTHORS_TAGS,
+        type: 'RECEIVE_PATCHES_AUTHORS_TAGS',
         state: getState()
       });
     },

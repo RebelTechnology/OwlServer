@@ -35,6 +35,7 @@ export const OpenWareMidiSysexCommand = {
   SYSEX_FLASH_ERASE               : 0x14,
   SYSEX_SETTINGS_RESET            : 0x15,
   SYSEX_SETTINGS_STORE            : 0x16,
+  SYSEX_FIRMWARE_SAVE             : 0x17,
   SYSEX_FIRMWARE_VERSION          : 0x20,
   SYSEX_DEVICE_ID                 : 0x21,
   SYSEX_PROGRAM_MESSAGE           : 0x22,
@@ -60,10 +61,10 @@ export const OpenWareMidiControl = {
   PATCH_CONTROL          : 26, /* Remote control: 0=local, 127=MIDI */
   PATCH_BUTTON_ON        : 27, /* Switch a button on: 0-127 button id */
   PATCH_BUTTON_OFF       : 28, /* Switch a button off: 0-127 button id */
-  LED                    : 30, /* set/get LED value: 
+  LED                    : 30, /* set/get LED value:
 				* 0-41 : off
 				* 42-83 : green
-				* 84-127 : red 
+				* 84-127 : red
 				*/
   LEFT_INPUT_GAIN        : 32, /* left channel input gain, -34.5dB to +12dB (92 : 0dB) */
   RIGHT_INPUT_GAIN       : 33,

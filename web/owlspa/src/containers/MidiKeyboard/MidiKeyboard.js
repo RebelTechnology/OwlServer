@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Note from './Note/Note';
-import { owlCmd } from 'lib';
+import * as owl from 'lib/owlCmd';
 import { connect } from 'react-redux';
 
 class MidiKeyboard extends Component {
@@ -57,7 +57,7 @@ class MidiKeyboard extends Component {
       webAudioPatch
     } = this.props;
 
-    isConnected && owlCmd.sendNoteOn(note, 100);
+    isConnected && owl.sendNoteOn(note, 100);
     webAudioPatch.instance && webAudioPatch.instance.processMidi(0x90, note, 100);
   }
 
@@ -69,7 +69,7 @@ class MidiKeyboard extends Component {
       webAudioPatch
     } = this.props;
 
-    isConnected && owlCmd.sendNoteOff(note, 100);
+    isConnected && owl.sendNoteOff(note, 100);
     webAudioPatch.instance && webAudioPatch.instance.processMidi(0x80, note, 100);
   }
 

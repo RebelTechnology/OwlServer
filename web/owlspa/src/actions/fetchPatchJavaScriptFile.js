@@ -1,20 +1,20 @@
 import { getScript } from 'utils';
-import { 
+
+import {
   API_END_POINT,
-  REQUEST_PATCH_JAVASCRIPT,
-  LOADED_PATCH_JAVASCRIPT
 } from 'constants';
+
 import newDialog from './newDialog';
 
 const fetchPatchJavaScriptFile = (patch) => {
   return (dispatch) => {
     dispatch({
-      type: REQUEST_PATCH_JAVASCRIPT
+      type: 'REQUEST_PATCH_JAVASCRIPT'
     });
     return getScript(API_END_POINT + '/builds/'+ patch._id +'?format=js&download=0&cachebust='+ new Date().getTime())
       .then(()=>{
         dispatch({
-          type: LOADED_PATCH_JAVASCRIPT,
+          type: 'LOADED_PATCH_JAVASCRIPT',
           isFetching: false,
           patchId: patch._id
         });
@@ -26,7 +26,7 @@ const fetchPatchJavaScriptFile = (patch) => {
             header :'Error',
             isError: true,
             contents: 'Darn it there was an Error trying to load or run this patch in the browser.'
-          }] 
+          }]
         }));
         console.error(err);
       })

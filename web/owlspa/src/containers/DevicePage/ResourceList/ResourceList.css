@@ -4,40 +4,26 @@
   background: #5d5d5d;
 }
 
-.preset-list h2 {
+.resource-list h2 {
   color: #5d5d5d;
   font-weight: bold;
   font-size: 14px;
 }
 
-.preset-list table {
+.resource-list table {
   border-collapse: collapse;
   margin: 1px;
 }
 
-.preset-list th {
+.resource-list th {
   font-size: 19px !important;
 }
 
-.preset-list tr {
+.resource-list tr {
   height: 50px;
 }
 
-.preset-list .is-active td{
-  background: #008000;
-}
-
-.preset-list th:first-child, .preset-list td:first-child {
-  width: 150px;
-  text-align: center;
-  color: #e19758;
-}
-
-.preset-list td:last-child {
-  text-align: left;
-}
-
-.preset-list td, .preset-list th {
+.resource-list td, .resource-list th {
   background: #5d5d5d;
   color: #fff;
   text-align: center;
@@ -45,7 +31,7 @@
   font-size: 16px;
 }
 
-.preset-list button {
+.resource-list button {
   padding: 20px;
   line-height: 0;
 }

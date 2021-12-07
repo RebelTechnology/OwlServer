@@ -1,18 +1,3 @@
-import { 
-  REQUEST_PATCH_DETAILS,
-  RECEIVE_PATCH_DETAILS,
-  PATCH_DELETED,
-  PATCH_SAVING,
-  PATCH_SAVED,
-  ERROR_SAVING_PATCH,
-  PATCH_SEO_NAME_CHANGED,
-  REQUEST_COMPILE_PATCH,
-  RECEIVE_COMPILE_PATCH,
-  PATCH_COMPILATION_FAILED,
-  CLIENT_ADD_PATCH_STAR,
-  CLIENT_REMOVE_PATCH_STAR
-} from 'constants';
-
 const initialState = {
   isSaving: false,
   savedSuccess: false,
@@ -54,12 +39,13 @@ const updatePatchesWithNewPatchSeoName = (patches, oldSeoName, newSeoName, newPa
 
 const patchDetails = (state = initialState, action) => {
   switch (action.type) {
-    case REQUEST_PATCH_DETAILS:
+    case 'REQUEST_PATCH_DETAILS':
       return {
         ...state,
         isFetching: true
-      }
-    case RECEIVE_PATCH_DETAILS:
+      };
+
+    case 'RECEIVE_PATCH_DETAILS':
       return {
         ...state,
         isFetching: false,
@@ -67,8 +53,9 @@ const patchDetails = (state = initialState, action) => {
           ...state.patches,
           [action.patchDetails.seoName]:action.patchDetails
         }
-      }
-    case CLIENT_ADD_PATCH_STAR:
+      };
+
+    case 'CLIENT_ADD_PATCH_STAR':
       return {
         ...state,
         patches: {
@@ -78,8 +65,9 @@ const patchDetails = (state = initialState, action) => {
             starList: addOrUpdateStarInList(state.patches[action.patchSeoName].starList, action.star)
           }
         }
-      }
-    case CLIENT_REMOVE_PATCH_STAR:
+      };
+
+    case 'CLIENT_REMOVE_PATCH_STAR':
       return {
         ...state,
         patches: {
@@ -89,23 +77,26 @@ const patchDetails = (state = initialState, action) => {
             starList: removeStarFromList(state.patches[action.patchSeoName].starList, action.star)
           }
         }
-      }
-    case PATCH_DELETED:
+      };
+
+    case 'PATCH_DELETED':
       return {
         ...state,
         patches : {
           ...state.patches,
           [action.patchSeoName]: null
         }
-      }
-    case PATCH_SAVING:
+      };
+
+    case 'PATCH_SAVING':
       return {
         ...state,
         savedSuccess: false,
         isSaving: true,
         patchSeoNameChanged: null
-      }
-    case PATCH_SAVED:
+      };
+
+    case 'PATCH_SAVED':
       return {
         ...state,
         savedSuccess: true,
@@ -114,19 +105,22 @@ const patchDetails = (state = initialState, action) => {
           ...state.patches,
           [action.patch.seoName]: action.patch
         }
-      }
-    case ERROR_SAVING_PATCH:
+      };
+
+    case 'ERROR_SAVING_PATCH':
       return {
         ...state,
         isSaving: false
-      }
-    case PATCH_SEO_NAME_CHANGED:
+      };
+
+    case 'PATCH_SEO_NAME_CHANGED':
       return {
         ...state,
         patchSeoNameChanged: action.newSeoName,
         patches: updatePatchesWithNewPatchSeoName(state.patches, action.oldSeoName, action.newSeoName, action.newPatchName)
-      }
-    case REQUEST_COMPILE_PATCH:
+      };
+
+    case 'REQUEST_COMPILE_PATCH':
       return {
         ...state,
         patches : {
@@ -136,8 +130,9 @@ const patchDetails = (state = initialState, action) => {
             isCompiling: true
           }
         }
-      }
-    case RECEIVE_COMPILE_PATCH:
+      };
+
+    case 'RECEIVE_COMPILE_PATCH':
       return {
         ...state,
         patches : {
@@ -147,8 +142,9 @@ const patchDetails = (state = initialState, action) => {
             isCompiling: false
           }
         }
-      }
-    case PATCH_COMPILATION_FAILED:
+      };
+
+    case 'PATCH_COMPILATION_FAILED':
       return {
         ...state,
         patches : {
@@ -158,9 +154,10 @@ const patchDetails = (state = initialState, action) => {
             isCompiling: false
           }
         }
-      }
+      };
+
     default:
-      return state
+      return state;
   }
 }
 

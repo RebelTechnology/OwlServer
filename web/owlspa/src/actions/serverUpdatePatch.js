@@ -1,18 +1,9 @@
-import {
-  API_END_POINT,
-  PATCH_SAVING,
-  PATCH_SAVED,
-  PATCH_SEO_NAME_CHANGED,
-  ERROR_SAVING_PATCH,
-  ERROR_IN_SOURCE_FILE_URL,
-  INVALID_FIELD_DATA
-} from 'constants';
 import newDialog from './newDialog';
 
 const serverUpdatePatch = (patch) => {
   return (dispatch) => {
     dispatch({
-      type: PATCH_SAVING
+      type: 'PATCH_SAVING'
     });
 
     return fetch( API_END_POINT + '/patch/' + patch._id, {
@@ -25,17 +16,17 @@ const serverUpdatePatch = (patch) => {
       body: JSON.stringify({ patch })
     })
       .then(response => {
-        return response.json().then(json => {       
+        return response.json().then(json => {
           if(json.type === 'not_valid' && json.field){
             if(json.field === 'github'){
               dispatch({
-                type: ERROR_IN_SOURCE_FILE_URL,
+                type: 'ERROR_IN_SOURCE_FILE_URL',
                 index: json.index,
                 error: json.message || 'error with file url'
               });
             } else {
               dispatch({
-                type: INVALID_FIELD_DATA,
+                type: 'INVALID_FIELD_DATA',
                 field: json.field,
                 error: json.message
               });
@@ -48,20 +39,20 @@ const serverUpdatePatch = (patch) => {
             } else {
               throw new Error('Error updating patch');
             }
-          } 
+          }
           return json;
         });
       })
       .then( json => {
-        
+
         if(json.patch){
           dispatch({
-            type: PATCH_SAVED,
+            type: 'PATCH_SAVED',
             patch: json.patch
           });
           if(patch.seoName !== json.patch.seoName){
             dispatch({
-              type: PATCH_SEO_NAME_CHANGED,
+              type: 'PATCH_SEO_NAME_CHANGED',
               newSeoName: json.patch.seoName,
               oldSeoName: patch.seoName,
               newPatchName: patch.name
@@ -71,7 +62,7 @@ const serverUpdatePatch = (patch) => {
         } else {
           throw new Error('Error updating patch: patch missing');
         }
-        
+
       }).catch((err) => {
         console.error(err);
         dispatch(newDialog({
@@ -81,10 +72,10 @@ const serverUpdatePatch = (patch) => {
             header :'Error',
             isError: true,
             contents: err.message
-          }] 
+          }]
         }));
         dispatch({
-          type: ERROR_SAVING_PATCH
+          type: 'ERROR_SAVING_PATCH'
         });
       });
   }

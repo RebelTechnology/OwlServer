@@ -1,13 +1,24 @@
 import React, { PropTypes, Component }  from 'react';
 import { connect } from 'react-redux';
 import { OwlControl } from 'containers';
-import { resetDevice, eraseDeviceStorage, showDeviceUUID } from 'actions';
+import classNames from 'classnames';
+import { resetDevice, eraseDeviceStorage } from 'actions';
 import DevicePageTile from './DevicePageTile/DevicePageTile';
 import MidiPortSelector from './MidiPortSelector/MidiPortSelector';
 import PresetList from './PresetList/PresetList';
-import { owlCmd } from 'lib';
+import ResourceList from './ResourceList/ResourceList';
+import * as owl from 'lib/owlCmd';
 
 class DevicePage extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      activeTab: 0,
+      showingPresets: true,
+      showingResources: false,
+    };
+  }
 
   handleEraseStorageClick(){
     if(window.confirm('Are you sure you want to erase the device storage?')){
@@ -21,17 +32,56 @@ class DevicePage extends Component {
     }
   }
 
-  handleGetPatchesClick(){
-    this.props.showDeviceUUID(); // request UUID
-    owlCmd.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
+  getPresets(){
+    owl.requestDevicePresets(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
   }
 
-  render(){ 
-    
+  getResources(){
+    owl.requestDeviceResources(); // request PRESET_NAME, DEVICE_STATS and FIRMWARE_VERSION
+  }
+
+  handleRefreshClick() {
+    if (this.state.showingPresets)
+      this.getPresets();
+
+    else if (this.state.showingResources)
+      this.getResources();
+  }
+
+  handleChangeTab(_,activeTab){
+    const showingPresets = !this.state.showingPresets;
+    const showingResources = !this.state.showingResources;
+
+    this.setState({
+      showingPresets,
+      showingResources,
+      activeTab,
+    });
+
+    if (showingPresets && this.props.presets.length === 0)
+      this.getPresets();
+
+    else if (showingResources && this.props.resources.length === 0)
+      this.getResources();
+  }
+
+  render(){
+
     const {
       isConnected,
-      uuid
     } = this.props;
+
+    const {
+      activeTab,
+      showingPresets,
+      showingResources,
+    } = this.state;
+
+    const tabNavItems = ['Patches', 'Resources'].map((t,i) => (
+      <li onClick={(e) => this.handleChangeTab(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
+        <span>{t}</span>
+      </li>
+    ));
 
     return (
       <div className="wrapper flexbox" style={{ minHeight: '400px' }}>
@@ -42,15 +92,15 @@ class DevicePage extends Component {
               <div>
                 <OwlControl />
                 <MidiPortSelector />
-               {uuid && <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>Device UUID: {uuid}</div>}
               </div>
             </DevicePageTile>
 
-            { isConnected && ( 
+            { isConnected && (
               <DevicePageTile title="Device Commands">
                 <div>
-                  <button onClick={() => this.handleGetPatchesClick() }>
-                    Refresh
+                  <button onClick={() => this.handleRefreshClick() }>
+                    { showingPresets && "Refresh Patches" }
+                    { showingResources && "Refresh Resources" }
                   </button>
                   <button onClick={() => this.handleEraseStorageClick() }>
                     Erase Storage
@@ -62,14 +112,22 @@ class DevicePage extends Component {
               </DevicePageTile>
             )}
           </div>
-          { isConnected && (
-            <div id="two-thirds" className="patch-library">
-              <div className="white-box2">
-                <PresetList />
-              </div>
-            </div>
-          )}
 
+          <div id="two-thirds">
+            <ul className="tab-nav">
+              {tabNavItems}
+            </ul>
+
+            <div className="tab-content" style={{ overflow: 'auto', backgroundColor: 'white' }}>
+              { isConnected && showingPresets && (
+                <PresetList />
+              )}
+
+              { isConnected && showingResources && (
+                <ResourceList />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -77,13 +135,13 @@ class DevicePage extends Component {
 
 }
 
-const mapStateToProps = ({ owlState: { isConnected, presets, activePresetSlot, uuid } }) => {
-  return { 
+const mapStateToProps = ({ owlState: { isConnected, presets, resources, activePresetSlot } }) => {
+  return {
     isConnected,
     presets,
     activePresetSlot,
-    uuid
+    resources,
   }
 };
 
-export default connect(mapStateToProps, { resetDevice, eraseDeviceStorage, showDeviceUUID })(DevicePage);
+export default connect(mapStateToProps, { resetDevice, eraseDeviceStorage })(DevicePage);

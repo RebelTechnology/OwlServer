@@ -366,7 +366,6 @@ span.parameter-label {
 
 .owl-device-control .owl-device-stats {
     float: left;
-    margin-left: 30px;
     margin-top: 13px;
     font-size: 15px;
     width: 320px;
@@ -922,7 +921,7 @@ h2 {
 }
 
 .btn-large:disabled {
-  background-color: #ccc; 
+  background-color: #ccc;
   border-bottom: 2px solid #999;
 }
 
@@ -1420,5 +1419,3 @@ input[type=submit]:disabled:hover, input[type=reset]:disabled:hover, input[type=
         width: 48.9%;
     }
 }
-
-

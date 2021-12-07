@@ -1,14 +1,11 @@
-
 import {
   API_END_POINT,
-  REQUEST_AUTHORS,
-  RECEIVE_AUTHORS
 } from 'constants';
 
 const fetchAuthors = () => {
   return (dispatch) => {
     dispatch({
-      type: REQUEST_AUTHORS
+      type: 'REQUEST_AUTHORS'
     });
 
     return fetch( API_END_POINT + '/authors/')
@@ -20,7 +17,7 @@ const fetchAuthors = () => {
             console.error('bad status:', response.status);
           } else {
             dispatch({
-              type: RECEIVE_AUTHORS,
+              type: 'RECEIVE_AUTHORS',
               authors: response.result
             });
           }
