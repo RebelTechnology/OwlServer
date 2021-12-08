@@ -42,7 +42,8 @@ export const OpenWareMidiSysexCommand = {
   SYSEX_PROGRAM_MESSAGE           : 0x22,
   SYSEX_DEVICE_STATS              : 0x23,
   SYSEX_PROGRAM_STATS             : 0x24,
-  SYSEX_PROGRAM_ERROR             : 0x30
+  SYSEX_BOOTLOADER_VERSION        : 0x25,
+  SYSEX_PROGRAM_ERROR             : 0x30,
 };
 
 /*
@@ -96,5 +97,5 @@ export const OpenWareMidiControl = {
   PATCH_PARAMETER_BE     : 87,
   PATCH_PARAMETER_BF     : 88,
   PATCH_PARAMETER_BG     : 89,
-  PATCH_PARAMETER_BH     : 90
+  PATCH_PARAMETER_BH     : 90,
 };
