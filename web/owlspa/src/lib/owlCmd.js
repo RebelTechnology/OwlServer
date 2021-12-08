@@ -52,11 +52,11 @@ const crcTable = (function() {
 	return t;
 })();
 
-function crc32(str) {
+function crc32(arr) {
 	let crc = 0 ^ (-1);
 
-	for (let i = 0; i < str.length; i++)
-		crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+	for (let i = 0; i < arr.length; i++)
+		crc = (crc >>> 8) ^ crcTable[(crc ^ arr[i]) & 0xFF];
 
 	return (crc ^ (-1)) >>> 0;
 };
@@ -93,8 +93,8 @@ function encodeSysexData(data) {
 	sysex[0] = 0;
 
 	for (cnt = 0; cnt < data.length; cnt++) {
-		const c = data.charCodeAt(cnt) & 0x7F;
-		const msb = data.charCodeAt(cnt) >> 7;
+		const c = data[cnt] & 0x7F;
+		const msb = data[cnt] >> 7;
 
 		sysex[pos] |= msb << cnt7;
 		sysex[pos + 1 + cnt7] = c;
