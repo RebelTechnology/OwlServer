@@ -1277,7 +1277,7 @@ div.file-upload-container input[type=file] {
 }
 
 /* general buttons */
-input[type=submit], input[type=reset], input[type=button], button {
+input[type=submit], input[type=reset], input[type=button], button, label.btn {
     color: #fff;
     font-family: "montserrat",sans-serif;
     font-size: 12px !important;

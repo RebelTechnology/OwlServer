@@ -53,11 +53,23 @@ const owlState = (state = initialState, action) => {
         patchIsLoading: true,
         patchLoaded : false
       }
+    case 'BEGIN_LOAD_RESOURCE_ON_TO_OWL':
+      return {
+        ...state,
+        resourceIsLoading: true,
+        resourceLoaded : false
+      }
     case 'COMPLETE_LOAD_PATCH_ON_TO_OWL':
       return {
         ...state,
         patchIsLoading: false,
         patchLoaded : action.patchLoaded
+      }
+    case 'COMPLETE_LOAD_RESOURCE_ON_TO_OWL':
+      return {
+        ...state,
+        resourceIsLoading: false,
+        resourceLoaded : action.resourceLoaded
       }
     case 'STORE_PATCH_ON_DEVICE_REQUEST':
       return {

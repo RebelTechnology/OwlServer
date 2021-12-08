@@ -56,6 +56,7 @@ export setWebAudioPatch from './setWebAudioPatch';
 export setWebAudioPatchParameter from './setWebAudioPatchParameter';
 export sourceFileChange from './sourceFileChange';
 export storePatchInDeviceSlot from './storePatchInDeviceSlot';
+export storeResourceOnDevice from './storeResourceOnDevice';
 export togglePatchListSubFilter from './togglePatchListSubFilter';
 export updateCompilationType from './updateCompilationType';
 export updatePatchSourceCodeFile from './updatePatchSourceCodeFile';

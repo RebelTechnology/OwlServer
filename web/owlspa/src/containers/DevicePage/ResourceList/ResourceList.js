@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import CSSModules from 'react-css-modules';
-import { deleteDeviceResourceFromSlot } from 'actions';
+import { deleteDeviceResourceFromSlot, storeResourceOnDevice } from 'actions';
 import styles from './ResourceList.css';
 import { IconButton } from 'components';
 
@@ -12,6 +12,13 @@ class ResourceList extends Component {
       this.props.deleteDeviceResourceFromSlot(slot);
     }
   }
+
+	handleFileUploadChange(e) {
+		console.log(e.target.files.length);
+
+		if (e.target.files.length > 0)
+			this.props.storeResourceOnDevice(e.target.files[0]);
+	}
 
   render(){
 
@@ -28,7 +35,7 @@ class ResourceList extends Component {
 
     return (
       <div styleName="resource-list" >
-        {!!resources.length && (
+        {!!resources && (
           <div styleName="table-wrapper">
             <table>
               <thead>
@@ -37,6 +44,21 @@ class ResourceList extends Component {
                 </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <label className="btn"
+                           style={{ padding: '20px', lineHeight: '0', display: 'inline-block', marginTop: '3px' }}
+                           htmlFor="resource-add-file">Add</label>
+
+                    <input style={{ display: 'none' }}
+                           id="resource-add-file"
+                           type="file"
+                           onChange={(e) => this.handleFileUploadChange(e)} />
+                  </td>
+                </tr>
+
                 { sortedResources.map((resource, i) => {
                     return (
                       <tr key={i}>
@@ -69,4 +91,4 @@ const mapStateToProps = ({
   }
 }
 
-export default connect(mapStateToProps, { deleteDeviceResourceFromSlot })(CSSModules(ResourceList, styles));
+export default connect(mapStateToProps, { deleteDeviceResourceFromSlot, storeResourceOnDevice })(CSSModules(ResourceList, styles));

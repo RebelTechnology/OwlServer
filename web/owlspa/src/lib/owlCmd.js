@@ -558,6 +558,25 @@ export function loadPatchOnDevice(patchId) {
 	return sendProgramFromUrl(url);
 };
 
+export function storeResourceOnDevice(file) {
+  return file.arrayBuffer()
+    .then(x => sendDataChunks(0, packageSysexData((new Uint8Array(x))), _ => {
+      const n = file.name;
+
+      const msg = [
+        0xF0,
+        MIDI_SYSEX_MANUFACTURER,
+        MIDI_SYSEX_OMNI_DEVICE,
+        OpenWareMidiSysexCommand.SYSEX_FIRMWARE_SAVE,
+        ...n.split('').map(t => t.charCodeAt(0)),
+        0x00,
+        0xF7
+      ];
+
+      midi(msg, ["sysex SAVE command", msg]);
+    }));
+};
+
 export function storePatchInDeviceSlot(patchId, slot) {
 	return loadPatchOnDevice(patchId).then(function() {
 		return storeProgramInDeviceSlot(slot);
