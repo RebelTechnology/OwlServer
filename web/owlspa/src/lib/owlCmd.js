@@ -443,8 +443,13 @@ function storeProgramInDeviceSlot(slot) {
 };
 
 export function resetDevice() {
-	const cmd = OpenWareMidiSysexCommand.SYSEX_DEVICE_RESET_COMMAND;
-	const msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE, cmd, 0xf7 ];
+	const msg = [
+		0xf0,
+		MIDI_SYSEX_MANUFACTURER,
+		MIDI_SYSEX_OMNI_DEVICE,
+		OpenWareMidiSysexCommand.SYSEX_DEVICE_RESET_COMMAND,
+		0xf7
+	];
 
 	midiClient.log(msg);
 	midiClient.output.send(msg, 0);
@@ -452,7 +457,13 @@ export function resetDevice() {
 
 export function eraseDeviceStorage() {
 	const cmd = OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE;
-	const msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE, cmd, 0xf7 ];
+	const msg = [
+		0xf0,
+		MIDI_SYSEX_MANUFACTURER,
+		MIDI_SYSEX_OMNI_DEVICE,
+		cmd,
+		0xf7
+	];
 
 	midiClient.log(msg);
 	midiClient.output.send(msg, 0);
@@ -461,7 +472,14 @@ export function eraseDeviceStorage() {
 export function deleteDevicePresetFromSlot(slot) {
 	const cmd = OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE;
 	const data = [0, 0, 0, 0, slot];
-	const msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE, cmd, ...data, 0xf7 ];
+	const msg = [
+		0xf0,
+		MIDI_SYSEX_MANUFACTURER,
+		MIDI_SYSEX_OMNI_DEVICE,
+		cmd,
+		...data,
+		0xf7
+	];
 
 	midiClient.log(msg);
 	midiClient.output.send(msg, 0);
@@ -470,7 +488,14 @@ export function deleteDevicePresetFromSlot(slot) {
 export function deleteDeviceResourceFromSlot(slot) {
 	const cmd = OpenWareMidiSysexCommand.SYSEX_FLASH_ERASE;
 	const data = [0, 0, 0, 0, slot];
-	const msg = [0xf0, MIDI_SYSEX_MANUFACTURER, MIDI_SYSEX_OMNI_DEVICE, cmd, ...data, 0xf7 ];
+	const msg = [
+		0xf0,
+		MIDI_SYSEX_MANUFACTURER,
+		MIDI_SYSEX_OMNI_DEVICE,
+		cmd,
+		...data,
+		0xf7
+	];
 
 	midiClient.log(msg);
 	midiClient.output.send(msg, 0);
@@ -499,23 +524,15 @@ function chunkData(data) {
 	return chunks;
 };
 
-let sendDataTimeout;
 function sendDataChunks(index, chunks, resolve) {
-	index = index || 0;
-
-	if (sendDataTimeout) {
-		window.clearTimeout(sendDataTimeout);
-		sendDataTimeout = null;
-	}
-
 	if (index < chunks.length) {
 		midiClient.log(chunks[index]);
 
-		midi(chunks[index]);
+		midi(chunks[index], ["sent chunk", index]);
 
-		sendDataTimeout = window.setTimeout(function() {
+		window.setTimeout(function() {
 			sendDataChunks(++index, chunks, resolve);
-		}, 0);
+		}, 1);
 	} else {
 		resolve && resolve();
 	}
@@ -560,22 +577,22 @@ export function loadPatchOnDevice(patchId) {
 };
 
 export function storeResourceOnDevice(file) {
-  return file.arrayBuffer()
-    .then(x => sendDataChunks(0, packageSysexData((new Uint8Array(x))), _ => {
-      const n = file.name;
+	return file.arrayBuffer()
+		.then(x => sendDataChunks(0, packageSysexData((new Uint8Array(x))), _ => {
+			const n = file.name;
 
-      const msg = [
-        0xF0,
-        MIDI_SYSEX_MANUFACTURER,
-        MIDI_SYSEX_OMNI_DEVICE,
-        OpenWareMidiSysexCommand.SYSEX_FIRMWARE_SAVE,
-        ...n.split('').map(t => t.charCodeAt(0)),
-        0x00,
-        0xF7
-      ];
+			const msg = [
+				0xF0,
+				MIDI_SYSEX_MANUFACTURER,
+				MIDI_SYSEX_OMNI_DEVICE,
+				OpenWareMidiSysexCommand.SYSEX_FIRMWARE_SAVE,
+				...n.split('').map(t => t.charCodeAt(0)),
+				0x00,
+				0xF7
+			];
 
-      midi(msg, ["sysex SAVE command", msg]);
-    }));
+			midi(msg, ["sysex SAVE command", msg]);
+		}));
 };
 
 export function storePatchInDeviceSlot(patchId, slot) {
