@@ -118,7 +118,7 @@ const owlState = (state = initialState, action) => {
         ...state,
         resources: [
           ...state.resources.filter(resource => resource.slot !== action.slot),
-          { name: action.name, slot: action.slot }
+          { name: action.name, slot: action.slot, size: action.size }
         ]
       };
     case 'DEVICE_UUID_RECEIVED':

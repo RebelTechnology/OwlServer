@@ -186,9 +186,10 @@ export function systemCalls(data) {
 	case OpenWareMidiSysexCommand.SYSEX_RESOURCE_NAME_COMMAND: {
 		const name = getStringFromSysex(data, 5, 1);
 		const slot = data[4];
+		const size = data.length > 5+6+name.length ? decodeInt(data.slice(6+name.length)) : 0;
 
-		deviceDispatchResourceReceived({ slot, name });
-		log("resource received:", name, "slot:", slot);
+		deviceDispatchResourceReceived({ slot, name, size });
+		log("resource received:", name, "slot:", slot, "size:", size);
 
 		break;
 	}

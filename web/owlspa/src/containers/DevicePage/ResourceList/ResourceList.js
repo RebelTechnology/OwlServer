@@ -40,7 +40,7 @@ class ResourceList extends Component {
             <table>
               <thead>
                 <tr>
-                  <th>Name</th><th></th>
+                  <th>Name</th><th>Size</th><th></th>
                 </tr>
               </thead>
               <tbody>
@@ -63,6 +63,7 @@ class ResourceList extends Component {
                     return (
                       <tr key={i}>
                         <td>{resource.name}</td>
+                        <td><code>{resource.size}</code></td>
                         <td><button onClick={() => this.handleDeleteClick(resource.slot)}>Delete</button></td>
                       </tr>
                     );
