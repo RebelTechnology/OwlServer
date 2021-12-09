@@ -18,7 +18,7 @@ const compilePatch = (patch) => {
 
     return fetch( API_END_POINT + '/builds/' + patch._id, {method:'PUT', credentials: 'same-origin'})
       .then(response => {
-        return response.json().then(json =>{
+        return response.json().then(json =>{ // todo: shouldn't try to parse the response as json before checking the status
           if(response.status >= 400){
             throw new Error(json.message);
           }

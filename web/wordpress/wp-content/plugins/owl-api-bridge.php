@@ -92,7 +92,8 @@ function owl_getUserInfoBatch($userIds)
     $sql = 'SELECT ID, display_name FROM ' . $table_prefix . 'users WHERE ID IN(' . implode(', ', $userIds) . ')';
     $res = $db->query($sql);
     $result = [];
-    while ($user = $res->fetch_assoc()) {
+
+    while ($res && ($user = $res->fetch_assoc())) {
         $result[$user['ID']] = array('display_name' => $user['display_name']);
     }
 
