@@ -30,13 +30,20 @@ const serverUploadPatchFiles = (patchFileList, patchId) => {
 
     const formData = new FormData();
     for (var i = 0; i < patchFileList.length; i++) {
+      // File.name is read-only. we need to clone the file and rename it to avoid server compilation problems.
+      //
+      const f = new File(
+        [patchFileList[i]],
+        patchFileList[i].name.replace(/[^a-z0-9\.\-]+/gi, '_'),
+        { type: patchFileList[i].type }
+      );
 
-      if(patchFileList[i].toString() === '[object File]'){
-        formData.append('files[]', patchFileList[i]);
+      if(f.toString() === '[object File]'){
+        formData.append('files[]', f);
       }
 
-      if(patchFileList[i].toString() === '[object Blob]'){
-        formData.append('files[]', patchFileList[i], patchFileList[i].name);
+      if(f.toString() === '[object Blob]'){
+        formData.append('files[]', f, f.name);
       }
     }
 
