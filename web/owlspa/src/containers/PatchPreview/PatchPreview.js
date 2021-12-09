@@ -259,19 +259,17 @@ class PatchPreview extends Component {
 
     return (
       <div className="white-box2">
-        { webAudioPatch.isPlaying && (
-          <div>
-            <PatchParameters
-              patchIsActive={webAudioPatch.isPlaying}
-              editMode={editMode}
-              onChangeParameters={params => this.props.onChangeParameters(params)}
-              isSaving={isSaving}
-              parameters={parameters}
-            />
+        <div>
+          <PatchParameters
+            patchIsActive={webAudioPatch.isPlaying}
+            editMode={editMode}
+            onChangeParameters={params => this.props.onChangeParameters(params)}
+            isSaving={isSaving}
+            parameters={parameters}
+          />
 
-            <hr />
-          </div>
-        )}
+          <hr />
+        </div>
 
         { (webAudioPatch.isReady || owlState.isConnected) && (
           <button
