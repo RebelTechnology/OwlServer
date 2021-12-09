@@ -1,5 +1,6 @@
 import {
   WORDPRESS_AJAX_END_POINT,
+  PATCH_UPLOAD_DIR
 } from 'constants';
 
 import newDialog from './newDialog';
