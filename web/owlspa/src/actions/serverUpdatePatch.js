@@ -1,3 +1,7 @@
+import {
+  API_END_POINT,
+} from 'constants';
+
 import newDialog from './newDialog';
 
 const serverUpdatePatch = (patch) => {
