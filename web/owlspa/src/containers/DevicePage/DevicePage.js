@@ -99,8 +99,7 @@ class DevicePage extends Component {
               <DevicePageTile title="Device Commands">
                 <div>
                   <button onClick={() => this.handleRefreshClick() }>
-                    { showingPresets && "Refresh Patches" }
-                    { showingResources && "Refresh Resources" }
+                    Refresh
                   </button>
                   <button onClick={() => this.handleEraseStorageClick() }>
                     Erase Storage
