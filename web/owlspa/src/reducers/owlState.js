@@ -92,7 +92,9 @@ const owlState = (state = initialState, action) => {
     case 'DEVICE_PROGRAM_CHANGE':
       return {
         ...state,
-        activePresetSlot : action.slot
+        activePresetSlot: action.slot,
+        programError: null,
+        programMessage: null,
       }
     case 'CLEAR_PRESET_LIST':
       return {
