@@ -12,7 +12,7 @@ const setPatchStarAndSendToSever = ({add, star, patchSeoName, patchId}) => {
         .then( response => {
           // add server generated star timestamp to existing client star
           dispatch(clientAddPatchStar({
-            star:{
+            star: {
               userId: response.result.userId,
               timeStamp: response.result.timeStamp
             },

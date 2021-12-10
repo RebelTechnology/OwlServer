@@ -28,9 +28,9 @@ const connectToOwl = () => {
       console.error(err);
       dispatch(newDialog({
         header: 'Failed to Connect to OWL',
-        isError : true,
-        tabs:[{
-          header :'Error',
+        isError: true,
+        tabs: [{
+          header: 'Error',
           isError: true,
           contents: 'Failed to Connect to OWL'
         }]

@@ -133,8 +133,8 @@ BoolParameter.propTypes = {
   io: PropTypes.string,
   onEdit: PropTypes.func,
   isSaving: PropTypes.bool,
-  onPushButtonDown : PropTypes.func,
-  onPushButtonUp : PropTypes.func
+  onPushButtonDown: PropTypes.func,
+  onPushButtonUp: PropTypes.func
 };
 
 BoolParameter.defaultProps = {

@@ -24,9 +24,9 @@ const loadAndRunPatchOnDevice = (patch) => {
       console.error(err);
       dispatch(newDialog({
         header: 'Failed to load patch on to OWL',
-        isError : true,
-        tabs:[{
-          header :'Error',
+        isError: true,
+        tabs: [{
+          header: 'Error',
           isError: true,
           contents: 'Failed to load patch to OWL'
         }]

@@ -21,9 +21,9 @@ const fetchPatchJavaScriptFile = (patch) => {
       }).catch(err => {
         dispatch(newDialog({
           header: 'Error trying to run the patch',
-          isError : true,
-          tabs:[{
-            header :'Error',
+          isError: true,
+          tabs: [{
+            header: 'Error',
             isError: true,
             contents: 'Darn it there was an Error trying to load or run this patch in the browser.'
           }]

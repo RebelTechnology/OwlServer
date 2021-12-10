@@ -12,7 +12,7 @@ export class SearchInput extends Component {
   }
 
   render(){
-    const { patchListSearch:{searchTerm} } = this.props;
+    const { patchListSearch: {searchTerm} } = this.props;
     return (
       <div styleName="search-input">
         <input autoFocus type="text" value={searchTerm || ''} onChange={ e => this.handleSearchInputChange(e) } />

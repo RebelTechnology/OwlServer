@@ -56,7 +56,7 @@ class CompilationTypeSelector extends Component {
         <div className="row">
           <label>Type</label>
           <select
-            style={{fontSize:'18px'}}
+            style={{fontSize: '18px'}}
             name="compilationtype"
             onChange={(e) => onCompilationTypeChange(e.target.value)}
             value={compilationType}>
@@ -86,7 +86,7 @@ class CompilationTypeSelector extends Component {
 CompilationTypeSelector.propTypes = {
   compilationType: PropTypes.string,
   mainSourceFile: PropTypes.object,
-  onCompilationTypeChange : PropTypes.func
+  onCompilationTypeChange: PropTypes.func
 };
 
 export default CompilationTypeSelector;

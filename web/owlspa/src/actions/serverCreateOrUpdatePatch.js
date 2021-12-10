@@ -110,9 +110,9 @@ const serverCreateOrUpdatePatch = (patch, options = {}) => {
         console.error(err);
         dispatch(newDialog({
           header: 'Error Saving Patch',
-          isError : true,
-          tabs:[{
-            header :'Error',
+          isError: true,
+          tabs: [{
+            header: 'Error',
             isError: true,
             contents: err.message
           }]

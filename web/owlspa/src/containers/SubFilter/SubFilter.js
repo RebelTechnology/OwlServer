@@ -80,7 +80,7 @@ function mapStateToProps({ patchListFilter, authors, tags }){
 }
 
 SubFilter.propTypes = {
-  routeParams : PropTypes.object
+  routeParams: PropTypes.object
 }
 
 export default connect(mapStateToProps, {

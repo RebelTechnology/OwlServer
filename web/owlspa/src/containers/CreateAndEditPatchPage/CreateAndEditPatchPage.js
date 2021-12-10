@@ -137,7 +137,7 @@ class CreateAndEditPatchPage extends Component {
       ],
       compilationType: compilationType,
       published: 0,
-      starList:[],
+      starList: [],
       github: this.getSortedSourceFilesMainFileFirst().map(file => file.path)
     }, options);
   }
@@ -198,7 +198,7 @@ class CreateAndEditPatchPage extends Component {
           <a
             href={file.path}
             target="_blank"
-            style={{width: '60%', marginLeft:'10px', marginRight:'10px'}}
+            style={{width: '60%', marginLeft: '10px', marginRight: '10px'}}
             className={ classNames({ 'invalid': !!sourceFileErrors[i] }) }
             id={'frm-patch-github_' + i}
           >
@@ -211,9 +211,9 @@ class CreateAndEditPatchPage extends Component {
             </button>
           )}
 
-          <button style={{ display:'inline-block', marginLeft:'10px' }} onClick={(e) => this.handleRemoveFile(e, file)}>remove</button>
+          <button style={{ display: 'inline-block', marginLeft: '10px' }} onClick={(e) => this.handleRemoveFile(e, file)}>remove</button>
           { sourceFileErrors[i] ? (
-            <div className="error-message" style={{ display:'block' }}> { sourceFileErrors[i] } </div>
+            <div className="error-message" style={{ display: 'block' }}> { sourceFileErrors[i] } </div>
           ) : null }
         </div>
       );
@@ -237,7 +237,7 @@ class CreateAndEditPatchPage extends Component {
                     onChange={(e) => this.handlePatchNameChange(e)}
                     name="name" />
                     { invalidFields.name ? (
-                      <div className="error-message" style={{ display:'block' }}> { invalidFields.name } </div>
+                      <div className="error-message" style={{ display: 'block' }}> { invalidFields.name } </div>
                     ) : null }
                 </div>
               </fieldset>
@@ -280,7 +280,7 @@ class CreateAndEditPatchPage extends Component {
                       type="url"
                       value={editPatchForm.gitHubURLField}
                       onChange={(e) => this.handleGitHubURLFieldChange(e)}/>
-                    <button onClick={(e)=> this.handleAddGithubUrlClick(e)} style={{ marginLeft:'20px' }}>ADD</button>
+                    <button onClick={(e)=> this.handleAddGithubUrlClick(e)} style={{ marginLeft: '20px' }}>ADD</button>
                   </div>
                 </div>
 

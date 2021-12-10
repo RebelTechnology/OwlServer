@@ -13,14 +13,14 @@ class PatchPreview extends Component {
   constructor(props){
     super(props);
     this.state = {
-      audioSelectValue : 'none',
-      pushButtonLedColour : '#ececec',
+      audioSelectValue: 'none',
+      pushButtonLedColour: '#ececec',
       showMidiKeyboard: false
     };
   }
 
   handleTestPatchButtonClick(){
-    const { patch, patch:{jsAvailable}, fetchPatchJavaScriptFile } = this.props;
+    const { patch, patch: {jsAvailable}, fetchPatchJavaScriptFile } = this.props;
     if(webAudio.webAudioApiIsAvailable() && jsAvailable){
       fetchPatchJavaScriptFile(patch);
     }
@@ -52,7 +52,7 @@ class PatchPreview extends Component {
     const patchInstance = webAudio.initPatchAudio();
 
     this.props.setWebAudioPatch({
-      instance : patchInstance,
+      instance: patchInstance,
       isReady: true
     });
   }
@@ -121,7 +121,7 @@ class PatchPreview extends Component {
   }
 
   updateWebAudioPatchParameters(nextParams){
-    const { webAudioPatchParameters:currentParams, webAudioPatch:{instance} } = this.props;
+    const { webAudioPatchParameters: currentParams, webAudioPatch: {instance} } = this.props;
 
     if(!instance){
       return;
@@ -138,14 +138,14 @@ class PatchPreview extends Component {
   }
 
   patchJavaScriptWillLoad(nextProps){
-    const { patchJavaScript:{loadedPatch:nextLoadedPatch} } = nextProps;
-    const { patchJavaScript:{ loadedPatch }, patch } = this.props;
+    const { patchJavaScript: {loadedPatch: nextLoadedPatch} } = nextProps;
+    const { patchJavaScript: { loadedPatch }, patch } = this.props;
     return loadedPatch !== nextLoadedPatch && nextLoadedPatch === patch._id;
   }
 
   patchParametersWillChange(nextProps){
-    const { webAudioPatchParameters:nextParameters } = nextProps;
-    const { webAudioPatchParameters:currentParameters } = this.props;
+    const { webAudioPatchParameters: nextParameters } = nextProps;
+    const { webAudioPatchParameters: currentParameters } = this.props;
     if(nextParameters.length !== currentParameters.length){
       return true;
     }
@@ -156,8 +156,8 @@ class PatchPreview extends Component {
   }
 
   patchInstanceWillBeReady(nextProps){
-    const { webAudioPatch:{isReady} } = this.props;
-    const { webAudioPatch:{isReady:willBeReady} } = nextProps;
+    const { webAudioPatch: {isReady} } = this.props;
+    const { webAudioPatch: {isReady: willBeReady} } = nextProps;
     return !isReady && willBeReady;
   }
 
@@ -192,7 +192,7 @@ class PatchPreview extends Component {
       <div className="patch-preview-buttons">
         { !webAudioPatch.isReady && (
           <button
-            style={{display:'inline-block'}}
+            style={{display: 'inline-block'}}
             disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() }
             onClick={() => this.handleTestPatchButtonClick()} >
             Play
@@ -201,9 +201,9 @@ class PatchPreview extends Component {
 
         { webAudioPatch.isReady && (
           <button
-            style={{display:'inline-block'}}
+            style={{display: 'inline-block'}}
             onClick={() => this.togglePatchAudio()} >
-            { webAudioPatch.isPlaying ? 'stop audio':'start audio' }
+            { webAudioPatch.isPlaying ? 'stop audio' : 'start audio' }
           </button>
         )}
 

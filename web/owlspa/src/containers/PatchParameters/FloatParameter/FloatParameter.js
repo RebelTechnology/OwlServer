@@ -47,7 +47,7 @@ class FloatParameter extends Component {
   }
 
   setParameterValue(val){
-    this.setState({parameterValue:val});
+    this.setState({parameterValue: val});
     this.props.onParamValueChange(val);
   }
 
@@ -142,14 +142,14 @@ class FloatParameter extends Component {
 
           { !editMode && (<span styleName="parameter-io">{ isInputParam ? pid+' IN' : pid+' OUT' }</span>)}
           <svg width="100" height="100" viewBox="0 0 100 100">
-            <path style={{fill:'none',stroke:'#eee', strokeWidth:10}} d="
+            <path style={{fill: 'none', stroke: '#eee', strokeWidth: 10}} d="
               M 22, 79
               A 40,40 0 1,1 78,79
               "
             />
           </svg>
           <svg
-            style={{position:'absolute', top:0, left:0, transform:'rotate('+ this.getParameterValueAsRotationDegrees(parameterValue)+'deg)'}}
+            style={{position: 'absolute', top: 0, left: 0, transform: 'rotate('+ this.getParameterValueAsRotationDegrees(parameterValue)+'deg)'}}
             width="100"
             height="100"
             viewBox="0 0 100 100">

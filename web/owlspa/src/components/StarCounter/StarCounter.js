@@ -24,12 +24,12 @@ class StarCounter extends Component {
 
 StarCounter.propTypes = {
   onStarClick: PropTypes.func,
-  starCount : PropTypes.number,
+  starCount: PropTypes.number,
   starred: PropTypes.bool
 }
 
 StarCounter.defaultProps = {
-  starCount : 0,
+  starCount: 0,
   starred: false
 }
 

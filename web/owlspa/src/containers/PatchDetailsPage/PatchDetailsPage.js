@@ -54,7 +54,7 @@ class PatchDetailsPage extends Component {
     if(!patch){
       return false;
     }
-    const { currentUser:user } = this.props;
+    const { currentUser: user } = this.props;
     const { author } = patch;
     if(author && (user.ID || user.display_name)){
       return author.name === user.display_name || author.wordpressId === user.ID;
@@ -98,7 +98,7 @@ class PatchDetailsPage extends Component {
   }
 
   handleUpdatePatchDetails(properties){
-    const { routeParams:{patchSeoName}, patchDetails } = this.props;
+    const { routeParams: {patchSeoName}, patchDetails } = this.props;
     const patch = patchDetails.patches[patchSeoName];
 
     this.props.serverUpdatePatch({
@@ -208,10 +208,10 @@ class PatchDetailsPage extends Component {
   componentWillReceiveProps(nextProps){
     const {
       patchDetails,
-      patchDetails : {
+      patchDetails: {
         patchSeoNameChanged
       },
-      routeParams:{ patchSeoName }
+      routeParams: { patchSeoName }
     } = this.props;
 
     const {
@@ -274,7 +274,7 @@ class PatchDetailsPage extends Component {
     const {
       patchDetails,
       currentUser ,
-      routeParams:{ patchSeoName },
+      routeParams: { patchSeoName },
       availableTags
     } = this.props;
 
@@ -380,7 +380,7 @@ class PatchDetailsPage extends Component {
   }
 
   componentDidMount(){
-    const { fetchPatchDetails, routeParams:{patchSeoName}, availableTags } = this.props;
+    const { fetchPatchDetails, routeParams: {patchSeoName}, availableTags } = this.props;
     if(patchSeoName && !this.patchIsCached(patchSeoName)){
       this.props.fetchPatchDetails(patchSeoName);
     }

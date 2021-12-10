@@ -6,7 +6,7 @@ const patchPlaying = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_PATCH_PLAYING':
       return {
-        playing:action.playing
+        playing: action.playing
       };
 
     default:

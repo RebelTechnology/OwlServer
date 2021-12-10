@@ -23,7 +23,7 @@ class PatchListPage extends Component {
     if(!patch){
       return false;
     }
-    const { currentUser:user } = this.props;
+    const { currentUser: user } = this.props;
     const { author } = patch;
     if(author && (user.ID || user.display_name)){
       return author.name === user.display_name || author.wordpressId === user.ID;
