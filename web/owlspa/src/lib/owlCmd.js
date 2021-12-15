@@ -294,20 +294,23 @@ function messageHandler(event) {
 
 	switch (data[0] & 0xF0) {
 	case 0x80:
+	        log('received noteOff:', data[1], 'velocity:', data[2]);
+	        break;
+
 	case 0x90:
 		if (data[2] === 0)
-			log('sending noteOn:', data[1], 'velocity:', data[2]);
+			log('received noteOff:', data[1], 'velocity:', data[2]);
 		else
-			log('sending noteOff:', data[1], 'velocity:', data[2]);
+			log('received noteOn:', data[1], 'velocity:', data[2]);
 
 		break;
 
 	case 0xB0:
-		log("sending CC ", data[1], "/", data[2]);
+		log("received CC ", data[1], "/", data[2]);
 		break;
 
 	case 0xC0:
-		log("sending CC ", data[1], "/", data[2]);
+		log("received PC ", data[1]);
 		deviceDispatchProgramChange(data[1]);
 		break;
 
