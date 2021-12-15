@@ -294,13 +294,12 @@ function messageHandler(event) {
 
 	switch (data[0] & 0xF0) {
 	case 0x80:
-		midi(data, ['sending noteOff:', data[1], 'velocity:', data[2]]);
-		break;
-
 	case 0x90:
-		if (data[2] === 0) break;	// if velocity != 0, this is a note-on message
+		if (data[2] === 0)
+			midi(data, ['sending noteOn:', data[1], 'velocity:', data[2]]);
+		else
+			midi(data, ['sending noteOff:', data[1], 'velocity:', data[2]]);
 
-		midi(data, ['sending noteOn:', data[1], 'velocity:', data[2]]);
 		break;
 
 	case 0xB0:
