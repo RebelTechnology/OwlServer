@@ -296,18 +296,18 @@ function messageHandler(event) {
 	case 0x80:
 	case 0x90:
 		if (data[2] === 0)
-			midi(data, ['sending noteOn:', data[1], 'velocity:', data[2]]);
+			log('sending noteOn:', data[1], 'velocity:', data[2]);
 		else
-			midi(data, ['sending noteOff:', data[1], 'velocity:', data[2]]);
+			log('sending noteOff:', data[1], 'velocity:', data[2]);
 
 		break;
 
 	case 0xB0:
-		midi(data, ["sending CC ", data[1], "/", data[2]]);
+		log("sending CC ", data[1], "/", data[2]);
 		break;
 
 	case 0xC0:
-		midi(data, ["sending PC", data[1]]);
+		log("sending CC ", data[1], "/", data[2]);
 		deviceDispatchProgramChange(data[1]);
 		break;
 
