@@ -269,7 +269,7 @@ export function systemCalls(data) {
 	}
 
 	default: {
-		log('Unhandled SYSEX DEVICE event:', msg);
+		log('Unhandled SYSEX DEVICE event:', data);
 		break;
 	}
 	}
