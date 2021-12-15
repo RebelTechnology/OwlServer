@@ -18,13 +18,13 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
 
     try {
       fileList = codeFiles.map(file => {
-        return new File([file.fileString], getFileNameFromUrl(file.fileUrl), {type : 'application/octet-stream'});
+        return new File([file.fileString], getFileNameFromUrl(file.fileUrl), {type: 'application/octet-stream'});
       });
     } catch (e) {
 
       try {
         fileList = codeFiles.map(file => {
-          let blob = new Blob([file.fileString], {type : 'application/octet-stream'});
+          let blob = new Blob([file.fileString], {type: 'application/octet-stream'});
           blob.lastModifiedDate = new Date();
           blob.name = getFileNameFromUrl(file.fileUrl);
           return blob
@@ -32,9 +32,9 @@ const serverSavePatchFiles = (patch, codeFiles, options = {}) => {
       } catch (e) {
         dispatch(newDialog({
           header: 'File Save Error',
-          isError : true,
-          tabs:[{
-            header :'Error',
+          isError: true,
+          tabs: [{
+            header: 'Error',
             isError: true,
             contents: 'your browser is unable to save files: '
           }]

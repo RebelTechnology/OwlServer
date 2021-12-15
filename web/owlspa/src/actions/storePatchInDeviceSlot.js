@@ -28,9 +28,9 @@ const storePatchInDeviceSlot = (patch, slot) => {
 
       dispatch(newDialog({
         header: 'Failed to store patch device',
-        isError : true,
-        tabs:[{
-          header :'Error',
+        isError: true,
+        tabs: [{
+          header: 'Error',
           isError: true,
           contents: 'Failed to store the patch on the device'
         }]

@@ -30,7 +30,7 @@ class PatchCounter extends Component {
 
 PatchCounter.proptypes = {
   patches: PropTypes.array,
-  myPatches : PropTypes.bool
+  myPatches: PropTypes.bool
 }
 
 export default PatchCounter;

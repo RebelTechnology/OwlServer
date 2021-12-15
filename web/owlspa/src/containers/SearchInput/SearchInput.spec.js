@@ -54,7 +54,7 @@ describe('SearchInput', () => {
         <SearchInput />
       </Provider>
     );
-    const mockEvent = {target :{ value : 'hummus'}};
+    const mockEvent = {target: { value: 'hummus'}};
     const action = {
       type: SET_PATCHLIST_SEARCH_TERM,
       searchTerm: mockEvent.target.value

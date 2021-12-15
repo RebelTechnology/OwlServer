@@ -71,9 +71,9 @@ const serverUpdatePatch = (patch) => {
         console.error(err);
         dispatch(newDialog({
           header: 'Error Updating Patch',
-          isError : true,
-          tabs:[{
-            header :'Error',
+          isError: true,
+          tabs: [{
+            header: 'Error',
             isError: true,
             contents: err.message
           }]

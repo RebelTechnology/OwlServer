@@ -29,9 +29,9 @@ const storeResourceOnDevice = (file) => {
 
 					dispatch(newDialog({
 						header: 'Failed to load resource on to OWL',
-						isError : true,
-						tabs:[{
-							header :'Error',
+						isError: true,
+						tabs: [{
+							header: 'Error',
 							isError: true,
 							contents: 'Failed to load resource to OWL'
 						}]

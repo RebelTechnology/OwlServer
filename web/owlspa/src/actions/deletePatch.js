@@ -19,7 +19,7 @@ const deletePatch = (patch, options = {}) => {
       patchSeoName: patch.seoName
     });
 
-    return fetch( API_END_POINT + '/patch/' + patch._id, {method:'DELETE', credentials: 'same-origin'})
+    return fetch( API_END_POINT + '/patch/' + patch._id, {method: 'DELETE', credentials: 'same-origin'})
       .then(response => {
         return response.json().then(json =>{
           if(response.status >= 400){

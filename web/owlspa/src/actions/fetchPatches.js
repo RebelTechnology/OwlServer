@@ -31,9 +31,9 @@ const fetchPatches = () => {
         console.error(err);
         dispatch(newDialog({
           header: 'Server Error',
-          isError : true,
-          tabs:[{
-            header :'Error',
+          isError: true,
+          tabs: [{
+            header: 'Error',
             isError: true,
             contents: err.message
           }]

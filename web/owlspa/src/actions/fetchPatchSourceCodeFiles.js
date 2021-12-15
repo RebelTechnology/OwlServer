@@ -29,7 +29,7 @@ const fetchHostedFile = (fileUrl) => {
     throw new error('no file url specified');
   }
 
-  return fetch(parseUrl(fileUrl).path, {method:'GET'})
+  return fetch(parseUrl(fileUrl).path, {method: 'GET'})
     .then(response => {
       if(response.status >= 400){
         throw new Error(response.statusText + ' ' + fileUrl);
@@ -63,7 +63,7 @@ const fetchGithubFile = (fileUrl) => {
   if(!fileUrl){
     throw new error('no file url specified');
   }
-  return fetch(constructGithubApiFileUrl(fileUrl), {method:'GET', mode:'cors'})
+  return fetch(constructGithubApiFileUrl(fileUrl), {method: 'GET', mode: 'cors'})
     .then(response => {
       if(response.status >= 400){
         throw new Error(response.statusText + ' ' + url);
@@ -94,7 +94,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
           type: 'FETCH_PATCH_SOURCE_FILE_ERROR',
           patchId,
           index,
-          reason:'file url error'
+          reason: 'file url error'
         });
         return;
       }
@@ -119,7 +119,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
             type: 'FETCH_PATCH_SOURCE_FILE_ERROR',
             patchId,
             index,
-            reason:'// Could not fetch file.'
+            reason: '// Could not fetch file.'
           });
         });
       }
@@ -143,7 +143,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
               type: 'FETCH_PATCH_SOURCE_FILE_ERROR',
               patchId,
               index,
-              reason:'// This file could not be fetched. Is it from a public GitHub repository?'
+              reason: '// This file could not be fetched. Is it from a public GitHub repository?'
             });
           }
         }).catch( err => {
@@ -152,7 +152,7 @@ const fetchPatchSourceCodeFiles = (fileUrls, patchId) => {
             type: 'FETCH_PATCH_SOURCE_FILE_ERROR',
             patchId,
             index,
-            reason:'// Could not fetch file.'
+            reason: '// Could not fetch file.'
           });
         });
       }

@@ -1,9 +1,9 @@
 const initialState = {
-  isOpen:false,
-  isError:false,
+  isOpen: false,
+  isError: false,
   header: '',
-  activeDialogTab:0,
-  tabs:[]
+  activeDialogTab: 0,
+  tabs: []
 };
 
 const dialog = (state = initialState, action) => {

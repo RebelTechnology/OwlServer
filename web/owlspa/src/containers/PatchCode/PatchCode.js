@@ -229,7 +229,7 @@ class PatchCode extends Component {
     const tabNavItems = fileUrls.map((fileUrl, i )=> {
       const fileName = this.getFileName(fileUrl);
       return (
-        <li onClick={(e) => this.handleTabClick(e,i)} key={i} className={ classNames({active:(i === activeTab)}) }>
+        <li onClick={(e) => this.handleTabClick(e,i)} key={i} className={ classNames({active: (i === activeTab)}) }>
           <span>{fileName}</span>
           { i === activeTab && (
             <a onClick={(e)=> e.stopPropagation()} target="_blank" download={fileName} className="file-download-link" href={this.getDownloadUrl(fileUrl)}></a>
@@ -242,12 +242,12 @@ class PatchCode extends Component {
       <div className="white-box2" id="git-code">
           <h2 className="bolder">Patch code</h2>
           { canEdit && (
-            <h6 className="patchcode-toolbar" style={{marginBottom:'10px'}}>
+            <h6 className="patchcode-toolbar" style={{marginBottom: '10px'}}>
               { showPatchCodeEditControls && (
                 <button
                   onClick={e => this.handleEditPatchCodeClick(e)}
                   disabled={filesAreSaving}
-                  style={ editModeActive ? {backgroundColor:'#c52374', borderBottomColor: '#86154e'} : {} }
+                  style={ editModeActive ? {backgroundColor: '#c52374', borderBottomColor: '#86154e'} : {} }
                   className="btn-large edit-patch-code">
                   { editModeActive ? 'EDITING' : 'EDIT'}
                 </button>
@@ -301,8 +301,8 @@ class PatchCode extends Component {
                   value={activeTabFileString}
                   name="ace-editor-unique-id"
                   className="ace-editor"
-                  style={{zIndex:'0'}}
-                  editorProps={{$blockScrolling:'Infinity'}}
+                  style={{zIndex: '0'}}
+                  editorProps={{$blockScrolling: 'Infinity'}}
                 />)
               }
 

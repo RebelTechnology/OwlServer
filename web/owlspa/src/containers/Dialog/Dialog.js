@@ -34,7 +34,7 @@ class Dialog extends Component {
 
     const customStyles = {
       overlay: {zIndex: 9999},
-      content : {
+      content: {
         top: '50%',
         left: '50%',
         right: 'auto',
@@ -54,12 +54,12 @@ class Dialog extends Component {
         onRequestClose={() => this.closeModal()}
         style={customStyles}>
         <div className="modal-dialog">
-          <h1 className={classNames('dialog-header',{'error':dialog.isError})}>{dialog.header}</h1>
+          <h1 className={classNames('dialog-header', {'error': dialog.isError})}>{dialog.header}</h1>
           <ul className="dialog-tabs">
             {dialog.tabs.map((tab,i) => {
               return (
                 <li
-                  className={classNames({active:i === activeDialogTab,error:tab.isError})}
+                  className={classNames({active: i === activeDialogTab, error: tab.isError})}
                   key={i}
                   onClick={(e)=>this.setActiveDialogTab(e,i)} >
                   {tab.header}

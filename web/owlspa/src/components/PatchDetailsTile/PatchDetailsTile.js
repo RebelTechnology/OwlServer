@@ -10,7 +10,7 @@ class PatchDetailsTile extends Component {
 
     return (
       <div styleName="patch-details-tile" style={style}>
-        <h2 style={{ marginBottom:'10px' }}>{title}</h2>
+        <h2 style={{ marginBottom: '10px' }}>{title}</h2>
         { editMode ? (
             <textarea
               style={{backgroundColor: isSaving ? '#bbb' : '#fff'}}

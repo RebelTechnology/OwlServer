@@ -50,7 +50,7 @@ describe('CompilationTypeSelector', () => {
         compilationType={ compilationType }
         onCompilationTypeChange={ onCompilationTypeChange }/>
     );
-    const mockEvent = {target :{ value : 'gen'}};
+    const mockEvent = {target: { value: 'gen'}};
     const select = wrapper.find('select');
     select.simulate('change', mockEvent);
     expect(onCompilationTypeChange.calledOnce).to.be.true;

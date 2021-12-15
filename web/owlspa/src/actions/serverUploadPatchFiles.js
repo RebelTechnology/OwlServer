@@ -95,9 +95,9 @@ const serverUploadPatchFiles = (patchFileList, patchId) => {
 
         dispatch(newDialog({
           header: 'File Upload Error',
-          isError : true,
-          tabs:[{
-            header :'Error',
+          isError: true,
+          tabs: [{
+            header: 'Error',
             isError: true,
             contents: err.message
           }]

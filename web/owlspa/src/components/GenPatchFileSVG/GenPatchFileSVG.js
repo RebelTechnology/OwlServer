@@ -163,7 +163,7 @@ class GenPatchFileSVG extends Component {
   }
 
   getBoxById(id){
-    const { data:{ patcher:{ boxes } } } = this.props;
+    const { data: { patcher: { boxes } } } = this.props;
     return boxes.filter(box => box.box.id === id)[0];
   }
 
@@ -187,8 +187,8 @@ class GenPatchFileSVG extends Component {
   }
 
   getLinePoints(source, destination){
-    const { x:x1, y:y1 } = this.getPortCoord(source, 'source');
-    const { x:x2, y:y2 } = this.getPortCoord(destination, 'destination');
+    const { x: x1, y: y1 } = this.getPortCoord(source, 'source');
+    const { x: x2, y: y2 } = this.getPortCoord(destination, 'destination');
     return { x1, y1, x2, y2 }
   }
 
@@ -221,7 +221,7 @@ class GenPatchFileSVG extends Component {
 
 
   render(){
-    const { data:{ patcher:{ rect, boxes, lines } } } = this.props;
+    const { data: { patcher: { rect, boxes, lines } } } = this.props;
     const newObjs = boxes.filter(box => box.box.maxclass === 'newobj');
     const codeBoxes = boxes.filter(box => box.box.maxclass === 'codebox');
     const comments = boxes.filter(box => box.box.maxclass === 'comment');

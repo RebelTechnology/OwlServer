@@ -109,7 +109,7 @@ Note.propTypes = {
 };
 
 Note.defaultProps = {
-  x:0,
+  x: 0,
   width: 80,
   height: 400,
   onNoteOn: () => {},

@@ -197,10 +197,10 @@ class PatchStats extends Component {
 
 PatchStats.propTypes = {
   patch: PropTypes.object,
-  editMode : PropTypes.bool,
+  editMode: PropTypes.bool,
   availableTagList: PropTypes.array,
   tags: PropTypes.array,
-  onChangeTags : PropTypes.func,
+  onChangeTags: PropTypes.func,
   isSaving: PropTypes.bool
 };
 

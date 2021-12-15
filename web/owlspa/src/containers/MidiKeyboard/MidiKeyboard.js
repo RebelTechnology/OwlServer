@@ -300,7 +300,7 @@ class MidiKeyboard extends Component {
     return (
       <div>
         <svg
-          style={{cursor:'pointer', width: '100%'}}
+          style={{cursor: 'pointer', width: '100%'}}
           viewBox="0 0 2800 400"
           height="140"
           onMouseDown={e => this.handleMidiKeyboardMouseDown(e)}

@@ -1,5 +1,5 @@
 const availableParameterIds = {
-  float : [
+  float: [
     { id: 0, displayName: 'PARAMETER_A'},
     { id: 1, displayName: 'PARAMETER_B'},
     { id: 2, displayName: 'PARAMETER_C'},
@@ -41,7 +41,7 @@ const availableParameterIds = {
     { id: 38, displayName: 'PARAMETER_DG'},
     { id: 39, displayName: 'PARAMETER_DH'}
   ],
-  bool : [
+  bool: [
     { id: 80, displayName: 'BUTTON_1'},
     { id: 81, displayName: 'BUTTON_2'},
     { id: 82, displayName: 'BUTTON_3'},

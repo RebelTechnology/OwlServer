@@ -68,9 +68,9 @@ const initialState = {
   sourceFiles: [],
   gitHubURLField: '',
   patchName: '',
-  sourceFileErrors:[],
+  sourceFileErrors: [],
   invalidFields: {},
-  compilationType:'cpp'
+  compilationType: 'cpp'
 };
 
 const editPatchForm = (state = initialState, action) => {
@@ -196,25 +196,25 @@ const editPatchForm = (state = initialState, action) => {
     case 'REQUEST_COMPILE_PATCH':
       return {
         ...state,
-        isCompiling : true
+        isCompiling: true
       };
 
     case 'RECEIVE_COMPILE_PATCH':
       return {
         ...state,
-        isCompiling : false
+        isCompiling: false
       };
 
     case 'PATCH_COMPILATION_FAILED':
       return {
         ...state,
-        isCompiling : false
+        isCompiling: false
       };
 
     case 'UPDATE_COMPILATION_TYPE':
       return {
         ...state,
-        compilationType : action.compilationType
+        compilationType: action.compilationType
       };
 
     default:

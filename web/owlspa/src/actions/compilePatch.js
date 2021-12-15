@@ -16,7 +16,7 @@ const compilePatch = (patch) => {
       patchSeoName: patch.seoName
     });
 
-    return fetch( API_END_POINT + '/builds/' + patch._id, {method:'PUT', credentials: 'same-origin'})
+    return fetch( API_END_POINT + '/builds/' + patch._id, {method: 'PUT', credentials: 'same-origin'})
       .then(response => {
         return response.json().then(json =>{ // todo: shouldn't try to parse the response as json before checking the status
           if(response.status >= 400){
@@ -42,16 +42,17 @@ const compilePatch = (patch) => {
 
         dispatch(newDialog({
           header: 'Patch Compilation ' + (json.success ? 'Succeeded' : 'Failed'),
-          activeDialogTab:json.success ? 0 : 1,
-          isError : !json.success,
-          tabs:[
-            { header:'stdout',
-              contents:json.stdout
+          activeDialogTab: json.success ? 0 : 1,
+          isError: !json.success,
+          tabs: [
+            {
+              header: 'stdout',
+              contents: json.stdout
             },
             {
-              header :'stderr',
+              header: 'stderr',
               isError: !json.success,
-              contents:json.stderr
+              contents: json.stderr
             }
           ]
         }));
@@ -63,9 +64,9 @@ const compilePatch = (patch) => {
         });
         dispatch(newDialog({
           header: 'Error',
-          isError : true,
-          tabs:[{
-            header :'Error',
+          isError: true,
+          tabs: [{
+            header: 'Error',
             isError: true,
             contents: err.message
           }]

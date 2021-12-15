@@ -6,7 +6,7 @@ const initialState = {
   connectedMidiOutputPort: null,
   isRequesting: false,
   patchIsLoading: false,
-  patchLoaded : false,
+  patchLoaded: false,
   patchIsStoring: false,
   patchStoredSuccess: false,
   activePresetSlot: null,
@@ -51,25 +51,25 @@ const owlState = (state = initialState, action) => {
       return {
         ...state,
         patchIsLoading: true,
-        patchLoaded : false
+        patchLoaded: false
       }
     case 'BEGIN_LOAD_RESOURCE_ON_TO_OWL':
       return {
         ...state,
         resourceIsLoading: true,
-        resourceLoaded : false
+        resourceLoaded: false
       }
     case 'COMPLETE_LOAD_PATCH_ON_TO_OWL':
       return {
         ...state,
         patchIsLoading: false,
-        patchLoaded : action.patchLoaded
+        patchLoaded: action.patchLoaded
       }
     case 'COMPLETE_LOAD_RESOURCE_ON_TO_OWL':
       return {
         ...state,
         resourceIsLoading: false,
-        resourceLoaded : action.resourceLoaded
+        resourceLoaded: action.resourceLoaded
       }
     case 'STORE_PATCH_ON_DEVICE_REQUEST':
       return {
@@ -131,22 +131,22 @@ const owlState = (state = initialState, action) => {
     case 'OWL_FIRMWARE_VERSION_RECEIVED':
       return {
         ...state,
-        firmWareVersion : action.firmWare
+        firmWareVersion: action.firmWare
       }
     case 'OWL_PATCH_STATUS_RECEIVED':
       return {
         ...state,
-        status : action.status
+        status: action.status
       }
     case 'OWL_PROGRAM_MESSAGE_RECEIVED':
       return {
         ...state,
-        programMessage : action.programMessage
+        programMessage: action.programMessage
       }
     case 'OWL_PROGRAM_ERROR_RECEIVED':
       return {
         ...state,
-        programError : action.programError
+        programError: action.programError
       }
     default:
       return state;

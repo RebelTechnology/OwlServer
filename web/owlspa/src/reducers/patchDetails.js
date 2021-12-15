@@ -51,7 +51,7 @@ const patchDetails = (state = initialState, action) => {
         isFetching: false,
         patches: {
           ...state.patches,
-          [action.patchDetails.seoName]:action.patchDetails
+          [action.patchDetails.seoName]: action.patchDetails
         }
       };
 
@@ -60,7 +60,7 @@ const patchDetails = (state = initialState, action) => {
         ...state,
         patches: {
           ...state.patches,
-          [action.patchSeoName]:{
+          [action.patchSeoName]: {
             ...state.patches[action.patchSeoName],
             starList: addOrUpdateStarInList(state.patches[action.patchSeoName].starList, action.star)
           }
@@ -72,7 +72,7 @@ const patchDetails = (state = initialState, action) => {
         ...state,
         patches: {
           ...state.patches,
-          [action.patchSeoName]:{
+          [action.patchSeoName]: {
             ...state.patches[action.patchSeoName],
             starList: removeStarFromList(state.patches[action.patchSeoName].starList, action.star)
           }
@@ -82,7 +82,7 @@ const patchDetails = (state = initialState, action) => {
     case 'PATCH_DELETED':
       return {
         ...state,
-        patches : {
+        patches: {
           ...state.patches,
           [action.patchSeoName]: null
         }
@@ -101,7 +101,7 @@ const patchDetails = (state = initialState, action) => {
         ...state,
         savedSuccess: true,
         isSaving: false,
-        patches : {
+        patches: {
           ...state.patches,
           [action.patch.seoName]: action.patch
         }
@@ -123,7 +123,7 @@ const patchDetails = (state = initialState, action) => {
     case 'REQUEST_COMPILE_PATCH':
       return {
         ...state,
-        patches : {
+        patches: {
           ...state.patches,
           [action.patchSeoName]: {
             ...state.patches[action.patchSeoName],
@@ -135,7 +135,7 @@ const patchDetails = (state = initialState, action) => {
     case 'RECEIVE_COMPILE_PATCH':
       return {
         ...state,
-        patches : {
+        patches: {
           ...state.patches,
           [action.patchSeoName]: {
             ...state.patches[action.patchSeoName],
@@ -147,7 +147,7 @@ const patchDetails = (state = initialState, action) => {
     case 'PATCH_COMPILATION_FAILED':
       return {
         ...state,
-        patches : {
+        patches: {
           ...state.patches,
           [action.patchSeoName]: {
             ...state.patches[action.patchSeoName],

@@ -86,7 +86,7 @@ const patchSourceCodeFiles = (state = initialState, action) => {
     case 'CLEAR_PATCH_SOURCE_CODE_FILES':
       return {
         ...state,
-        [action.patchId]:[]
+        [action.patchId]: []
       }
 
     default:
