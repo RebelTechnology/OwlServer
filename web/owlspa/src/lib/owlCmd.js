@@ -276,10 +276,17 @@ export function systemCalls(data) {
 };
 
 function midi(data, msg) {
+	const output = midiClient.output;
+
 	if (typeof msg === 'string')
 		log(msg);
 	else if (msg !== undefined)
 		log(...msg);
+
+	if (!(output instanceof MIDIOutput))
+		throw new Error(`owlCmd.run: expected output to be a MIDIOutput. It is '${typeof output}'`);
+
+	output.send(data, 0);
 };
 
 function messageHandler(event) {
