@@ -393,8 +393,8 @@ function selectPorts({inputs, outputs}) {
 	if (!output) throw new Error('Failed to connect to MIDI output');
 
 	return {
-		input,
-		output,
+		connectedMidiInputPort: input,
+		connectedMidiOutputPort: output,
 		isConnected: !!(input && output),
 		midiInputs: inputs,
 		midiOutputs: outputs,
