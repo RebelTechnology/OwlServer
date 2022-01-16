@@ -1,5 +1,12 @@
 export default function formatBytes(v, decimals = 2) {
-	if (v === 0) return '0 Bytes';
+	v = +v;
+
+	if (v === 0 || isNaN(v))
+		return {
+			amount: 0,
+			unit: "Bytes",
+			string: "0 Bytes",
+		};
 
 	const sizes = ['Bytes', 'KB', 'MB', 'GB'];
 
