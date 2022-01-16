@@ -78,7 +78,9 @@ class DevicePage extends Component {
     } = this.state;
 
     const tabNavItems = ['Patches', 'Resources'].map((t,i) => (
-      <li onClick={(e) => this.handleChangeTab(e,i)} key={i} className={ classNames({active: (i === activeTab)}) }>
+      <li onClick={(e) => this.handleChangeTab(e,i)}
+          key={i}
+          className={ classNames({active: (i === activeTab)}) }>
         <span>{t}</span>
       </li>
     ));

@@ -286,7 +286,7 @@ class PatchDetailsPage extends Component {
       published,
       soundcloud,
       parameters,
-      tags
+      tags,
     } = this.state;
 
     const patch = patchDetails.patches[patchSeoName];
@@ -373,7 +373,6 @@ class PatchDetailsPage extends Component {
             <PatchCode onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} fileUrls={patch.github} />
 
           </div>
-
         </div>
       </div>
     );
@@ -389,20 +388,17 @@ class PatchDetailsPage extends Component {
       this.props.fetchTags();
     }
   }
-
-}
+};
 
 PatchDetailsPage.contextTypes = {
   router: PropTypes.object.isRequired
 };
 
-const mapStateToProps = ({ patchDetails, currentUser, tags }) => {
-  return {
+const mapStateToProps = ({ patchDetails, currentUser, tags }) => ({
     patchDetails,
     currentUser,
     availableTags: tags
-  }
-};
+});
 
 export default connect(mapStateToProps, {
   fetchPatchDetails,

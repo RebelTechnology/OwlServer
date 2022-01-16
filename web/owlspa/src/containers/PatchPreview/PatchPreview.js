@@ -7,7 +7,8 @@ import {
   fetchPatchJavaScriptFile,
   setWebAudioPatch,
   setPatchPlaying,
-  resetWebAudioPatch } from 'actions';
+  resetWebAudioPatch,
+} from 'actions';
 
 class PatchPreview extends Component {
   constructor(props){
@@ -87,8 +88,8 @@ class PatchPreview extends Component {
       instance.connectToOutput({outputs: patch.outputs});
 
       webAudioPatchParameters.forEach( (param, i) => {
-         param.value = instance.getParameter(i) * 100;
-         // instance.update(i, param.value / 100);
+        param.value = instance.getParameter(i) * 100;
+        // instance.update(i, param.value / 100);
       });
 
       this.props.setPatchPlaying(true);
@@ -192,8 +193,7 @@ class PatchPreview extends Component {
       <div className="patch-preview-buttons">
         { !webAudioPatch.isReady && (
           <button
-            style={{display: 'inline-block'}}
-            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() }
+            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable()}
             onClick={() => this.handleTestPatchButtonClick()} >
             Play
           </button>
@@ -201,9 +201,8 @@ class PatchPreview extends Component {
 
         { webAudioPatch.isReady && (
           <button
-            style={{display: 'inline-block'}}
             onClick={() => this.togglePatchAudio()} >
-            { webAudioPatch.isPlaying ? 'stop audio' : 'start audio' }
+            { webAudioPatch.isPlaying ? 'Stop Audio' : 'Start Audio' }
           </button>
         )}
 
@@ -235,7 +234,6 @@ class PatchPreview extends Component {
           </div>
         )}
 
-        <hr />
       </div>
     );
 
@@ -290,7 +288,7 @@ class PatchPreview extends Component {
 
         { this.renderControlButtons() }
 
-        {!webAudio.webAudioApiIsAvailable() ? (
+        { !webAudio.webAudioApiIsAvailable() &&
           <div className="error-msg">
             <p><strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.</p>
             <p>consider upgrading your browser. Here's a
@@ -298,7 +296,6 @@ class PatchPreview extends Component {
               of browsers that do support the Web Audio API.
             </p>
           </div>
-        ) : null}
 
         <OwlControl patch={patch} storeButton loadButton />
       </div>
