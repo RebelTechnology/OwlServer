@@ -59,18 +59,3 @@
 .patch-title-published-editor input {
     margin: 5px;
 }
-
-@media only screen and (max-width: 1430px) {
-    .patch-tile-small {
-        width: 32%;
-        height: auto;
-        margin-top: 0px;
-        margin-bottom: 0px;
-    }
-}
-
-@media only screen and (max-width: 860px) {
-    .patch-tile-small {
-        width: 100%;
-    }
-}
