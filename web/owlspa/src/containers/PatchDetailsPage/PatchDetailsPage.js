@@ -8,6 +8,7 @@ import {
   serverUpdatePatch,
   setPatchStarAndSendToSever
 } from 'actions';
+import classNames from 'classnames';
 import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
 
@@ -34,6 +35,8 @@ class PatchDetailsPage extends Component {
 
 
     this.state = {
+      activeTab: 0,
+      showingAbout: true,
       description,
       instructions,
       published,
@@ -199,6 +202,42 @@ class PatchDetailsPage extends Component {
     });
   }
 
+  handleChangeTab(_,activeTab,name){
+    let showingAbout, showingSource, showingEdit, showingDevice, showingEmulate = false;
+
+    switch (name) {
+    case 'Source':
+      showingSource = true;
+      break;
+
+    case 'Edit':
+      showingEdit = true;
+      break;
+
+    case 'Emulate':
+      showingEmulate = true;
+      break;
+
+    case 'Device':
+      showingDevice = true;
+      break;
+
+    default:
+    case 'About':
+      showingAbout = true;
+      break;
+    }
+
+    this.setState({
+      showingAbout,
+      showingSource,
+      showingEmulate,
+      showingDevice,
+      showingEdit,
+      activeTab,
+    });
+  }
+
   handleChangeTags(tags){
     this.setState({
       tags
@@ -279,6 +318,7 @@ class PatchDetailsPage extends Component {
     } = this.props;
 
     const {
+      activeTab,
       instructions,
       description,
       editMode,
@@ -287,6 +327,11 @@ class PatchDetailsPage extends Component {
       soundcloud,
       parameters,
       tags,
+      showingAbout,
+      showingSource,
+      showingEmulate,
+      showingDevice,
+      showingEdit,
     } = this.state;
 
     const patch = patchDetails.patches[patchSeoName];
@@ -302,8 +347,7 @@ class PatchDetailsPage extends Component {
       <div className="wrapper flexbox">
         <div className="content-container">
 
-          <div id="one-third" className="patch-library">
-
+          <div className="patch-library">
             <PatchTileSmall
               patch={patch}
               patchName={name}
@@ -321,57 +365,74 @@ class PatchDetailsPage extends Component {
               published={published}
             />
 
-            <PatchDetailsTile
-              title="Description"
-              text={description}
-              onTextChange={description => this.handlePatchDetailsDescriptionChange(description)}
-              isSaving={patchDetails.isSaving}
-              editMode={editMode}
-            />
+            <ul className="tab-nav">
+              {['About', 'Device', 'Emulate', 'Source', 'Edit'].map((t,i) => (
+                <li onClick={(e) => this.handleChangeTab(e,i,t)}
+                    key={i}
+                    className={ classNames({active: (i === activeTab)}) }>
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
 
-            { (patch.instructions || canEdit ) &&
-              <PatchDetailsTile
-                style={{background: 'grey'}}
-                title="Instructions"
-                text={instructions}
-                onTextChange={instructions => this.handlePatchDetailsInstructionsChange(instructions)}
-                isSaving={patchDetails.isSaving}
+            <div className="white-box2">
+              {showingAbout && (
+                <div>
+                  <PatchSoundcloud
+                    soundcloud={soundcloud}
+                    editMode={editMode}
+                    isSaving={patchDetails.isSaving}
+                    savedSuccess={patchDetails.savedSuccess}
+                    onChangeSoundCloudArr={ soundcloudArr => this.handleChangeSoundCloudArr(soundcloudArr)} />
+
+                  <PatchDetailsTile
+                    title="Description"
+                    text={description}
+                    onTextChange={description => this.handlePatchDetailsDescriptionChange(description)}
+                    isSaving={patchDetails.isSaving}
+                    editMode={editMode}
+                  />
+
+                  { (patch.instructions || canEdit) &&
+                    <PatchDetailsTile
+                      style={{background: 'grey'}}
+                      title="Instructions"
+                      text={instructions}
+                      onTextChange={instructions => this.handlePatchDetailsInstructionsChange(instructions)}
+                      isSaving={patchDetails.isSaving}
+                      editMode={editMode}
+                    />
+                  }
+
+                  <PatchStats
+                    isSaving={patchDetails.isSaving}
+                    availableTagList={availableTags.items}
+                    tags={tags}
+                    editMode={editMode}
+                    onChangeTags={tags => this.handleChangeTags(tags)}
+                    patch={patch}
+                    isSaving={patchDetails.isSaving}
+                  />
+                </div>
+              )}
+
+              <PatchPreview
+                onCompileClick={(e) => this.handleCompileClick(e,patch)}
                 editMode={editMode}
-              />
-            }
+                isSaving={patchDetails.isSaving}
+                parameters={parameters}
+                detailsState={this.state}
+                onChangeParameters={parameters => this.handleChangeParameters(parameters)}
+                patch={patch} />
 
-            <PatchStats
-              isSaving={patchDetails.isSaving}
-              availableTagList={availableTags.items}
-              tags={tags}
-              editMode={editMode}
-              onChangeTags={tags => this.handleChangeTags(tags)}
-              patch={patch}
-              isSaving={patchDetails.isSaving}
-            />
-
-          </div>
-
-          <div id="two-thirds" className="patch-library">
-
-            <PatchSoundcloud
-              soundcloud={soundcloud}
-              editMode={editMode}
-              isSaving={patchDetails.isSaving}
-              savedSuccess={patchDetails.savedSuccess}
-              onChangeSoundCloudArr={ soundcloudArr => this.handleChangeSoundCloudArr(soundcloudArr)}
-            />
-
-            <PatchPreview
-              onCompileClick={(e) => this.handleCompileClick(e,patch)}
-              editMode={editMode}
-              isSaving={patchDetails.isSaving}
-              parameters={parameters}
-              onChangeParameters={parameters => this.handleChangeParameters(parameters)}
-              patch={patch} />
-
-            <PatchCode onCompileClick={(e) => this.handleCompileClick(e,patch)} canEdit={canEdit} patch={patch} fileUrls={patch.github} />
-
+              {showingSource && (
+                <PatchCode
+                  onCompileClick={(e) => this.handleCompileClick(e,patch)}
+                  canEdit={canEdit}
+                  patch={patch}
+                  fileUrls={patch.github} />
+              )}
+            </div>
           </div>
         </div>
       </div>

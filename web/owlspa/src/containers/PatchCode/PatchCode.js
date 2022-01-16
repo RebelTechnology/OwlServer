@@ -239,7 +239,7 @@ class PatchCode extends Component {
     });
 
     return (
-      <div className="white-box2" id="git-code">
+      <div id="git-code">
           <h2 className="bolder">Patch code</h2>
           { canEdit && (
             <h6 className="patchcode-toolbar" style={{marginBottom: '10px'}}>

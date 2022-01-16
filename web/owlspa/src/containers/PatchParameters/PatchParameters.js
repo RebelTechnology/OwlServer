@@ -71,6 +71,7 @@ class PatchParameters extends Component {
   render(){
 
     const {
+      stopAudio,
       patchIsActive,
       isSaving,
       editMode,
@@ -149,9 +150,13 @@ class PatchParameters extends Component {
     );
   }
 
+  componentWillUnmount(){
+    this.props.stopAudio();
+  }
 }
 
 PatchParameters.propTypes = {
+  stopAudio: PropTypes.func,
   patchIsActive: PropTypes.bool,
   editMode: PropTypes.bool,
   isSaving: PropTypes.bool,
