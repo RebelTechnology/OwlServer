@@ -45,22 +45,3 @@
   right: 20px;
   top: 20px;
 }
-
-@media only screen and (max-width: 1430px) {
-  .patch-details-tile {
-    display: block;
-    height: auto;
-    margin-bottom: 0px;
-    margin-left: 2%;
-    margin-top: 0px;
-    width: 32%;
-  }
-}
-
-@media only screen and (max-width: 860px) {
-  .patch-details-tile {
-    margin-left: 0px;
-    margin-top: 10px;
-    width: 100%;
-  }
-}
