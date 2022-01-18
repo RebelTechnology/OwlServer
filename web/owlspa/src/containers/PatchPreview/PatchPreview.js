@@ -50,6 +50,12 @@ class PatchPreview extends Component {
   }
 
   createPatchInstance(){
+    const {
+      detailsState,
+    } = this.props;
+
+    if (!detailsState.showingEmulate) return;
+
     const patchInstance = webAudio.initPatchAudio();
 
     this.props.setWebAudioPatch({
