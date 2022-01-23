@@ -451,6 +451,7 @@ span.parameter-label {
     padding: 10px;
     height: 250px;
     overflow: scroll;
+    white-space: pre;
 }
 
 .modal-dialog .dialog-footer {
