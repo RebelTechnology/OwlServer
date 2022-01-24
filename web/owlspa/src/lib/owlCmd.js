@@ -430,6 +430,8 @@ function storeProgramInDeviceSlot(slot) {
 			return;
 		}
 
+		sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
+
 		const msg = [
 			0xf0,
 			MIDI_SYSEX_MANUFACTURER,
