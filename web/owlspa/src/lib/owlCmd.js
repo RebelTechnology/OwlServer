@@ -615,7 +615,7 @@ export function sendNoteOff(note, velocity) {
 	midi([0x90, note, velocity], ['sending Note On:', note, 'velocity:', velocity]);
 };
 
-export function sendNoteOn() {
+export function sendNoteOn(note, velocity) {
 	midi([0x80, note, velocity], ['sending Note Off:', note, 'velocity:', velocity]);
 };
 
