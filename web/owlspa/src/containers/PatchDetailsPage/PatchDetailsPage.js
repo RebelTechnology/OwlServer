@@ -368,14 +368,14 @@ class PatchDetailsPage extends Component {
             <ul className="tab-nav">
               {
                 ['About', 'Device', 'Emulate', 'Source']
-               .concat(canEdit ? ['Edit'] : [])
-               .map((t,i) => (
-                 <li onClick={(e) => this.handleChangeTab(e,i,t)}
-                     key={i}
-                     className={ classNames({active: (i === activeTab)}) }>
-                   <span>{t}</span>
-                 </li>
-               ))
+                  .concat(canEdit ? [] : [])
+                  .map((t,i) => (
+                    <li onClick={(e) => this.handleChangeTab(e,i,t)}
+                        key={i}
+                        className={ classNames({active: (i === activeTab)}) }>
+                      <span>{t}</span>
+                    </li>
+                  ))
               }
             </ul>
 
