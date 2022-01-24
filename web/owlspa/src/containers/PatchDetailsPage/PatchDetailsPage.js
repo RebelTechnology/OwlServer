@@ -123,6 +123,8 @@ class PatchDetailsPage extends Component {
   }
 
   handleOnEditPatchClick(){
+    this.handleChangeTab(_, 0, "About");
+
     this.setState({
       editMode: true
     });
