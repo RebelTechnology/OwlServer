@@ -19,6 +19,12 @@ const fetchPatchJavaScriptFile = (patch) => {
           patchId: patch._id
         });
       }).catch(err => {
+        console.error(err);
+
+        dispatch({
+          type: 'RESET_PATCH_JAVASCRIPT'
+        });
+
         dispatch(newDialog({
           header: 'Error trying to run the patch',
           isError: true,
@@ -28,7 +34,6 @@ const fetchPatchJavaScriptFile = (patch) => {
             contents: 'Darn it there was an Error trying to load or run this patch in the browser.'
           }]
         }));
-        console.error(err);
       })
   }
 }
