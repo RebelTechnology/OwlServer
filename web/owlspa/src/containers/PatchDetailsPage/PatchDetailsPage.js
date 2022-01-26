@@ -382,6 +382,15 @@ class PatchDetailsPage extends Component {
             </ul>
 
             <div className="white-box2">
+              <PatchPreview
+                onCompileClick={(e) => this.handleCompileClick(e,patch)}
+                editMode={editMode}
+                isSaving={patchDetails.isSaving}
+                parameters={parameters}
+                detailsState={this.state}
+                onChangeParameters={parameters => this.handleChangeParameters(parameters)}
+                patch={patch} />
+
               {showingAbout && (
                 <div>
                   <PatchSoundcloud
@@ -421,15 +430,6 @@ class PatchDetailsPage extends Component {
                   />
                 </div>
               )}
-
-              <PatchPreview
-                onCompileClick={(e) => this.handleCompileClick(e,patch)}
-                editMode={editMode}
-                isSaving={patchDetails.isSaving}
-                parameters={parameters}
-                detailsState={this.state}
-                onChangeParameters={parameters => this.handleChangeParameters(parameters)}
-                patch={patch} />
 
               {showingSource && (
                 <PatchCode
