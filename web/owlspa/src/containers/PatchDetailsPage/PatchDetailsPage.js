@@ -187,6 +187,11 @@ class PatchDetailsPage extends Component {
   }
 
   handlePatchNameChange(name){
+    if (!name.match("^[a-zA-Z0-9\\[\\]._ -]+$")) {
+      alert("Invalid patch name. Alphanumeric characters and . _ - and [ ] are accepted.");
+      return false;
+    }
+
     this.setState({
       name
     });
