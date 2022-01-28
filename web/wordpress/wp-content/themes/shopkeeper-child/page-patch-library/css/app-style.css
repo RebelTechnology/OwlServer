@@ -451,6 +451,7 @@ span.parameter-label {
     padding: 10px;
     height: 250px;
     overflow: scroll;
+    white-space: pre;
 }
 
 .modal-dialog .dialog-footer {
@@ -1080,7 +1081,6 @@ h2 {
 /* tabs */
 
 .tab-nav {
-  border-bottom: 1px solid #d3d3d3;
   font-size: 11px;
   margin: 0;
 }

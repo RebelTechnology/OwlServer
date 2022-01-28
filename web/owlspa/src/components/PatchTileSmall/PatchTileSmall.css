@@ -10,6 +10,7 @@
     box-shadow: 0px 0px 10px #6f757f;
     background: #503F60;
     transition: .3s;
+    margin-bottom: 1em;
     font-family: 'Ubuntu', sans-serif;
     background: #E6C79B;
     background: -moz-radial-gradient(circle at bottom left,  #7C1A58 0%, transparent 30%), -moz-radial-gradient(center, circle at top right, #E6C79B 5%, #929285 30%, #503F60 80%);
@@ -57,19 +58,4 @@
 
 .patch-title-published-editor input {
     margin: 5px;
-}
-
-@media only screen and (max-width: 1430px) {
-    .patch-tile-small {
-        width: 32%;
-        height: auto;
-        margin-top: 0px;
-        margin-bottom: 0px;
-    }
-}
-
-@media only screen and (max-width: 860px) {
-    .patch-tile-small {
-        width: 100%;
-    }
 }

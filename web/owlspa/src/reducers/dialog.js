@@ -8,24 +8,24 @@ const initialState = {
 
 const dialog = (state = initialState, action) => {
   switch (action.type) {
-    case 'NEW_DIALOG':
-      return {
-        ...initialState,
-        isOpen: true,
-        ...action.dialog
-      };
+  case 'NEW_DIALOG':
+    return {
+      ...initialState,
+      isOpen: true,
+      ...action.dialog
+    };
 
-	  case 'SET_ACTIVE_DIALOG_TAB':
-      return {
-        ...state,
-        activeDialogTab: action.tabNum
-      };
+  case 'SET_ACTIVE_DIALOG_TAB':
+    return {
+      ...state,
+      activeDialogTab: action.tabNum
+    };
 
-    case 'CLOSE_DIALOG':
-      return initialState;
+  case 'CLOSE_DIALOG':
+    return initialState;
 
-    default:
-      return state;
+  default:
+    return state;
   }
 }
 

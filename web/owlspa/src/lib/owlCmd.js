@@ -393,8 +393,8 @@ function selectPorts({inputs, outputs}) {
 	if (!output) throw new Error('Failed to connect to MIDI output');
 
 	return {
-		input,
-		output,
+		connectedMidiInputPort: input,
+		connectedMidiOutputPort: output,
 		isConnected: !!(input && output),
 		midiInputs: inputs,
 		midiOutputs: outputs,
@@ -429,6 +429,8 @@ function storeProgramInDeviceSlot(slot) {
 			reject(new Error('slot is not a number from 0 to 40'));
 			return;
 		}
+
+		sendRequest(OpenWareMidiSysexCommand.SYSEX_DEVICE_STATS);
 
 		const msg = [
 			0xf0,
@@ -615,7 +617,7 @@ export function sendNoteOff(note, velocity) {
 	midi([0x90, note, velocity], ['sending Note On:', note, 'velocity:', velocity]);
 };
 
-export function sendNoteOn() {
+export function sendNoteOn(note, velocity) {
 	midi([0x80, note, velocity], ['sending Note Off:', note, 'velocity:', velocity]);
 };
 

@@ -7,7 +7,8 @@ import {
   fetchPatchJavaScriptFile,
   setWebAudioPatch,
   setPatchPlaying,
-  resetWebAudioPatch } from 'actions';
+  resetWebAudioPatch,
+} from 'actions';
 
 class PatchPreview extends Component {
   constructor(props){
@@ -49,6 +50,12 @@ class PatchPreview extends Component {
   }
 
   createPatchInstance(){
+    const {
+      detailsState,
+    } = this.props;
+
+    if (!detailsState.showingEmulate) return;
+
     const patchInstance = webAudio.initPatchAudio();
 
     this.props.setWebAudioPatch({
@@ -87,8 +94,8 @@ class PatchPreview extends Component {
       instance.connectToOutput({outputs: patch.outputs});
 
       webAudioPatchParameters.forEach( (param, i) => {
-         param.value = instance.getParameter(i) * 100;
-         // instance.update(i, param.value / 100);
+        param.value = instance.getParameter(i) * 100;
+        // instance.update(i, param.value / 100);
       });
 
       this.props.setPatchPlaying(true);
@@ -175,7 +182,7 @@ class PatchPreview extends Component {
     }
   }
 
-  renderControlButtons(){
+  renderPlaySection(){
     const {
       webAudioPatch,
       patch
@@ -192,8 +199,7 @@ class PatchPreview extends Component {
       <div className="patch-preview-buttons">
         { !webAudioPatch.isReady && (
           <button
-            style={{display: 'inline-block'}}
-            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable() }
+            disabled={!patch.jsAvailable || !webAudio.webAudioApiIsAvailable()}
             onClick={() => this.handleTestPatchButtonClick()} >
             Play
           </button>
@@ -201,9 +207,8 @@ class PatchPreview extends Component {
 
         { webAudioPatch.isReady && (
           <button
-            style={{display: 'inline-block'}}
             onClick={() => this.togglePatchAudio()} >
-            { webAudioPatch.isPlaying ? 'stop audio' : 'start audio' }
+            { webAudioPatch.isPlaying ? 'Stop Audio' : 'Start Audio' }
           </button>
         )}
 
@@ -235,10 +240,62 @@ class PatchPreview extends Component {
           </div>
         )}
 
-        <hr />
       </div>
     );
 
+  }
+
+  renderEmulateTab() {
+    const {
+      webAudioPatch,
+      editMode,
+      isSaving,
+      parameters
+    } = this.props;
+
+    return (
+      <div>
+        <PatchParameters
+          stopAudio={_ => this.stopPatchAudio()}
+          patchIsActive={webAudioPatch.isPlaying}
+          editMode={editMode}
+          onChangeParameters={params => this.props.onChangeParameters(params)}
+          isSaving={isSaving}
+          parameters={parameters}
+        />
+
+        <MidiKeyboard />
+
+        { this.renderPlaySection() }
+      </div>
+    )
+  }
+
+  renderDeviceTab() {
+    const {
+      patch,
+      webAudioPatch,
+      editMode,
+      isSaving,
+      parameters
+    } = this.props;
+
+    return (
+      <div>
+        <PatchParameters
+          stopAudio={_ => this.stopPatchAudio()}
+          patchIsActive={webAudioPatch.isPlaying}
+          editMode={editMode}
+          onChangeParameters={params => this.props.onChangeParameters(params)}
+          isSaving={isSaving}
+          parameters={parameters}
+        />
+
+        <MidiKeyboard />
+
+        <OwlControl patch={patch} storeButton loadButton />
+      </div>
+    )
   }
 
   render(){
@@ -254,43 +311,35 @@ class PatchPreview extends Component {
       editMode,
       isSaving,
       owlState,
+      detailsState,
       parameters
     } = this.props;
 
     return (
-      <div className="white-box2">
-        <div>
-          <PatchParameters
-            patchIsActive={webAudioPatch.isPlaying}
-            editMode={editMode}
-            onChangeParameters={params => this.props.onChangeParameters(params)}
-            isSaving={isSaving}
-            parameters={parameters}
-          />
-
-          <hr />
-        </div>
-
-        { (webAudioPatch.isReady || owlState.isConnected) && (
-          <button
-            style={{
-              margin: '10px',
-              padding: '20px',
-              width: '165px',
-              lineHeight: '0px'
-            }}
-            onClick={() => this.toggleMidiKeyboardVisibility()} >
-            { showMidiKeyboard ? 'hide keyboard' : 'show keyboard'}
-          </button>
-        )}
-
-        { (webAudioPatch.isReady || owlState.isConnected) && showMidiKeyboard &&
-          <MidiKeyboard />
+      <div>
+        {
+          detailsState.showingAbout &&
+            <PatchParameters
+              stopAudio={_ => this.stopPatchAudio()}
+              patchIsActive={webAudioPatch.isPlaying}
+              editMode={editMode}
+              onChangeParameters={params => this.props.onChangeParameters(params)}
+              isSaving={isSaving}
+              parameters={parameters}
+            />
         }
 
-        { this.renderControlButtons() }
+        {
+          detailsState.showingEmulate &&
+            this.renderEmulateTab()
+        }
 
-        {!webAudio.webAudioApiIsAvailable() ? (
+        {
+          detailsState.showingDevice &&
+            this.renderDeviceTab()
+        }
+
+        { !webAudio.webAudioApiIsAvailable() &&
           <div className="error-msg">
             <p><strong>Error:</strong> Your browser does not support the HTML5 Web Audio API.</p>
             <p>consider upgrading your browser. Here's a
@@ -298,9 +347,7 @@ class PatchPreview extends Component {
               of browsers that do support the Web Audio API.
             </p>
           </div>
-        ) : null}
-
-        <OwlControl patch={patch} storeButton loadButton />
+        }
       </div>
     );
   }

@@ -94,7 +94,6 @@ const owlState = (state = initialState, action) => {
         ...state,
         activePresetSlot: action.slot,
         programError: null,
-        programMessage: null,
       }
     case 'CLEAR_PRESET_LIST':
       return {

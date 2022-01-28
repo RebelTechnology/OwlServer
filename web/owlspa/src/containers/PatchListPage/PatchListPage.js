@@ -36,6 +36,7 @@ class PatchListPage extends Component {
     const patchesToBeRendered = filteredSortedPatches.map( patch => {
       return (
         <PatchTile
+          patch={patch}
           key={patch._id}
           id={patch._id}
           name={patch.name}

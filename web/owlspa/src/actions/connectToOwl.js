@@ -8,7 +8,7 @@ const connectToOwl = () => {
       type: 'REQUEST_CONNECT_TO_OWL'
     });
 
-    return owl.connect().then(({ isConnected, midiInputs, midiOutputs, connectedMidiInputPort, connectedMidiOutputPort }) => {
+    function res({ isConnected, midiInputs, midiOutputs, connectedMidiInputPort, connectedMidiOutputPort }) {
       dispatch({
         type: 'RECEIVE_CONNECTION_FROM_OWL',
         isConnected,
@@ -19,8 +19,9 @@ const connectToOwl = () => {
       });
       owl.pollStatus();
       owl.requestDevicePresets();
-    },
-    (err) => {
+    };
+
+    function rej(err) {
       dispatch({
         type: 'RECEIVE_CONNECTION_FROM_OWL',
         isConnected: false
@@ -35,7 +36,9 @@ const connectToOwl = () => {
           contents: 'Failed to Connect to OWL'
         }]
       }));
-    });
+    };
+
+    return owl.connect().then(res, rej);
   }
 }
 

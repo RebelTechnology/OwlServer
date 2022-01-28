@@ -13,12 +13,12 @@ class ResourceList extends Component {
     }
   }
 
-	handleFileUploadChange(e) {
-		console.log(e.target.files.length);
+  handleFileUploadChange(e) {
+    console.log(e.target.files.length);
 
-		if (e.target.files.length > 0)
-			this.props.storeResourceOnDevice(e.target.files[0]);
-	}
+    if (e.target.files.length > 0)
+      this.props.storeResourceOnDevice(e.target.files[0]);
+  }
 
   render(){
 
@@ -60,15 +60,15 @@ class ResourceList extends Component {
                 </tr>
 
                 { sortedResources.map((resource, i) => {
-                    return (
-                      <tr key={i}>
-                        <td>{resource.name}</td>
-                        <td><code>{resource.size}</code></td>
-                        <td><button onClick={() => this.handleDeleteClick(resource.slot)}>Delete</button></td>
-                      </tr>
-                    );
-                  }
-                )}
+                  return (
+                    <tr key={i}>
+                      <td>{resource.name}</td>
+                      <td><code>{resource.size}</code></td>
+                      <td><button onClick={() => this.handleDeleteClick(resource.slot)}>Delete</button></td>
+                    </tr>
+                  );
+                }
+																		 )}
               </tbody>
             </table>
           </div>
