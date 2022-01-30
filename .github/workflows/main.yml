@@ -1,0 +1,46 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - dev
+  # pull_request:
+  #   branches:
+  #     - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: echo "There can be a step to run tests"
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    permissions:
+      id-token: write
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup AWS Copilot
+        uses: nvmker/setup-aws-copilot@v1.1
+        with:
+          version: v1.14.0
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1.6.0
+        with:
+          aws-region: eu-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: GithubActions
+          role-duration-seconds: 1800
+      - run: copilot svc deploy --app web --env dev --name api
