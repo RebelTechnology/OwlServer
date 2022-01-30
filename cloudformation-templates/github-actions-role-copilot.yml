@@ -1,0 +1,68 @@
+Parameters:
+  GitHubOrg:
+    Type: String
+  RepositoryName:
+    Type: String
+  App:
+    Description: Name of the app.
+    Type: String
+  Env:
+    Description: Environment name.
+    Type: String
+
+Resources:
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${App}-${Env}-copilot-gh-actions-${GitHubOrg}-${RepositoryName}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated:
+                - !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
+      Policies:
+        - PolicyName: AssumeEnvManagerRole
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: sts:AssumeRole
+                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${App}-${Env}-EnvManagerRole
+        - PolicyName: S3PutObject
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: "*"
+                Condition:
+                  StringEquals:
+                    s3:ResourceAccount: !Ref AWS::AccountId
+        - PolicyName: ECRPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - ecr:DescribeRepositories
+                  - ecr:GetAuthorizationToken
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+                  - ecr:PutImage
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+
+Outputs:
+  Role:
+    Value: !GetAtt Role.Arn
