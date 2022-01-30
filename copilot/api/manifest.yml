@@ -1,25 +1,12 @@
 name: api
-type: Load Balanced Web Service
-
-http:
-  path: "/"
-  healthcheck:
-    path: "/patches"
-    success_codes: "200"
-    healthy_threshold: 3
-    unhealthy_threshold: 2
-    interval: 15s
-    timeout: 10s
-    grace_period: 45s
-  deregistration_delay: 5s
-  stickiness: false
-  allowed_source_ips: ["35.177.61.189/32"]
-  alias: api.develop.rebeltech.org
+type: Backend Service
 
 image:
   build:
     dockerfile: ./web/api/Dockerfile
     context: ./web
+    cache_from:
+      - ${API_ECR_REPOSITORY}:${API_IMAGE_TAG}
   port: 3000
 
 count: 1
@@ -28,16 +15,12 @@ memory: 1024
 
 exec: true
 
-network:
-  vpc:
-    placement: private
-
 variables:
   LOG_LEVEL: debug
   NODE_ENV: staging
   API_PORT: 3000
   MONGO_COLLECTION: patches
-  WORDPRESS_BASE_URL: https://dev.rebeltech.org
+  WORDPRESS_BASE_URL: http://wordpress.web.local
   PATCH_SOURCE_URL_FRAGMENT: wp-content/uploads/patch-files
   PATCH_FILES_SOURCE_PATH: /patch-files
   PATCH_BUILDER_PATH: /patch-builder/patch-builder.php
@@ -51,6 +34,10 @@ variables:
 
 environments:
   dev:
+    network:
+      vpc:
+        placement: public
+        security_groups: [sg-0db0488c1114879ab]
     secrets:
       MONGO_CONNECTION_STRING: /copilot/web/dev/secrets/MONGO_CONNECTION_STRING
       JWT_SECRET: /copilot/web/dev/secrets/JWT_SECRET
@@ -58,6 +45,13 @@ environments:
       PATCH_UPLOAD_SECRET: /copilot/web/dev/secrets/PATCH_UPLOAD_SECRET
       WORDPRESS_XML_RPC_USERNAME: /copilot/web/dev/secrets/WORDPRESS_XML_RPC_USERNAME
       WORDPRESS_XML_RPC_PASSWORD: /copilot/web/dev/secrets/WORDPRESS_XML_RPC_PASSWORD
+    storage:
+      volumes:
+        PatchFiles:
+          efs:
+            id: fs-06882811d1fa4f349
+          path: /patch-files
+          read_only: true
   production:
     variables:
       LOG_LEVEL: info
