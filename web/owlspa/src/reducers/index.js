@@ -32,7 +32,7 @@ const reducers = combineReducers({
   patchSourceCodeFiles,
   tags,
   webAudioPatch,
-  webAudioPatchParameters
+  webAudioPatchParameters,
 });
 
 export default reducers;

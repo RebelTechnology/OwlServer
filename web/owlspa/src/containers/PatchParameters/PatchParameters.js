@@ -99,8 +99,8 @@ class PatchParameters extends Component {
           name={parameter.name}
           editMode={editMode}
           onDelete={ () => this.handleDeleteParam(parameter.id) }
-          onEdit={ editedParameter => this.handleEditedParam(parameter, editedParameter)}
-          availableIds={ thisIdEntry.concat(availableFloatIds)}
+          onEdit={ editedParameter => this.handleEditedParam(parameter, editedParameter) }
+          availableIds={ thisIdEntry.concat(availableFloatIds) }
           min={0}
           max={100}
           initialValue={parameter.io === 'input' ? 35 : 0}
