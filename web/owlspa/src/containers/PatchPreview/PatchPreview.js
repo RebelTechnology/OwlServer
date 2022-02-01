@@ -277,7 +277,7 @@ class PatchPreview extends Component {
       webAudioPatch,
       editMode,
       isSaving,
-      parameters
+      parameters,
     } = this.props;
 
     return (
