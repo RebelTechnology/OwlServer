@@ -44,3 +44,6 @@ jobs:
           role-session-name: GithubActions
           role-duration-seconds: 1800
       - run: copilot svc deploy --app web --env dev --name api
+        env:
+          API_ECR_REPOSITORY: ${{ secrets.API_ECR_REPOSITORY }}
+          API_IMAGE_TAG: ${{ secrets.API_ECR_REPOSITORY }}
