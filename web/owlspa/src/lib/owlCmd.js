@@ -345,8 +345,18 @@ export function pollStatusStop() {
 	}
 };
 
-function setParameter(pid, value) {
-	midi([0xB0, OpenWareMidiControl.PATCH_PARAMETER_A+pid, value], ["sending CC ", cc, "/", value]);
+export function setParameter(param) {
+	const { id, value } = param;
+
+	const X = ['A','B','C','D','E','F','G','H'];
+
+	const _P = X[Math.floor(id / 8) - 1];
+	const P = _P > -1 ? _P : "";
+	const S = X[(id % 8)]
+
+	const T = `PATCH_PARAMETER_${P}${S}`;
+
+	midi([0xB0, OpenWareMidiControl[T], value], [`sending CC:`, T, "/", value]);
 };
 
 function sendLoadRequest() {
