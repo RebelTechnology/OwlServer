@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import * as owl from 'lib/owlCmd';
 import FloatParameter from './FloatParameter/FloatParameter';
 import BoolParameter from './BoolParameter/BoolParameter';
-import { setWebAudioPatchParameter } from 'actions';
+import { setWebAudioPatchParameter, setMIDIPatchParameter } from 'actions';
 import AddParameterButton from './AddParameterButton/AddParameterButton';
 import availableParameterIds from './availableParameterIds';
 
@@ -68,11 +69,21 @@ class PatchParameters extends Component {
     this.props.onChangeParameters(parameters);
   }
 
+  sendValue(parameter, value) {
+    if (this.props.deviceIsConnected) {
+      this.props.setMIDIPatchParameter({ ...parameter, value });
+      owl.setParameter(parameter);
+    }
+    else if (this.props.patchIsActive)
+      this.props.setWebAudioPatchParameter({ ...parameter, value });
+  }
+
   render(){
 
     const {
       stopAudio,
       patchIsActive,
+      deviceIsConnected,
       isSaving,
       editMode,
       parameters
@@ -90,8 +101,8 @@ class PatchParameters extends Component {
       const thisIdEntry = availableParameterIds.float.filter(idEntry => idEntry.id === parameter.id);
       return (
         <FloatParameter
-          active={patchIsActive}
-          onParamValueChange={ value => this.props.setWebAudioPatchParameter({ ...parameter, value })}
+          active={patchIsActive || deviceIsConnected}
+          onParamValueChange={ value => this.sendValue({ ...parameter, value }) }
           key={i}
           id={parameter.id}
           io={parameter.io}
@@ -112,7 +123,7 @@ class PatchParameters extends Component {
       return (
         <BoolParameter
           key={i}
-          isActive={patchIsActive}
+          isActive={patchIsActive || deviceIsConnected}
           io={parameter.io}
           id={parameter.id}
           name={parameter.name}
@@ -121,8 +132,8 @@ class PatchParameters extends Component {
           onDelete={ () => this.handleDeleteParam(parameter.id) }
           onEdit={editedParameter => this.handleEditedParam(parameter, editedParameter)}
           availableIds={thisIdEntry.concat(availableBoolIds)}
-          onPushButtonDown={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 4095 })}
-          onPushButtonUp={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 0 })}
+          onPushButtonDown={() => this.sendValue({ ...parameter, value: 4095, press: 1 })}
+          onPushButtonUp={() => this.sendValue({ ...parameter, value: 0, press: 0 })}
         />);
     });
 
@@ -168,4 +179,4 @@ PatchParameters.defaultProps = {
   onChangeParameters: () => {}
 };
 
-export default connect(null, { setWebAudioPatchParameter })(PatchParameters);
+export default connect(null, { setWebAudioPatchParameter, setMIDIPatchParameter })(PatchParameters);

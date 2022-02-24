@@ -275,9 +275,11 @@ class PatchPreview extends Component {
     const {
       patch,
       webAudioPatch,
+      deviceIsConnected,
       editMode,
       isSaving,
       parameters,
+      owlState,
     } = this.props;
 
     return (
@@ -285,6 +287,7 @@ class PatchPreview extends Component {
         <PatchParameters
           stopAudio={_ => this.stopPatchAudio()}
           patchIsActive={webAudioPatch.isPlaying}
+          deviceIsConnected={owlState.isConnected}
           editMode={editMode}
           onChangeParameters={params => this.props.onChangeParameters(params)}
           isSaving={isSaving}
