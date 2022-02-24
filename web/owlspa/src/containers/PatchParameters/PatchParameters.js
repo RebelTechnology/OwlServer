@@ -91,11 +91,11 @@ class PatchParameters extends Component {
 
     const floatParameters = parameters.filter(parameter => parameter.type === 'float').sort((a, b) => a.id - b.id);
     const usedFloatParameterIds = floatParameters.map(({ id }) => id);
-    const availableFloatIds = availableParameterIds.float.filter(idEntry => usedFloatParameterIds.indexOf(idEntry.id) === -1)
+    const availableFloatIds = availableParameterIds.float.filter(idEntry => usedFloatParameterIds.indexOf(idEntry.id) === -1);
 
     const boolParameters = parameters.filter(parameter => parameter.type === 'bool').sort((a, b) => a.id - b.id);
     const usedBoolParameterIds = boolParameters.map(({ id }) => id);
-    const availableBoolIds = availableParameterIds.bool.filter(idEntry => usedBoolParameterIds.indexOf(idEntry.id) === -1)
+    const availableBoolIds = availableParameterIds.bool.filter(idEntry => usedBoolParameterIds.indexOf(idEntry.id) === -1);
 
     const renderFloatParameters = floatParameters.map((parameter, i) => {
       const thisIdEntry = availableParameterIds.float.filter(idEntry => idEntry.id === parameter.id);

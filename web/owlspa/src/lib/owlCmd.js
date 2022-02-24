@@ -294,8 +294,8 @@ function messageHandler(event) {
 
 	switch (data[0] & 0xF0) {
 	case 0x80:
-	        log('received noteOff:', data[1], 'velocity:', data[2]);
-	        break;
+		log('received noteOff:', data[1], 'velocity:', data[2]);
+		break;
 
 	case 0x90:
 		if (data[2] === 0)
