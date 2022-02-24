@@ -124,7 +124,7 @@ class FloatParameter extends Component {
           }}
           onTouchStart={e => isInputParam && active && this.handlePointerDown(e) }
           onTouchEnd={e => isInputParam && active && this.handlePointerUp(e) }
-          onMouseDown={e => isInputParam && this.handlePointerDown(e)}>
+          onMouseDown={e => isInputParam && this.handlePointerDown(e) }>
           { editMode && (
             <IconButton
               title="delete parameter"

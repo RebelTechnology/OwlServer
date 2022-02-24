@@ -3,7 +3,6 @@ const initialState = [];
 const MIDIPatchParameters = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_MIDI_PATCH_PARAMETER':
-		  console.warn(state, action);
       return [
         ...state.filter(param => param.id !== action.parameter.id),
         action.parameter
