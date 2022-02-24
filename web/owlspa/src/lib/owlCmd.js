@@ -346,17 +346,24 @@ export function pollStatusStop() {
 };
 
 export function setParameter(param) {
-	const { id, value } = param;
+	const { id, value, press } = param;
 
-	const X = ['A','B','C','D','E','F','G','H'];
+	if (id < 40) {
+		const X = ['A','B','C','D','E','F','G','H'];
 
-	const _P = X[Math.floor(id / 8) - 1];
-	const P = _P > -1 ? _P : "";
-	const S = X[(id % 8)]
+		const I = X[Math.floor(id / 8) - 1];
+		const P = I > -1 ? I : "";
+		const S = X[(id % 8)]
 
-	const T = `PATCH_PARAMETER_${P}${S}`;
+		const T = `PATCH_PARAMETER_${P}${S}`;
 
-	midi([0xB0, OpenWareMidiControl[T], value], [`sending CC:`, T, "/", value]);
+		midi([0xB0, OpenWareMidiControl[T], value], [`sending CC:`, T, "/", value]);
+	} else if (id >= 80 && id < 88) {
+		const T = press ? 'PATCH_BUTTON_ON' : 'PATCH_BUTTON_OFF';
+		const B = (id - 76);
+
+		midi([0xB0, OpenWareMidiControl[T], B], [`sending CC:`, T, "/", B]);
+	}
 };
 
 function sendLoadRequest() {

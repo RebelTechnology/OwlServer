@@ -16,6 +16,7 @@ import tags from './tags';
 import thunk from 'redux-thunk';
 import webAudioPatch from './webAudioPatch';
 import webAudioPatchParameters from './webAudioPatchParameters';
+import MIDIPatchParameters from './MIDIPatchParameters';
 
 const reducers = combineReducers({
   authors,
@@ -33,6 +34,7 @@ const reducers = combineReducers({
   tags,
   webAudioPatch,
   webAudioPatchParameters,
+  MIDIPatchParameters,
 });
 
 export default reducers;

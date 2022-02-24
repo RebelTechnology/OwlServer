@@ -54,6 +54,7 @@ export setPatchPlaying from './setPatchPlaying';
 export setPatchStarAndSendToSever from './setPatchStarAndSendToSever';
 export setWebAudioPatch from './setWebAudioPatch';
 export setWebAudioPatchParameter from './setWebAudioPatchParameter';
+export setMIDIPatchParameter from './setMIDIPatchParameter';
 export sourceFileChange from './sourceFileChange';
 export storePatchInDeviceSlot from './storePatchInDeviceSlot';
 export storeResourceOnDevice from './storeResourceOnDevice';
