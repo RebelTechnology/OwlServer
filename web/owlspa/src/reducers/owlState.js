@@ -12,6 +12,7 @@ const initialState = {
   activePresetSlot: null,
   firmWareVersion: null,
   status: null,
+  param: null,
   programMessage: null,
   programError: null,
   presets: [],
@@ -94,6 +95,11 @@ const owlState = (state = initialState, action) => {
         ...state,
         activePresetSlot: action.slot,
         programError: null,
+      }
+    case 'DEVICE_CONTROL_CHANGE':
+      return {
+        ...state,
+        param: action.param,
       }
     case 'CLEAR_PRESET_LIST':
       return {
