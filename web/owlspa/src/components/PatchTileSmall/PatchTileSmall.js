@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import CSSModules from 'react-css-modules';
 import styles from './PatchTileSmall.css';
-import { IconButton, StarCounter, AuthorLink, Tag } from 'components';
+import { IconButton, StarCounter, AuthorLink, Tag, PatchDetailsTile } from 'components';
 
 class PatchTileSmall extends Component {
 
@@ -63,6 +63,7 @@ class PatchTileSmall extends Component {
       tags,
       availableTagList,
       patch,
+      description,
       canEdit,
       editMode,
       isSaving,
@@ -157,6 +158,17 @@ class PatchTileSmall extends Component {
         </div>
 
         { author && <AuthorLink author={ author.name } /> }
+
+        { editMode ?
+          <PatchDetailsTile
+            title="Description"
+            text={description}
+            onTextChange={d => this.handlePatchDetailsDescriptionChange(d)}
+            isSaving={isSaving}
+            editMode={editMode}
+          /> :
+          (description ? <div styleName="patch-description">{description}</div> : null)
+        }
 
         <div styleName="tags-wrapper">
           { tags && tags.map(tag => <Tag editMode={editMode} onDelete={() => this.handleDeleteTag(tag)} key={tag} tag={tag} />) }

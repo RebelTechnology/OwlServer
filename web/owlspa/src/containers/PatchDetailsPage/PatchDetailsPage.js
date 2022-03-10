@@ -361,6 +361,7 @@ class PatchDetailsPage extends Component {
               canEdit={canEdit}
               editMode={editMode}
               tags={tags}
+              description={description}
               availableTagList={availableTags.items}
               onChangeTags={tags => this.handleChangeTags(tags)}
               isSaving={patchDetails.isSaving}
@@ -407,14 +408,6 @@ class PatchDetailsPage extends Component {
                     isSaving={patchDetails.isSaving}
                     savedSuccess={patchDetails.savedSuccess}
                     onChangeSoundCloudArr={ soundcloudArr => this.handleChangeSoundCloudArr(soundcloudArr)} />
-
-                  <PatchDetailsTile
-                    title="Description"
-                    text={description}
-                    onTextChange={description => this.handlePatchDetailsDescriptionChange(description)}
-                    isSaving={patchDetails.isSaving}
-                    editMode={editMode}
-                  />
 
                   { (patch.instructions || canEdit) &&
                     <PatchDetailsTile
