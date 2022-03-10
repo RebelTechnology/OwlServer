@@ -1,61 +1,91 @@
 .patch-tile-small {
-    position: relative;
-    display: block;
-    box-sizing: border-box;
-    height: 160px;
-    width: 100%;
-    padding: 20px;
-    border: 1px solid #d0d0d0;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px #6f757f;
-    background: #503F60;
-    transition: .3s;
-    margin-bottom: 1em;
-    font-family: 'Ubuntu', sans-serif;
-    background: #E6C79B;
-    background: -moz-radial-gradient(circle at bottom left,  #7C1A58 0%, transparent 30%), -moz-radial-gradient(center, circle at top right, #E6C79B 5%, #929285 30%, #503F60 80%);
-    background: -webkit-radial-gradient(circle at bottom left,  #7C1A58 0%, transparent 30%), -webkit-radial-gradient(center, circle at top right,  #E6C79B 5%,#929285 30%,#503F60 80%);
-    background: radial-gradient(circle at bottom left,  #7C1A58 0%, transparent 30%), radial-gradient(circle at top right,  #E6C79B 5%,#929285 30%,#503F60 80%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#E6C79B', endColorstr='#503F60',GradientType=1 );
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid #d0d0d0;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #6f757f;
+  transition: .3s;
+  margin-bottom: 1em;
+  background: -moz-radial-gradient(circle at bottom left,  #7C1A58 0%, transparent 30%), -moz-radial-gradient(center, circle at top right, #E6C79B 5%, #929285 30%, #503F60 80%);
+  background: -webkit-radial-gradient(circle at bottom left,  #7C1A58 0%, transparent 30%), -webkit-radial-gradient(center, circle at top right,  #E6C79B 5%,#929285 30%,#503F60 80%);
+  background: radial-gradient(circle at bottom left,  #7C1A58 0%, transparent 30%), radial-gradient(circle at top right,  #E6C79B 5%,#929285 30%,#503F60 80%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#E6C79B', endColorstr='#503F60',GradientType=1 );
 }
 
 .patch-title {
-    font-family: inherit;
-    display: block;
-    float: left;
-    line-height: 30px;
-    padding: 10px;
-    color: #fff;
-    font-size: 18px;
-    font-weight: 700;
-    background: #231f20;
-    transition: .3s;
+  display: inline-block;
+  line-height: 30px;
+  padding: 10px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  background: #231f20;
+  transition: .3s;
 }
 
-.patch-tile-controls {
-    font-family: 'Ubuntu', sans-serif;
-    float: right;
-    margin-bottom: 20px;
+.patch-right-side {
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 
-.star-counter-wrapper {
-    float: right;
-    clear: both;
-}
+.patch-tile-controls {}
 
-.patch-title-published-editor {
-    text-align: right;
-    float: right;
-    clear: both;
-}
+.star-counter-wrapper {}
+
+.patch-title-published-editor {}
 
 .patch-title-published-editor label {
-    color: #fff;
-    display: inline-block;
-    margin-right: 10px;
-    font-weight: normal;
+  color: #fff;
+  display: inline-block;
+  margin-right: 10px;
+  font-weight: normal;
 }
 
 .patch-title-published-editor input {
-    margin: 5px;
+  margin: 5px;
+}
+
+.tags-wrapper {
+  text-align: right;
+}
+
+.tag-editor {
+  margin-right: 10px;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.tag-editor-filter-input {
+  width: 100px;
+  display: inline-block;
+  font-weight: normal;
+  text-transform: uppercase;
+  line-height: 32px;
+  height: 32px;
+}
+
+.tag-dropdown {
+  text-align: left;
+  width: 150px;
+  position: absolute;
+  z-index: 100;
+  list-style-type: none;
+  background: #ddd;
+  padding: 0;
+  margin: 0;
+  max-height: 180px;
+  overflow-y: scroll;
+}
+
+.tag-dropdown li {
+  margin: 0;
+  padding: 4px 0 4px 10px;
+  cursor: pointer;
+}
+
+.tag-dropdown li:hover {
+  background: #e19758;
+  color: #fff;
 }

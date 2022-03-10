@@ -360,6 +360,9 @@ class PatchDetailsPage extends Component {
               patchName={name}
               canEdit={canEdit}
               editMode={editMode}
+              tags={tags}
+              availableTagList={availableTags.items}
+              onChangeTags={tags => this.handleChangeTags(tags)}
               isSaving={patchDetails.isSaving}
               onEditClick={() => this.handleOnEditPatchClick()}
               onSaveClick={() => this.handleOnSavePatchClick()}
@@ -426,10 +429,7 @@ class PatchDetailsPage extends Component {
 
                   <PatchStats
                     isSaving={patchDetails.isSaving}
-                    availableTagList={availableTags.items}
-                    tags={tags}
                     editMode={editMode}
-                    onChangeTags={tags => this.handleChangeTags(tags)}
                     patch={patch}
                     isSaving={patchDetails.isSaving}
                   />
