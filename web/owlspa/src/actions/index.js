@@ -13,6 +13,7 @@ export deleteDeviceResourceFromSlot from './deleteDeviceResourceFromSlot';
 export deviceDispatchPresetReceived from './deviceDispatchPresetReceived';
 export deviceDispatchResourceReceived from './deviceDispatchResourceReceived';
 export deviceDispatchProgramChange from './deviceDispatchProgramChange';
+export deviceDispatchControlChange from './deviceDispatchControlChange';
 export deviceDispatchDeviceUUIDReceived from './deviceDispatchDeviceUUIDReceived';
 export eraseDeviceStorage from './eraseDeviceStorage';
 export fetchAuthors from './fetchAuthors';

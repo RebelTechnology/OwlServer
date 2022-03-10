@@ -1,15 +1,67 @@
+const floats = [
+  20,
+  21,
+  22,
+  23,
+  24,
+  1,
+  12,
+  13,
+  75,
+  76,
+  77,
+  78,
+  79,
+  80,
+  81,
+  82,
+  83,
+  84,
+  85,
+  86,
+  87,
+  88,
+  89,
+  90,
+];
+
+export function midi_to_param(data) {
+  const o = {
+    id: null,
+    value: null,
+  }
+
+  const f = floats.indexOf(data[1]);
+  if (f > -1) {
+    o.id = f;
+    o.value = data[2];
+  }
+
+  else if (data[1] === 27) {
+    o.id = data[2] + 76;
+    o.value = 127;
+  }
+
+  else if (data[1] === 28) {
+    o.id = data[2] + 76;
+    o.value = 0;
+  };
+
+  return o;
+};
+
 const availableParameterIds = {
   float: [
-    { id: 0, displayName: 'PARAMETER_A'},
-    { id: 1, displayName: 'PARAMETER_B'},
-    { id: 2, displayName: 'PARAMETER_C'},
-    { id: 3, displayName: 'PARAMETER_D'},
-    { id: 4, displayName: 'PARAMETER_E'},
-    { id: 5, displayName: 'PARAMETER_F'},
-    { id: 6, displayName: 'PARAMETER_G'},
-    { id: 7, displayName: 'PARAMETER_H'},
-    { id: 8, displayName: 'PARAMETER_AA'},
-    { id: 9, displayName: 'PARAMETER_AB'},
+    { id: 0,  displayName: 'PARAMETER_A' },
+    { id: 1,  displayName: 'PARAMETER_B' },
+    { id: 2,  displayName: 'PARAMETER_C' },
+    { id: 3,  displayName: 'PARAMETER_D' },
+    { id: 4,  displayName: 'PARAMETER_E' },
+    { id: 5,  displayName: 'PARAMETER_F' },
+    { id: 6,  displayName: 'PARAMETER_G' },
+    { id: 7,  displayName: 'PARAMETER_H' },
+    { id: 8,  displayName: 'PARAMETER_AA'},
+    { id: 9,  displayName: 'PARAMETER_AB'},
     { id: 10, displayName: 'PARAMETER_AC'},
     { id: 11, displayName: 'PARAMETER_AD'},
     { id: 12, displayName: 'PARAMETER_AE'},

@@ -1,5 +1,7 @@
 import * as openWareMidi from './openWareMidi';
 
+import {availableParameterIds} from 'lib/availableParameterIds';
+
 import * as midiClient from './midiClient';
 
 import { API_END_POINT } from 'constants';
@@ -9,6 +11,7 @@ import {
 	deviceDispatchResourceReceived,
 	deviceDispatchDeviceUUIDReceived,
 	deviceDispatchProgramChange,
+	deviceDispatchControlChange,
 	owlDispatchPatchStatus,
 	owlDispatchFirmWareVersion,
 	owlDispatchProgramMessage,
@@ -295,6 +298,8 @@ function messageHandler(event) {
 	switch (data[0] & 0xF0) {
 	case 0x80:
 		log('received noteOff:', data[1], 'velocity:', data[2]);
+
+		deviceDispatchControlChange(data);
 		break;
 
 	case 0x90:
@@ -303,10 +308,14 @@ function messageHandler(event) {
 		else
 			log('received noteOn:', data[1], 'velocity:', data[2]);
 
+		deviceDispatchControlChange(data);
+
 		break;
 
 	case 0xB0:
 		log("received CC ", data[1], "/", data[2]);
+
+		deviceDispatchControlChange(data);
 		break;
 
 	case 0xC0:
