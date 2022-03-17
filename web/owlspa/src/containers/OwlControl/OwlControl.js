@@ -37,8 +37,9 @@ class OwlControl extends Component {
     }
 
     if(navigator.requestMIDIAccess){
+      const r = window.prompt('Enter a slot number from 1 to 40', this.props.owlState.nextAvailableSlot);
 
-      const slot = parseInt(window.prompt('Enter a slot number from 1 to 40'));
+      const slot = parseInt(r);
 
       if (typeof slot === 'number' && slot > 0 && slot < 41)
         this.props.storePatchInDeviceSlot(this.props.patch, slot);
