@@ -95,6 +95,9 @@ const owlState = (state = initialState, action) => {
         ...state,
         activePresetSlot: action.slot,
         programError: null,
+        programMessage: null,
+        status: null,
+        presets: (action.slot === 0) ? state.presets : state.presets.filter(preset => preset.slot !== 0),
       }
     case 'DEVICE_CONTROL_CHANGE':
       return {

@@ -314,7 +314,6 @@ function messageHandler(event) {
 
 	case 0xB0:
 		log("received CC ", data[1], "/", data[2]);
-
 		deviceDispatchControlChange(data);
 		break;
 
