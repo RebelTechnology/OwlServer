@@ -19,12 +19,12 @@ class PatchTile extends Component {
   }
 
   storePatchInDeviceSlotClick(patch){
-    const slot = parseInt(window.prompt('Enter a slot number from 0 to 40'));
+    const slot = parseInt(window.prompt('Enter a slot number from 1 to 40'));
 
-    if (slot > 0 && slot < 40)
+    if (slot > 0 && slot < 41)
       this.props.storePatchInDeviceSlot(patch, slot);
     else
-      window.alert('slot must be a number between 0 and 40 inclusive');
+      window.alert('slot must be a number from 1 to 40');
   }
 
   render(){
