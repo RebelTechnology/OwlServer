@@ -11,6 +11,9 @@ import {
 import classNames from 'classnames';
 import { Tag, PatchStats, PatchTileSmall, PatchSoundcloud, PatchDetailsTile } from 'components';
 import { PatchPreview, PatchCode } from 'containers';
+import customHistory from '../../customHistory';
+
+const TABS = ['About', 'Device', 'Emulate', 'Source'];
 
 class PatchDetailsPage extends Component {
 
@@ -212,6 +215,8 @@ class PatchDetailsPage extends Component {
   handleChangeTab(_,activeTab,name){
     let showingAbout, showingSource, showingEdit, showingDevice, showingEmulate = false;
 
+    const { routeParams: { patchSeoName } } = this.props;
+
     switch (name) {
     case 'Source':
       showingSource = true;
@@ -243,6 +248,8 @@ class PatchDetailsPage extends Component {
       showingEdit,
       activeTab,
     });
+
+    customHistory.push('/patch/'+ patchSeoName + '#' + name);
   }
 
   handleChangeTags(tags){
@@ -345,6 +352,7 @@ class PatchDetailsPage extends Component {
     const canEdit = currentUser.isAdmin || this.currentUserCanEdit(patch);
     const starForThisPatch = this.getCurrentUserStarForThisPatch(patch, currentUser);
     const starred = !!starForThisPatch;
+    const tab = null;
 
     if(!patch){
       return <div />
@@ -378,7 +386,7 @@ class PatchDetailsPage extends Component {
 
             <ul className="tab-nav">
               {
-                ['About', 'Device', 'Emulate', 'Source']
+                TABS
                   .concat(canEdit ? [] : [])
                   .map((t,i) => (
                     <li onClick={(e) => this.handleChangeTab(e,i,t)}
@@ -444,6 +452,11 @@ class PatchDetailsPage extends Component {
   }
 
   componentDidMount(){
+    const ti = TABS.indexOf(location.hash.replace('#', ''));
+
+    if (ti > -1)
+      this.handleChangeTab(_, ti, TABS[ti]);
+
     const { fetchPatchDetails, routeParams: {patchSeoName}, availableTags } = this.props;
     if(patchSeoName && !this.patchIsCached(patchSeoName)){
       this.props.fetchPatchDetails(patchSeoName);
