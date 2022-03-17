@@ -29,8 +29,6 @@ class PresetList extends Component {
       return null;
     }
 
-    const sortedPresets = presets.sort((a, b) => a.slot - b.slot);
-
     return (
       <div styleName="preset-list" >
         {!!presets.length && (
@@ -42,27 +40,29 @@ class PresetList extends Component {
                 </tr>
               </thead>
               <tbody>
-                { sortedPresets.map((preset, i) => {
-                    const isActive = preset.slot === activePresetSlot;
-                    const isRamSlot = preset.slot === 0;
+                { presets
+                  .sort((a,b) => a.slot - b.slot)
+                  .map((p, i) => {
+                    const active = p.slot === activePresetSlot;
+                    const ram = p.slot === 0;
 
                     return (
-                      <tr key={i} className={isActive ? styles['is-active'] : null } style={{fontWeight: isActive ? 'bold': 'normal' }}>
-                        <td>{ isRamSlot ? 'RAM' : preset.slot }</td>
-                        <td>{preset.name}</td>
-                        <td><code>{preset.size}</code></td>
-                        {isRamSlot && <td></td>}
-                        {isRamSlot && <td></td>}
-                        {!isRamSlot && (
-                          <td>{isActive ? 'Selected' : <button onClick={() => this.handleSelectPresetSlot(preset.slot) }>Select</button>}</td>
+                      <tr key={i} className={active ? styles['is-active'] : null } style={{fontWeight: active ? 'bold': 'normal' }}>
+                        <td>{ ram ? 'RAM' : p.slot }</td>
+                        <td>{p.name}</td>
+                        <td><code>{p.size}</code></td>
+                        {ram && <td></td>}
+                        {ram && <td></td>}
+                        {!ram && (
+                          <td>{active ? 'Selected' : <button onClick={() => this.handleSelectPresetSlot(p.slot) }>Select</button>}</td>
                         )}
-                        {!isRamSlot && (
-                          <td><button onClick={() => this.handleDeleteClick(preset.slot)}>Delete</button></td>
+                        {!ram && (
+                          <td><button onClick={() => this.handleDeleteClick(p.slot)}>Delete</button></td>
                         )}
                       </tr>
                     );
-                  }
-                )}
+                  })
+                }
               </tbody>
             </table>
           </div>
