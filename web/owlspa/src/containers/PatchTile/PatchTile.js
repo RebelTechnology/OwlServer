@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Tag, AuthorLink } from 'components';
 import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot } from 'actions';
+import { askSlotsStore } from 'utils';
 
 class PatchTile extends Component {
 
@@ -19,14 +20,7 @@ class PatchTile extends Component {
   }
 
   storePatchInDeviceSlotClick(patch){
-    const r = window.prompt('Enter a slot number from 1 to 40', this.props.owlState.nextAvailableSlot);
-
-    const slot = parseInt(r);
-
-    if (typeof slot === 'number' && slot > 0 && slot < 41)
-      this.props.storePatchInDeviceSlot(this.props.patch, slot);
-    else
-      window.alert('slot must be a number from 1 to 40');
+    askSlotsStore.call(this);
   }
 
   render(){
