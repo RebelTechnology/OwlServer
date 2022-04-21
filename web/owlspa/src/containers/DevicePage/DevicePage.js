@@ -48,14 +48,16 @@ class DevicePage extends Component {
       this.getResources();
   }
 
-  handleChangeTab(_,activeTab){
+  handleChangeTab(_,tab){
+	  if (this.state.activeTab === tab) return;
+
     const showingPresets = !this.state.showingPresets;
     const showingResources = !this.state.showingResources;
 
     this.setState({
       showingPresets,
       showingResources,
-      activeTab,
+	    activeTab: tab,
     });
 
     if (showingPresets && this.props.presets.length === 0)
