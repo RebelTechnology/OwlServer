@@ -1151,7 +1151,7 @@ div.patch-visibility {
   color: white;
   text-transform: uppercase;
   font-size: 12px;
-  margin-top: 10px;
+  margin: 5px auto;
   background: url("../images/lock.png") no-repeat 5px center;
   padding-left: 21px;
 }

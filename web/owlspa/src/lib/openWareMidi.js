@@ -64,10 +64,10 @@ export const OpenWareMidiControl = {
   PATCH_BUTTON_ON        : 27, /* Switch a button on: 0-127 button id */
   PATCH_BUTTON_OFF       : 28, /* Switch a button off: 0-127 button id */
   LED                    : 30, /* set/get LED value:
-				* 0-41 : off
-				* 42-83 : green
-				* 84-127 : red
-				*/
+                                * 0-41 : off
+                                * 42-83 : green
+                                * 84-127 : red
+                                */
   LEFT_INPUT_GAIN        : 32, /* left channel input gain, -34.5dB to +12dB (92 : 0dB) */
   RIGHT_INPUT_GAIN       : 33,
   LEFT_OUTPUT_GAIN       : 34, /* left channel output gain, -73dB to +6dB (121 : 0dB) */

@@ -5,6 +5,8 @@ import * as owl from 'lib/owlCmd';
 
 import { connectToOwl, loadAndRunPatchOnDevice, storePatchInDeviceSlot } from 'actions';
 
+import { askSlotsStore } from 'utils';
+
 import styles from './OwlControl.css';
 
 class OwlControl extends Component {
@@ -37,16 +39,7 @@ class OwlControl extends Component {
     }
 
     if(navigator.requestMIDIAccess){
-
-      const slot = parseInt(window.prompt('Enter a slot number from 0 to 40'));
-
-      if(typeof slot !== 'number' || slot < 0 || slot > 40){
-        window.alert('slot must be a number between 0 and 40 inclusive');
-        return;
-      }
-
-      this.props.storePatchInDeviceSlot(this.props.patch, slot);
-
+      askSlotsStore.call(this);
     } else {
       window.alert('Please use a Web MIDI enabled browser (e.g. Chrome) to connect to your OWL');
     }

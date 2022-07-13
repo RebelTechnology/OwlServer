@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import * as owl from 'lib/owlCmd';
 import FloatParameter from './FloatParameter/FloatParameter';
 import BoolParameter from './BoolParameter/BoolParameter';
-import { setWebAudioPatchParameter } from 'actions';
+import { setWebAudioPatchParameter, setMIDIPatchParameter } from 'actions';
 import AddParameterButton from './AddParameterButton/AddParameterButton';
 import availableParameterIds from './availableParameterIds';
 
@@ -68,63 +69,95 @@ class PatchParameters extends Component {
     this.props.onChangeParameters(parameters);
   }
 
+  sendValue(parameter, value) {
+    if (this.props.deviceIsConnected) {
+      this.props.setMIDIPatchParameter({ ...parameter, value });
+      owl.setParameter(parameter);
+    }
+    else if (this.props.patchIsActive)
+      this.props.setWebAudioPatchParameter({ ...parameter, value });
+  }
+
+  consumeParam(p) {
+    let r = null;
+
+    if (this.props.param && this.props.param.id === p.id) {
+      r = Object.assign({}, this.props.param)
+
+      this.props.param.id = null;
+      this.props.param.value = null;
+    }
+
+    return r;
+  }
+
   render(){
 
     const {
       stopAudio,
       patchIsActive,
+      deviceIsConnected,
       isSaving,
       editMode,
-      parameters
+      parameters,
     } = this.props;
 
-    const floatParameters = parameters.filter(parameter => parameter.type === 'float').sort((a, b) => a.id - b.id);
-    const usedFloatParameterIds = floatParameters.map(({ id }) => id);
-    const availableFloatIds = availableParameterIds.float.filter(idEntry => usedFloatParameterIds.indexOf(idEntry.id) === -1)
+    const availableFloatIds = availableParameterIds.float.filter(e => parameters.find(p => p.type === 'float' && p.id !== e.id));
+    const availableBoolIds = availableParameterIds.bool.filter(e => parameters.find(p => p.type === 'bool' && p.id !== e.id));
 
-    const boolParameters = parameters.filter(parameter => parameter.type === 'bool').sort((a, b) => a.id - b.id);
-    const usedBoolParameterIds = boolParameters.map(({ id }) => id);
-    const availableBoolIds = availableParameterIds.bool.filter(idEntry => usedBoolParameterIds.indexOf(idEntry.id) === -1)
+    if (this.props.param) {
+      const p = parameters.find(x => x.id === this.props.param.id);
+      if (p) p.value = this.props.param.value;
+    }
 
-    const renderFloatParameters = floatParameters.map((parameter, i) => {
-      const thisIdEntry = availableParameterIds.float.filter(idEntry => idEntry.id === parameter.id);
-      return (
-        <FloatParameter
-          active={patchIsActive}
-          onParamValueChange={ value => this.props.setWebAudioPatchParameter({ ...parameter, value })}
-          key={i}
-          id={parameter.id}
-          io={parameter.io}
-          isSaving={isSaving}
-          name={parameter.name}
-          editMode={editMode}
-          onDelete={ () => this.handleDeleteParam(parameter.id) }
-          onEdit={ editedParameter => this.handleEditedParam(parameter, editedParameter)}
-          availableIds={ thisIdEntry.concat(availableFloatIds)}
-          min={0}
-          max={100}
-          initialValue={parameter.io === 'input' ? 35 : 0}
-        />);
-    });
+    const renderFloatParameters = parameters
+      .filter(p => p.type === 'float')
+      .sort((a,b) => a.id - b.id)
+      .map((p,i) => {
+        const available_ids = availableFloatIds.concat([availableParameterIds.float.find(x => x.id === p.id)]);
 
-    const renderBoolParameters = boolParameters.map((parameter, i) => {
-      const thisIdEntry = availableParameterIds.bool.filter(idEntry => idEntry.id === parameter.id);
-      return (
-        <BoolParameter
-          key={i}
-          isActive={patchIsActive}
-          io={parameter.io}
-          id={parameter.id}
-          name={parameter.name}
-          editMode={editMode}
-          isSaving={isSaving}
-          onDelete={ () => this.handleDeleteParam(parameter.id) }
-          onEdit={editedParameter => this.handleEditedParam(parameter, editedParameter)}
-          availableIds={thisIdEntry.concat(availableBoolIds)}
-          onPushButtonDown={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 4095 })}
-          onPushButtonUp={() => this.props.setWebAudioPatchParameter({ ...parameter, value: 0 })}
-        />);
-    });
+        return (
+          <FloatParameter
+            active={patchIsActive || deviceIsConnected}
+            onParamValueChange={ v => this.sendValue({ ...p, value: (p.value || v) })}
+            key={i}
+            id={p.id}
+            io={p.io}
+            isSaving={isSaving}
+            name={p.name}
+            editMode={editMode}
+            onDelete={ () => this.handleDeleteParam(p.id) }
+            onEdit={ e => this.handleEditedParam(p,e) }
+            availableIds={available_ids}
+            min={0}
+            max={100}
+            param={this.consumeParam(p)}
+          />);
+      });
+
+    const renderBoolParameters = parameters
+      .filter(p => p.type === 'bool')
+      .sort((a,b) => a.id - b.id)
+      .map((p,i) => {
+        const available_ids = availableBoolIds.concat([availableParameterIds.bool.find(x => x.id === p.id)]);
+
+        return (
+          <BoolParameter
+            key={i}
+            isActive={patchIsActive || deviceIsConnected || p.value > 0}
+            io={p.io}
+            id={p.id}
+            name={p.name}
+            editMode={editMode}
+            isSaving={isSaving}
+            onDelete={ () => this.handleDeleteParam(p.id) }
+            onEdit={ e => this.handleEditedParam(p,e) }
+            availableIds={available_ids}
+            onPushButtonDown={() => this.sendValue({ ...p, value: 4095, press: 1 })}
+            onPushButtonUp={() => this.sendValue({ ...p, value: 0, press: 0 })}
+            param={this.consumeParam(p)}
+          />);
+      });
 
     return (
       <div>
@@ -168,4 +201,10 @@ PatchParameters.defaultProps = {
   onChangeParameters: () => {}
 };
 
-export default connect(null, { setWebAudioPatchParameter })(PatchParameters);
+const mapStateToProps = ({ owlState: { param } }) => {
+  return {
+    param
+  }
+};
+
+export default connect(mapStateToProps, { setWebAudioPatchParameter, setMIDIPatchParameter })(PatchParameters);

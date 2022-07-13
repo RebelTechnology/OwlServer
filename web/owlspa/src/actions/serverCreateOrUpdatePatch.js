@@ -6,7 +6,7 @@ import {
 import newDialog from './newDialog';
 
 const redirectToPatchDetails = patchSeoName => {
-  customHistory.push('/patch/'+ patchSeoName);
+  customHistory.push('/patch/'+ patchSeoName + '#Source');
 }
 
 const replaceTempDir = (fileUrl, patchId) => {

@@ -1,16 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import CSSModules from 'react-css-modules';
 import styles from './PatchStats.css';
-import { Tag } from 'components';
 
 class PatchStats extends Component {
 
   constructor(props){
     super(props);
-    this.state = {
-      tagFilter: '',
-      showTagsDropDown: false
-    };
   }
 
   bytesToHumanReadable(bytes){
@@ -28,64 +23,13 @@ class PatchStats extends Component {
     }
   }
 
-  handleAddTag(tag){
-    const {
-      tags
-    } = this.props;
-
-    if(tags.indexOf(tag) > -1){
-      return;
-    }
-
-    this.setState({
-      tagFilter: '',
-      showTagsDropDown: false
-    });
-
-    this.props.onChangeTags([
-      ...tags,
-      tag
-    ]);
-  }
-
-  handleTagFilterInputClick(){
-    this.setState({
-      showTagsDropDown: !this.state.showTagsDropDown
-    });
-  }
-
-  handleTagFilterChange(tagFilter){
-    this.setState({
-      tagFilter
-    });
-  }
-
-  handleDeleteTag(tag){
-    const {
-      tags
-    } = this.props;
-
-    this.setState({
-      showTagsDropDown: false
-    });
-
-    this.props.onChangeTags(tags.filter(existingTag => tag !== existingTag))
-  }
-
   render(){
     const {
-      tags,
       patch,
       editMode,
-      availableTagList,
       isSaving,
       savedSuccess
     } = this.props;
-
-    const {
-      tagFilter,
-      showTagsDropDown
-    } = this.state;
 
     if(!patch){
       return (
@@ -152,44 +96,6 @@ class PatchStats extends Component {
           </div>
           )
         }
-        <div className="patch-stats-row" style={{position: 'relative'}}>
-          { tags && tags.map( tag => <Tag editMode={editMode} onDelete={() => this.handleDeleteTag(tag)} key={tag} tag={tag} />) }
-        </div>
-        { editMode && (
-          <div className="patch-stats-row" style={{position: 'relative'}}>
-            <div styleName="tag-editor">
-              <input
-                styleName="tag-editor-filter-input"
-                style={{width: '100px'}}
-                type="text"
-                placeholder="add a tag"
-                value={tagFilter}
-                disabled={isSaving}
-                onClick={ e => this.handleTagFilterInputClick()}
-                onChange={(e) => this.handleTagFilterChange(e.target.value) }
-              />
-              { showTagsDropDown && (
-                <ul styleName="tag-dropdown">
-                  { availableTagList && availableTagList.filter( tag => {
-                    return !tagFilter || tag.toUpperCase().indexOf(tagFilter.toUpperCase()) !== -1;
-                  }).filter( tag => {
-                    return tags.indexOf(tag) === -1;
-                  }).map( (tag, i) => {
-                    return (
-                      <li
-                        key={i}
-                        onClick={() => this.handleAddTag(tag)}
-                      >
-                      {tag}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-
-            </div>
-          </div>
-        )}
       </div>
     );
   }
@@ -198,16 +104,9 @@ class PatchStats extends Component {
 PatchStats.propTypes = {
   patch: PropTypes.object,
   editMode: PropTypes.bool,
-  availableTagList: PropTypes.array,
-  tags: PropTypes.array,
-  onChangeTags: PropTypes.func,
   isSaving: PropTypes.bool
 };
 
-PatchStats.defaultProps = {
-  availableTagList: [],
-  tags: [],
-  onChangeTags: () => {}
-};
+PatchStats.defaultProps = {};
 
 export default CSSModules(PatchStats, styles);

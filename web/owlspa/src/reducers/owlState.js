@@ -1,3 +1,5 @@
+import { nextAvailableSlot } from 'utils';
+
 const initialState = {
   isConnected: false,
   midiInputs: null,
@@ -10,8 +12,10 @@ const initialState = {
   patchIsStoring: false,
   patchStoredSuccess: false,
   activePresetSlot: null,
+  nextAvailableSlot: null,
   firmWareVersion: null,
   status: null,
+  param: null,
   programMessage: null,
   programError: null,
   presets: [],
@@ -94,6 +98,15 @@ const owlState = (state = initialState, action) => {
         ...state,
         activePresetSlot: action.slot,
         programError: null,
+        programMessage: null,
+        status: null,
+        presets: (action.slot === 0) ? state.presets : state.presets.filter(preset => preset.slot !== 0),
+        nextAvailableSlot: nextAvailableSlot(state.presets),
+      }
+    case 'DEVICE_CONTROL_CHANGE':
+      return {
+        ...state,
+        param: action.param,
       }
     case 'CLEAR_PRESET_LIST':
       return {
@@ -112,7 +125,8 @@ const owlState = (state = initialState, action) => {
         presets: [
           ...state.presets.filter(preset => preset.slot !== action.slot),
           { name: action.name, slot: action.slot, size: action.size }
-        ]
+        ],
+        nextAvailableSlot: nextAvailableSlot(state.presets),
       };
     case 'DEVICE_RESOURCE_RECEIVED':
       return {
@@ -135,7 +149,8 @@ const owlState = (state = initialState, action) => {
     case 'OWL_PATCH_STATUS_RECEIVED':
       return {
         ...state,
-        status: action.status
+        status: action.status,
+        nextAvailableSlot: nextAvailableSlot(state.presets),
       }
     case 'OWL_PROGRAM_MESSAGE_RECEIVED':
       return {

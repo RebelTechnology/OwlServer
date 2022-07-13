@@ -7,9 +7,10 @@ import { IconButton } from 'components';
 class FloatParameter extends Component {
   constructor(props){
     super(props);
+
     this.state = {
       previousY: null,
-      parameterValue: 0
+      value: 0,
     }
 
     this.debouncedUpdateClientY = debounce( e => {
@@ -20,7 +21,7 @@ class FloatParameter extends Component {
   }
 
   updateParamValue(clientY){
-    const { previousY, parameterValue } = this.state;
+    const { previousY, value } = this.state;
     const { min, max } = this.props;
     const yDifference = previousY - clientY;
 
@@ -29,25 +30,29 @@ class FloatParameter extends Component {
     }
 
     this.setState({ previousY: clientY });
-    const newVal = parameterValue + yDifference;
+    const newVal = value + yDifference;
 
     if(newVal > max){
-      if(parameterValue !== max){
+      if(value !== max){
         this.setParameterValue(max);
       }
       return;
     }
     if(newVal < min){
-      if(parameterValue !== min){
+      if(value !== min){
         this.setParameterValue(min);
       }
       return;
     }
+
     this.setParameterValue(newVal);
   }
 
   setParameterValue(val){
-    this.setState({parameterValue: val});
+    if (this.props.param)
+      this.props.param.value = this.perc_to_midi(val);
+
+    this.setState({ value: val });
     this.props.onParamValueChange(val);
   }
 
@@ -88,18 +93,27 @@ class FloatParameter extends Component {
     this.debouncedUpdateClientY(e);
   }
 
-  shouldComponentUpdate(nextProps,nextState){
-    const { parameterValue, active } = this.state;
-    return nextState.parameterValue !== parameterValue || nextProps.active !== active;
+  midi_to_perc(v = 0) {
+    return Math.round((v / 127) * 100);
   }
 
-  getParameterValueAsRotationDegrees(val){
+  perc_to_midi(v = 0) {
+    return Math.round(v * 1.27);
+  }
+
+  shouldComponentUpdate(nextProps,nextState) {
+    if (this.props.param)
+      this.setState({ value: this.midi_to_perc(this.props.param.value) });
+
+    return (this.state.value !== nextState.value) || (nextProps.active !== this.state.active);
+  }
+
+  getParameterValueAsRotationDegrees(val) {
     return Math.round((val * 2.7) - 135);
   }
 
-  render(){
+  render() {
     const { name, active, editMode, isSaving, io, id, availableIds } = this.props;
-    const { parameterValue } = this.state;
 
     const isInputParam = io === 'input';
     const activeColor = isInputParam ? '#ed7800' : '#007095';
@@ -124,7 +138,7 @@ class FloatParameter extends Component {
           }}
           onTouchStart={e => isInputParam && active && this.handlePointerDown(e) }
           onTouchEnd={e => isInputParam && active && this.handlePointerUp(e) }
-          onMouseDown={e => isInputParam && this.handlePointerDown(e)}>
+          onMouseDown={e => isInputParam && this.handlePointerDown(e) }>
           { editMode && (
             <IconButton
               title="delete parameter"
@@ -149,7 +163,7 @@ class FloatParameter extends Component {
             />
           </svg>
           <svg
-            style={{position: 'absolute', top: 0, left: 0, transform: 'rotate('+ this.getParameterValueAsRotationDegrees(parameterValue)+'deg)'}}
+            style={{position: 'absolute', top: 0, left: 0, transform: 'rotate('+ this.getParameterValueAsRotationDegrees(this.state.value)+'deg)'}}
             width="100"
             height="100"
             viewBox="0 0 100 100">
@@ -170,7 +184,7 @@ class FloatParameter extends Component {
               ) : name
             }
           </span>
-          <span styleName="parameter-value">{parameterValue}</span>
+          <span styleName="parameter-value">{this.state.value}</span>
           { editMode && (
             <div styleName="parameter-id-dropdown" >
               <span>ID: </span>
@@ -184,8 +198,9 @@ class FloatParameter extends Component {
     );
   }
 
-  componentDidMount(){
-    this.setParameterValue(this.props.initialValue)
+  componentDidMount() {
+    if (this.props.param)
+      this.setParameterValue(this.midi_to_perc(this.props.param.value));
   }
 
 }
@@ -196,16 +211,16 @@ FloatParameter.propTypes = {
   io: PropTypes.string,
   active: PropTypes.bool,
   onParamValueChange: PropTypes.func,
-  initialValue: PropTypes.number,
   editMode: PropTypes.bool,
   availableIds: PropTypes.array,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  isSaving: PropTypes.bool
+  isSaving: PropTypes.bool,
+  param: PropTypes.object,
 }
 
 FloatParameter.defaultProps = {
-  initialValue: 0,
+  value: 0,
   min: 0,
   max: 100,
   onParamValueChange: () => {},
@@ -213,7 +228,8 @@ FloatParameter.defaultProps = {
   onDelete: () => {},
   active: false,
   name: '',
-  io: 'input'
+  io: 'input',
+  param: {},
 }
 
 export default CSSModules(FloatParameter, styles);

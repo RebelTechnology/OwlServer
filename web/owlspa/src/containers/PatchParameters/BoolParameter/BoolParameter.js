@@ -7,25 +7,28 @@ class BoolParameter extends Component {
 
   constructor(props){
     super(props);
+
     this.state = {
-      ledColour: '#ececec'
+      ledColour: '#ececec',
+      value: 0,
     }
   }
 
   handleButtonDown(e){
-    this.setState({
-      ledColour: 'green'
-    });
-
+    this.setParameterValue(127);
     this.props.onPushButtonDown(e);
   }
 
   handleButtonUp(e){
-    this.setState({
-      ledColour: '#ececec'
-    });
-
+    this.setParameterValue(0);
     this.props.onPushButtonUp(e);
+  }
+
+  setParameterValue(val){
+    this.setState({
+      value: val,
+      ledColour: (val ? 'green' : '#ececec')
+    });
   }
 
   render(){
@@ -40,7 +43,8 @@ class BoolParameter extends Component {
     } = this.props;
 
     const {
-      ledColour
+      ledColour,
+      value,
     } = this.state;
 
     const isInputParam = io === 'input';
@@ -83,7 +87,6 @@ class BoolParameter extends Component {
                 <option value="output">OUTPUT</option>
               </select>
             )}
-
           { !editMode && (<span styleName="parameter-io">{ isInputParam ? pid+' IN' : pid+' OUT' }</span>)}
           <div
             style={{
@@ -122,6 +125,22 @@ class BoolParameter extends Component {
     );
   }
 
+  componentDidMount(){
+    if (this.props.param)
+      this.setParameterValue(this.props.param.value);
+  }
+
+  shouldComponentUpdate(nextProps,nextState) {
+    let v = this.props.param ? this.props.param.value : undefined;
+
+    if (v !== undefined) this.setState({
+      value: v,
+      ledColour: (v ? 'green' : '#ececec'),
+    });
+
+    return (v !== this.state.value);
+  }
+
 }
 
 BoolParameter.propTypes = {
@@ -134,7 +153,8 @@ BoolParameter.propTypes = {
   onEdit: PropTypes.func,
   isSaving: PropTypes.bool,
   onPushButtonDown: PropTypes.func,
-  onPushButtonUp: PropTypes.func
+  onPushButtonUp: PropTypes.func,
+  param: PropTypes.object,
 };
 
 BoolParameter.defaultProps = {
@@ -142,7 +162,8 @@ BoolParameter.defaultProps = {
   onEdit: () => {},
   onDelete: () => {},
   onPushButtonDown: ()=>{},
-  onPushButtonUp: ()=>{}
+  onPushButtonUp: ()=>{},
+  param: {},
 };
 
 export default CSSModules(BoolParameter, styles);
