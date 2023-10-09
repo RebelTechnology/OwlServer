@@ -53,7 +53,7 @@ class FloatParameter extends Component {
       this.props.param.value = this.perc_to_midi(val);
 
     this.setState({ value: val });
-    this.props.onParamValueChange(val);
+    this.props.onParamValueChange(this.perc_to_midi(val));
   }
 
   handlePointerDown = (e) => {
