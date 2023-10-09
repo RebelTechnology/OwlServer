@@ -34,6 +34,12 @@ class PatchTileSmall extends Component {
     ]);
   }
 
+  handlePatchDetailsDescriptionChange(description){
+    this.setState({
+      description
+    });
+  }
+
   handleTagFilterInputClick(){
     this.setState({
       showTagsDropDown: !this.state.showTagsDropDown

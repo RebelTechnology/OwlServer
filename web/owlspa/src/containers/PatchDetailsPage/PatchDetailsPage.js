@@ -85,12 +85,6 @@ class PatchDetailsPage extends Component {
     this.props.deletePatch(patch, {redirect: 'my-patches'});
   }
 
-  handlePatchDetailsDescriptionChange(description){
-    this.setState({
-      description
-    });
-  }
-
   handlePatchDetailsInstructionsChange(instructions){
     this.setState({
       instructions
