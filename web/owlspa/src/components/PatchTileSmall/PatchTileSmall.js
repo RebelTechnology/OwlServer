@@ -34,12 +34,6 @@ class PatchTileSmall extends Component {
     ]);
   }
 
-  handlePatchDetailsDescriptionChange(description){
-    this.setState({
-      description
-    });
-  }
-
   handleTagFilterInputClick(){
     this.setState({
       showTagsDropDown: !this.state.showTagsDropDown
@@ -169,7 +163,7 @@ class PatchTileSmall extends Component {
           <PatchDetailsTile
             title="Description"
             text={description}
-            onTextChange={d => this.handlePatchDetailsDescriptionChange(d)}
+            onTextChange={d => this.props.onDescriptionChange(d)}
             isSaving={isSaving}
             editMode={editMode}
           /> :
@@ -227,6 +221,7 @@ PatchTileSmall.propTypes = {
   onDeletePatchClick: PropTypes.func,
   onChangePublished: PropTypes.func,
   onPatchNameChange: PropTypes.func,
+  onDescriptionChange: PropTypes.func,
   onStarClick: PropTypes.func,
   onSaveClick: PropTypes.func,
   onCancelClick: PropTypes.func,
@@ -240,6 +235,7 @@ PatchTileSmall.propTypes = {
 PatchTileSmall.defaultProps = {
   onChangePublished: () => {},
   onPatchNameChange: () => {},
+  onDescriptionChange: () => {},
   onSaveClick: () => {},
   onCancelClick: () => {},
   onEditClick: () => {},
