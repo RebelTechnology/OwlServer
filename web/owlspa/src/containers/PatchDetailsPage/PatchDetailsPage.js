@@ -85,6 +85,12 @@ class PatchDetailsPage extends Component {
     this.props.deletePatch(patch, {redirect: 'my-patches'});
   }
 
+  handlePatchDetailsDescriptionChange(description){
+    this.setState({
+      description
+    });
+  }
+
   handlePatchDetailsInstructionsChange(instructions){
     this.setState({
       instructions
@@ -193,7 +199,7 @@ class PatchDetailsPage extends Component {
       name
     });
   }
-
+    
   handleChangeSoundCloudArr(soundcloud){
     this.setState({
       soundcloud
@@ -372,6 +378,7 @@ class PatchDetailsPage extends Component {
               onCancelClick={() => this.handleOnCancelEditPatchClick()}
               onDeletePatchClick={(e)=>this.handleDeletePatchClick(e,patch)}
               onPatchNameChange={patchName => this.handlePatchNameChange(patchName)}
+              onDescriptionChange={description => this.handlePatchDetailsDescriptionChange(description)}
               onChangePublished={published => this.handleChangePublished(published)}
               onStarClick={(e)=> this.handleStarClick(e,patch, starForThisPatch)}
               starred={starred}
